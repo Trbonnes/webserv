@@ -8,7 +8,6 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include "Ifstream.hpp"
 
 #define PORT 8080
 int main(int argc, char const *argv[])
@@ -43,6 +42,15 @@ int main(int argc, char const *argv[])
         perror("In listen");
         exit(EXIT_FAILURE);
     }
+	int yes=1;
+	//char yes='1'; // Solaris people use this
+
+	// lose the pesky "Address already in use" error message
+	if (setsockopt(server_fd,SOL_SOCKET,SO_REUSEADDR,&yes,sizeof yes) == -1) 
+	{
+   		perror("setsockopt");
+   		exit(1);
+	}
     while(1)
     {
         printf("\n+++++++ Waiting for new connection ++++++++\n\n");
