@@ -21,6 +21,9 @@ int main(void)
     } else {
         int pollin_happened = pfds[0].revents & POLLIN;
 
+            printf("%d\n", pollin_happened);
+            printf("%d\n", pfds[0].revents);
+            printf("%d\n", POLLIN);
         if (pollin_happened) {
             printf("File descriptor %d is ready to read\n", pfds[0].fd);
         } else {
