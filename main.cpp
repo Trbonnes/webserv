@@ -3,6 +3,7 @@
 
 int     main(void)
 {
+    Config  config;
     Socket  socket;
     Methods method(socket);
 

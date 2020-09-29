@@ -38,6 +38,7 @@ class   Methods : public Config
     std::string         _date;
     std::string         _retryAfter;
     std::string         _transferEncoding;
+    std::string         _body;
     std::string         _methodsName[NB_METHODS];
     void                (*_method[NB_METHODS])(void);
 
