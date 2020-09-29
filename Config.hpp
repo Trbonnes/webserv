@@ -1,18 +1,21 @@
 #ifndef CONFIG_HPP
 # define CONFIG_HPP
 
+# include <iostream>
+
 class   Config
 {
-    private:
+    protected:
 
     std::string     _root;
 
     public:
+
     Config();
-    Config(Config &config);
+    Config(Config &copy);
     ~Config();
 
-    Config      &operator=(Config const &rhs);
+    Config          &operator=(Config const &rhs);
 
     std::string     getRoot();
 };
