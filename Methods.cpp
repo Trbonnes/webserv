@@ -1,6 +1,7 @@
 #include "Methods.hpp"
 
 Methods::Methods() :
+Config(),
 _socket(0),
 _response(0),
 _allow(""),
@@ -15,7 +16,8 @@ _contentLocation(""),
 _contentType(""),
 _date(""),
 _retryAfter(""),
-_transferEncoding("") {
+_transferEncoding(""),
+_body("") {
     _methodsName[GET] = "GET"; 
     _methodsName[HEAD] = "HEAD"; 
     _methodsName[POST] = "POST"; 
@@ -37,6 +39,7 @@ _transferEncoding("") {
 }
 
 Methods::Methods(Socket &socket) :
+Config(),
 _socket(socket),
 _response(0),
 _allow(""),
@@ -51,7 +54,8 @@ _contentLocation(""),
 _contentType(""),
 _date(""),
 _retryAfter(""),
-_transferEncoding("")
+_transferEncoding(""),
+_body("")
 {
     _methodsName[GET] = "GET"; 
     _methodsName[HEAD] = "HEAD"; 
@@ -110,7 +114,10 @@ Methods     &Methods::operator=(Methods const &rhs)
 
 void        Methods::get()
 {
-    std::cout << "GET" << std::endl;
+    std::string root;
+
+    root = _root;
+    root.append(_socket.getRequestURI());
     return ;
 }
 
