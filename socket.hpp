@@ -6,7 +6,7 @@
 /*   By: trbonnes <trbonnes@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/30 15:10:02 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/09/30 15:10:34 by trbonnes         ###   ########.fr       */
+/*   Updated: 2020/09/30 15:45:55 by trbonnes         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,7 @@ class   Socket
     std::string     _authorization;
     std::string     _host;
     std::string     _userAgent;
+	std::string		_referer;
 
     // BODY
 
@@ -48,7 +49,7 @@ class   Socket
 
     // PRIVATE FUNCTIONS
 
-    void            parser(void);
+    void            parseHTTP(void);
 
     public:
     Socket();
@@ -71,6 +72,7 @@ class   Socket
     std::string     getAuthorization();
     std::string     getHost();
     std::string     getUserAgent();
+	std::string		getReferer();
     std::string     getBody();
 };
 
