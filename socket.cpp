@@ -6,7 +6,7 @@
 /*   By: trbonnes <trbonnes@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/30 15:10:55 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/09/30 17:27:00 by trbonnes         ###   ########.fr       */
+/*   Updated: 2020/09/30 18:12:19 by trbonnes         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -105,62 +105,62 @@ std::string     Socket::getRequestURI()
     return _requestURI;
 }
 
-std::string     Socket::gethttpVersion()
+std::string     Socket::getHttpVersion()
 {
     return _httpVersion;
 }
 
-std::list<std::string>     Socket::getContentLength()
+std::vector<std::string>     Socket::getContentLength()
 {
     return _contentLength;
 }
 
-std::list<std::string>     Socket::getContentLocation()
+std::vector<std::string>     Socket::getContentLocation()
 {
     return _contentLocation;
 }
 
-std::list<std::string>     Socket::getContentType()
+std::vector<std::string>     Socket::getContentType()
 {
     return _contentType;
 }
 
-std::list<std::string>     Socket::getDate()
+std::vector<std::string>     Socket::getDate()
 {
     return _date;
 }
 
-std::list<std::string>     Socket::getTransferEncoding()
+std::vector<std::string>     Socket::getTransferEncoding()
 {
     return _transferEncoding;
 }
 
-std::list<std::string>     Socket::getAcceptCharset()
+std::vector<std::string>     Socket::getAcceptCharset()
 {
     return _acceptCharset;
 }
 
-std::list<std::string>     Socket::getAcceptLanguage()
+std::vector<std::string>     Socket::getAcceptLanguage()
 {
     return _acceptLanguage;
 }
 
-std::list<std::string>     Socket::getAuthorization()
+std::vector<std::string>     Socket::getAuthorization()
 {
     return _authorization;
 }
 
-std::list<std::string>     Socket::getHost()
+std::vector<std::string>     Socket::getHost()
 {
     return _host;
 }
 
-std::list<std::string>     Socket::getUserAgent()
+std::vector<std::string>     Socket::getUserAgent()
 {
     return _userAgent;
 }
 
-std::list<std::string> Socket::getReferer()
+std::vector<std::string> Socket::getReferer()
 {
 	return _referer;
 }
@@ -184,51 +184,51 @@ void	Socket::setRequestURI(std::string RequestURI) {
 	_requestURI = RequestURI;
 }
 
-void	Socket::sethttpVersion(std::string httpVersion) {
+void	Socket::setHttpVersion(std::string httpVersion) {
 	_httpVersion = httpVersion;
 }
 
-void	Socket::setContentLength(std::list<std::string> ContentLength) {
+void	Socket::setContentLength(std::vector<std::string> ContentLength) {
 	_contentLength = ContentLength;
 }
 
-void	Socket::setContentLocation(std::list<std::string> ContentLocation) {
+void	Socket::setContentLocation(std::vector<std::string> ContentLocation) {
 	_contentLocation = ContentLocation;
 }
 
-void	Socket::setContentType(std::list<std::string> ContentType) {
+void	Socket::setContentType(std::vector<std::string> ContentType) {
 	_contentType = ContentType;
 }
 
-void	Socket::setDate(std::list<std::string> Date) {
+void	Socket::setDate(std::vector<std::string> Date) {
 	_date = Date;
 }
 
-void	Socket::setTransferEncoding(std::list<std::string> TransferEncoding) {
+void	Socket::setTransferEncoding(std::vector<std::string> TransferEncoding) {
 	_transferEncoding = TransferEncoding;
 }
 
-void	Socket::setAcceptCharset(std::list<std::string> AcceptCharset) {
+void	Socket::setAcceptCharset(std::vector<std::string> AcceptCharset) {
 	_acceptCharset = AcceptCharset;
 }
 
-void	Socket::setAcceptLanguage(std::list<std::string> AcceptLanguage) {
+void	Socket::setAcceptLanguage(std::vector<std::string> AcceptLanguage) {
 	_acceptLanguage = AcceptLanguage;
 }
 
-void	Socket::setAuthorization(std::list<std::string> Authorization) {
+void	Socket::setAuthorization(std::vector<std::string> Authorization) {
 	_authorization = Authorization;
 }
 
-void	Socket::setHost(std::list<std::string> Host) {
+void	Socket::setHost(std::vector<std::string> Host) {
 	_host = Host;
 }
 
-void	Socket::setUserAgent(std::list<std::string> UserAgent) {
+void	Socket::setUserAgent(std::vector<std::string> UserAgent) {
 	_userAgent = UserAgent;
 }
 
-void	Socket::setReferer(std::list<std::string> Referer) {
+void	Socket::setReferer(std::vector<std::string> Referer) {
 	_referer = Referer;
 }
 
