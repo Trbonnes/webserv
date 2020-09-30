@@ -6,47 +6,46 @@
 /*   By: trbonnes <trbonnes@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/30 15:10:55 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/09/30 15:54:18 by trbonnes         ###   ########.fr       */
+/*   Updated: 2020/09/30 17:27:00 by trbonnes         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "Socket.hpp"
+#include "socket.hpp"
 
 Socket::Socket() :
 _fd(0),
-_method("GET"),
-_requestURI("/index.html"),
-_httpVersion("HTTP/1.1"),
-_contentLength(""),
-_contentLocation(""),
-_contentType(""),
-_date(""),
-_transferEncoding(""),
-_acceptCharset(""),
-_acceptLanguage("en-US,en;q="".9"),
-_authorization(""),
-_host("localhost"),
-_userAgent("Mozilla/5."" (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/8""."".3987.149 Safari/537.36"),
-_body("") {
+_method(),
+_requestURI(),
+_httpVersion(),
+_contentLength(),
+_contentLocation(),
+_contentType(),
+_date(),
+_transferEncoding(),
+_acceptCharset(),
+_acceptLanguage(),
+_authorization(),
+_host(),
+_userAgent(),
+_body() {
 }
 
 Socket::Socket(int fd) :
 _fd(fd),
-_method(""),
-_requestURI(""),
-_httpVersion(""),
-_contentLength(""),
-_contentLocation(""),
-_contentType(""),
-_date(""),
-_transferEncoding(""),
-_acceptCharset(""),
-_acceptLanguage(""),
-_authorization(""),
-_host(""),
-_userAgent(""),
-_body("") {
-	parseHTTP();
+_method(),
+_requestURI(),
+_httpVersion(),
+_contentLength(),
+_contentLocation(),
+_contentType(),
+_date(),
+_transferEncoding(),
+_acceptCharset(),
+_acceptLanguage(),
+_authorization(),
+_host(),
+_userAgent(),
+_body() {
 }
 
 Socket::Socket(Socket const &copy)
@@ -91,9 +90,9 @@ Socket      &Socket::operator=(Socket const &rhs)
     return *this;
 }
 
-void        Socket::parseHTTP(void)
+int				Socket::getFd()
 {
-    return ;
+	return _fd;
 }
 
 std::string     Socket::getMethod()
@@ -111,57 +110,57 @@ std::string     Socket::gethttpVersion()
     return _httpVersion;
 }
 
-std::string     Socket::getContentLenght()
+std::list<std::string>     Socket::getContentLength()
 {
     return _contentLength;
 }
 
-std::string     Socket::getContentLocation()
+std::list<std::string>     Socket::getContentLocation()
 {
     return _contentLocation;
 }
 
-std::string     Socket::getContentType()
+std::list<std::string>     Socket::getContentType()
 {
     return _contentType;
 }
 
-std::string     Socket::getDate()
+std::list<std::string>     Socket::getDate()
 {
     return _date;
 }
 
-std::string     Socket::getTransferEncoding()
+std::list<std::string>     Socket::getTransferEncoding()
 {
     return _transferEncoding;
 }
 
-std::string     Socket::getAcceptCharset()
+std::list<std::string>     Socket::getAcceptCharset()
 {
     return _acceptCharset;
 }
 
-std::string     Socket::getAcceptLanguage()
+std::list<std::string>     Socket::getAcceptLanguage()
 {
     return _acceptLanguage;
 }
 
-std::string     Socket::getAuthorization()
+std::list<std::string>     Socket::getAuthorization()
 {
     return _authorization;
 }
 
-std::string     Socket::getHost()
+std::list<std::string>     Socket::getHost()
 {
     return _host;
 }
 
-std::string     Socket::getUserAgent()
+std::list<std::string>     Socket::getUserAgent()
 {
     return _userAgent;
 }
 
-std::string Socket::getReferer()
+std::list<std::string> Socket::getReferer()
 {
 	return _referer;
 }
@@ -169,4 +168,70 @@ std::string Socket::getReferer()
 std::string     Socket::getBody()
 {
     return _body;
+}
+
+
+
+void	Socket::setFd(int fd) {
+	_fd = fd;
+}
+
+void	Socket::setMethod(std::string method) {
+	_method = method;
+}
+
+void	Socket::setRequestURI(std::string RequestURI) {
+	_requestURI = RequestURI;
+}
+
+void	Socket::sethttpVersion(std::string httpVersion) {
+	_httpVersion = httpVersion;
+}
+
+void	Socket::setContentLength(std::list<std::string> ContentLength) {
+	_contentLength = ContentLength;
+}
+
+void	Socket::setContentLocation(std::list<std::string> ContentLocation) {
+	_contentLocation = ContentLocation;
+}
+
+void	Socket::setContentType(std::list<std::string> ContentType) {
+	_contentType = ContentType;
+}
+
+void	Socket::setDate(std::list<std::string> Date) {
+	_date = Date;
+}
+
+void	Socket::setTransferEncoding(std::list<std::string> TransferEncoding) {
+	_transferEncoding = TransferEncoding;
+}
+
+void	Socket::setAcceptCharset(std::list<std::string> AcceptCharset) {
+	_acceptCharset = AcceptCharset;
+}
+
+void	Socket::setAcceptLanguage(std::list<std::string> AcceptLanguage) {
+	_acceptLanguage = AcceptLanguage;
+}
+
+void	Socket::setAuthorization(std::list<std::string> Authorization) {
+	_authorization = Authorization;
+}
+
+void	Socket::setHost(std::list<std::string> Host) {
+	_host = Host;
+}
+
+void	Socket::setUserAgent(std::list<std::string> UserAgent) {
+	_userAgent = UserAgent;
+}
+
+void	Socket::setReferer(std::list<std::string> Referer) {
+	_referer = Referer;
+}
+
+void	Socket::setBody(std::string Body) {
+	_body = Body;
 }
