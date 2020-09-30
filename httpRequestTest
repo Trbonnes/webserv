@@ -1,0 +1,13 @@
+GET /hello.html HTTP/1.1
+Host: localhost:8000
+User-Agent: Mozilla/5.0 (Macintosh;...) ... Firefox/51.0
+Accept : text/html,aplication/xhtml+xml,...,*/*;q=0.8
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+Connection: keep-alive
+Upgrade-Insecure-Requests: 1
+Content-Type: multipart/form-data; boundary=-12656964
+Content-Length: 345
+
+-12656974
+[...]
