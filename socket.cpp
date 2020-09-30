@@ -6,7 +6,7 @@
 /*   By: trbonnes <trbonnes@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/30 15:10:55 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/09/30 15:11:49 by trbonnes         ###   ########.fr       */
+/*   Updated: 2020/09/30 15:14:12 by trbonnes         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,7 +68,8 @@ Socket::Socket(Socket const &copy)
     _body = copy._body;
 }
 
-Socket::~Socket() {}
+Socket::~Socket() {
+}
 
 Socket      &Socket::operator=(Socket const &rhs)
 {
