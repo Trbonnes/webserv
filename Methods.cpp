@@ -26,17 +26,6 @@ _body("") {
     _methodsName[OPTIONS] = "OPTIONS"; 
     _methodsName[TRACE] = "TRACE"; 
     _methodsName[PATCH] = "PATCH"; 
-    // _method[GET] = &Methods::get; 
-    // _method[HEAD] = &Methods::head; 
-    // _method[POST] = &Methods::post; 
-    // _method[PUT] = &Methods::put; 
-    // _method[DELETE] = &Methods::del; 
-    // _method[CONNECT] = &Methods::connect; 
-    // _method[OPTIONS] = &Methods::options; 
-    // _method[TRACE] = &Methods::trace; 
-    // _method[PATCH] = &Methods::patch; 
-
-    std::cout << "Default constructor Methods" << std::endl;
 }
 
 Methods::Methods(Socket &socket) :
@@ -66,28 +55,8 @@ _body("")
     _methodsName[OPTIONS] = "OPTIONS"; 
     _methodsName[TRACE] = "TRACE"; 
     _methodsName[PATCH] = "PATCH"; 
-    // _method[GET] = &Methods::get; 
-    // _method[HEAD] = &Methods::head; 
-    // _method[POST] = &Methods::post; 
-    // _method[PUT] = &Methods::put; 
-    // _method[DELETE] = &Methods::del; 
-    // _method[CONNECT] = &Methods::connect; 
-    // _method[OPTIONS] = &Methods::options; 
-    // _method[TRACE] = &Methods::trace; 
-    // _method[PATCH] = &Methods::patch; 
-
-    std::cout << "Constructor Methods" << std::endl;
 
     int     i;
-
-    // i = 0;
-    // while (i < NB_METHODS)
-    // {
-    //     if (_socket.getMethod().compare(_methodsName[i]) == 0)
-    //         _method[i]();
-    //     i++;
-    // }
-    // int     i;
 
     i = 0;
     while (i < NB_METHODS)
@@ -95,7 +64,8 @@ _body("")
         if (_socket.getMethod().compare(_methodsName[i]) == 0)
             callMethod(i);
         i++;
-    }    
+    }
+    _error = BAD_REQUEST;
 }
 
 Methods::Methods(Methods const &copy)
@@ -145,15 +115,7 @@ void        Methods::callMethod(int method)
         patch();
 }
 
-void        Methods::get()
-{
-    std::string root;
-    Config      config;
 
-    root.assign(config.getRoot());
-    root.append(_socket.getRequestURI());
-    return ;
-}
 
 void        Methods::head()
 {

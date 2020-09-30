@@ -1,8 +1,8 @@
 #include "Config.hpp"
 
 Config::Config() :
-_root("/home/pauline/webserver/www") {
-    std::cout << "Config constructor" << std::endl;
+_root("/sgoinfre/goinfre/Perso/pganglof/webserver/www"),
+_serverName("localhost") {
 }
 
 Config::Config(Config &copy)
@@ -23,3 +23,7 @@ std::string    Config::getRoot()
     return _root;
 }
 
+std::string     Config::getServerName()
+{
+    return _serverName;
+}
