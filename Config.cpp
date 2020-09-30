@@ -1,7 +1,9 @@
 #include "Config.hpp"
 
 Config::Config() :
-_root("/home/pauline/webserver/www") {}
+_root("/home/pauline/webserver/www") {
+    std::cout << "Config constructor" << std::endl;
+}
 
 Config::Config(Config &copy)
 {

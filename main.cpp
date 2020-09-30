@@ -3,7 +3,7 @@
 
 int     main(void)
 {
-    Config  config;
+    // Config  config;
     Socket  socket;
     Methods method(socket);
 
