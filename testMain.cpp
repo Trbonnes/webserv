@@ -6,7 +6,7 @@
 /*   By: trbonnes <trbonnes@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/30 15:30:52 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/09/30 18:11:59 by trbonnes         ###   ########.fr       */
+/*   Updated: 2020/09/30 18:52:37 by trbonnes         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,9 @@ int main() {
     std::cout << socket->getAcceptCharset().front() << std::endl;
     std::cout << socket->getAcceptLanguage().front() << std::endl;
     std::cout << socket->getAuthorization().front() << std::endl;
+    */
     std::cout << socket->getHost().front() << std::endl;
+    /*
     std::cout << socket->getUserAgent().front() << std::endl;
 	std::cout << socket->getReferer().front() << std::endl;
     std::cout << socket->getBody() << std::endl;
