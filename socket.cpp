@@ -6,7 +6,7 @@
 /*   By: trbonnes <trbonnes@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/30 15:10:55 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/09/30 15:14:12 by trbonnes         ###   ########.fr       */
+/*   Updated: 2020/09/30 15:54:18 by trbonnes         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,7 @@ _authorization(""),
 _host(""),
 _userAgent(""),
 _body("") {
-    parser();
+	parseHTTP();
 }
 
 Socket::Socket(Socket const &copy)
@@ -91,7 +91,7 @@ Socket      &Socket::operator=(Socket const &rhs)
     return *this;
 }
 
-void        Socket::parser(void)
+void        Socket::parseHTTP(void)
 {
     return ;
 }
@@ -159,6 +159,11 @@ std::string     Socket::getHost()
 std::string     Socket::getUserAgent()
 {
     return _userAgent;
+}
+
+std::string Socket::getReferer()
+{
+	return _referer;
 }
 
 std::string     Socket::getBody()
