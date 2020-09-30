@@ -6,7 +6,7 @@
 /*   By: trbonnes <trbonnes@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/30 15:30:52 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/09/30 17:25:42 by trbonnes         ###   ########.fr       */
+/*   Updated: 2020/09/30 18:11:59 by trbonnes         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,12 +18,12 @@ int main() {
 
 	int fd = open("./httpRequestTest", O_RDONLY);
     Socket *socket = httpRequestParser(fd);
-	(void)socket;
-    /*
+
     std::cout << socket->getFd() << std::endl;
     std::cout << socket->getMethod() << std::endl;
-    std::cout << socket->getRequestURI() << std::endl;
-    std::cout << socket->gethttpVersion() << std::endl;
+	std::cout << socket->getRequestURI() << std::endl;
+    std::cout << socket->getHttpVersion() << std::endl;
+    /*
     std::cout << socket->getContentLength().front() << std::endl;
     std::cout << socket->getContentLocation().front() << std::endl;
     std::cout << socket->getContentType().front() << std::endl;

@@ -1,5 +1,5 @@
 CXX = clang++
-CXXFLAGS = -Wall -Wextra -Werror
+CXXFLAGS = -Wall -Wextra -Werror -g3 -fsanitize=address
 
 SRCS = $(wildcard *.cpp)
 OBJECTS = $(subst .cpp,.o,$(SRCS))
