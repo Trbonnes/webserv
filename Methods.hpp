@@ -2,8 +2,13 @@
 # define METHODS_HPP
 
 # include <iostream>
-# include "Socket.hpp"
-# include "Config.hpp"
+# include <unistd.h>
+# include <sys/types.h>
+# include <sys/stat.h>
+# include <fcntl.h>
+# include "TEST/Socket.hpp"
+# include "TEST/Config.hpp"
+# include "error.hpp"
 
 enum
 {
@@ -48,14 +53,32 @@ class   Methods : public Config
 
     void            callMethod(int method);
 
+    // GET
     void            get(void);
+    void            openFile(std::string root);
+
+    // HEAD
     void            head(void);
+
+    // POST
     void            post(void);
+
+    // PUT
     void            put(void);
+
+    // DEL
     void            del(void);
+
+    // CONNECT
     void            connect(void);
+
+    // OPTIONS
     void            options(void);
+
+    // TRACE
     void            trace(void);
+
+    // PATCH
     void            patch(void);
 
     

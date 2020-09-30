@@ -1,21 +1,25 @@
-CXX = clang++
-CXXFLAGS = -Wall -Wextra -Werror -g3 -fsanitize=address
+SRCS =	TEST/main.cpp \
+		TEST/Socket.cpp \
+		TEST/Config.cpp	\
+		Methods.cpp		\
+		get.cpp
 
-SRCS = $(wildcard *.cpp)
-OBJECTS = $(subst .cpp,.o,$(SRCS))
+OBJS = $(SRCS:.cpp=.o)
+NAME = methods
+RM = rm -f
+CC = clang++
+CFLAGS = -Wall -Wextra -Werror 
 
-NAME = htppParser
+all: $(NAME)
 
-all:	$(NAME)
-
-$(NAME):	$(OBJECTS)
-			$(CXX) $(CXXFLAGS) $(OBJECTS) -o $(NAME)
+$(NAME): $(OBJS)
+	$(CC) $(CFLAGS) $(OBJS) -o $(NAME)
 
 clean:
-		rm -f $(OBJECTS)
+	$(RM) $(OBJS) 
 
 fclean: clean
-		rm -f $(NAME)
+	$(RM) $(NAME)
 
 re: fclean all
 
