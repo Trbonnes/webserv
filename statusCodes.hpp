@@ -1,5 +1,5 @@
-#ifndef ERROR_HPP
-# define ERROR_HPP
+#ifndef STATUSCODES_HPP
+# define STATUSCODES_HPP
 
 // INFORMATIONAL
 

@@ -65,7 +65,7 @@ _body("")
             callMethod(i);
         i++;
     }
-    _error = BAD_REQUEST;
+    _statusCode = BAD_REQUEST;
 }
 
 Methods::Methods(Methods const &copy)
