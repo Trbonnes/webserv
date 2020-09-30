@@ -8,7 +8,7 @@
 # include <fcntl.h>
 # include "TEST/Socket.hpp"
 # include "TEST/Config.hpp"
-# include "error.hpp"
+# include "statusCodes.hpp"
 
 enum
 {
@@ -30,7 +30,7 @@ class   Methods : public Config
 
     Socket          _socket;
     int             _response;
-    int             _error;
+    int             _statusCode;
     std::string     _allow;
     std::string     _wwwAuthenticate;
     std::string     _referer;
@@ -55,7 +55,8 @@ class   Methods : public Config
 
     // GET
     void            get(void);
-    void            openFile(std::string root);
+    int             openFile(std::string root);
+    void            copyFile(int fd);
 
     // HEAD
     void            head(void);
