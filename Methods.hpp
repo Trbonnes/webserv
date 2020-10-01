@@ -7,6 +7,7 @@
 # include <sys/stat.h>
 # include <string>
 # include <fcntl.h>
+# include <algorithm>
 # include "TEST/Socket.hpp"
 # include "TEST/Config.hpp"
 # include "statusCodes.hpp"

@@ -49,8 +49,6 @@ void        Methods::setContentType(std::string root)
     std::list<std::string>::iterator it;
 
     find = root.find('.', 0);
-    if (find == -1)
-        _contentType = "txt";
     find += 1;
     length = root.length() - find;
     _contentType = root.substr(find, length);
@@ -65,7 +63,7 @@ void        Methods::setContentType(std::string root)
     if (find >= 0)
         _contentType = (*it).substr(0, (*it).find(" "));
     else
-        _contentType = "text/plain";
+        _contentType = getDefaultType();
 }
 
 int         Methods::openFile(std::string root)
@@ -157,6 +155,7 @@ std::string     Methods::acceptLanguage()
     std::vector<std::string>::iterator itClientEnd;
     std::vector<std::string>::iterator itServerBegin;
     std::vector<std::string>::iterator itServerEnd;
+    std::vector<std::string>::iterator itServer;
     std::string str;
 
     str.assign("/");
@@ -165,13 +164,11 @@ std::string     Methods::acceptLanguage()
     itServerEnd = getDefaultLanguage().end();
     while (itClientBegin != itClientEnd)
     {
-        itServerBegin = getDefaultLanguage().begin();
-        while (itServerBegin != itServerEnd && (*itClientBegin).compare(*itServerBegin) != 0)
-            itServerBegin++;
-        if (itServerBegin != itServerEnd)
+        itServer = std::find(getDefaultLanguage().begin(), getDefaultLanguage().end(), *itClientBegin);
+        if (itServer != itServerEnd)
         {
-            _contentLanguage = *itServerBegin;
-            return (str.append(*itServerBegin));
+            _contentLanguage = *itServer;
+            return (str.append(*itServer));
         }
         itClientBegin++;
     }
