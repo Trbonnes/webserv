@@ -3,9 +3,22 @@
 Config::Config() :
 _root("/sgoinfre/goinfre/Perso/pganglof/webserver/www"),
 _serverName("localhost"),
-_index(0) {
+_index(0),
+_defaultType("text/plain") {
     _index.push_back("index.php");
     _index.push_back("index.html");
+
+    //** open mime.types **
+    int     ret;
+    int     fd;
+    char    *line;
+
+    if ((fd = open("../mime.types", O_RDONLY)) >= 0)
+    {
+        while ((ret = get_next_line(fd, &line)) > 0)
+            _mimeTypes.push_back(std::string(line));
+        close (fd);
+    }
 }
 
 Config::Config(Config &copy)
@@ -31,7 +44,17 @@ std::string             Config::getServerName()
     return _serverName;
 }
 
-std::list<std::string>  Config::getIndex()
+std::list<std::string>  &Config::getIndex()
 {
     return _index;
+}
+
+std::string             Config::getDefaultType()
+{
+    return _defaultType;
+}
+
+std::list<std::string>  &Config::getMimeTypes()
+{
+    return _mimeTypes;
 }
