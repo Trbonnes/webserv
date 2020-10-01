@@ -35,17 +35,17 @@ class   Socket
 
     // HEADERS
 
-    std::vector<std::string>	_contentLength;
-    std::vector<std::string>	_contentLocation;
-    std::vector<std::string>	_contentType;
-    std::vector<std::string>	_date;
-    std::vector<std::string>	_transferEncoding;
+    std::string	                _contentLength;
+    std::string	                _contentLocation;
+    std::string	                _contentType;
+    std::string	                _date;
+    std::string	                _transferEncoding;
     std::vector<std::string>	_acceptCharset;
     std::vector<std::string>	_acceptLanguage;
-    std::vector<std::string>	_authorization;
-    std::vector<std::string>	_host;
-    std::vector<std::string>	_userAgent;
-	std::vector<std::string>	_referer;
+    std::string                 _authorization;
+    std::string	                _host;
+    std::string	                _userAgent;
+	std::string	                _referer;
 
     // BODY
 
@@ -64,17 +64,17 @@ class   Socket
     std::string     			getMethod();
     std::string     			getRequestURI();
     std::string     			getHttpVersion();
-    std::vector<std::string>	getContentLength();
-    std::vector<std::string>	getContentLocation();
-    std::vector<std::string>	getContentType();
-    std::vector<std::string>	getDate();
-    std::vector<std::string>	getTransferEncoding();
+    std::string	                getContentLength();
+    std::string	                getContentLocation();
+    std::string	                getContentType();
+    std::string	                getDate();
+    std::string	                getTransferEncoding();
     std::vector<std::string>	getAcceptCharset();
     std::vector<std::string>	getAcceptLanguage();
-    std::vector<std::string>	getAuthorization();
-    std::vector<std::string>	getHost();
-    std::vector<std::string>	getUserAgent();
-	std::vector<std::string>	getReferer();
+    std::string	                getAuthorization();
+    std::string	                getHost();
+    std::string	                getUserAgent();
+	std::string	                getReferer();
     std::string     			getBody();
 
 
@@ -82,17 +82,17 @@ class   Socket
     void	setMethod(std::string method);
     void	setRequestURI(std::string RequestURI);
     void	setHttpVersion(std::string httpVersion);
-    void	setContentLength(std::vector<std::string> ContentLength);
-    void	setContentLocation(std::vector<std::string> ContentLocation);
-    void	setContentType(std::vector<std::string> ContentType);
-    void	setDate(std::vector<std::string> Date);
-    void	setTransferEncoding(std::vector<std::string> TransferEncoding);
+    void	setContentLength(std::string ContentLength);
+    void	setContentLocation(std::string ContentLocation);
+    void	setContentType(std::string ContentType);
+    void	setDate(std::string Date);
+    void	setTransferEncoding(std::string TransferEncoding);
     void	setAcceptCharset(std::vector<std::string> AcceptCharset);
     void	setAcceptLanguage(std::vector<std::string> AcceptLanguage);
-    void	setAuthorization(std::vector<std::string> Authorization);
-    void	setHost(std::vector<std::string> Host);
-    void	setUserAgent(std::vector<std::string> UserAgent);
-	void	setReferer(std::vector<std::string> Referer);
+    void	setAuthorization(std::string Authorization);
+    void	setHost(std::string Host);
+    void	setUserAgent(std::string UserAgent);
+	void	setReferer(std::string Referer);
     void	setBody(std::string Body);
 };
 
