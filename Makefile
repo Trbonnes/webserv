@@ -1,7 +1,8 @@
-SRCS =	TEST/main.cpp \
-		TEST/Socket.cpp \
-		TEST/Config.cpp	\
-		Methods.cpp		\
+SRCS =	TEST/main.cpp 			\
+		TEST/Socket.cpp 		\
+		TEST/Config.cpp			\
+		utils/get_next_line.cpp \
+		Methods.cpp				\
 		get.cpp
 
 OBJS = $(SRCS:.cpp=.o)

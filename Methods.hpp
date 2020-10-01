@@ -5,6 +5,7 @@
 # include <unistd.h>
 # include <sys/types.h>
 # include <sys/stat.h>
+# include <string>
 # include <fcntl.h>
 # include "TEST/Socket.hpp"
 # include "TEST/Config.hpp"
@@ -56,7 +57,9 @@ class   Methods : public Config
     // GET
     void            get(void);
     int             openFile(std::string root);
-    void            copyFile(int fd);
+    int             setRoot(std::string &root);
+    void            setBody(int fd);
+    void            setContentType(std::string root);
 
     // HEAD
     void            head(void);
