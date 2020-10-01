@@ -60,6 +60,7 @@ class   Methods : public Config
     int             setRoot(std::string &root);
     void            setBody(int fd);
     void            setContentType(std::string root);
+    std::string     acceptLanguage();
 
     // HEAD
     void            head(void);

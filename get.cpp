@@ -18,10 +18,10 @@ void        Methods::get()
         setContentType(root);
     }
 
-    std::cout << root << std::endl;
-    std::cout << _body << std::endl;
-    std::cout << _contentType << std::endl;
-    std::cout << _statusCode << std::endl;
+    std::cout << "ROOT: " << root << std::endl << std::endl;
+    std::cout << "STATUS CODE: " << _statusCode << std::endl << std::endl;
+    std::cout << "CONTENT TYPE: " << _contentType << std::endl << std::endl;
+    std::cout << "BODY: " << std::endl << _body << std::endl << std::endl;
 
     return ;
 }
@@ -37,23 +37,20 @@ void        Methods::setContentType(std::string root)
     find = root.find('.', 0);
     if (find == -1)
         _contentType = "txt";
-    else
+    find += 1;
+    length = root.length() - find;
+    _contentType = root.substr(find, length);
+    it = getMimeTypes().begin();
+    while (it != getMimeTypes().end())
     {
-        find += 1;
-        length = root.length() - find;
-        _contentType = root.substr(find, length);
-        // mimeTypes = getMimeTypes();
-        it = getMimeTypes().begin();
-        while (it != getMimeTypes().end())
-        {
-            (*it).find(_contentType);
-            it++;
-        }
-        if (it != getMimeTypes().end())
-            _contentType = (*it).substr(0, (*it).find(" "));
-        else
-            _contentType = "text/plain";
+        if ((find = (*it).find(_contentType)) >= 0)
+            break ;
+        it++;
     }
+    if (find >= 0)
+        _contentType = (*it).substr(0, (*it).find(" "));
+    else
+        _contentType = "text/plain";
 }
 
 int         Methods::openFile(std::string root)
@@ -86,6 +83,8 @@ int         Methods::setRoot(std::string &root)
         {
             root.assign(getRoot());
             root.append("/");
+            root.append(acceptLanguage());
+            root.append("/");
             root.append(*it);
 
             //** Open and test if the file exist **
@@ -104,12 +103,14 @@ int         Methods::setRoot(std::string &root)
             find = root.append(_socket.getRequestURI()).find(getServerName());
             root.erase(0, find + getServerName().length());
             root.insert(0, getRoot());
+            root.append(acceptLanguage());
         }
         else
         {
             //** Relative path **
 
             root.assign(getRoot());
+            root.append(acceptLanguage());
             root.append(_socket.getRequestURI());
         }
         //** Open and test if the file exist **
@@ -132,4 +133,25 @@ void        Methods::setBody(int fd)
     if (ret == -1)
         _statusCode = INTERNAL_SERVER_ERROR;
     close(fd);
+}
+
+//** Define the language page **
+std::string     Methods::acceptLanguage()
+{
+    std::vector<std::string>::iterator itClient;
+    std::vector<std::string>::iterator itServer;
+    std::string str;
+
+    str.assign("/");
+    itClient = _socket.getAcceptLanguage().begin();
+    while (itClient != _socket.getAcceptLanguage().end())
+    {
+        itServer = getDefaultLanguage().begin();
+        while (itServer != getDefaultLanguage().end() && (*itClient).compare(*itServer) != 0)
+            itServer++;
+        if (itServer != getDefaultLanguage().end())
+            return (str.append(*itServer));
+        itClient++;
+    }
+    return (str.append(*(getDefaultLanguage().begin())));
 }

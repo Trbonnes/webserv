@@ -7,18 +7,20 @@
 # include <sys/types.h>
 # include <sys/stat.h>
 # include <fcntl.h>
-# include <string>
+# include <vector>
 # include "../utils/utils.hpp"
 
 class   Config
 {
     private:
 
-    std::string             _root;
-    std::string             _serverName;
-    std::list<std::string>  _index;
-    std::string             _defaultType;
-    std::list<std::string>  _mimeTypes;
+    std::string                 _root;
+    std::string                 _serverName;
+    std::list<std::string>      _index;
+    std::string                 _defaultType;
+    std::list<std::string>      _mimeTypes;
+    std::string                 _configFiles;
+    std::vector<std::string>    _defaultLanguage;
 
     public:
 
@@ -33,6 +35,7 @@ class   Config
     std::list<std::string>  &getIndex();
     std::string             getDefaultType();
     std::list<std::string>  &getMimeTypes();
+    std::vector<std::string> &getDefaultLanguage();
 };
 
 #endif

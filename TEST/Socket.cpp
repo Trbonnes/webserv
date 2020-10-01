@@ -11,11 +11,12 @@ _contentType(""),
 _date(""),
 _transferEncoding(""),
 _acceptCharset(""),
-_acceptLanguage("en-US,en;q="".9"),
 _authorization(""),
 _host("localhost"),
 _userAgent("Mozilla/5."" (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/8""."".3987.149 Safari/537.36"),
 _body("") {
+    _acceptLanguage.push_back("de");
+    _acceptLanguage.push_back("en");
 }
 
 Socket::Socket(int fd) :
@@ -29,7 +30,7 @@ _contentType(""),
 _date(""),
 _transferEncoding(""),
 _acceptCharset(""),
-_acceptLanguage(""),
+_acceptLanguage(),
 _authorization(""),
 _host(""),
 _userAgent(""),
@@ -128,7 +129,7 @@ std::string     Socket::getAcceptCharset()
     return _acceptCharset;
 }
 
-std::string     Socket::getAcceptLanguage()
+std::vector<std::string>     &Socket::getAcceptLanguage()
 {
     return _acceptLanguage;
 }

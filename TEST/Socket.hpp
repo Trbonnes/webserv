@@ -2,6 +2,7 @@
 # define SOCKET_HPP
 
 # include <iostream>
+# include <vector>
 
 class   Socket
 {
@@ -13,26 +14,26 @@ class   Socket
 
     // REQUEST LINE
 
-    std::string     _method;
-    std::string     _requestURI;
-    std::string     _httpVersion;
+    std::string                 _method;
+    std::string                 _requestURI;
+    std::string                 _httpVersion;
 
-    // HEADERS
+    // HEADERS          
 
-    std::string     _contentLength;
-    std::string     _contentLocation;
-    std::string     _contentType;
-    std::string     _date;
-    std::string     _transferEncoding;
-    std::string     _acceptCharset;
-    std::string     _acceptLanguage;
-    std::string     _authorization;
-    std::string     _host;
-    std::string     _userAgent;
+    std::string                 _contentLength;
+    std::string                 _contentLocation;
+    std::string                 _contentType;
+    std::string                 _date;
+    std::string                 _transferEncoding;
+    std::string                 _acceptCharset;
+    std::vector<std::string>    _acceptLanguage;
+    std::string                 _authorization;
+    std::string                 _host;
+    std::string                 _userAgent;
 
-    // BODY
+    // BODY         
 
-    std::string     _body;
+    std::string                 _body;
 
     // PRIVATE FUNCTIONS
 
@@ -55,7 +56,7 @@ class   Socket
     std::string     getDate();
     std::string     getTransferEncoding();
     std::string     getAcceptCharset();
-    std::string     getAcceptLanguage();
+    std::vector<std::string>     &getAcceptLanguage();
     std::string     getAuthorization();
     std::string     getHost();
     std::string     getUserAgent();
