@@ -51,7 +51,6 @@ types {
     application/x-shockwave-flash         swf;
     application/x-stuffit                 sit;
     application/x-tcl                     tcl tk;
-    application/x-httpd-php               php;
     application/x-x509-ca-cert            der pem crt;
     application/x-xpinstall               xpi;
     application/xhtml+xml                 xhtml;
