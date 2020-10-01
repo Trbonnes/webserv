@@ -103,7 +103,7 @@ int         Methods::setRoot(std::string &root)
             find = root.append(_socket.getRequestURI()).find(getServerName());
             root.erase(0, find + getServerName().length());
             root.insert(0, getRoot());
-            root.append(acceptLanguage());
+            root.insert(getRoot().length(), acceptLanguage());
         }
         else
         {
