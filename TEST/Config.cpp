@@ -4,19 +4,42 @@ Config::Config() :
 _root("/sgoinfre/goinfre/Perso/pganglof/webserver/www"),
 _serverName("localhost"),
 _index(0),
-_defaultType("text/plain") {
+_defaultType("text/plain"),
+_configFiles("/sgoinfre/goinfre/Perso/pganglof/webserver/config/")
+{
+    _defaultLanguage.push_back("fr");
+    _defaultLanguage.push_back("en");
     _index.push_back("index.php");
     _index.push_back("index.html");
 
     //** open mime.types **
-    int     ret;
-    int     fd;
-    char    *line;
+    int         ret;
+    int         fd;
+    char        *line;
+    std::string string;
+    std::string file;
+    std::list<std::string>::iterator it;
+    std::string::iterator s_it;
 
-    if ((fd = open("../mime.types", O_RDONLY)) >= 0)
+    file.append(_configFiles);
+    file.append("mime.types");
+    if ((fd = open(file.c_str(), O_RDONLY)) >= 0)
     {
         while ((ret = get_next_line(fd, &line)) > 0)
-            _mimeTypes.push_back(std::string(line));
+        {
+            string = line;
+            _mimeTypes.push_back(string);
+
+        }
+        it = _mimeTypes.begin();
+        while (it != _mimeTypes.end())
+        {
+            s_it = (*it).begin();
+            while (*s_it == ' ')
+                s_it++;
+            (*it).erase((*it).begin(), s_it);
+            it++;
+        }
         close (fd);
     }
 }
@@ -57,4 +80,9 @@ std::string             Config::getDefaultType()
 std::list<std::string>  &Config::getMimeTypes()
 {
     return _mimeTypes;
+}
+
+std::vector<std::string>    &Config::getDefaultLanguage()
+{
+    return _defaultLanguage;
 }
