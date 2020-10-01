@@ -15,15 +15,29 @@ void        Methods::get()
     if (_statusCode != NOT_FOUND)
     {
         setBody(fd);
+        setStat(root);
         setContentType(root);
+        setContentLength();
+        setServerName();
     }
-
     std::cout << "ROOT: " << root << std::endl << std::endl;
-    std::cout << "STATUS CODE: " << _statusCode << std::endl << std::endl;
-    std::cout << "CONTENT TYPE: " << _contentType << std::endl << std::endl;
-    std::cout << "BODY: " << std::endl << _body << std::endl << std::endl;
 
     return ;
+}
+
+void        Methods::setServerName()
+{
+    _server = getServerName();
+}
+
+void        Methods::setContentLength()
+{
+    _contentLength = _stat.st_size;
+}
+
+void        Methods::setStat(std::string root)
+{
+    stat(root.c_str(), &_stat);
 }
 
 void        Methods::setContentType(std::string root)
@@ -40,6 +54,7 @@ void        Methods::setContentType(std::string root)
     find += 1;
     length = root.length() - find;
     _contentType = root.substr(find, length);
+    find = -1;
     it = getMimeTypes().begin();
     while (it != getMimeTypes().end())
     {
@@ -131,26 +146,35 @@ void        Methods::setBody(int fd)
     }
     if (ret == -1)
         _statusCode = INTERNAL_SERVER_ERROR;
+    else
     close(fd);
 }
 
 //** Define the language page **
 std::string     Methods::acceptLanguage()
 {
-    std::vector<std::string>::iterator itClient;
-    std::vector<std::string>::iterator itServer;
+    std::vector<std::string>::iterator itClientBegin;
+    std::vector<std::string>::iterator itClientEnd;
+    std::vector<std::string>::iterator itServerBegin;
+    std::vector<std::string>::iterator itServerEnd;
     std::string str;
 
     str.assign("/");
-    itClient = _socket.getAcceptLanguage().begin();
-    while (itClient != _socket.getAcceptLanguage().end())
+    itClientBegin = _socket.getAcceptLanguage().begin();
+    itClientEnd = _socket.getAcceptLanguage().end();
+    itServerEnd = getDefaultLanguage().end();
+    while (itClientBegin != itClientEnd)
     {
-        itServer = getDefaultLanguage().begin();
-        while (itServer != getDefaultLanguage().end() && (*itClient).compare(*itServer) != 0)
-            itServer++;
-        if (itServer != getDefaultLanguage().end())
-            return (str.append(*itServer));
-        itClient++;
+        itServerBegin = getDefaultLanguage().begin();
+        while (itServerBegin != itServerEnd && (*itClientBegin).compare(*itServerBegin) != 0)
+            itServerBegin++;
+        if (itServerBegin != itServerEnd)
+        {
+            _contentLanguage = *itServerBegin;
+            return (str.append(*itServerBegin));
+        }
+        itClientBegin++;
     }
+    _contentLanguage = *(getDefaultLanguage().begin());
     return (str.append(*(getDefaultLanguage().begin())));
 }
