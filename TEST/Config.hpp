@@ -15,6 +15,7 @@ class   Config
     private:
 
     std::string                 _root;
+    std::vector<std::string>    _defaultAllow;
     std::string                 _serverName;
     std::list<std::string>      _index;
     std::string                 _defaultType;
@@ -28,14 +29,15 @@ class   Config
     Config(Config &copy);
     ~Config();
 
-    Config                  &operator=(Config const &rhs);
+    Config                      &operator=(Config const &rhs);
 
-    std::string             getRoot();
-    std::string             getServerName();
-    std::list<std::string>  &getIndex();
-    std::string             getDefaultType();
-    std::list<std::string>  &getMimeTypes();
-    std::vector<std::string> &getDefaultLanguage();
+    std::string                 getRoot();
+    std::string                 getServerName();
+    std::list<std::string>      &getIndex();
+    std::string                 getDefaultType();
+    std::list<std::string>      &getMimeTypes();
+    std::vector<std::string>    &getDefaultLanguage();
+    std::vector<std::string>    &getDefaultAllow();
 };
 
 #endif

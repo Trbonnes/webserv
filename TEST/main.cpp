@@ -6,5 +6,6 @@ int     main(void)
     Socket  socket;
     Methods method(socket);
 
+    method.getResponse();
     return 0;
 }
