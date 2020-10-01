@@ -82,7 +82,6 @@ int         Methods::setRoot(std::string &root)
         while (it != getIndex().end())
         {
             root.assign(getRoot());
-            root.append("/");
             root.append(acceptLanguage());
             root.append("/");
             root.append(*it);
