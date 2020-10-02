@@ -6,7 +6,7 @@
 /*   By: trbonnes <trbonnes@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/30 18:55:18 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/10/02 10:17:48 by trbonnes         ###   ########.fr       */
+/*   Updated: 2020/10/02 10:49:52 by trbonnes         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,65 +33,70 @@ std::vector<std::string> ParseAcceptHeaders(std::string request, size_t pos) {
 	std::string delimiter = ",";
 	int q;
 
-	try {
-		while (request[pos] && request[pos] != ':') { pos++; }
-		pos++;
-		while (request[pos] && request[pos] == ' ') { pos++; }
-		while (request[pos] && request[pos] != '\n') {
-			s.push_back(request[pos++]);
-		}
+	while (request[pos] && request[pos] != ':') { pos++; }
+	pos++;
+	while (request[pos] && request[pos] == ' ') { pos++; }
+	while (request[pos] && request[pos] != '\n') {
+		s.push_back(request[pos++]);
+	}
 
-		while ((pos = s.find(delimiter)) != s.npos) {
-			s2 = s.substr(0, pos);
-			s.erase(0, pos + 1);
-			tmpV.push_back(s2);
-			s2.clear();
-		}
-		s2 = s.substr(0, s.npos);
-		s.erase(0, pos);
+	while ((pos = s.find(delimiter)) != s.npos) {
+		s2 = s.substr(0, pos);
+		s.erase(0, pos + 1);
 		tmpV.push_back(s2);
 		s2.clear();
-		s.clear();
-
-		while (tmpV.size()) {
-			std::vector<std::string>::iterator tmpIt = tmpV.begin();
-			std::vector<std::string>::iterator it = tmpIt;
-
-			s = *tmpIt;
-			pos = s.find(";");
-			if (pos == s.npos)
-				q = 1;
-			else {
-				pos = s.find("=");
-				std::string tmpS = s.substr(pos + 1, s.npos);
-				q = std::stoi(tmpS);
-			}
-			for (tmpIt++; tmpIt != tmpV.end(); tmpIt++) {
-				int q2 = 0;
-				s2 = *tmpIt;
-				pos = s2.find(";");
-				if (pos == s2.npos)
-					q2 = 1;
-				else {
-					pos = s2.find("=");
-					std::string tmpS = s2.substr(pos + 1, s2.npos);
-					q2 = std::stoi(tmpS);
-				}
-				if (q2 > q) {
-					q = q2;
-					s = s2;
-					it = tmpIt;
-				}
-			}
-			s.erase(s.find(";"), s.npos);
-			v.push_back(s);
-			tmpV.erase(it);
-			s.clear();
-			s2.clear();
-		}
 	}
-	catch (std::exception &e) {
-		std::cout << "Exception: " << e.what() << std::endl;
+	s2 = s.substr(0, s.npos);
+	s.erase(0, pos);
+	tmpV.push_back(s2);
+	s2.clear();
+	s.clear();
+	while (tmpV.size()) {
+		std::vector<std::string>::iterator tmpIt = tmpV.begin();
+		std::vector<std::string>::iterator it = tmpIt;
+
+		s = *tmpIt;
+		pos = s.find(";");
+		//std::cout << "1" << std::endl;
+		if (pos == s.npos)
+			q = 1;
+		else {
+		//std::cout << "2" << std::endl;
+			pos = s.find("=");
+			std::string tmpS = s.substr(pos + 1, s.npos);
+			q = std::stoi(tmpS);
+		}
+		for (tmpIt++; tmpIt != tmpV.end(); tmpIt++) {
+			//std::cout << "3" << std::endl;
+			int q2 = 0;
+			s2 = *tmpIt;
+			pos = s2.find(";");
+			if (pos == s2.npos)
+				q2 = 1;
+			else {
+				//std::cout << "4" << std::endl;
+				pos = s2.find("=");
+				std::string tmpS = s2.substr(pos + 1, s2.npos);
+				q2 = std::stoi(tmpS);
+			}
+			if (q2 > q) {
+				q = q2;
+				s = s2;
+				it = tmpIt;
+			}
+		}
+		//std::cout << "5" << std::endl;
+		//std::cout << s << std::endl;
+		if (s.find(";") != s.npos)
+			s.erase(s.find(";"), s.npos);
+		//std::cout << "6" << std::endl;
+		v.push_back(s);
+		tmpV.erase(it);
+		s.clear();
+		s2.clear();
+	}
+	for (std::vector<std::string>::iterator it = v.begin(); it != v.end(); it++) {
+		std::cout << "v " << *it << std::endl;
 	}
 	return v;
 }
