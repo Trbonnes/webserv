@@ -3,7 +3,7 @@
 Socket::Socket() :
 _fd(0),
 _method("GET"),
-_requestURI("/data/index.html"),
+_requestURI("/data/"),
 _httpVersion("HTTP/1.1"),
 _contentLength(""),
 _contentLocation(""),

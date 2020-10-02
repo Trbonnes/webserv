@@ -182,7 +182,7 @@ int         Methods::checkAllowMethods(std::string method)
 //** replace URI by the location **
 void        Methods::replaceURI()
 {
-    _uri.replace(_uri.find(_location), _location.length(), getRoot(_uri));
+    _uri.replace(_uri.find(_location), _location.length(), getRoot(_location));
 }
 
 void        Methods::setLocation()

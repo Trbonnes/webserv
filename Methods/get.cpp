@@ -64,16 +64,29 @@ void        Methods::setContentType()
 
 int         Methods::openFile()
 {
-    int     fd;
-    int     find;
-    int     length;
+    int         fd;
+    struct stat file;
+    std::string str;
+    std::list<std::string>::iterator itIndexBegin;
+    std::list<std::string>::iterator itIndexEnd;
 
-    if ((fd = open(_route.c_str(), O_RDONLY)) < 0)
+    itIndexBegin = getIndex(_location).begin();
+    itIndexEnd = getIndex(_location).end();
+    stat(_route.c_str(), &file);
+    str.assign(_route);
+    while (itIndexBegin != itIndexEnd && (file.st_mode & S_IFMT) == S_IFDIR)
     {
-        _statusCode = NOT_FOUND;
-        return -1;
+        str.assign(_route).append(*itIndexBegin);
+        std::cout << str << std::endl;
+        stat(str.c_str(), &file);
+        itIndexBegin++;
     }
-    _statusCode = OK;
+    _route.assign(str);
+    fd = open(_route.c_str(), O_RDONLY);
+    if (fd < 0)
+        _statusCode = NOT_FOUND;
+    else
+       _statusCode = OK;
     return fd;
 }
 
@@ -92,7 +105,7 @@ int         Methods::setRoot()
         it = getIndex(_uri).begin();
         while (it != getIndex(_uri).end())
         {
-            _route.assign(getRoot(_uri));
+            _route.assign(getRoot(_location));
             _route.append(acceptLanguage());
             _route.append("/");
             _route.append(*it);
@@ -113,16 +126,16 @@ int         Methods::setRoot()
 
             find = _route.append(_socket.getRequestURI()).find(getServerName(_uri));
             _route.erase(0, find + getServerName(_uri).length());
-            _route.insert(0, getRoot(_uri));
-            _route.insert(getRoot(_uri).length(), acceptLanguage());
+            _route.insert(0, getRoot(_location));
+            _route.insert(getRoot(_location).length(), acceptLanguage());
         }
         else
         {
             //** Relative path **
 
-            _route.assign(getRoot(_uri));
+            _route.assign(getRoot(_location));
             _route.append(acceptLanguage());
-            _route.append(str.assign(_uri).erase(0, getRoot(_uri).length()));
+            _route.append(str.assign(_uri).erase(0, getRoot(_location).length()));
         }
         //** Open and test if the file exist **
         fd = openFile();
