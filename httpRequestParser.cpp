@@ -6,16 +6,22 @@
 /*   By: trbonnes <trbonnes@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/30 15:45:46 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/10/02 12:34:15 by trbonnes         ###   ########.fr       */
+/*   Updated: 2020/10/02 13:35:15 by trbonnes         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "socket.hpp"
 
 int		httpRequestParseBody(std::string request, Socket *socket) {
+	std::vector<std::string> v;
 	if (!socket->getContentLength().size() && socket->getTransferEncoding().find("chunked") == std::string::npos)
 		return 0;
-	request.find("\n\n");
+	size_t pos = request.find("\n\n");
+
+	if (!socket->getMultipartContent()) {
+		v.push_back(request.substr(pos + 2, request.npos));
+	}
+	socket->setBody(v);
 	return 0;
 }
 

@@ -12,4 +12,9 @@ Content-Length: 345
 
 --12656974
 [...]
+this is a test
+--12656974
+Content-Type: text/plain; charset=us-ascii
+
+this is a test 2
 --12656964--

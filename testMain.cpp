@@ -6,7 +6,7 @@
 /*   By: trbonnes <trbonnes@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/30 15:30:52 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/10/02 12:33:29 by trbonnes         ###   ########.fr       */
+/*   Updated: 2020/10/02 13:34:02 by trbonnes         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 #include "socket.hpp"
 
 int main() {
-
+    size_t i = 0;
 	int fd = open("./httpRequestTest", O_RDONLY);
     Socket *socket = httpRequestParser(fd);
 
@@ -24,11 +24,14 @@ int main() {
 	std::cout << "URI: " << socket->getRequestURI() << std::endl;
     std::cout << "Version: " << socket->getHttpVersion() << std::endl;
 
-    //std::cout << "ContentType: " << socket->getContentType() << std::endl;
+    std::cout << "ContentType: " << std::endl;
+    while (i < socket->getContentType().size()){
+        std::cout << socket->getContentType()[i] << std::endl;
+        i++;
+    }
     std::cout << "getDate: " << socket->getDate() << std::endl;
     std::cout << "TransferEncoding: " << socket->getTransferEncoding() << std::endl;
-
-    size_t i = 0;
+    i = 0;
     std::cout << "AcceptCharset: " << std::endl;
     while (i < socket->getAcceptCharset().size()){
         std::cout << socket->getAcceptCharset()[i] << std::endl;
@@ -47,5 +50,10 @@ int main() {
 	std::cout << "Referer: " << socket->getReferer() << std::endl;
     std::cout << "ContentLocation: " << socket->getContentLocation() << std::endl;
     std::cout << "ContentLength: " << socket->getContentLength() << std::endl;
-    //std::cout << "Body: " << socket->getBody() << std::endl;
+    i = 0;
+    std::cout << "Body: " << std::endl;
+    while (i < socket->getBody().size()){
+        std::cout << socket->getBody()[i] << std::endl;
+        i++;
+    }
 }
