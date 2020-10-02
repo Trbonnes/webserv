@@ -6,22 +6,55 @@
 /*   By: trbonnes <trbonnes@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/30 15:45:46 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/10/02 13:35:15 by trbonnes         ###   ########.fr       */
+/*   Updated: 2020/10/02 14:46:01 by trbonnes         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "socket.hpp"
 
 int		httpRequestParseBody(std::string request, Socket *socket) {
-	std::vector<std::string> v;
+	std::vector<std::string> contentV;
+	std::vector<std::string> bodyV;
 	if (!socket->getContentLength().size() && socket->getTransferEncoding().find("chunked") == std::string::npos)
 		return 0;
 	size_t pos = request.find("\n\n");
 
 	if (!socket->getMultipartContent()) {
-		v.push_back(request.substr(pos + 2, request.npos));
+		bodyV.push_back(request.substr(pos + 2, request.npos));
 	}
-	socket->setBody(v);
+	else {
+		std::string s = request;
+		std::string boundary = "--" + socket->getContentBoundary();
+		std::string endBoundary = "--" + socket->getContentBoundary() + "--";
+		size_t endPos = s.find(endBoundary);
+		size_t boundPos;
+
+		contentV = socket->getContentType();
+		bodyV.push_back("");
+		s.erase(0, pos + 2);
+		endPos = s.find(endBoundary);
+		while ((pos = s.find(boundary)) != endPos) {
+			s.erase(0, pos + boundary.length() + 1);
+			endPos = s.find(endBoundary);
+			boundPos = s.find(boundary);
+			pos = s.find("Content-Type");
+			if (pos >= boundPos) {
+				contentV.push_back("text/plain");
+				bodyV.push_back(s.substr(0, boundPos - 1));
+			}
+			else {
+				pos += 14;
+				contentV.push_back(s.substr(pos, s.find("\n", pos) - 14));
+				s.erase(0, s.find("\n", pos) + 1);;
+				boundPos = s.find(boundary);
+				bodyV.push_back(s.substr(0, boundPos - 1));
+			}
+			s.erase(0, boundPos);
+			endPos = s.find(endBoundary);
+		}
+		socket->setContentType(contentV);
+	}
+	socket->setBody(bodyV);
 	return 0;
 }
 
