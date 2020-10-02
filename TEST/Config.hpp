@@ -15,7 +15,7 @@ class   Config
 {
     private:
 
-    std::list<Location>         _location;
+    std::list<Location>         _locationList;
     std::string                 _defaultRoot;
     std::vector<std::string>    _defaultAllow;
     std::string                 _defaultServerName;
@@ -35,12 +35,12 @@ class   Config
 
     std::string                 getRoot(std::string _uri);
     std::string                 getServerName(std::string _uri);
-    std::list<std::string>      &getIndex(std::string _uri);
+    std::list<std::string>      &getIndex(std::string location);
     std::string                 getType(std::string _uri);
     std::vector<std::string>    &getLanguage(std::string _uri);
     std::vector<std::string>    &getAllow(std::string _uri);
     std::list<std::string>      &getMimeTypes();
-    std::string                 getLocation(std::string uri);
+    std::string                 getLocation(std::string location);
 };
 
 #endif
