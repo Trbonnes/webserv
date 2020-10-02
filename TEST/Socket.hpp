@@ -61,7 +61,7 @@ class   Socket
 
     // PRIVATE FUNCTIONS
 
-    void            parser(void);
+    void                        parser(void);
 
     public:
     Socket();
@@ -69,22 +69,22 @@ class   Socket
     Socket(Socket const &copy);
     ~Socket();
 
-    Socket          &operator=(Socket const &rhs);
-    int             getFd();
-    std::string     getMethod();
-    std::string     getRequestURI();
-    std::string     gethttpVersion();
-    std::string     getContentLenght();
-    std::string     getContentLocation();
-    std::string     getContentType();
-    std::string     getDate();
-    std::string     getTransferEncoding();
-    std::string     getAcceptCharset();
-    std::vector<std::string>     &getAcceptLanguage();
-    std::string     getAuthorization();
-    std::string     getHost();
-    std::string     getUserAgent();
-    std::string     getBody();
+    Socket                      &operator=(Socket const &rhs);
+    int                         getFd();
+    std::string                 getMethod();
+    std::string                 getRequestURI();
+    std::string                 gethttpVersion();
+    std::string                 getContentLenght();
+    std::string                 getContentLocation();
+    std::string                 getContentType();
+    std::string                 getDate();
+    std::string                 getTransferEncoding();
+    std::string                 getAcceptCharset();
+    std::string                 getAuthorization();
+    std::string                 getHost();
+    std::string                 getUserAgent();
+    std::string                 getBody();
+    std::vector<std::string>    &getAcceptLanguage();
 };
 
 #endif

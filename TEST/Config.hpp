@@ -8,12 +8,14 @@
 # include <sys/stat.h>
 # include <fcntl.h>
 # include <vector>
+# include "Location.hpp"
 # include "../utils/utils.hpp"
 
 class   Config
 {
     private:
 
+    std::list<Location>         _location;
     std::string                 _defaultRoot;
     std::vector<std::string>    _defaultAllow;
     std::string                 _defaultServerName;
@@ -31,13 +33,14 @@ class   Config
 
     Config                      &operator=(Config const &rhs);
 
-    std::string                 getRoot();
-    std::string                 getServerName();
-    std::list<std::string>      &getIndex();
-    std::string                 getDefaultType();
+    std::string                 getRoot(std::string _uri);
+    std::string                 getServerName(std::string _uri);
+    std::list<std::string>      &getIndex(std::string _uri);
+    std::string                 getType(std::string _uri);
+    std::vector<std::string>    &getLanguage(std::string _uri);
+    std::vector<std::string>    &getAllow(std::string _uri);
     std::list<std::string>      &getMimeTypes();
-    std::vector<std::string>    &getDefaultLanguage();
-    std::vector<std::string>    &getDefaultAllow();
+    std::string                 getLocation(std::string uri);
 };
 
 #endif

@@ -31,6 +31,8 @@ class   Methods : public Config
     private:
 
     Socket                      _socket;
+    std::string                 _uri;
+    std::string                 _route;
     struct stat                 _stat;
     int                         _response;
     int                         _statusCode;
@@ -51,20 +53,22 @@ class   Methods : public Config
     std::string                 _methodsName[NB_METHODS];
     void                        (*_method[NB_METHODS])(void);
 
-
     Methods();
 
     void            callMethod(int method);
     int             checkAllowMethods(std::string method);
+    void            setConfigURI();
+    void            setLocation();
+    void            replaceURI();
 
     // GET
     void            get(void);
-    int             openFile(std::string root);
-    int             setRoot(std::string &root);
+    int             openFile(void);
+    int             setRoot(void);
     void            setBody(int fd);
-    void            setContentType(std::string root);
+    void            setContentType();
     std::string     acceptLanguage();
-    void            setStat(std::string root);
+    void            setStat(void);
     void            setContentLength();
     void            setServerName();
 

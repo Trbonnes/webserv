@@ -45,6 +45,12 @@ _configFilesRoot("/home/pauline/webserver/config")
         }
         close (fd);
     }
+
+    //** Locations **
+
+    _location.push_back(Location("/data/", "/home/pauline/webserver/www",
+    _defaultAllow, _defaultServerName, _defaultIndex,
+    "text/html", _defaultLanguage));
 }
 
 Config::Config(Config &copy)
@@ -74,22 +80,52 @@ Config                  &Config::operator=(Config const &rhs)
     return *this;
 }
 
-std::string             Config::getRoot()
+std::string             Config::getLocation(std::string uri)
 {
+    std::list<Location>::iterator itBegin;
+    std::list<Location>::iterator itEnd; 
+
+    itBegin = _location.begin();
+    itEnd = _location.end();
+    while (itBegin != itEnd)
+    {
+        if (uri.find(itBegin->_location) >= 0)
+            return (itBegin->_location);
+        itBegin++;
+    }
+    return (_defaultRoot);
+}
+
+
+std::string             Config::getRoot(std::string uri)
+{
+    std::list<Location>::iterator itBegin;
+    std::list<Location>::iterator itEnd;
+    std::string                     str;
+
+    itBegin = _location.begin();
+    itEnd = _location.end();
+    while (itBegin != itEnd)
+    {
+        // if ((itBegin->_location).compare(uri) == 0)
+        if (uri.find(itBegin->_location) >= 0)
+            return (str.assign((itBegin->_root)).append(itBegin->_location));
+        itBegin++;
+    }
     return _defaultRoot;
 }
 
-std::string             Config::getServerName()
+std::string             Config::getServerName(std::string uri)
 {
     return _defaultServerName;
 }
 
-std::list<std::string>  &Config::getIndex()
+std::list<std::string>  &Config::getIndex(std::string uri)
 {
     return _defaultIndex;
 }
 
-std::string             Config::getDefaultType()
+std::string                 Config::getType(std::string uri)
 {
     return _defaultType;
 }
@@ -99,12 +135,12 @@ std::list<std::string>      &Config::getMimeTypes()
     return _mimeTypes;
 }
 
-std::vector<std::string>    &Config::getDefaultLanguage()
+std::vector<std::string>    &Config::getLanguage(std::string uri)
 {
     return _defaultLanguage;
 }
 
-std::vector<std::string>    &Config::getDefaultAllow()
+std::vector<std::string>    &Config::getAllow(std::string uri)
 {
     return _defaultAllow;
 }
