@@ -3,6 +3,6 @@
 void    Methods::head(void)
 {
     get();
-    _body.assign("");
+    _body.clear();
     return ;
 }

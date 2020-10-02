@@ -3,7 +3,7 @@
 Socket::Socket() :
 _fd(0),
 _method("GET"),
-_requestURI("/data/"),
+_requestURI("/images/42.png"),
 _httpVersion("HTTP/1.1"),
 _contentLength(""),
 _contentLocation(""),
@@ -18,6 +18,7 @@ _userAgent("Mozilla/5."" (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gec
 _body("") {
     _acceptLanguage.push_back("de");
     _acceptLanguage.push_back("en");
+
 }
 
 Socket::Socket(int fd) :
