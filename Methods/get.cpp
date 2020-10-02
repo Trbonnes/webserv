@@ -169,6 +169,8 @@ std::string     Methods::acceptLanguage()
     std::vector<std::string>::iterator itServerEnd;
     std::vector<std::string>::iterator itServer;
     std::string str;
+    std::string trydir;
+    struct stat dir;
 
     str.assign("/");
     itClientBegin = _socket.getAcceptLanguage().begin();
@@ -181,11 +183,21 @@ std::string     Methods::acceptLanguage()
         {
             _contentLanguage = *itServer;
             str.append(*itServer);
-            return (str.append("/"));
+            str.append("/");
+            stat(trydir.assign(_route).append(str).c_str(), &dir);
+            if ((dir.st_mode & S_IFMT) == S_IFDIR)
+                return (str);
+            else
+                return ("");
         }
         itClientBegin++;
     }
     _contentLanguage = *(getLanguage(_uri).begin());
     str.append(*(getLanguage(_uri).begin()));
-    return (str.append("/"));
+    str.append("/");
+    stat(trydir.assign(_route).append(str).c_str(), &dir);
+    if ((dir.st_mode & S_IFMT) == S_IFDIR)
+        return (str);
+    else
+        return ("");
 }
