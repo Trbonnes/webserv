@@ -6,7 +6,7 @@
 /*   By: trbonnes <trbonnes@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/30 15:30:52 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/10/01 15:46:15 by trbonnes         ###   ########.fr       */
+/*   Updated: 2020/10/02 10:03:55 by trbonnes         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,8 +27,14 @@ int main() {
     std::cout << "ContentType: " << socket->getContentType() << std::endl;
     std::cout << "getDate: " << socket->getDate() << std::endl;
     std::cout << "TransferEncoding: " << socket->getTransferEncoding() << std::endl;
-    //std::cout << "AcceptCharset: " << socket->getAcceptCharset() << std::endl;
-    //std::cout << "AcceptLanguage: " << socket->getAcceptLanguage() << std::endl;
+    std::cout << "AcceptCharset: " << std::endl;
+    for (std::vector<std::string>::iterator it = socket->getAcceptCharset().begin(); it != socket->getAcceptCharset().end(); it++){
+        std::cout << *it << std::endl;
+    }
+    std::cout << "AcceptLanguage: " << std::endl;
+    for (std::vector<std::string>::iterator it = socket->getAcceptLanguage().begin(); it != socket->getAcceptLanguage().end(); it++){
+        std::cout << *it << std::endl;
+    }
     std::cout << "Authorization: " << socket->getAuthorization() << std::endl;
     std::cout << "Host: " << socket->getHost() << std::endl;
     std::cout << "UserAgent: " << socket->getUserAgent() << std::endl;
