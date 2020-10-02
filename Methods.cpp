@@ -61,6 +61,10 @@ _body("")
     int     i;
 
     i = 0;
+    _uri = socket.getRequestURI();
+    setLocation();
+    replaceURI(); 
+
     while (i < NB_METHODS)
     {
         if (_socket.getMethod().compare(_methodsName[i]) == 0)
@@ -162,8 +166,8 @@ int         Methods::checkAllowMethods(std::string method)
     int ret;
 
     ret = 0;
-    itBegin = getDefaultAllow().begin();
-    itEnd = getDefaultAllow().end();
+    itBegin = getAllow(_uri).begin();
+    itEnd = getAllow(_uri).end();
     while (itBegin != itEnd)
     {
         _allow.push_back(*itBegin);
@@ -175,50 +179,27 @@ int         Methods::checkAllowMethods(std::string method)
     return (ret);
 }
 
-void        Methods::head()
+//** replace URI by the location **
+void        Methods::replaceURI()
 {
-    return ;
+    _uri.replace(_uri.find(_location), _location.length(), getRoot(_uri));
 }
 
-void        Methods::post()
+void        Methods::setLocation()
 {
-    return ;
-}
-
-void        Methods::put()
-{
-    return ;
-}
-
-void        Methods::del()
-{
-    return ;
-}
-
-void        Methods::connect()
-{
-    return ;
-}
-
-void        Methods::options()
-{
-    return ;
-}
-
-void        Methods::trace()
-{
-    return ;
-}
-
-void        Methods::patch()
-{
-    return ;
+    _location = getLocation(_uri);
 }
 
 int         Methods::getResponse()
 {
     std::vector<std::string>::iterator it;
+    std::cout << std::endl;
 
+    std::cout << "ORIGINALE URI: " << _socket.getRequestURI() << std::endl << std::endl;
+    std::cout << "LOCATION: " << _location << std::endl << std::endl;
+    std::cout << "URI: " << _uri << std::endl << std::endl;
+    std::cout << "ROUTE: " << _route << std::endl << std::endl;
+    std::cout << "SERVER NAME: " << _server << std::endl << std::endl;
     std::cout << "STATUS CODE: " << _statusCode << std::endl << std::endl;
 
     it = _allow.begin();
@@ -229,7 +210,6 @@ int         Methods::getResponse()
         it++;
     }
     std::cout << std::endl << std::endl;
-    std::cout << "SERVER NAME: " << _server << std::endl << std::endl;
     std::cout << "CONTENT TYPE: " << _contentType << std::endl << std::endl;
     std::cout << "CONTENT LENGTH: " << _contentLength << std::endl << std::endl;
     std::cout << "CONTENT LANGUAGE: " << _contentLanguage << std::endl << std::endl;

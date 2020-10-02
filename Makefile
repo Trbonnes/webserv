@@ -1,9 +1,18 @@
 SRCS =	TEST/main.cpp 			\
 		TEST/Socket.cpp 		\
 		TEST/Config.cpp			\
+		TEST/Location.cpp		\
 		utils/get_next_line.cpp \
 		Methods.cpp				\
-		get.cpp
+		Methods/get.cpp			\
+		Methods/head.cpp		\
+		Methods/post.cpp		\
+		Methods/put.cpp			\
+		Methods/options.cpp		\
+		Methods/patch.cpp		\
+		Methods/trace.cpp		\
+		Methods/delete.cpp		\
+		Methods/connect.cpp
 
 OBJS = $(SRCS:.cpp=.o)
 NAME = methods

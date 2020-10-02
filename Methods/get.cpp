@@ -1,4 +1,4 @@
-#include "Methods.hpp"
+#include "../Methods.hpp"
 
 void        Methods::get()
 {
@@ -9,25 +9,21 @@ void        Methods::get()
 
             // std::cout << _socket.getRequestURI() << std::endl;
 
-    //** Set the string root **
-
-    fd = setRoot(root);
+    fd = setRoot();
     if (_statusCode != NOT_FOUND)
     {
         setBody(fd);
-        setStat(root);
-        setContentType(root);
+        setStat();
+        setContentType();
         setContentLength();
         setServerName();
     }
-    std::cout << "ROOT: " << root << std::endl << std::endl;
-
     return ;
 }
 
 void        Methods::setServerName()
 {
-    _server = getServerName();
+    _server = getServerName(_uri);
 }
 
 void        Methods::setContentLength()
@@ -35,12 +31,12 @@ void        Methods::setContentLength()
     _contentLength = _stat.st_size;
 }
 
-void        Methods::setStat(std::string root)
+void        Methods::setStat()
 {
-    stat(root.c_str(), &_stat);
+    stat(_route.c_str(), &_stat);
 }
 
-void        Methods::setContentType(std::string root)
+void        Methods::setContentType()
 {
     int                     find;
     int                     length;
@@ -48,10 +44,10 @@ void        Methods::setContentType(std::string root)
     std::list<std::string>  mimeTypes;
     std::list<std::string>::iterator it;
 
-    find = root.find('.', 0);
+    find = _route.find('.', 0);
     find += 1;
-    length = root.length() - find;
-    _contentType = root.substr(find, length);
+    length = _route.length() - find;
+    _contentType = _route.substr(find, length);
     find = -1;
     it = getMimeTypes().begin();
     while (it != getMimeTypes().end())
@@ -63,16 +59,16 @@ void        Methods::setContentType(std::string root)
     if (find >= 0)
         _contentType = (*it).substr(0, (*it).find(" "));
     else
-        _contentType = getDefaultType();
+        _contentType = getType(_uri);
 }
 
-int         Methods::openFile(std::string root)
+int         Methods::openFile()
 {
     int     fd;
     int     find;
     int     length;
 
-    if ((fd = open(root.c_str(), O_RDONLY)) < 0)
+    if ((fd = open(_route.c_str(), O_RDONLY)) < 0)
     {
         _statusCode = NOT_FOUND;
         return -1;
@@ -81,26 +77,28 @@ int         Methods::openFile(std::string root)
     return fd;
 }
 
-int         Methods::setRoot(std::string &root)
+int         Methods::setRoot()
 {
-    int     fd;
-    int     find;
+    int         fd;
+    int         find;
+    std::string str;
 
-    if (_socket.getRequestURI().compare(0, 2, "/") == 0)
+    // if (_socket.getRequestURI().compare(0, 2, "/") == 0)
+    if (_uri.compare(0, 2, "/") == 0)
     {
         //** Default index page **
         std::list<std::string>::iterator it;
 
-        it = getIndex().begin();
-        while (it != getIndex().end())
+        it = getIndex(_uri).begin();
+        while (it != getIndex(_uri).end())
         {
-            root.assign(getRoot());
-            root.append(acceptLanguage());
-            root.append("/");
-            root.append(*it);
+            _route.assign(getRoot(_uri));
+            _route.append(acceptLanguage());
+            _route.append("/");
+            _route.append(*it);
 
             //** Open and test if the file exist **
-            if ((fd = openFile(root)) < 0)
+            if ((fd = openFile()) < 0)
                 it++;
             else
                 break ;
@@ -108,25 +106,26 @@ int         Methods::setRoot(std::string &root)
     }
     else
     {
-        if (_socket.getRequestURI().compare(0, 4, "http") == 0)
+        // if (_socket.getRequestURI().compare(0, 4, "http") == 0)
+        if (_uri.compare(0, 4, "http") == 0)
         {
             //** Absolute path **
 
-            find = root.append(_socket.getRequestURI()).find(getServerName());
-            root.erase(0, find + getServerName().length());
-            root.insert(0, getRoot());
-            root.insert(getRoot().length(), acceptLanguage());
+            find = _route.append(_socket.getRequestURI()).find(getServerName(_uri));
+            _route.erase(0, find + getServerName(_uri).length());
+            _route.insert(0, getRoot(_uri));
+            _route.insert(getRoot(_uri).length(), acceptLanguage());
         }
         else
         {
             //** Relative path **
 
-            root.assign(getRoot());
-            root.append(acceptLanguage());
-            root.append(_socket.getRequestURI());
+            _route.assign(getRoot(_uri));
+            _route.append(acceptLanguage());
+            _route.append(str.assign(_uri).erase(0, getRoot(_uri).length()));
         }
         //** Open and test if the file exist **
-        fd = openFile(root);
+        fd = openFile();
     }
     return (fd);
 }
@@ -161,17 +160,19 @@ std::string     Methods::acceptLanguage()
     str.assign("/");
     itClientBegin = _socket.getAcceptLanguage().begin();
     itClientEnd = _socket.getAcceptLanguage().end();
-    itServerEnd = getDefaultLanguage().end();
+    itServerEnd = getLanguage(_uri).end();
     while (itClientBegin != itClientEnd)
     {
-        itServer = std::find(getDefaultLanguage().begin(), getDefaultLanguage().end(), *itClientBegin);
+        itServer = std::find(getLanguage(_uri).begin(), getLanguage(_uri).end(), *itClientBegin);
         if (itServer != itServerEnd)
         {
             _contentLanguage = *itServer;
-            return (str.append(*itServer));
+            str.append(*itServer);
+            return (str.append("/"));
         }
         itClientBegin++;
     }
-    _contentLanguage = *(getDefaultLanguage().begin());
-    return (str.append(*(getDefaultLanguage().begin())));
+    _contentLanguage = *(getLanguage(_uri).begin());
+    str.append(*(getLanguage(_uri).begin()));
+    return (str.append("/"));
 }
