@@ -6,7 +6,7 @@
 /*   By: trbonnes <trbonnes@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/30 15:10:55 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/10/01 15:18:24 by trbonnes         ###   ########.fr       */
+/*   Updated: 2020/10/02 12:42:31 by trbonnes         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,8 @@ _httpVersion(),
 _contentLength(),
 _contentLocation(),
 _contentType(),
+_multipartContent(),
+_contentBoundary(),
 _date(),
 _transferEncoding(),
 _acceptCharset(),
@@ -38,6 +40,8 @@ _httpVersion(),
 _contentLength(),
 _contentLocation(),
 _contentType(),
+_multipartContent(),
+_contentBoundary(),
 _date(),
 _transferEncoding(),
 _acceptCharset(),
@@ -57,6 +61,8 @@ Socket::Socket(Socket const &copy)
     _contentLength = copy._contentLength;
     _contentLocation = copy._contentLocation;
     _contentType = copy._contentType;
+    _multipartContent = copy._multipartContent;
+    _contentBoundary = copy._contentBoundary;
     _date = copy._date;
     _transferEncoding = copy._transferEncoding;
     _acceptCharset = copy._acceptCharset;
@@ -79,6 +85,8 @@ Socket      &Socket::operator=(Socket const &rhs)
     _contentLength = rhs._contentLength;
     _contentLocation = rhs._contentLocation;
     _contentType = rhs._contentType;
+    _multipartContent = rhs._multipartContent;
+    _contentBoundary = rhs._contentBoundary;
     _date = rhs._date;
     _transferEncoding = rhs._transferEncoding;
     _acceptCharset = rhs._acceptCharset;
@@ -120,9 +128,19 @@ std::string     Socket::getContentLocation()
     return _contentLocation;
 }
 
-std::string     Socket::getContentType()
+std::vector<std::string>     Socket::getContentType()
 {
     return _contentType;
+}
+
+bool    Socket::getMultipartContent()
+{
+    return _multipartContent;
+}
+
+std::string     Socket::getContentBoundary()
+{
+    return _contentBoundary;
 }
 
 std::string     Socket::getDate()
@@ -165,7 +183,7 @@ std::string Socket::getReferer()
 	return _referer;
 }
 
-std::string     Socket::getBody()
+std::vector<std::string>     Socket::getBody()
 {
     return _body;
 }
@@ -196,8 +214,18 @@ void	Socket::setContentLocation(std::string ContentLocation) {
 	_contentLocation = ContentLocation;
 }
 
-void	Socket::setContentType(std::string ContentType) {
+void	Socket::setContentType(std::vector<std::string> ContentType) {
 	_contentType = ContentType;
+}
+
+void    Socket::setMultipartContent(bool multipart)
+{
+    _multipartContent = multipart;
+}
+
+void     Socket::setContentBoundary(std::string boundary)
+{
+    _contentBoundary = boundary;
 }
 
 void	Socket::setDate(std::string Date) {
@@ -232,6 +260,6 @@ void	Socket::setReferer(std::string Referer) {
 	_referer = Referer;
 }
 
-void	Socket::setBody(std::string Body) {
+void	Socket::setBody(std::vector<std::string> Body) {
 	_body = Body;
 }

@@ -37,7 +37,9 @@ class   Socket
 
     std::string	                _contentLength;
     std::string	                _contentLocation;
-    std::string	                _contentType;
+    std::vector<std::string>    _contentType;
+    bool                        _multipartContent;
+    std::string                 _contentBoundary;
     std::string	                _date;
     std::string	                _transferEncoding;
     std::vector<std::string>	_acceptCharset;
@@ -49,7 +51,7 @@ class   Socket
 
     // BODY
 
-    std::string     _body;
+    std::vector<std::string>     _body;
 
     // PRIVATE FUNCTIONS
 
@@ -66,7 +68,9 @@ class   Socket
     std::string     			getHttpVersion();
     std::string	                getContentLength();
     std::string	                getContentLocation();
-    std::string	                getContentType();
+    std::vector<std::string>    getContentType();
+    bool                        getMultipartContent();
+    std::string                 getContentBoundary();
     std::string	                getDate();
     std::string	                getTransferEncoding();
     std::vector<std::string>	getAcceptCharset();
@@ -75,7 +79,7 @@ class   Socket
     std::string	                getHost();
     std::string	                getUserAgent();
 	std::string	                getReferer();
-    std::string     			getBody();
+    std::vector<std::string>    getBody();
 
 
     void	setFd(int fd);
@@ -84,7 +88,9 @@ class   Socket
     void	setHttpVersion(std::string httpVersion);
     void	setContentLength(std::string ContentLength);
     void	setContentLocation(std::string ContentLocation);
-    void	setContentType(std::string ContentType);
+    void	setContentType(std::vector<std::string> ContentType);
+    void    setMultipartContent(bool multipart);
+    void    setContentBoundary(std::string boundary);
     void	setDate(std::string Date);
     void	setTransferEncoding(std::string TransferEncoding);
     void	setAcceptCharset(std::vector<std::string> AcceptCharset);
@@ -93,7 +99,7 @@ class   Socket
     void	setHost(std::string Host);
     void	setUserAgent(std::string UserAgent);
 	void	setReferer(std::string Referer);
-    void	setBody(std::string Body);
+    void	setBody(std::vector<std::string> Body);
 };
 
 Socket	*httpRequestParser(int fd);
