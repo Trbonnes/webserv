@@ -6,7 +6,7 @@
 /*   By: trbonnes <trbonnes@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/30 15:45:46 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/10/01 15:34:57 by trbonnes         ###   ########.fr       */
+/*   Updated: 2020/10/02 10:52:11 by trbonnes         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,14 +39,14 @@ int		httpRequestParseHeaders(std::string request, Socket *socket) {
 		&ParseTransferEncoding,
 		&ParseUserAgent
 	};
-	std::vector<std::string> methodsVec(x, x + sizeof(x) / sizeof(*x));
+	std::vector<std::string> headerVec(x, x + sizeof(x) / sizeof(*x));
 	std::string	s2;
 	size_t		pos;
 	int			j = 0;
 
-	for (std::vector<std::string>::iterator i = methodsVec.begin(); i != methodsVec.end(); i++) {
+	for (std::vector<std::string>::iterator i = headerVec.begin(); i != headerVec.end(); i++) {
 		pos = request.find(*i);
-		if (pos != std::string::npos)
+		if (pos != request.npos)
 			f[j](socket, request, pos);
 		j++;
 	}
@@ -71,7 +71,7 @@ int		httpRequestParseRequestLine(std::string request, Socket *socket) {
 	//GET METHOD FROM REQUEST
 	for (std::vector<std::string>::iterator i = methodsVec.begin(); i != methodsVec.end(); i++) {
 		pos = request.find(*i);
-		if (pos != std::string::npos)
+		if (pos != request.npos)
 			break ;
 	}
 	if (pos == std::string::npos)
