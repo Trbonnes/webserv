@@ -14,14 +14,14 @@ class   Config
 {
     private:
 
-    std::string                 _root;
+    std::string                 _defaultRoot;
     std::vector<std::string>    _defaultAllow;
-    std::string                 _serverName;
-    std::list<std::string>      _index;
+    std::string                 _defaultServerName;
+    std::list<std::string>      _defaultIndex;
     std::string                 _defaultType;
-    std::list<std::string>      _mimeTypes;
-    std::string                 _configFiles;
     std::vector<std::string>    _defaultLanguage;
+    std::list<std::string>      _mimeTypes;
+    std::string                 _configFilesRoot;
 
     public:
 
