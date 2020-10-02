@@ -6,11 +6,18 @@
 /*   By: trbonnes <trbonnes@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/30 15:45:46 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/10/02 11:03:14 by trbonnes         ###   ########.fr       */
+/*   Updated: 2020/10/02 12:34:15 by trbonnes         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "socket.hpp"
+
+int		httpRequestParseBody(std::string request, Socket *socket) {
+	if (!socket->getContentLength().size() && socket->getTransferEncoding().find("chunked") == std::string::npos)
+		return 0;
+	request.find("\n\n");
+	return 0;
+}
 
 int		httpRequestParseHeaders(std::string request, Socket *socket) {
 	char const *x[] = {
@@ -118,6 +125,7 @@ Socket	*httpRequestParser(int fd) {
 	
 	httpRequestParseRequestLine(request, socket);
 	httpRequestParseHeaders(request, socket);
+	httpRequestParseBody(request, socket);
 
 	return socket;
 }

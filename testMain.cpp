@@ -6,7 +6,7 @@
 /*   By: trbonnes <trbonnes@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/30 15:30:52 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/10/02 11:02:29 by trbonnes         ###   ########.fr       */
+/*   Updated: 2020/10/02 12:33:29 by trbonnes         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ int main() {
 	std::cout << "URI: " << socket->getRequestURI() << std::endl;
     std::cout << "Version: " << socket->getHttpVersion() << std::endl;
 
-    std::cout << "ContentType: " << socket->getContentType() << std::endl;
+    //std::cout << "ContentType: " << socket->getContentType() << std::endl;
     std::cout << "getDate: " << socket->getDate() << std::endl;
     std::cout << "TransferEncoding: " << socket->getTransferEncoding() << std::endl;
 

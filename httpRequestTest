@@ -7,8 +7,9 @@ Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.7
 Accept-Encoding: gzip, deflate
 Connection: keep-alive
 Upgrade-Insecure-Requests: 1
-Content-Type: multipart/form-data; boundary=-12656964
+Content-Type: multipart/form-data; boundary=12656964
 Content-Length: 345
 
--12656974
+--12656974
 [...]
+--12656964--

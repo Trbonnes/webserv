@@ -6,7 +6,7 @@
 /*   By: trbonnes <trbonnes@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/30 18:55:18 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/10/02 11:01:41 by trbonnes         ###   ########.fr       */
+/*   Updated: 2020/10/02 12:39:01 by trbonnes         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,7 +112,18 @@ void ParseContentLocation(Socket *socket, std::string request, size_t pos) {
 }
 
 void ParseContentType(Socket *socket, std::string request, size_t pos) {
-	socket->setContentType(ParseStdHeaders(request, pos));
+	std::vector<std::string> v;
+	std::string s = ParseStdHeaders(request, pos);
+	v.push_back(s);
+	socket->setContentType(v);
+	pos = s.find("multipart");
+	if (pos == s.npos)
+		socket->setMultipartContent(false);
+	else {
+		socket->setMultipartContent(true);
+		pos = s.find("boundary=");
+		socket->setContentBoundary(s.substr(pos + 9, s.npos));
+	}
 }
 
 void ParseDate(Socket *socket, std::string request, size_t pos) {
