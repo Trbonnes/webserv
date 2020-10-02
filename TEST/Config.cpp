@@ -1,11 +1,11 @@
 #include "Config.hpp"
 
 Config::Config() :
-_root("/home/pauline/webserver/www"),
-_serverName("localhost"),
-_index(0),
+_defaultRoot("/home/pauline/webserver/www"),
+_defaultServerName("localhost"),
+_defaultIndex(0),
 _defaultType("text/plain"),
-_configFiles("/home/pauline/webserver/config")
+_configFilesRoot("/home/pauline/webserver/config")
 {
     _defaultAllow.push_back("GET");
     _defaultAllow.push_back("HEAD");
@@ -13,8 +13,8 @@ _configFiles("/home/pauline/webserver/config")
     _defaultAllow.push_back("PUT");
     _defaultLanguage.push_back("fr");
     _defaultLanguage.push_back("en");
-    _index.push_back("index.html");
-    _index.push_back("index.php");
+    _defaultIndex.push_back("index.html");
+    _defaultIndex.push_back("index.php");
 
     //** open mime.types **
     int         ret;
@@ -25,7 +25,7 @@ _configFiles("/home/pauline/webserver/config")
     std::list<std::string>::iterator it;
     std::string::iterator s_it;
 
-    file.append(_configFiles);
+    file.append(_configFilesRoot);
     file.append("/mime.types");
     if ((fd = open(file.c_str(), O_RDONLY)) >= 0)
     {
@@ -49,30 +49,44 @@ _configFiles("/home/pauline/webserver/config")
 
 Config::Config(Config &copy)
 {
-    _root = copy._root;
+    _defaultRoot = copy._defaultRoot;
+    _defaultAllow = copy._defaultAllow;
+    _defaultServerName = copy._defaultServerName;
+    _defaultIndex = copy._defaultIndex;
+    _defaultType = copy._defaultType;
+    _defaultLanguage = copy._defaultLanguage;
+    _mimeTypes = copy._mimeTypes;
+    _configFilesRoot = copy._configFilesRoot;
 }
 
 Config::~Config() {}
 
 Config                  &Config::operator=(Config const &rhs)
 {
-    _root = rhs._root;
+    _defaultRoot = rhs._defaultRoot;
+    _defaultAllow = rhs._defaultAllow;
+    _defaultServerName = rhs._defaultServerName;
+    _defaultIndex = rhs._defaultIndex;
+    _defaultType = rhs._defaultType;
+    _defaultLanguage = rhs._defaultLanguage;
+    _mimeTypes = rhs._mimeTypes;
+    _configFilesRoot = rhs._configFilesRoot;
     return *this;
 }
 
 std::string             Config::getRoot()
 {
-    return _root;
+    return _defaultRoot;
 }
 
 std::string             Config::getServerName()
 {
-    return _serverName;
+    return _defaultServerName;
 }
 
 std::list<std::string>  &Config::getIndex()
 {
-    return _index;
+    return _defaultIndex;
 }
 
 std::string             Config::getDefaultType()
