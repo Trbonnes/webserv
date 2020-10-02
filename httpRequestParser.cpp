@@ -6,7 +6,7 @@
 /*   By: trbonnes <trbonnes@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/30 15:45:46 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/10/02 10:52:11 by trbonnes         ###   ########.fr       */
+/*   Updated: 2020/10/02 11:03:14 by trbonnes         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 int		httpRequestParseHeaders(std::string request, Socket *socket) {
 	char const *x[] = {
-		"Accept-Charsets",
+		"Accept-Charset",
 		"Accept-Language",
 		"Autorization",
 		"Content-Length",
@@ -27,7 +27,7 @@ int		httpRequestParseHeaders(std::string request, Socket *socket) {
 		"User-Agent"
 	};
 	void (*f[])(Socket*, std::string, size_t) = {
-		&ParseAcceptCharsets,
+		&ParseAcceptCharset,
 		&ParseAcceptLanguage,
 		&ParseAutorization,
 		&ParseContentLength,

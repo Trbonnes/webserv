@@ -98,7 +98,7 @@ class   Socket
 
 Socket	*httpRequestParser(int fd);
 
-void	ParseAcceptCharsets(Socket *socket, std::string request, size_t pos);
+void	ParseAcceptCharset(Socket *socket, std::string request, size_t pos);
 void	ParseAcceptLanguage(Socket *socket, std::string request, size_t pos);
 void	ParseAutorization(Socket *socket, std::string request, size_t pos);
 void	ParseContentLength(Socket *socket, std::string request, size_t pos);
