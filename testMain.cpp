@@ -6,7 +6,7 @@
 /*   By: trbonnes <trbonnes@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/30 15:30:52 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/10/02 10:42:33 by trbonnes         ###   ########.fr       */
+/*   Updated: 2020/10/02 11:02:29 by trbonnes         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,14 +27,20 @@ int main() {
     std::cout << "ContentType: " << socket->getContentType() << std::endl;
     std::cout << "getDate: " << socket->getDate() << std::endl;
     std::cout << "TransferEncoding: " << socket->getTransferEncoding() << std::endl;
+
+    size_t i = 0;
     std::cout << "AcceptCharset: " << std::endl;
-    for (std::vector<std::string>::iterator it = socket->getAcceptCharset().begin(); it != socket->getAcceptCharset().end(); it++){
-        std::cout << *it << std::endl;
+    while (i < socket->getAcceptCharset().size()){
+        std::cout << socket->getAcceptCharset()[i] << std::endl;
+        i++;
     }
+    i = 0;
     std::cout << "AcceptLanguage: " << std::endl;
-    for (std::vector<std::string>::iterator it = socket->getAcceptLanguage().begin(); it != socket->getAcceptLanguage().end(); it++){
-        std::cout << *it << std::endl;
+    while (i < socket->getAcceptLanguage().size()){
+        std::cout << socket->getAcceptLanguage()[i] << std::endl;
+        i++;
     }
+
     std::cout << "Authorization: " << socket->getAuthorization() << std::endl;
     std::cout << "Host: " << socket->getHost() << std::endl;
     std::cout << "UserAgent: " << socket->getUserAgent() << std::endl;

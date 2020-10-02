@@ -6,7 +6,7 @@
 /*   By: trbonnes <trbonnes@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/30 18:55:18 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/10/02 10:49:52 by trbonnes         ###   ########.fr       */
+/*   Updated: 2020/10/02 11:01:41 by trbonnes         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,24 +57,20 @@ std::vector<std::string> ParseAcceptHeaders(std::string request, size_t pos) {
 
 		s = *tmpIt;
 		pos = s.find(";");
-		//std::cout << "1" << std::endl;
 		if (pos == s.npos)
 			q = 1;
 		else {
-		//std::cout << "2" << std::endl;
 			pos = s.find("=");
 			std::string tmpS = s.substr(pos + 1, s.npos);
 			q = std::stoi(tmpS);
 		}
 		for (tmpIt++; tmpIt != tmpV.end(); tmpIt++) {
-			//std::cout << "3" << std::endl;
 			int q2 = 0;
 			s2 = *tmpIt;
 			pos = s2.find(";");
 			if (pos == s2.npos)
 				q2 = 1;
 			else {
-				//std::cout << "4" << std::endl;
 				pos = s2.find("=");
 				std::string tmpS = s2.substr(pos + 1, s2.npos);
 				q2 = std::stoi(tmpS);
@@ -85,23 +81,17 @@ std::vector<std::string> ParseAcceptHeaders(std::string request, size_t pos) {
 				it = tmpIt;
 			}
 		}
-		//std::cout << "5" << std::endl;
-		//std::cout << s << std::endl;
 		if (s.find(";") != s.npos)
 			s.erase(s.find(";"), s.npos);
-		//std::cout << "6" << std::endl;
 		v.push_back(s);
 		tmpV.erase(it);
 		s.clear();
 		s2.clear();
 	}
-	for (std::vector<std::string>::iterator it = v.begin(); it != v.end(); it++) {
-		std::cout << "v " << *it << std::endl;
-	}
 	return v;
 }
 
-void ParseAcceptCharsets(Socket *socket, std::string request, size_t pos) {
+void ParseAcceptCharset(Socket *socket, std::string request, size_t pos) {
 	socket->setAcceptCharset(ParseAcceptHeaders(request, pos));
 }
 
