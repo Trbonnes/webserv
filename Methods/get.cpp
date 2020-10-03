@@ -17,6 +17,7 @@ void        Methods::get()
         setContentType();
         setContentLength();
         setServerName();
+        setContentLocation();
     }
     return ;
 }
@@ -76,8 +77,10 @@ int         Methods::openFile()
     str.assign(_route);
     while (itIndexBegin != itIndexEnd && (file.st_mode & S_IFMT) == S_IFDIR)
     {
-        str.assign(_route).append(*itIndexBegin);
-        std::cout << str << std::endl;
+        str.assign(_route);
+        if (str.back() != '/')
+            str.append("/");
+        str.append(*itIndexBegin);
         stat(str.c_str(), &file);
         itIndexBegin++;
     }
@@ -133,7 +136,7 @@ int         Methods::setRoot()
 
             _route.assign(getRoot(_location));
             _route.append(acceptLanguage());
-            _route.append(str.assign(_uri).erase(0, getRoot(_location).length()));
+            _route.append(str.assign(_socket.getRequestURI()).erase(0, _location.length()));
         }
         //** Open and test if the file exist **
         fd = openFile();
@@ -141,67 +144,44 @@ int         Methods::setRoot()
     return (fd);
 }
 
-//** Copy file into body string **
-void        Methods::setBody(int fd)
-{
-    int     ret;
-    char    buf[1024 + 1];
-
-    while ((ret = read(fd, buf, 1024)) > 0)
-    {
-        buf[ret] = '\0';
-        _body.assign(buf);
-    }
-    if (ret == -1)
-        _statusCode = INTERNAL_SERVER_ERROR;
-    else
-    close(fd);
-}
-
 //** Define the language page **
 std::string     Methods::acceptLanguage()
 {
     std::vector<std::string>::iterator itClientBegin;
     std::vector<std::string>::iterator itClientEnd;
-    std::vector<std::string>::iterator itServerBegin;
-    std::vector<std::string>::iterator itServerEnd;
     std::vector<std::string>::iterator itServer;
+    std::vector<std::string>::iterator itServerEnd;
     std::string str;
     std::string trydir;
     struct stat dir;
 
-    str.assign("/");
-    itClientBegin = _socket.getAcceptLanguage().begin();
-    itClientEnd = _socket.getAcceptLanguage().end();
-    itServerEnd = getLanguage(_uri).end();
-    while (itClientBegin != itClientEnd)
+    if (!getLanguage(_location).empty())
     {
-        itServer = std::find(getLanguage(_uri).begin(), getLanguage(_uri).end(), *itClientBegin);
-        if (itServer != itServerEnd)
+        str.assign("/");
+        itClientBegin = _socket.getAcceptLanguage().begin();
+        itClientEnd = _socket.getAcceptLanguage().end();
+        itServerEnd = getLanguage(_location).end();
+        while (itClientBegin != itClientEnd)
         {
-            _contentLanguage = *itServer;
-            str.append(*itServer);
-            str.append("/");
-            stat(trydir.assign(_route).append(str).c_str(), &dir);
-            if ((dir.st_mode & S_IFMT) == S_IFDIR)
-                return (str);
-            else
+            itServer = std::find(getLanguage(_location).begin(), getLanguage(_location).end(), *itClientBegin);
+            if (itServer != itServerEnd)
             {
-                _contentLanguage.assign("");
-                return ("");
+                _contentLanguage = *itServer;
+                str.append(*itServer);
+                stat(trydir.assign(_route).append(str).c_str(), &dir);
+                if ((dir.st_mode & S_IFMT) == S_IFDIR)
+                    return (str);
+                else
+                    return (_contentLanguage.assign(""));
             }
+            itClientBegin++;
         }
-        itClientBegin++;
-    }
-    _contentLanguage = *(getLanguage(_uri).begin());
-    str.append(*(getLanguage(_uri).begin()));
-    str.append("/");
-    stat(trydir.assign(_route).append(str).c_str(), &dir);
-    if ((dir.st_mode & S_IFMT) == S_IFDIR)
-        return (str);
-    else
-    {
-        _contentLanguage.assign("");
-        return ("");
+        _contentLanguage = *(getLanguage(_location).begin());
+        str.append(*(getLanguage(_uri).begin()));
+        stat(trydir.assign(_route).append(str).c_str(), &dir);
+        if ((dir.st_mode & S_IFMT) == S_IFDIR)
+            return (str);
+        else
+            return (_contentLanguage.assign(""));
     }
 }

@@ -5,6 +5,7 @@ _defaultRoot("/home/pauline/webserver/www"),
 _defaultServerName("localhost"),
 _defaultIndex(0),
 _defaultType("text/plain"),
+_defaultLanguage(0),
 _configFilesRoot("/home/pauline/webserver/config")
 {
     _defaultAllow.push_back("GET");
@@ -14,7 +15,7 @@ _configFilesRoot("/home/pauline/webserver/config")
     _defaultLanguage.push_back("fr");
     _defaultLanguage.push_back("en");
     _defaultIndex.push_back("index.html");
-    // _defaultIndex.push_back("index.php");
+    _defaultIndex.push_back("index.php");
 
     //** open mime.types **
     int         ret;
@@ -100,7 +101,7 @@ std::string             Config::getLocation(std::string uri)
 {
     std::list<Location>::iterator itBegin;
     std::list<Location>::iterator itEnd; 
-    std::string str;
+
     itBegin = _locationList.begin();
     itEnd = _locationList.end();
     while (itBegin != itEnd)
@@ -125,6 +126,7 @@ std::string             Config::getRoot(std::string location)
     {
         if (location.compare(itBegin->_location) == 0)
             return (str.assign((itBegin->_root)).append(itBegin->_location));
+            // return (str.assign(itBegin->_root));
         itBegin++;
     }
     return _defaultRoot;
@@ -133,31 +135,29 @@ std::string             Config::getRoot(std::string location)
 std::string             Config::getServerName(std::string location)
 {
     std::list<Location>::iterator itBegin;
-    std::list<Location>::iterator itEnd;
-    std::string                     str;
+    std::list<Location>::iterator itEnd; 
 
     itBegin = _locationList.begin();
     itEnd = _locationList.end();
     while (itBegin != itEnd)
     {
-        if (location.compare(itBegin->_location) == 0)
+        if (location.find(itBegin->_location) != std::string::npos)
             return (itBegin->_serverName);
         itBegin++;
-    }    
+    }
     return _defaultServerName;
 }
 
 std::list<std::string>  &Config::getIndex(std::string location)
 {
     std::list<Location>::iterator itBegin;
-    std::list<Location>::iterator itEnd;
-    std::string                     str;
+    std::list<Location>::iterator itEnd; 
 
     itBegin = _locationList.begin();
     itEnd = _locationList.end();
     while (itBegin != itEnd)
     {
-        if (location.compare(itBegin->_location) == 0)
+        if (location.find(itBegin->_location) != std::string::npos)
             return (itBegin->_index);
         itBegin++;
     }
@@ -167,17 +167,16 @@ std::list<std::string>  &Config::getIndex(std::string location)
 std::string                 Config::getType(std::string location)
 {
     std::list<Location>::iterator itBegin;
-    std::list<Location>::iterator itEnd;
-    std::string                     str;
+    std::list<Location>::iterator itEnd; 
 
     itBegin = _locationList.begin();
     itEnd = _locationList.end();
     while (itBegin != itEnd)
     {
-        if (location.compare(itBegin->_location) == 0)
+        if (location.find(itBegin->_location) != std::string::npos)
             return (itBegin->_type);
         itBegin++;
-    }    
+    }
     return _defaultType;
 }
 
@@ -189,33 +188,31 @@ std::list<std::string>      &Config::getMimeTypes()
 std::vector<std::string>    &Config::getLanguage(std::string location)
 {
     std::list<Location>::iterator itBegin;
-    std::list<Location>::iterator itEnd;
-    std::string                     str;
+    std::list<Location>::iterator itEnd; 
 
     itBegin = _locationList.begin();
     itEnd = _locationList.end();
     while (itBegin != itEnd)
     {
-        if (location.compare(itBegin->_location) == 0)
+        if (location.find(itBegin->_location) != std::string::npos)
             return (itBegin->_language);
         itBegin++;
-    }    
+    }
     return _defaultLanguage;
 }
 
 std::vector<std::string>    &Config::getAllow(std::string location)
 {
     std::list<Location>::iterator itBegin;
-    std::list<Location>::iterator itEnd;
-    std::string                     str;
+    std::list<Location>::iterator itEnd; 
 
     itBegin = _locationList.begin();
     itEnd = _locationList.end();
     while (itBegin != itEnd)
     {
-        if (location.compare(itBegin->_location) == 0)
+        if (location.find(itBegin->_location) != std::string::npos)
             return (itBegin->_allow);
         itBegin++;
-    }    
+    }
     return _defaultAllow;
 }

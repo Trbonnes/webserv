@@ -33,14 +33,17 @@ class   Methods : public Config
     Socket                      _socket;
     std::string                 _uri;
     std::string                 _route;
+    std::string                 _location;
     struct stat                 _stat;
     int                         _response;
+
+    // headers
+
     int                         _statusCode;
     std::vector<std::string>    _allow;
     std::string                 _wwwAuthenticate;
     std::string                 _referer;
     std::string                 _lastModified;
-    std::string                 _location;
     std::string                 _server;
     std::string                 _contentLanguage;
     int                         _contentLength;
@@ -49,7 +52,13 @@ class   Methods : public Config
     std::string                 _date;
     std::string                 _retryAfter;
     std::string                 _transferEncoding;
+    
+    // body
+
     std::string                 _body;
+    
+    // methods
+
     std::string                 _methodsName[NB_METHODS];
     void                        (*_method[NB_METHODS])(void);
 
@@ -57,20 +66,21 @@ class   Methods : public Config
 
     void            callMethod(int method);
     int             checkAllowMethods(std::string method);
-    void            setConfigURI();
-    void            setLocation();
-    void            replaceURI();
+    void            setConfigURI(void);
+    void            setLocation(void);
+    void            replaceURI(void);
 
     // GET
     void            get(void);
     int             openFile(void);
     int             setRoot(void);
     void            setBody(int fd);
-    void            setContentType();
-    std::string     acceptLanguage();
+    void            setContentType(void);
+    std::string     acceptLanguage(void);
     void            setStat(void);
-    void            setContentLength();
-    void            setServerName();
+    void            setContentLength(void);
+    void            setServerName(void);
+    void            setContentLocation(void);
 
     // HEAD
     void            head(void);
