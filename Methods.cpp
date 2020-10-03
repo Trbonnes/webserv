@@ -63,9 +63,6 @@ _body("")
     i = 0;
     _uri = socket.getRequestURI();
     setLocation();
-    std::cout << "URI: " << _uri << std::endl;
-    std::cout << "socket.getRequestURI(): " << socket.getRequestURI() << std::endl;
-    std::cout << "Location: " << _location << std::endl;
     replaceURI(); 
 
 
