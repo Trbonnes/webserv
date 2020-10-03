@@ -34,11 +34,11 @@ class   Config
     Config                      &operator=(Config const &rhs);
 
     std::string                 getRoot(std::string _uri);
-    std::string                 getServerName(std::string _uri);
+    std::string                 getServerName(std::string location);
     std::list<std::string>      &getIndex(std::string location);
-    std::string                 getType(std::string _uri);
-    std::vector<std::string>    &getLanguage(std::string _uri);
-    std::vector<std::string>    &getAllow(std::string _uri);
+    std::string                 getType(std::string location);
+    std::vector<std::string>    &getLanguage(std::string location);
+    std::vector<std::string>    &getAllow(std::string location);
     std::list<std::string>      &getMimeTypes();
     std::string                 getLocation(std::string location);
 };
