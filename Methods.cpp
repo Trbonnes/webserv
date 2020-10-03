@@ -60,12 +60,10 @@ _body("")
 
     int     i;
 
-    i = 0;
     _uri = socket.getRequestURI();
     setLocation();
     replaceURI(); 
-
-
+    i = 0;
     while (i < NB_METHODS)
     {
         if (_socket.getMethod().compare(_methodsName[i]) == 0)
@@ -183,12 +181,36 @@ int         Methods::checkAllowMethods(std::string method)
 //** replace URI by the location **
 void        Methods::replaceURI()
 {
-    _uri.replace(_uri.find(_location), _location.length(), getRoot(_location));
+    _uri.assign(getRoot(_location));
 }
 
+//** absolute location route for the server **
 void        Methods::setLocation()
 {
     _location = getLocation(_uri);
+}
+
+//** absolute location route for the user agent **
+void        Methods::setContentLocation()
+{
+    _contentLocation.assign("http://").append(getServerName(_location)).append(_route);
+}
+
+//** Copy file into body string **
+void        Methods::setBody(int fd)
+{
+    int     ret;
+    char    buf[1024 + 1];
+
+    while ((ret = read(fd, buf, 1024)) > 0)
+    {
+        buf[ret] = '\0';
+        _body.assign(buf);
+    }
+    if (ret == -1)
+        _statusCode = INTERNAL_SERVER_ERROR;
+    else
+        close(fd);
 }
 
 int         Methods::getResponse()
@@ -200,6 +222,7 @@ int         Methods::getResponse()
     std::cout << "LOCATION: " << _location << std::endl << std::endl;
     std::cout << "URI: " << _uri << std::endl << std::endl;
     std::cout << "ROUTE: " << _route << std::endl << std::endl;
+    std::cout << "CONTENT-LOCATION: " << _contentLocation << std::endl << std::endl;
     std::cout << "SERVER NAME: " << _server << std::endl << std::endl;
     std::cout << "STATUS CODE: " << _statusCode << std::endl << std::endl;
 
