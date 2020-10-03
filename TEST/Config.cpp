@@ -130,8 +130,20 @@ std::string             Config::getRoot(std::string location)
     return _defaultRoot;
 }
 
-std::string             Config::getServerName(std::string uri)
+std::string             Config::getServerName(std::string location)
 {
+    std::list<Location>::iterator itBegin;
+    std::list<Location>::iterator itEnd;
+    std::string                     str;
+
+    itBegin = _locationList.begin();
+    itEnd = _locationList.end();
+    while (itBegin != itEnd)
+    {
+        if (location.compare(itBegin->_location) == 0)
+            return (itBegin->_serverName);
+        itBegin++;
+    }    
     return _defaultServerName;
 }
 
@@ -152,8 +164,20 @@ std::list<std::string>  &Config::getIndex(std::string location)
     return _defaultIndex;
 }
 
-std::string                 Config::getType(std::string uri)
+std::string                 Config::getType(std::string location)
 {
+    std::list<Location>::iterator itBegin;
+    std::list<Location>::iterator itEnd;
+    std::string                     str;
+
+    itBegin = _locationList.begin();
+    itEnd = _locationList.end();
+    while (itBegin != itEnd)
+    {
+        if (location.compare(itBegin->_location) == 0)
+            return (itBegin->_type);
+        itBegin++;
+    }    
     return _defaultType;
 }
 
@@ -162,12 +186,36 @@ std::list<std::string>      &Config::getMimeTypes()
     return _mimeTypes;
 }
 
-std::vector<std::string>    &Config::getLanguage(std::string uri)
+std::vector<std::string>    &Config::getLanguage(std::string location)
 {
+    std::list<Location>::iterator itBegin;
+    std::list<Location>::iterator itEnd;
+    std::string                     str;
+
+    itBegin = _locationList.begin();
+    itEnd = _locationList.end();
+    while (itBegin != itEnd)
+    {
+        if (location.compare(itBegin->_location) == 0)
+            return (itBegin->_language);
+        itBegin++;
+    }    
     return _defaultLanguage;
 }
 
-std::vector<std::string>    &Config::getAllow(std::string uri)
+std::vector<std::string>    &Config::getAllow(std::string location)
 {
+    std::list<Location>::iterator itBegin;
+    std::list<Location>::iterator itEnd;
+    std::string                     str;
+
+    itBegin = _locationList.begin();
+    itEnd = _locationList.end();
+    while (itBegin != itEnd)
+    {
+        if (location.compare(itBegin->_location) == 0)
+            return (itBegin->_allow);
+        itBegin++;
+    }    
     return _defaultAllow;
 }
