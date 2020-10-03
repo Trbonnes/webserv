@@ -96,7 +96,6 @@ int         Methods::setRoot()
     int         find;
     std::string str;
 
-    // if (_socket.getRequestURI().compare(0, 2, "/") == 0)
     if (_uri.compare(0, 2, "/") == 0)
     {
         //** Default index page **
@@ -119,7 +118,6 @@ int         Methods::setRoot()
     }
     else
     {
-        // if (_socket.getRequestURI().compare(0, 4, "http") == 0)
         if (_uri.compare(0, 4, "http") == 0)
         {
             //** Absolute path **
@@ -188,7 +186,10 @@ std::string     Methods::acceptLanguage()
             if ((dir.st_mode & S_IFMT) == S_IFDIR)
                 return (str);
             else
+            {
+                _contentLanguage.assign("");
                 return ("");
+            }
         }
         itClientBegin++;
     }
@@ -199,5 +200,8 @@ std::string     Methods::acceptLanguage()
     if ((dir.st_mode & S_IFMT) == S_IFDIR)
         return (str);
     else
+    {
+        _contentLanguage.assign("");
         return ("");
+    }
 }

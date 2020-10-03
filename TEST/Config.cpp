@@ -60,13 +60,13 @@ _configFilesRoot("/home/pauline/webserver/config")
 
         //** second location **
 
-    // std::list<std::string> index2;
+    std::list<std::string> index2;
 
-    // index.push_back("42.png");
+    index.push_back("42.png");
 
-    // _locationList.push_back(Location("/images/", "/home/pauline/webserver/www",
-    // _defaultAllow, _defaultServerName, index,
-    // "text/html", _defaultLanguage));
+    _locationList.push_back(Location("/images/", "/home/pauline/webserver/www",
+    _defaultAllow, _defaultServerName, index,
+    "text/html", _defaultLanguage));
 }
 
 Config::Config(Config &copy)
@@ -100,18 +100,13 @@ std::string             Config::getLocation(std::string uri)
 {
     std::list<Location>::iterator itBegin;
     std::list<Location>::iterator itEnd; 
-
+    std::string str;
     itBegin = _locationList.begin();
     itEnd = _locationList.end();
     while (itBegin != itEnd)
     {
-        // if (uri.find(itBegin->_location) >= 0)
-        if ((itBegin->_location).find(uri) >= 0)
-        {
-            std::cout << (itBegin->_location).find(uri) << std::endl;
-            std::cout << uri.find(itBegin->_location) << std::endl;
+        if (uri.find(itBegin->_location) != std::string::npos)
             return (itBegin->_location);
-        }
         itBegin++;
     }
     return (_defaultRoot);
