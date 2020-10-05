@@ -12,6 +12,7 @@ _location(""),
 _server(""),
 _contentLanguage(""),
 _contentLength(0),
+_charset(""),
 _contentLocation(""),
 _contentType(""),
 _date(""),
@@ -40,6 +41,7 @@ _lastModified(""),
 _location(""),
 _server(""),
 _contentLanguage(""),
+_charset(""),
 _contentLength(0),
 _contentLocation(""),
 _contentType(""),
@@ -213,6 +215,11 @@ void        Methods::setBody(int fd)
         close(fd);
 }
 
+void        Methods::setCharset(void)
+{
+    _charset = getCharset(_location);
+}
+
 int         Methods::getResponse()
 {
     std::vector<std::string>::iterator it;
@@ -235,8 +242,10 @@ int         Methods::getResponse()
     }
     std::cout << std::endl << std::endl;
     std::cout << "CONTENT TYPE: " << _contentType << std::endl << std::endl;
+    std::cout << "CHARSET: " << _charset << std::endl << std::endl;
     std::cout << "CONTENT LENGTH: " << _contentLength << std::endl << std::endl;
     std::cout << "CONTENT LANGUAGE: " << _contentLanguage << std::endl << std::endl;
+    std::cout << "WWW AUTHENTICATE: " << _wwwAuthenticate << std::endl << std::endl;
     std::cout << "BODY: " << std::endl << _body << std::endl << std::endl;
 
 

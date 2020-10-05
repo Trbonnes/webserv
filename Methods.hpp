@@ -49,6 +49,7 @@ class   Methods : public Config
     int                         _contentLength;
     std::string                 _contentLocation;
     std::string                 _contentType;
+    std::string                 _charset;
     std::string                 _date;
     std::string                 _retryAfter;
     std::string                 _transferEncoding;
@@ -81,6 +82,7 @@ class   Methods : public Config
     void            setContentLength(void);
     void            setServerName(void);
     void            setContentLocation(void);
+    void            setCharset(void);
 
     // HEAD
     void            head(void);
