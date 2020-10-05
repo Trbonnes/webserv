@@ -21,9 +21,12 @@ class   Config
     std::string                 _defaultServerName;
     std::list<std::string>      _defaultIndex;
     std::string                 _defaultType;
+    std::string                 _defaultCharset;
     std::vector<std::string>    _defaultLanguage;
     std::list<std::string>      _mimeTypes;
     std::string                 _configFilesRoot;
+    std::string                 _defaultAuth_basic;
+    std::string                 _defaultAuth_basic_user_file;
 
     public:
 
@@ -37,10 +40,13 @@ class   Config
     std::string                 getServerName(std::string location);
     std::list<std::string>      &getIndex(std::string location);
     std::string                 getType(std::string location);
+    std::string                 getCharset(std::string location);
     std::vector<std::string>    &getLanguage(std::string location);
     std::vector<std::string>    &getAllow(std::string location);
     std::list<std::string>      &getMimeTypes();
     std::string                 getLocation(std::string location);
+    std::string                 getAuthentification_basic(std::string location);
+    std::string                 getAuthentification_basic_user_file(std::string location);
 };
 
 #endif

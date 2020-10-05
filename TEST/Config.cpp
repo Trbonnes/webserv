@@ -1,12 +1,15 @@
 #include "Config.hpp"
 
 Config::Config() :
-_defaultRoot("/home/pauline/webserver/www"),
+_defaultRoot("/sgoinfre/goinfre/Perso/pganglof/webserver/www/"),
 _defaultServerName("localhost"),
 _defaultIndex(0),
 _defaultType("text/plain"),
+_defaultCharset("koi8-r"),
 _defaultLanguage(0),
-_configFilesRoot("/home/pauline/webserver/config")
+_configFilesRoot("/sgoinfre/goinfre/Perso/pganglof/webserver/config"),
+_defaultAuth_basic(""),
+_defaultAuth_basic_user_file("")
 {
     _defaultAllow.push_back("GET");
     _defaultAllow.push_back("HEAD");
@@ -55,9 +58,9 @@ _configFilesRoot("/home/pauline/webserver/config")
 
     index.push_back("index.php");
 
-    _locationList.push_back(Location("/data/", "/home/pauline/webserver/www",
+    _locationList.push_back(Location("/data/", "/sgoinfre/goinfre/Perso/pganglof/webserver/www/",
     _defaultAllow, _defaultServerName, index,
-    "text/html", _defaultLanguage));
+    "text/html", "utf-8", _defaultLanguage, "Authorization", "/sgoinfre/goinfre/Perso/pganglof/webserver/config/.htpasswd"));
 
         //** second location **
 
@@ -65,9 +68,9 @@ _configFilesRoot("/home/pauline/webserver/config")
 
     index.push_back("42.png");
 
-    _locationList.push_back(Location("/images/", "/home/pauline/webserver/www",
-    _defaultAllow, _defaultServerName, index,
-    "text/html", _defaultLanguage));
+    _locationList.push_back(Location("/images/", "/sgoinfre/goinfre/Perso/pganglof/webserver/www/",
+    _defaultAllow, _defaultServerName, index2,
+    "text/html", "", _defaultLanguage, _defaultAuth_basic, _defaultAuth_basic_user_file));
 }
 
 Config::Config(Config &copy)
@@ -215,4 +218,20 @@ std::vector<std::string>    &Config::getAllow(std::string location)
         itBegin++;
     }
     return _defaultAllow;
+}
+
+std::string                 Config::getCharset(std::string location)
+{
+    std::list<Location>::iterator itBegin;
+    std::list<Location>::iterator itEnd; 
+
+    itBegin = _locationList.begin();
+    itEnd = _locationList.end();
+    while (itBegin != itEnd)
+    {
+        if (location.find(itBegin->_location) != std::string::npos)
+            return (itBegin->_charset);
+        itBegin++;
+    }
+    return _defaultCharset;   
 }

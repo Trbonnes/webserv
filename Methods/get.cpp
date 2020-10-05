@@ -15,6 +15,7 @@ void        Methods::get()
         setBody(fd);
         setStat();
         setContentType();
+        setCharset();
         setContentLength();
         setServerName();
         setContentLocation();
@@ -184,4 +185,5 @@ std::string     Methods::acceptLanguage()
         else
             return (_contentLanguage.assign(""));
     }
+    return ("");
 }
