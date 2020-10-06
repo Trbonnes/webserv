@@ -23,6 +23,7 @@ void        Methods::get()
             setContentLength();
             setServerName();
             setContentLocation();
+            setDate();
         }
     }
     return ;
@@ -49,6 +50,18 @@ void        Methods::setLastModified()
 
     timeinfo = localtime(&(_stat.st_mtim.tv_sec));
     strftime(_lastModified, 100, "%a %d %b 20%y %OH:%OM:%OS GMT", timeinfo);
+}
+
+void        Methods::setDate()
+{
+    struct timeval  tv;
+    struct tm       *timeinfo;
+
+    if (gettimeofday(&tv, NULL) == 0)
+    {
+        timeinfo = localtime(&(tv.tv_sec));
+        strftime(_date, 100, "%a %d %b 20%y %OH:%OM:%OS GMT", timeinfo);
+    }
 }
 
 void        Methods::setContentType()

@@ -5,6 +5,7 @@
 # include <unistd.h>
 # include <sys/types.h>
 # include <sys/stat.h>
+# include <sys/time.h>
 # include <string>
 # include <fcntl.h>
 # include <algorithm>
@@ -46,13 +47,13 @@ class   Methods : public Config
     std::string                 _wwwAuthenticate;
     std::string                 _referer;
     char                        _lastModified[100];
+    char                        _date[100];
     std::string                 _server;
     std::string                 _contentLanguage;
     int                         _contentLength;
     std::string                 _contentLocation;
     std::string                 _contentType;
     std::string                 _charset;
-    std::string                 _date;
     std::string                 _retryAfter;
     std::string                 _transferEncoding;
     
@@ -87,6 +88,7 @@ class   Methods : public Config
     void            setCharset(void);
     void            authorization(void);
     void            setLastModified(void);
+    void            setDate(void);
 
     static inline
     bool            is_base64(unsigned char c);
