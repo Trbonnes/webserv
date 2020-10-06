@@ -6,9 +6,6 @@ void        Methods::get()
     int         find;
     int         fd;
 
-
-            // std::cout << _socket.getRequestURI() << std::endl;
-
     fd = setRoot();
     if (_statusCode == OK)
     {

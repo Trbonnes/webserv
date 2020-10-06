@@ -17,7 +17,6 @@ RUN		adduser -D -g 'www' www \
 		&& mv /etc/nginx/nginx.conf /etc/nginx/nginx.conf.orig \ 
 		&& mkdir -p /run/nginx
 
-
 RUN		adduser -D user
 RUN		echo "user:password"|chpasswd
 RUN 	ssh-keygen -A
@@ -34,7 +33,6 @@ COPY 	srcs/sshd_config /etc/ssh/sshd_config
 RUN		apk add supervisor
 COPY 	srcs/supervisord.conf /etc/supervisord.conf
 
-
 COPY	srcs/nginx.conf /etc/nginx/
 
 COPY	srcs/nginx.conf /etc/nginx/conf.d
@@ -47,11 +45,16 @@ COPY	srcs/index.html /www
 
 COPY 	srcs/code.css /www
 
+COPY	srcs/.htpasswd /home/www/
+
 COPY	srcs/start.sh .
+
 
 RUN 	chmod +x start.sh
 
 VOLUME 	/www
+
+# VOLUME 	/etc/nginx/nginx.conf
 
 EXPOSE	80 443 22
 
