@@ -10,6 +10,7 @@
 # include <algorithm>
 # include "TEST/Socket.hpp"
 # include "TEST/Config.hpp"
+# include "utils/utils.hpp"
 # include "statusCodes.hpp"
 
 enum
@@ -44,7 +45,7 @@ class   Methods : public Config
     std::vector<std::string>    _allow;
     std::string                 _wwwAuthenticate;
     std::string                 _referer;
-    timespec                    _lastModified;
+    char                        _lastModified[100];
     std::string                 _server;
     std::string                 _contentLanguage;
     int                         _contentLength;
@@ -119,10 +120,10 @@ class   Methods : public Config
     
     public:
     Methods(Socket &socket);
-    Methods(Methods const &copy);
+    Methods(Methods &copy);
     ~Methods();
 
-    Methods         &operator=(Methods const &rhs);
+    Methods         &operator=(Methods &rhs);
     int             getResponse();
 };
 

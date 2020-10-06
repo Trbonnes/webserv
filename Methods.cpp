@@ -12,7 +12,7 @@ _response(0),
 _allow(0),
 _wwwAuthenticate(""),
 _referer(""),
-_lastModified(),
+_lastModified(""),
 _location(""),
 _server(""),
 _contentLanguage(""),
@@ -42,7 +42,7 @@ _response(0),
 _allow(0),
 _wwwAuthenticate(""),
 _referer(""),
-_lastModified(),
+_lastModified(""),
 _location(""),
 _server(""),
 _contentLanguage(""),
@@ -88,7 +88,7 @@ _body("")
     _statusCode = BAD_REQUEST;
 }
 
-Methods::Methods(Methods const &copy)
+Methods::Methods(Methods &copy)
 {
     _socket = copy._socket;
     _response = copy._response;
@@ -96,7 +96,7 @@ Methods::Methods(Methods const &copy)
     _allow = copy._allow;
     _wwwAuthenticate = copy._wwwAuthenticate;
     _referer = copy._referer;
-    _lastModified = copy._lastModified;
+    ft_strcpy(copy._lastModified, _lastModified);
     _location = copy._location;
     _server = copy._server;
     _contentLanguage = copy._contentLanguage;
@@ -116,7 +116,7 @@ Methods::Methods(Methods const &copy)
 
 Methods::~Methods() {}
 
-Methods     &Methods::operator=(Methods const &rhs)
+Methods     &Methods::operator=(Methods &rhs)
 {
     _socket = rhs._socket;
     _response = rhs._response;
@@ -124,7 +124,7 @@ Methods     &Methods::operator=(Methods const &rhs)
     _allow = rhs._allow;
     _wwwAuthenticate = rhs._wwwAuthenticate;
     _referer = rhs._referer;
-    _lastModified = rhs._lastModified;
+    ft_strcpy(rhs._lastModified, _lastModified);
     _location = rhs._location;
     _server = rhs._server;
     _contentLanguage = rhs._contentLanguage;
@@ -341,8 +341,8 @@ int         Methods::getResponse()
     std::cout << "CONTENT LENGTH: " << _contentLength << std::endl << std::endl;
     std::cout << "CONTENT LANGUAGE: " << _contentLanguage << std::endl << std::endl;
     std::cout << "WWW AUTHENTICATE: " << _wwwAuthenticate << std::endl << std::endl;
+    std::cout << "LAST MODIFIED: " << _lastModified << std::endl << std::endl;
     std::cout << "BODY: " << std::endl << _body << std::endl << std::endl;
-
 
     return (1);
 }

@@ -45,10 +45,11 @@ void        Methods::setStat()
 
 void        Methods::setLastModified()
 {
-    _lastModified = _stat.st_mtim;
-    std::cout << _lastModified.tv_sec << " " << _lastModified.tv_nsec << std::endl;
-}
+    struct tm *timeinfo;
 
+    timeinfo = localtime(&(_stat.st_mtim.tv_sec));
+    strftime(_lastModified, 100, "%a %d %b 20%y %OH:%OM:%OS GMT", timeinfo);
+}
 
 void        Methods::setContentType()
 {

@@ -3,6 +3,7 @@ SRCS =	TEST/main.cpp 			\
 		TEST/Config.cpp			\
 		TEST/Location.cpp		\
 		utils/get_next_line.cpp \
+		utils/ft_strcpy.cpp		\
 		Methods.cpp				\
 		Methods/get.cpp			\
 		Methods/head.cpp		\
