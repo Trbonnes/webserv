@@ -45,8 +45,8 @@ class   Config
     std::vector<std::string>    &getAllow(std::string location);
     std::list<std::string>      &getMimeTypes();
     std::string                 getLocation(std::string location);
-    std::string                 getAuthentification_basic(std::string location);
-    std::string                 getAuthentification_basic_user_file(std::string location);
+    std::string                 getAuth_basic(std::string location);
+    std::string                 getAuth_basic_user_file(std::string location);
 };
 
 #endif

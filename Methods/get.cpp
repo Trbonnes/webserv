@@ -12,13 +12,18 @@ void        Methods::get()
     fd = setRoot();
     if (_statusCode != NOT_FOUND)
     {
-        setBody(fd);
-        setStat();
-        setContentType();
-        setCharset();
-        setContentLength();
-        setServerName();
-        setContentLocation();
+        authorization();
+        if (_statusCode != UNAUTHORIZED)
+        {
+            setBody(fd);
+            setStat();
+            setLastModified();
+            setContentType();
+            setCharset();
+            setContentLength();
+            setServerName();
+            setContentLocation();
+        }
     }
     return ;
 }
@@ -37,6 +42,13 @@ void        Methods::setStat()
 {
     stat(_route.c_str(), &_stat);
 }
+
+void        Methods::setLastModified()
+{
+    _lastModified = _stat.st_mtim;
+    std::cout << _lastModified.tv_sec << " " << _lastModified.tv_nsec << std::endl;
+}
+
 
 void        Methods::setContentType()
 {
@@ -186,4 +198,46 @@ std::string     Methods::acceptLanguage()
             return (_contentLanguage.assign(""));
     }
     return ("");
+}
+
+std::string base64_encode(unsigned char const* bytes_to_encode, unsigned int in_len);
+std::string base64_decode(std::string const& encoded_string);
+
+void            Methods::authorization()
+{
+    int     fd;
+    int     ret;
+    char    *line;
+
+    if (getAuth_basic(_location).compare("off") != 0)
+    {
+        if (_socket.getAuthorization().compare("") == 0)
+        {
+            _statusCode = UNAUTHORIZED;
+            _wwwAuthenticate.assign("Basic realm=").append(getAuth_basic(_location));
+        }
+        else
+        {
+            if ((fd = open(getAuth_basic_user_file(_location).c_str(), O_RDONLY)) >= 0)
+            {
+                while ((ret = get_next_line(fd, &line)) > 0)
+                {
+                    if (base64_decode(_socket.getAuthorization()).compare(line) == 0)
+                    {
+                        _wwwAuthenticate.assign("OK");
+                        break ;
+                    }
+                }
+                if (base64_decode(_socket.getAuthorization()).compare(line) == 0)
+                    _wwwAuthenticate.assign("OK");
+                if (_wwwAuthenticate.compare("OK") != 0)
+                {
+                    _statusCode = UNAUTHORIZED;
+                    _wwwAuthenticate.assign("Basic realm=").append(getAuth_basic(_location));
+                }
+            }
+        }
+    }
+    else
+        _wwwAuthenticate.assign("OK");
 }

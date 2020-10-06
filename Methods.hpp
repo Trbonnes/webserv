@@ -36,6 +36,7 @@ class   Methods : public Config
     std::string                 _location;
     struct stat                 _stat;
     int                         _response;
+    static const std::string    _base64_chars;
 
     // headers
 
@@ -43,7 +44,7 @@ class   Methods : public Config
     std::vector<std::string>    _allow;
     std::string                 _wwwAuthenticate;
     std::string                 _referer;
-    std::string                 _lastModified;
+    timespec                    _lastModified;
     std::string                 _server;
     std::string                 _contentLanguage;
     int                         _contentLength;
@@ -83,6 +84,13 @@ class   Methods : public Config
     void            setServerName(void);
     void            setContentLocation(void);
     void            setCharset(void);
+    void            authorization(void);
+    void            setLastModified(void);
+
+    static inline
+    bool            is_base64(unsigned char c);
+    std::string     base64_decode(std::string const& encoded_string);
+    std::string     base64_encode(unsigned char const* bytes_to_encode, unsigned int in_len);
 
     // HEAD
     void            head(void);
