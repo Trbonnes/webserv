@@ -89,6 +89,7 @@ class   Methods : public Config
     void            authorization(void);
     void            setLastModified(void);
     void            setDate(void);
+    void            setAutoindex(void);
 
     static inline
     bool            is_base64(unsigned char c);

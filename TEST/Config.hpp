@@ -24,9 +24,11 @@ class   Config
     std::string                 _defaultCharset;
     std::vector<std::string>    _defaultLanguage;
     std::list<std::string>      _mimeTypes;
+    std::string                 _autoindexRoot;
     std::string                 _configFilesRoot;
     std::string                 _defaultAuth_basic;
     std::string                 _defaultAuth_basic_user_file;
+    std::string                 _defaultAutoindex;
 
     public:
 
@@ -47,6 +49,8 @@ class   Config
     std::string                 getLocation(std::string location);
     std::string                 getAuth_basic(std::string location);
     std::string                 getAuth_basic_user_file(std::string location);
+    std::string                 getAutoindex(std::string location);
+    std::string                 getAutoindexRoot();
 };
 
 #endif

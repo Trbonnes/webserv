@@ -181,7 +181,7 @@ int         Methods::checkAllowMethods(std::string method)
             ret = 1;
         itBegin++;
     }
-    _statusCode = 405;
+    _statusCode = METHOD_NOT_ALLOWED;
     return (ret);
 }
 
@@ -212,7 +212,7 @@ void        Methods::setBody(int fd)
     while ((ret = read(fd, buf, 1024)) > 0)
     {
         buf[ret] = '\0';
-        _body.assign(buf);
+        _body.append(buf);
     }
     if (ret == -1)
         _statusCode = INTERNAL_SERVER_ERROR;

@@ -10,10 +10,10 @@ void        Methods::get()
             // std::cout << _socket.getRequestURI() << std::endl;
 
     fd = setRoot();
-    if (_statusCode != NOT_FOUND)
+    if (_statusCode == OK)
     {
         authorization();
-        if (_statusCode != UNAUTHORIZED)
+        if (_statusCode == OK)
         {
             setBody(fd);
             setStat();
@@ -25,6 +25,14 @@ void        Methods::get()
             setContentLocation();
             setDate();
         }
+    }
+    else if (getAutoindex(_location).compare("on") == 0)
+    {
+        setAutoindex();
+        setContentType();
+        setCharset();
+        setDate();
+        // TransferEncoding();
     }
     return ;
 }
@@ -98,11 +106,12 @@ int         Methods::openFile()
     std::list<std::string>::iterator itIndexBegin;
     std::list<std::string>::iterator itIndexEnd;
 
+    fd = -1;
     itIndexBegin = getIndex(_location).begin();
     itIndexEnd = getIndex(_location).end();
     stat(_route.c_str(), &file);
     str.assign(_route);
-    while (itIndexBegin != itIndexEnd && (file.st_mode & S_IFMT) == S_IFDIR)
+    while (itIndexBegin != itIndexEnd && (file.st_mode & S_IFMT) != S_IFREG)
     {
         str.assign(_route);
         if (str.back() != '/')
@@ -112,11 +121,13 @@ int         Methods::openFile()
         itIndexBegin++;
     }
     _route.assign(str);
-    fd = open(_route.c_str(), O_RDONLY);
-    if (fd < 0)
-        _statusCode = NOT_FOUND;
-    else
+    if ((file.st_mode & S_IFMT) == S_IFREG)
+    {
+        fd = open(_route.c_str(), O_RDONLY);
        _statusCode = OK;
+    }
+    else
+        _statusCode = FORBIDDEN;
     return fd;
 }
 
@@ -125,49 +136,45 @@ int         Methods::setRoot()
     int         fd;
     int         find;
     std::string str;
+    struct stat file;
 
-    if (_uri.compare(0, 2, "/") == 0)
+    if (_uri.compare(0, 4, "http") == 0)
     {
-        //** Default index page **
-        std::list<std::string>::iterator it;
+        //** Absolute path **
 
-        it = getIndex(_uri).begin();
-        while (it != getIndex(_uri).end())
-        {
-            _route.assign(getRoot(_location));
-            _route.append(acceptLanguage());
-            _route.append("/");
-            _route.append(*it);
-
-            //** Open and test if the file exist **
-            if ((fd = openFile()) < 0)
-                it++;
-            else
-                break ;
-        }
+        find = _route.append(_socket.getRequestURI()).find(getServerName(_uri));
+        
+        
+        _route.erase(0, find + getServerName(_uri).length());
+        _route.insert(0, getRoot(_location));
+        _route.insert(getRoot(_location).length(), acceptLanguage());
     }
     else
     {
-        if (_uri.compare(0, 4, "http") == 0)
-        {
-            //** Absolute path **
+        //** Relative path **
 
-            find = _route.append(_socket.getRequestURI()).find(getServerName(_uri));
-            _route.erase(0, find + getServerName(_uri).length());
-            _route.insert(0, getRoot(_location));
-            _route.insert(getRoot(_location).length(), acceptLanguage());
-        }
-        else
+        if (getLocation(_socket.getRequestURI()).compare(_socket.getRequestURI()) != 0)
         {
-            //** Relative path **
-
             _route.assign(getRoot(_location));
-            _route.append(acceptLanguage());
-            _route.append(str.assign(_socket.getRequestURI()).erase(0, _location.length()));
+            _route.append(_socket.getRequestURI());
+            stat(_route.c_str(), &file);
+            if ((file.st_mode & S_IFMT) == S_IFREG)
+            {
+                fd = open(_route.c_str(), O_RDONLY);
+                return (fd);
+            }
+            else
+            {
+                _statusCode = NOT_FOUND;
+                return (-1);
+            }
         }
-        //** Open and test if the file exist **
-        fd = openFile();
+        _route.assign(getRoot(_location));
+        _route.append(acceptLanguage());
+        _route.append(str.assign(_socket.getRequestURI()).erase(0, _location.length()));
     }
+    //** Open and test if the file exist **
+    fd = openFile();
     return (fd);
 }
 
@@ -184,7 +191,7 @@ std::string     Methods::acceptLanguage()
 
     if (!getLanguage(_location).empty())
     {
-        str.assign("/");
+        // str.assign("/");
         itClientBegin = _socket.getAcceptLanguage().begin();
         itClientEnd = _socket.getAcceptLanguage().end();
         itServerEnd = getLanguage(_location).end();
@@ -214,8 +221,32 @@ std::string     Methods::acceptLanguage()
     return ("");
 }
 
-std::string base64_encode(unsigned char const* bytes_to_encode, unsigned int in_len);
-std::string base64_decode(std::string const& encoded_string);
+void            Methods::setAutoindex(void)
+{
+    int         fd;
+    int         newfile;
+    int         ret;
+    char        *line;
+    std::string str;
+    struct stat dir;
+
+    fd = open(getAutoindexRoot().c_str(), O_RDWR);
+    newfile = open("autoindex.html", O_CREAT |  O_WRONLY, 0644);
+    while ((ret = get_next_line(fd, &line)) > 0)
+    {
+        str = line;
+        write(newfile, str.c_str(), str.length());
+        write(newfile, "\n", 1);
+        if (str.compare(0, 19, "<h1>Index of /</h1>") == 0)
+            break ;
+    }
+    stat(_uri.c_str(), &dir);
+    write(newfile, "<a href=\"", 9);
+    std::cout << "dir.st_mode: " << dir.st_mode << std::endl;
+    write(newfile, "/</a>\n", 6);
+    close(fd);
+    return ;
+}
 
 void            Methods::authorization()
 {
@@ -249,6 +280,7 @@ void            Methods::authorization()
                     _statusCode = UNAUTHORIZED;
                     _wwwAuthenticate.assign("Basic realm=").append(getAuth_basic(_location));
                 }
+                free(line);
             }
         }
     }
