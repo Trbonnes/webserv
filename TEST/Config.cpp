@@ -1,24 +1,26 @@
 #include "Config.hpp"
 
 Config::Config() :
-_defaultRoot("/home/pauline/webserver/www/"),
+_defaultRoot("/home/pauline/webserver/www"),
 _defaultServerName("localhost"),
 _defaultIndex(0),
 _defaultType("text/plain"),
 _defaultCharset("koi8-r"),
 _defaultLanguage(0),
 _configFilesRoot("/home/pauline/webserver/config"),
+_autoindexRoot("/home/pauline/webserver/config/autoindex.html"),
 _defaultAuth_basic("\"Authorization\""),
-_defaultAuth_basic_user_file("/home/pauline/webserver/config/.htpasswd")
+_defaultAuth_basic_user_file("/home/pauline/webserver/config/.htpasswd"),
+_defaultAutoindex("off")
 {
     _defaultAllow.push_back("GET");
     _defaultAllow.push_back("HEAD");
     _defaultAllow.push_back("POST");
     _defaultAllow.push_back("PUT");
-    _defaultLanguage.push_back("fr");
-    _defaultLanguage.push_back("en");
+    // _defaultLanguage.push_back("fr");
+    // _defaultLanguage.push_back("en");
     _defaultIndex.push_back("index.html");
-    _defaultIndex.push_back("index.php");
+    // _defaultIndex.push_back("index.php");
 
     //** open mime.types **
     int         ret;
@@ -49,6 +51,7 @@ _defaultAuth_basic_user_file("/home/pauline/webserver/config/.htpasswd")
             (*it).erase((*it).begin(), s_it);
             it++;
         }
+        free(line);
         close (fd);
     }
 
@@ -60,19 +63,23 @@ _defaultAuth_basic_user_file("/home/pauline/webserver/config/.htpasswd")
 
     index.push_back("index.php");
 
-    _locationList.push_back(Location("/data/", "/home/pauline/webserver/www/",
+    _locationList.push_back(Location("/data/", "/home/pauline/webserver/www",
     _defaultAllow, _defaultServerName, index,
-    "text/html", "utf-8", _defaultLanguage, _defaultAuth_basic, _defaultAuth_basic_user_file));
+    "text/html", "utf-8", _defaultLanguage, _defaultAuth_basic, _defaultAuth_basic_user_file, _defaultAutoindex));
 
         //** second location **
 
     std::list<std::string> index2;
 
-    index.push_back("42.png");
+    index2.push_back("42.png");
 
-    _locationList.push_back(Location("/images/", "/home/pauline/webserver/www/",
+    _locationList.push_back(Location("/images/", "/home/pauline/webserver/www",
     _defaultAllow, _defaultServerName, index2,
-    "text/html", "", _defaultLanguage, "off", ""));
+    "text/html", "", _defaultLanguage, "off", "", _defaultAutoindex));
+
+    _locationList.push_back(Location("/", "/home/pauline/webserver/www",
+    _defaultAllow, _defaultServerName, _defaultIndex,
+    _defaultType, _defaultCharset, _defaultLanguage, "off", "", "on"));
 }
 
 Config::Config(Config &copy)
@@ -267,4 +274,25 @@ std::string                 Config::getAuth_basic_user_file(std::string location
         itBegin++;
     }
     return _defaultAuth_basic_user_file;   
+}
+
+std::string                 Config::getAutoindex(std::string location)
+{
+    std::list<Location>::iterator itBegin;
+    std::list<Location>::iterator itEnd; 
+
+    itBegin = _locationList.begin();
+    itEnd = _locationList.end();
+    while (itBegin != itEnd)
+    {
+        if (location.find(itBegin->_location) != std::string::npos)
+            return (itBegin->_autoindex);
+        itBegin++;
+    }
+    return _defaultAutoindex;   
+}
+
+std::string                 Config::getAutoindexRoot()
+{
+    return _autoindexRoot;
 }
