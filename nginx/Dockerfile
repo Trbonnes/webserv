@@ -4,7 +4,11 @@ RUN		apk update \
 		&& apk add nginx openssh \
 		&& rm  -rf /tmp/* /var/cache/apk/*
 
+RUN		apk add vim
+
 RUN		apk add netcat-openbsd		
+
+RUN		apk add apache2-utils
 
 RUN		adduser -D -g 'www' www \
 		&& mkdir /www \
@@ -31,9 +35,13 @@ RUN		apk add supervisor
 COPY 	srcs/supervisord.conf /etc/supervisord.conf
 
 
-COPY	srcs/nginx.conf /etc/nginx
+COPY	srcs/nginx.conf /etc/nginx/
 
 COPY	srcs/nginx.conf /etc/nginx/conf.d
+
+COPY 	srcs/koi-utf	/etc/nginx/
+COPY 	srcs/koi-win	/etc/nginx/
+COPY 	srcs/win-utf	/etc/nginx/
 
 COPY	srcs/index.html /www
 

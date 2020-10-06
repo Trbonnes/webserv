@@ -1,15 +1,15 @@
 #include "Config.hpp"
 
 Config::Config() :
-_defaultRoot("/sgoinfre/goinfre/Perso/pganglof/webserver/www/"),
+_defaultRoot("/home/pauline/webserver/www/"),
 _defaultServerName("localhost"),
 _defaultIndex(0),
 _defaultType("text/plain"),
 _defaultCharset("koi8-r"),
 _defaultLanguage(0),
-_configFilesRoot("/sgoinfre/goinfre/Perso/pganglof/webserver/config"),
-_defaultAuth_basic(""),
-_defaultAuth_basic_user_file("")
+_configFilesRoot("/home/pauline/webserver/config"),
+_defaultAuth_basic("\"Authorization\""),
+_defaultAuth_basic_user_file("/home/pauline/webserver/config/.htpasswd")
 {
     _defaultAllow.push_back("GET");
     _defaultAllow.push_back("HEAD");
@@ -38,6 +38,8 @@ _defaultAuth_basic_user_file("")
             string = line;
             _mimeTypes.push_back(string);
         }
+        string = line;
+        _mimeTypes.push_back(string);
         it = _mimeTypes.begin();
         while (it != _mimeTypes.end())
         {
@@ -58,9 +60,9 @@ _defaultAuth_basic_user_file("")
 
     index.push_back("index.php");
 
-    _locationList.push_back(Location("/data/", "/sgoinfre/goinfre/Perso/pganglof/webserver/www/",
+    _locationList.push_back(Location("/data/", "/home/pauline/webserver/www/",
     _defaultAllow, _defaultServerName, index,
-    "text/html", "utf-8", _defaultLanguage, "Authorization", "/sgoinfre/goinfre/Perso/pganglof/webserver/config/.htpasswd"));
+    "text/html", "utf-8", _defaultLanguage, _defaultAuth_basic, _defaultAuth_basic_user_file));
 
         //** second location **
 
@@ -68,9 +70,9 @@ _defaultAuth_basic_user_file("")
 
     index.push_back("42.png");
 
-    _locationList.push_back(Location("/images/", "/sgoinfre/goinfre/Perso/pganglof/webserver/www/",
+    _locationList.push_back(Location("/images/", "/home/pauline/webserver/www/",
     _defaultAllow, _defaultServerName, index2,
-    "text/html", "", _defaultLanguage, _defaultAuth_basic, _defaultAuth_basic_user_file));
+    "text/html", "", _defaultLanguage, "off", ""));
 }
 
 Config::Config(Config &copy)
@@ -129,7 +131,6 @@ std::string             Config::getRoot(std::string location)
     {
         if (location.compare(itBegin->_location) == 0)
             return (str.assign((itBegin->_root)).append(itBegin->_location));
-            // return (str.assign(itBegin->_root));
         itBegin++;
     }
     return _defaultRoot;
@@ -234,4 +235,36 @@ std::string                 Config::getCharset(std::string location)
         itBegin++;
     }
     return _defaultCharset;   
+}
+
+std::string                 Config::getAuth_basic(std::string location)
+{
+    std::list<Location>::iterator itBegin;
+    std::list<Location>::iterator itEnd; 
+
+    itBegin = _locationList.begin();
+    itEnd = _locationList.end();
+    while (itBegin != itEnd)
+    {
+        if (location.find(itBegin->_location) != std::string::npos)
+            return (itBegin->_auth_basic);
+        itBegin++;
+    }
+    return _defaultAuth_basic;   
+}
+
+std::string                 Config::getAuth_basic_user_file(std::string location)
+{
+    std::list<Location>::iterator itBegin;
+    std::list<Location>::iterator itEnd; 
+
+    itBegin = _locationList.begin();
+    itEnd = _locationList.end();
+    while (itBegin != itEnd)
+    {
+        if (location.find(itBegin->_location) != std::string::npos)
+            return (itBegin->_auth_basic_user_file);
+        itBegin++;
+    }
+    return _defaultAuth_basic_user_file;   
 }
