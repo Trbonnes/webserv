@@ -4,6 +4,7 @@ SRCS =	TEST/main.cpp 			\
 		TEST/Location.cpp		\
 		utils/get_next_line.cpp \
 		utils/ft_strcpy.cpp		\
+		utils/ft_strlen.cpp		\
 		Methods.cpp				\
 		Methods/get.cpp			\
 		Methods/head.cpp		\
