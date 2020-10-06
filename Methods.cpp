@@ -103,7 +103,7 @@ Methods::Methods(Methods &copy)
     _contentLength = copy._contentLength;
     _contentLocation = copy._contentLocation;
     _contentType = copy._contentType;
-    _date = copy._date;
+    ft_strcpy(copy._date, _date);
     _retryAfter = copy._retryAfter;
     _transferEncoding = copy._transferEncoding;
     _body = copy._body;
@@ -131,7 +131,7 @@ Methods     &Methods::operator=(Methods &rhs)
     _contentLength = rhs._contentLength;
     _contentLocation = rhs._contentLocation;
     _contentType = rhs._contentType;
-    _date = rhs._date;
+    ft_strcpy(rhs._date, _date);
     _retryAfter = rhs._retryAfter;
     _transferEncoding = rhs._transferEncoding;
     _body = rhs._body;
@@ -342,6 +342,7 @@ int         Methods::getResponse()
     std::cout << "CONTENT LANGUAGE: " << _contentLanguage << std::endl << std::endl;
     std::cout << "WWW AUTHENTICATE: " << _wwwAuthenticate << std::endl << std::endl;
     std::cout << "LAST MODIFIED: " << _lastModified << std::endl << std::endl;
+    std::cout << "DATE: " << _date << std::endl << std::endl;
     std::cout << "BODY: " << std::endl << _body << std::endl << std::endl;
 
     return (1);
