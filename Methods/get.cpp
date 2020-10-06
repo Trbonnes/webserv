@@ -33,6 +33,7 @@ void        Methods::get()
         setCharset();
         setDate();
         // TransferEncoding();
+        _statusCode = OK;
     }
     return ;
 }
@@ -223,29 +224,52 @@ std::string     Methods::acceptLanguage()
 
 void            Methods::setAutoindex(void)
 {
-    int         fd;
-    int         newfile;
-    int         ret;
-    char        *line;
-    std::string str;
-    struct stat dir;
+    std::string     str;
+    struct stat     directory;
+    DIR             *dir;
+    struct dirent   *dirent;
+    struct tm       *timeinfo;
+    char            lastModifications[100];
+    std::stack<std::string> files;
 
-    fd = open(getAutoindexRoot().c_str(), O_RDWR);
-    newfile = open("autoindex.html", O_CREAT |  O_WRONLY, 0644);
-    while ((ret = get_next_line(fd, &line)) > 0)
+    _body.assign("<html>\n<head><title>Index of /</title></head>\n<body>\n<h1>Index of /</h1><hr><pre>\n");
+    dir = opendir(_uri.c_str());
+    if (dir == NULL)
+        _statusCode = INTERNAL_SERVER_ERROR;
+    else
     {
-        str = line;
-        write(newfile, str.c_str(), str.length());
-        write(newfile, "\n", 1);
-        if (str.compare(0, 19, "<h1>Index of /</h1>") == 0)
-            break ;
+        while ((dirent = readdir(dir)) != NULL)
+        {
+            stat(str.assign(_uri).append(dirent->d_name).c_str(), &directory);
+            if (str.assign(dirent->d_name).compare(".") == 0)
+                continue ;
+            str.assign("<a href=\"");
+            str.append(dirent->d_name);
+            if (dirent->d_type == DT_DIR)
+                str.append("/");
+            str.append("\">");
+            str.append(dirent->d_name);
+            if (dirent->d_type == DT_DIR)
+                str.append("/");
+            str.append("</a>\t\t\t\t");
+            timeinfo = localtime(&(directory.st_mtim.tv_sec));
+            strftime(lastModifications, 100, "%d-%b-20%y %OH:%OM", timeinfo);
+            str.append(lastModifications);
+            str.append("\t\t");
+            if (dirent->d_type == DT_DIR)
+                str.append("-");
+            else
+                str.append(std::to_string(directory.st_size));
+            str.append("\n");
+            files.push(str);
+        }
+        while (!files.empty())
+        {
+            _body.append(files.top());
+            files.pop();
+        }
     }
-    stat(_uri.c_str(), &dir);
-    write(newfile, "<a href=\"", 9);
-    std::cout << "dir.st_mode: " << dir.st_mode << std::endl;
-    write(newfile, "/</a>\n", 6);
-    close(fd);
-    return ;
+    _body.append("</pre><hr></body>\n</html>\n");
 }
 
 void            Methods::authorization()

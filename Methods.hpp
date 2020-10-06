@@ -6,9 +6,11 @@
 # include <sys/types.h>
 # include <sys/stat.h>
 # include <sys/time.h>
+# include <dirent.h>
 # include <string>
 # include <fcntl.h>
 # include <algorithm>
+# include <stack>
 # include "TEST/Socket.hpp"
 # include "TEST/Config.hpp"
 # include "utils/utils.hpp"
