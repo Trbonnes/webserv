@@ -9,11 +9,8 @@
 #include <iostream>
 #include <sys/socket.h>
 #include <netinet/in.h>
-<<<<<<< HEAD
 #include <unistd.h>
 #include <cstring>
-=======
->>>>>>> 3163f9f0b3bcdba39cfc1e1696900474686944e6
 
 class HttpServer
 {
