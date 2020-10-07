@@ -16,7 +16,7 @@ _defaultAutoindex("off")
     _defaultAllow.push_back("HEAD");
     _defaultAllow.push_back("POST");
     _defaultAllow.push_back("PUT");
-    // _defaultLanguage.push_back("fr");
+    _defaultLanguage.push_back("fr");
     // _defaultLanguage.push_back("en");
     _defaultIndex.push_back("index.html");
     // _defaultIndex.push_back("index.php");
@@ -59,12 +59,14 @@ _defaultAutoindex("off")
         //** first location **
 
     std::list<std::string> index;
-
+    
     index.push_back("index.php");
 
-    _locationList.push_back(Location("/data/", "/home/pauline/webserver/www",
-    _defaultAllow, _defaultServerName, index,
-    "text/html", "utf-8", _defaultLanguage, _defaultAuth_basic, _defaultAuth_basic_user_file, _defaultAutoindex));
+    Location loc1("/data/", "/home/pauline/webserver/www",
+    _defaultAllow, index,
+    "text/html", "utf-8", _defaultLanguage, _defaultAuth_basic, _defaultAuth_basic_user_file, _defaultAutoindex);
+
+    _locationList["/data/"] = loc1;
 
         //** second location **
 
@@ -72,13 +74,18 @@ _defaultAutoindex("off")
 
     index2.push_back("42.png");
 
-    _locationList.push_back(Location("/images/", "/home/pauline/webserver/www",
-    _defaultAllow, _defaultServerName, index2,
-    "text/html", "", _defaultLanguage, "off", "", _defaultAutoindex));
+    Location loc2("/images/", "/home/pauline/webserver/www",
+    _defaultAllow, index2,
+    "text/html", "", _defaultLanguage, "off", "", _defaultAutoindex);
 
-    _locationList.push_back(Location("/", "/home/pauline/webserver/www",
-    _defaultAllow, _defaultServerName, _defaultIndex,
-    _defaultType, _defaultCharset, _defaultLanguage, "off", "", "on"));
+    _locationList["/images/"] = loc2;
+
+    Location loc3("/", "/home/pauline/webserver/www",
+    _defaultAllow, _defaultIndex,
+    _defaultType, _defaultCharset, _defaultLanguage, "off", "", "on");
+
+    _locationList["/"] = loc3;
+
 }
 
 Config::Config(Config &copy)
@@ -110,15 +117,15 @@ Config                  &Config::operator=(Config const &rhs)
 
 std::string             Config::getLocation(std::string uri)
 {
-    std::list<Location>::iterator itBegin;
-    std::list<Location>::iterator itEnd; 
+    std::map<std::string, Location, Compare<std::string> >::iterator itBegin;
+    std::map<std::string, Location, Compare<std::string> >::iterator itEnd;
 
     itBegin = _locationList.begin();
     itEnd = _locationList.end();
     while (itBegin != itEnd)
     {
-        if (uri.find(itBegin->_location) != std::string::npos)
-            return (itBegin->_location);
+        if (uri.find(itBegin->first) != std::string::npos)
+            return (itBegin->first);
         itBegin++;
     }
     return (_defaultRoot);
@@ -126,16 +133,16 @@ std::string             Config::getLocation(std::string uri)
 
 std::string             Config::getRoot(std::string location)
 {
-    std::list<Location>::iterator itBegin;
-    std::list<Location>::iterator itEnd;
-    std::string                     str;
+    std::map<std::string, Location, Compare<std::string> >::iterator itBegin;
+    std::map<std::string, Location, Compare<std::string> >::iterator itEnd;    
+    std::string str;
 
     itBegin = _locationList.begin();
     itEnd = _locationList.end();
     while (itBegin != itEnd)
     {
-        if (location.compare(itBegin->_location) == 0)
-            return (str.assign((itBegin->_root)).append(itBegin->_location));
+        if (location.compare(itBegin->first) == 0)
+            return (str.assign((itBegin->second._root)).append(itBegin->second._location));
         itBegin++;
     }
     return _defaultRoot;
@@ -143,31 +150,20 @@ std::string             Config::getRoot(std::string location)
 
 std::string             Config::getServerName(std::string location)
 {
-    std::list<Location>::iterator itBegin;
-    std::list<Location>::iterator itEnd; 
-
-    itBegin = _locationList.begin();
-    itEnd = _locationList.end();
-    while (itBegin != itEnd)
-    {
-        if (location.find(itBegin->_location) != std::string::npos)
-            return (itBegin->_serverName);
-        itBegin++;
-    }
     return _defaultServerName;
 }
 
 std::list<std::string>  &Config::getIndex(std::string location)
 {
-    std::list<Location>::iterator itBegin;
-    std::list<Location>::iterator itEnd; 
+    std::map<std::string, Location, Compare<std::string> >::iterator itBegin;
+    std::map<std::string, Location, Compare<std::string> >::iterator itEnd;    
 
     itBegin = _locationList.begin();
     itEnd = _locationList.end();
     while (itBegin != itEnd)
     {
-        if (location.find(itBegin->_location) != std::string::npos)
-            return (itBegin->_index);
+        if (location.compare(itBegin->first) == 0)
+            return (itBegin->second._index);
         itBegin++;
     }
     return _defaultIndex;
@@ -175,15 +171,15 @@ std::list<std::string>  &Config::getIndex(std::string location)
 
 std::string                 Config::getType(std::string location)
 {
-    std::list<Location>::iterator itBegin;
-    std::list<Location>::iterator itEnd; 
+    std::map<std::string, Location, Compare<std::string> >::iterator itBegin;
+    std::map<std::string, Location, Compare<std::string> >::iterator itEnd;  
 
     itBegin = _locationList.begin();
     itEnd = _locationList.end();
     while (itBegin != itEnd)
     {
-        if (location.find(itBegin->_location) != std::string::npos)
-            return (itBegin->_type);
+        if (location.compare(itBegin->first) == 0)
+            return (itBegin->second._type);
         itBegin++;
     }
     return _defaultType;
@@ -196,15 +192,15 @@ std::list<std::string>      &Config::getMimeTypes()
 
 std::vector<std::string>    &Config::getLanguage(std::string location)
 {
-    std::list<Location>::iterator itBegin;
-    std::list<Location>::iterator itEnd; 
+    std::map<std::string, Location, Compare<std::string> >::iterator itBegin;
+    std::map<std::string, Location, Compare<std::string> >::iterator itEnd;  
 
     itBegin = _locationList.begin();
     itEnd = _locationList.end();
     while (itBegin != itEnd)
     {
-        if (location.find(itBegin->_location) != std::string::npos)
-            return (itBegin->_language);
+        if (location.compare(itBegin->first) == 0)
+            return (itBegin->second._language);
         itBegin++;
     }
     return _defaultLanguage;
@@ -212,15 +208,15 @@ std::vector<std::string>    &Config::getLanguage(std::string location)
 
 std::vector<std::string>    &Config::getAllow(std::string location)
 {
-    std::list<Location>::iterator itBegin;
-    std::list<Location>::iterator itEnd; 
+    std::map<std::string, Location, Compare<std::string> >::iterator itBegin;
+    std::map<std::string, Location, Compare<std::string> >::iterator itEnd;  
 
     itBegin = _locationList.begin();
     itEnd = _locationList.end();
     while (itBegin != itEnd)
     {
-        if (location.find(itBegin->_location) != std::string::npos)
-            return (itBegin->_allow);
+        if (location.compare(itBegin->first) == 0)
+            return (itBegin->second._allow);
         itBegin++;
     }
     return _defaultAllow;
@@ -228,15 +224,15 @@ std::vector<std::string>    &Config::getAllow(std::string location)
 
 std::string                 Config::getCharset(std::string location)
 {
-    std::list<Location>::iterator itBegin;
-    std::list<Location>::iterator itEnd; 
+    std::map<std::string, Location, Compare<std::string> >::iterator itBegin;
+    std::map<std::string, Location, Compare<std::string> >::iterator itEnd;  
 
     itBegin = _locationList.begin();
     itEnd = _locationList.end();
     while (itBegin != itEnd)
     {
-        if (location.find(itBegin->_location) != std::string::npos)
-            return (itBegin->_charset);
+        if (location.compare(itBegin->first) == 0)
+            return (itBegin->second._charset);
         itBegin++;
     }
     return _defaultCharset;   
@@ -244,15 +240,15 @@ std::string                 Config::getCharset(std::string location)
 
 std::string                 Config::getAuth_basic(std::string location)
 {
-    std::list<Location>::iterator itBegin;
-    std::list<Location>::iterator itEnd; 
+    std::map<std::string, Location, Compare<std::string> >::iterator itBegin;
+    std::map<std::string, Location, Compare<std::string> >::iterator itEnd;  
 
     itBegin = _locationList.begin();
     itEnd = _locationList.end();
     while (itBegin != itEnd)
     {
-        if (location.find(itBegin->_location) != std::string::npos)
-            return (itBegin->_auth_basic);
+        if (location.compare(itBegin->first) == 0)
+            return (itBegin->second._auth_basic);
         itBegin++;
     }
     return _defaultAuth_basic;   
@@ -260,15 +256,15 @@ std::string                 Config::getAuth_basic(std::string location)
 
 std::string                 Config::getAuth_basic_user_file(std::string location)
 {
-    std::list<Location>::iterator itBegin;
-    std::list<Location>::iterator itEnd; 
+    std::map<std::string, Location, Compare<std::string> >::iterator itBegin;
+    std::map<std::string, Location, Compare<std::string> >::iterator itEnd;  
 
     itBegin = _locationList.begin();
     itEnd = _locationList.end();
     while (itBegin != itEnd)
     {
-        if (location.find(itBegin->_location) != std::string::npos)
-            return (itBegin->_auth_basic_user_file);
+        if (location.compare(itBegin->first) == 0)
+            return (itBegin->second._auth_basic_user_file);
         itBegin++;
     }
     return _defaultAuth_basic_user_file;   
@@ -276,15 +272,15 @@ std::string                 Config::getAuth_basic_user_file(std::string location
 
 std::string                 Config::getAutoindex(std::string location)
 {
-    std::list<Location>::iterator itBegin;
-    std::list<Location>::iterator itEnd; 
+    std::map<std::string, Location, Compare<std::string> >::iterator itBegin;
+    std::map<std::string, Location, Compare<std::string> >::iterator itEnd;  
 
     itBegin = _locationList.begin();
     itEnd = _locationList.end();
     while (itBegin != itEnd)
     {
-        if (location.find(itBegin->_location) != std::string::npos)
-            return (itBegin->_autoindex);
+        if (location.compare(itBegin->first) == 0)
+            return (itBegin->second._autoindex);
         itBegin++;
     }
     return _defaultAutoindex;   
