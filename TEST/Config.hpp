@@ -8,6 +8,8 @@
 # include <sys/stat.h>
 # include <fcntl.h>
 # include <vector>
+# include <map>
+# include "Compare.hpp"
 # include "Location.hpp"
 # include "../utils/utils.hpp"
 
@@ -15,7 +17,7 @@ class   Config
 {
     private:
 
-    std::list<Location>         _locationList;
+    std::map<std::string, Location, Compare<std::string> > _locationList;
     std::string                 _defaultRoot;
     std::vector<std::string>    _defaultAllow;
     std::string                 _defaultServerName;

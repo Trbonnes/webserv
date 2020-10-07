@@ -4,7 +4,6 @@ Location::Location() :
 _location(""),
 _root(""),
 _allow(0),
-_serverName(""),
 _index(0),
 _type(""),
 _charset(""),
@@ -14,12 +13,11 @@ _auth_basic_user_file(""),
 _autoindex("off") {}
 
 Location::Location(std::string location, std::string root, std::vector<std::string> allow,
-std::string serverName, std::list<std::string> index, std::string type, std::string charset, std::vector<std::string> language,
+std::list<std::string> index, std::string type, std::string charset, std::vector<std::string> language,
 std::string auth_basic, std::string auth_basic_user_file, std::string autoindex) :
 _location(location),
 _root(root),
 _allow(allow),
-_serverName(serverName),
 _index(index),
 _type(type),
 _charset(charset),
