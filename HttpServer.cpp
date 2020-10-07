@@ -26,11 +26,7 @@ void HttpServer::initListenSocket() {
 	struct sockaddr_in address;
 	address.sin_family = AF_INET;
     address.sin_addr.s_addr = INADDR_ANY; 
-<<<<<<< HEAD
     address.sin_port = htons( 3256 );
-=======
-    address.sin_port = htons( 80 );
->>>>>>> 3163f9f0b3bcdba39cfc1e1696900474686944e6
 	int addrlen = sizeof(address);
 
 	bind(s, (struct sockaddr *)&address,  
@@ -39,7 +35,6 @@ void HttpServer::initListenSocket() {
 
 	int newfd = accept(s, (struct sockaddr *)&address,  
                        (socklen_t*)&addrlen);
-<<<<<<< HEAD
 	printf("New connection !\n");
 
 	char bf[] = "Server >> Hello, I am the server ! Who are you ?\nClient >> ";
@@ -53,11 +48,6 @@ void HttpServer::initListenSocket() {
 	send(newfd, buff, std::strlen(buff), 0);
 
 	close(newfd);
-=======
-
-	char *buff = "You've reached the server !\n";
-	send();
->>>>>>> 3163f9f0b3bcdba39cfc1e1696900474686944e6
 }
 
 void HttpServer::initWorkers() {
