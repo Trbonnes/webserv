@@ -2,13 +2,22 @@
 # define COMPARE_HPP
 
 template <class T>
-struct   Compare
+struct   CompLength
 {
     bool operator() (const T& x, const T& y) const
     {
         if (x.length() > y.length())
             return true;
         return false;
+    }
+};
+
+template <class T>
+struct  CompNormalOrder
+{
+    bool operator() (const T& x, const T& y) const
+    {
+        return true;
     }
 };
 

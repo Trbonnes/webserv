@@ -17,7 +17,7 @@ class   Config
 {
     private:
 
-    std::map<std::string, Location, Compare<std::string> > _locationList;
+    std::map<std::string, Location, CompLength<std::string> > _locationList;
     std::string                 _defaultRoot;
     std::vector<std::string>    _defaultAllow;
     std::string                 _defaultServerName;
