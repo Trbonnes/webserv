@@ -8,7 +8,6 @@ _defaultType("text/plain"),
 _defaultCharset("koi8-r"),
 _defaultLanguage(0),
 _configFilesRoot("/home/pauline/webserver/config"),
-_autoindexRoot("/home/pauline/webserver/config/autoindex.html"),
 _defaultAuth_basic("\"Authorization\""),
 _defaultAuth_basic_user_file("/home/pauline/webserver/config/.htpasswd"),
 _defaultAutoindex("off")
@@ -124,7 +123,6 @@ std::string             Config::getLocation(std::string uri)
     }
     return (_defaultRoot);
 }
-
 
 std::string             Config::getRoot(std::string location)
 {
@@ -290,9 +288,4 @@ std::string                 Config::getAutoindex(std::string location)
         itBegin++;
     }
     return _defaultAutoindex;   
-}
-
-std::string                 Config::getAutoindexRoot()
-{
-    return _autoindexRoot;
 }

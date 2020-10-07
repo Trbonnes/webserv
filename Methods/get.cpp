@@ -37,7 +37,7 @@ void        Methods::get()
 
 void        Methods::setServerName()
 {
-    _server = getServerName(_uri);
+    _server = getServerName(_location);
 }
 
 void        Methods::setContentLength()
@@ -93,7 +93,7 @@ void        Methods::setContentType()
     if (find >= 0)
         _contentType = (*it).substr(0, (*it).find(" "));
     else
-        _contentType = getType(_uri);
+        _contentType = getType(_location);
 }
 
 int         Methods::openFile()
