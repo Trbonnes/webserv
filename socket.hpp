@@ -18,6 +18,8 @@
 # include <list>
 # include <vector>
 # include <unistd.h>
+# include <sys/types.h>
+# include <sys/socket.h>
 
 class   Socket
 {
