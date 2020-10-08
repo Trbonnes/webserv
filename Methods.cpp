@@ -190,24 +190,18 @@ int         Methods::checkAllowMethods(std::string method)
 //** replace URI by the location **
 void        Methods::replaceURI()
 {
-    _uri.assign(_config.find(_socket.getHost())->second.getRoot(_location));
+  std::cout << "location: " << _location << std::endl;
+  _uri.assign(_config.find(_socket.getHost())->second.getRoot(_location));
 }
 
 //** absolute location route for the server **
 void        Methods::setLocation()
 {
-  std::map<std::string, Config, CompNormalOrder<std::string> >::iterator it;
-  std::map<std::string, Config, CompNormalOrder<std::string> >::iterator itEnd;
-  
-  std::cout << _socket.getHost() << std::endl;
-  it = _config.find(_socket.getHost());
-  // it = _config.begin();
-  if (it == _config.end())
-    std::cout << "NOT FOUND" << std::endl;
-  // std::cout << it->first << std::endl;
-  // it++;
-  // std::cout << it->first << std::endl;
-    _location = _config.find(_socket.getHost())->second.getLocation(_uri);
+  std::cout << "URI: " << _uri << std::endl;
+  if (_config.find(_socket.getHost()) != _config.end())
+    std::cout << "FIND!" << std::endl;
+  std::cout << "root: " << _config.find(_socket.getHost())->second.getRoot(_uri) << std::endl;
+  _location = _config.find(_socket.getHost())->second.getLocation(_uri);
 }
 
 //** absolute location route for the user agent **

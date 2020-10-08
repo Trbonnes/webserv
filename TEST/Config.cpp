@@ -17,7 +17,19 @@ _mimeTypes(mimeTypes),
 _configFilesRoot(configFilesRoot),
 _defaultAuth_basic(defaultAuth_basic),
 _defaultAuth_basic_user_file(defaultAuth_basic_user_file),
-_defaultAutoindex(defaultAutoindex) {}
+_defaultAutoindex(defaultAutoindex) {
+
+    // TEST
+    std::map<std::string, Location, CompLength<std::string> >::iterator itBegin;
+
+    itBegin = _locationList.begin();
+    while (itBegin != _locationList.end())
+    {
+        std::cout << "loc begin: " << itBegin->first << std::endl;
+        itBegin++;
+    }
+    // FIN TEST
+}
 
 Config::Config() :
 _locationList(),
@@ -144,14 +156,21 @@ std::string             Config::getLocation(std::string uri)
     std::map<std::string, Location, CompLength<std::string> >::iterator itEnd;
 
     itBegin = _locationList.begin();
-        std::cout << "TEST: " << itBegin->first << std::endl;
     itEnd = _locationList.end();
+    std::cout << " TEST _defaultRoot: " << _defaultRoot << std::endl;
+    std::cout << " TEST _defaultType: " << _defaultType << std::endl;
+    std::cout << " TEST LOCATION: " << itBegin->first << std::endl;
+    std::cout << " TEST LOCATION blabla: " << itBegin->second._location << std::endl;
     while (itBegin != itEnd)
     {
+            std::cout << "222 itBegin->first: " << itBegin->first << std::endl;
         if (uri.find(itBegin->first) != std::string::npos)
+        {
             return (itBegin->first);
+        }
         itBegin++;
     }
+    std::cout << "1/ default Root: " << _defaultRoot << std::endl;
     return (_defaultRoot);
 }
 
@@ -165,10 +184,17 @@ std::string             Config::getRoot(std::string location)
     itEnd = _locationList.end();
     while (itBegin != itEnd)
     {
+        std::cout << "location: " << location << std::endl;
+        std::cout << "itBegin->first: " << itBegin->first << std::endl;
+
         if (location.compare(itBegin->first) == 0)
+        {
+            std::cout << str.assign((itBegin->second._root)).append(itBegin->second._location) << std::endl;
             return (str.assign((itBegin->second._root)).append(itBegin->second._location));
+        }
         itBegin++;
     }
+    // std::cout << "default Root: " << _defaultRoot << std::endl;
     return _defaultRoot;
 }
 
