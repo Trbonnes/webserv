@@ -6,53 +6,94 @@
 /*   By: trbonnes <trbonnes@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/30 15:45:46 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/10/02 14:46:01 by trbonnes         ###   ########.fr       */
+/*   Updated: 2020/10/08 18:05:21 by trbonnes         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "socket.hpp"
 
-int		httpRequestParseBody(std::string request, Socket *socket) {
-	std::vector<std::string> contentV;
-	std::vector<std::string> bodyV;
-	if (!socket->getContentLength().size() && socket->getTransferEncoding().find("chunked") == std::string::npos)
-		return 0;
-	size_t pos = request.find("\n\n");
+int		httpRequestParseChunckedBody(std::string request, Socket *socket, size_t pos) {
+	size_t chunkSize;
+	std::string convert;
+	std::string s = request.substr(pos, request.npos);
+	std::vector<std::string>	bodyV;
 
-	if (!socket->getMultipartContent()) {
-		bodyV.push_back(request.substr(pos + 2, request.npos));
-	}
-	else {
-		std::string s = request;
-		std::string boundary = "--" + socket->getContentBoundary();
-		std::string endBoundary = "--" + socket->getContentBoundary() + "--";
-		size_t endPos = s.find(endBoundary);
-		size_t boundPos;
-
-		contentV = socket->getContentType();
-		bodyV.push_back("");
-		s.erase(0, pos + 2);
-		endPos = s.find(endBoundary);
-		while ((pos = s.find(boundary)) != endPos) {
-			s.erase(0, pos + boundary.length() + 1);
-			endPos = s.find(endBoundary);
-			boundPos = s.find(boundary);
-			pos = s.find("Content-Type");
-			if (pos >= boundPos) {
-				contentV.push_back("text/plain");
-				bodyV.push_back(s.substr(0, boundPos - 1));
-			}
-			else {
-				pos += 14;
-				contentV.push_back(s.substr(pos, s.find("\n", pos) - 14));
-				s.erase(0, s.find("\n", pos) + 1);;
-				boundPos = s.find(boundary);
-				bodyV.push_back(s.substr(0, boundPos - 1));
-			}
-			s.erase(0, boundPos);
-			endPos = s.find(endBoundary);
+	try {
+		pos = s.find("\r\n") - 1;
+		convert = s.substr(pos, 1);
+		chunkSize = std::stol(convert);
+		while (chunkSize > 0) {
+			bodyV.push_back(s.substr(pos + 3, chunkSize));
+			s.erase(pos, 2 + chunkSize + 2);
+			convert.clear();
+			pos = s.find("\r\n") - 1;
+			convert = s.substr(pos, 1);
+			chunkSize = std::stol(convert);
 		}
-		socket->setContentType(contentV);
+		socket->setBody(bodyV);
+	}
+	catch (std::exception &e) {
+		std::cout << "Exception: " << e.what() << std::endl;
+	}
+	
+	return 0;
+}
+
+int		httpRequestParseBody(std::string request, Socket *socket) {
+	std::vector<std::string>	contentV;
+	std::vector<std::string>	bodyV;
+	size_t						chunkedPos = socket->getTransferEncoding().find("chunked");
+	if (!socket->getContentLength().size() && chunkedPos == std::string::npos)
+		return 0;
+	
+	size_t pos = request.find("\r\n\r\n");
+	pos += 4;
+	if (pos == request.npos) {
+		pos = request.find("\n\n");
+		pos += 2;
+	}
+	if (chunkedPos != std::string::npos)
+		return httpRequestParseChunckedBody(request, socket, pos);
+
+	try {
+		if (!socket->getMultipartContent()) {
+			bodyV.push_back(request.substr(pos, request.npos));
+		}
+		else {
+			std::string s = request;
+			std::string boundary = "--" + socket->getContentBoundary();
+			std::string endBoundary = "--" + socket->getContentBoundary() + "--";
+			size_t endPos = s.find(endBoundary);
+			size_t boundPos;
+
+			contentV = socket->getContentType();
+			bodyV.push_back("");
+			s.erase(0, pos);
+			endPos = s.find(endBoundary);
+			while ((pos = s.find(boundary)) != endPos) {
+				s.erase(0, pos + boundary.length() + 1);
+				endPos = s.find(endBoundary);
+				boundPos = s.find(boundary);
+				pos = s.find("Content-Type");
+				if (pos >= boundPos) {
+					contentV.push_back("text/plain");
+					bodyV.push_back(s.substr(0, boundPos - 1));
+				}
+				else {
+					pos += 14;
+					contentV.push_back(s.substr(pos, s.find("\n", pos) - 14));
+					s.erase(0, s.find("\n", pos) + 1);;
+					boundPos = s.find(boundary);
+					bodyV.push_back(s.substr(0, boundPos - 1));
+				}
+				s.erase(0, boundPos);
+				endPos = s.find(endBoundary);
+			}
+			socket->setContentType(contentV);
+		}
+	}
+	catch (std::exception &e) {
+		std::cout << "Exception: " << e.what() << std::endl;
 	}
 	socket->setBody(bodyV);
 	return 0;
