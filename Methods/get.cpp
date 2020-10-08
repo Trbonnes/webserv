@@ -103,6 +103,7 @@ int         Methods::openFile()
     std::string str;
     std::list<std::string>::iterator itIndexBegin;
     std::list<std::string>::iterator itIndexEnd;
+    
 
     fd = -1;
     itIndexBegin = _config.find(_socket.getHost())->second.getIndex(_location).begin();
