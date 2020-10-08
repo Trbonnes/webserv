@@ -6,6 +6,7 @@ const std::string Methods::_base64_chars =
              "0123456789+/";
 
 Methods::Methods() :
+_config(),
 _socket(0),
 _stat(),
 _response(0),
@@ -35,7 +36,8 @@ _body("") {
     _methodsName[PATCH] = "PATCH"; 
 }
 
-Methods::Methods(Socket &socket) :
+Methods::Methods(std::map<std::string, Config, CompNormalOrder<std::string> > config, Socket &socket) :
+_config(config),
 _socket(socket),
 _stat(),
 _response(0),
@@ -172,8 +174,8 @@ int         Methods::checkAllowMethods(std::string method)
     int ret;
 
     ret = 0;
-    itBegin = getAllow(_uri).begin();
-    itEnd = getAllow(_uri).end();
+    itBegin = _config.find(_socket.getHost())->second.getAllow(_uri).begin();
+    itEnd = _config.find(_socket.getHost())->second.getAllow(_uri).end();
     while (itBegin != itEnd)
     {
         _allow.push_back(*itBegin);
@@ -188,19 +190,30 @@ int         Methods::checkAllowMethods(std::string method)
 //** replace URI by the location **
 void        Methods::replaceURI()
 {
-    _uri.assign(getRoot(_location));
+    _uri.assign(_config.find(_socket.getHost())->second.getRoot(_location));
 }
 
 //** absolute location route for the server **
 void        Methods::setLocation()
 {
-    _location = getLocation(_uri);
+  std::map<std::string, Config, CompNormalOrder<std::string> >::iterator it;
+  std::map<std::string, Config, CompNormalOrder<std::string> >::iterator itEnd;
+  
+  std::cout << _socket.getHost() << std::endl;
+  it = _config.find(_socket.getHost());
+  // it = _config.begin();
+  if (it == _config.end())
+    std::cout << "NOT FOUND" << std::endl;
+  // std::cout << it->first << std::endl;
+  // it++;
+  // std::cout << it->first << std::endl;
+    _location = _config.find(_socket.getHost())->second.getLocation(_uri);
 }
 
 //** absolute location route for the user agent **
 void        Methods::setContentLocation()
 {
-    _contentLocation.assign("http://").append(getServerName(_location)).append(_route);
+    _contentLocation.assign("http://").append(_config.find(_socket.getHost())->second.getServerName(_location)).append(_route);
 }
 
 //** Copy file into body string **
@@ -222,7 +235,7 @@ void        Methods::setBody(int fd)
 
 void        Methods::setCharset(void)
 {
-    _charset = getCharset(_location);
+    _charset = _config.find(_socket.getHost())->second.getCharset(_location);
 }
 
 

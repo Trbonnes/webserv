@@ -23,7 +23,7 @@ void        Methods::get()
             setDate();
         }
     }
-    else if (getAutoindex(_location).compare("on") == 0)
+    else if (_config.find(_socket.getHost())->second.getAutoindex(_location).compare("on") == 0)
     {
         setAutoindex();
         setContentType();
@@ -37,7 +37,7 @@ void        Methods::get()
 
 void        Methods::setServerName()
 {
-    _server = getServerName(_location);
+    _server = _config.find(_socket.getHost())->second.getServerName(_location);
 }
 
 void        Methods::setContentLength()
@@ -54,7 +54,7 @@ void        Methods::setLastModified()
 {
     struct tm *timeinfo;
 
-    timeinfo = localtime(&(_stat.st_mtim.tv_sec));
+    timeinfo = localtime(&(_stat.st_mtimespec.tv_sec)); // linux --> st_mtim - macos --> st_mtimespec
     strftime(_lastModified, 100, "%a %d %b 20%y %OH:%OM:%OS GMT", timeinfo);
 }
 
@@ -83,8 +83,8 @@ void        Methods::setContentType()
     length = _route.length() - find;
     _contentType = _route.substr(find, length);
     find = -1;
-    it = getMimeTypes().begin();
-    while (it != getMimeTypes().end())
+    it = _config.find(_socket.getHost())->second.getMimeTypes().begin();
+    while (it != _config.find(_socket.getHost())->second.getMimeTypes().end())
     {
         if ((find = (*it).find(_contentType)) >= 0)
             break ;
@@ -93,7 +93,7 @@ void        Methods::setContentType()
     if (find >= 0)
         _contentType = (*it).substr(0, (*it).find(" "));
     else
-        _contentType = getType(_location);
+        _contentType = _config.find(_socket.getHost())->second.getType(_location);
 }
 
 int         Methods::openFile()
@@ -105,8 +105,8 @@ int         Methods::openFile()
     std::list<std::string>::iterator itIndexEnd;
 
     fd = -1;
-    itIndexBegin = getIndex(_location).begin();
-    itIndexEnd = getIndex(_location).end();
+    itIndexBegin = _config.find(_socket.getHost())->second.getIndex(_location).begin();
+    itIndexEnd = _config.find(_socket.getHost())->second.getIndex(_location).end();
     stat(_route.c_str(), &file);
     str.assign(_route);
     while (itIndexBegin != itIndexEnd && (file.st_mode & S_IFMT) != S_IFREG)
@@ -140,20 +140,20 @@ int         Methods::setRoot()
     {
         //** Absolute path **
 
-        find = _route.append(_socket.getRequestURI()).find(getServerName(_uri));
+        find = _route.append(_socket.getRequestURI()).find(_config.find(_socket.getHost())->second.getServerName(_uri));
         
         
-        _route.erase(0, find + getServerName(_uri).length());
-        _route.insert(0, getRoot(_location));
-        _route.insert(getRoot(_location).length(), acceptLanguage());
+        _route.erase(0, find + _config.find(_socket.getHost())->second.getServerName(_uri).length());
+        _route.insert(0, _config.find(_socket.getHost())->second.getRoot(_location));
+        _route.insert(_config.find(_socket.getHost())->second.getRoot(_location).length(), acceptLanguage());
     }
     else
     {
         //** Relative path **
 
-        if (getLocation(_socket.getRequestURI()).compare(_socket.getRequestURI()) != 0)
+        if (_config.find(_socket.getHost())->second.getLocation(_socket.getRequestURI()).compare(_socket.getRequestURI()) != 0)
         {
-            _route.assign(getRoot(_location));
+            _route.assign(_config.find(_socket.getHost())->second.getRoot(_location));
             _route.append(_socket.getRequestURI());
             stat(_route.c_str(), &file);
             if ((file.st_mode & S_IFMT) == S_IFREG)
@@ -167,7 +167,7 @@ int         Methods::setRoot()
                 return (-1);
             }
         }
-        _route.assign(getRoot(_location));
+        _route.assign(_config.find(_socket.getHost())->second.getRoot(_location));
         _route.append(acceptLanguage());
         _route.append(str.assign(_socket.getRequestURI()).erase(0, _location.length()));
     }
@@ -187,15 +187,15 @@ std::string     Methods::acceptLanguage()
     std::string trydir;
     struct stat dir;
 
-    if (!getLanguage(_location).empty())
+    if (!_config.find(_socket.getHost())->second.getLanguage(_location).empty())
     {
         // str.assign("/");
         itClientBegin = _socket.getAcceptLanguage().begin();
         itClientEnd = _socket.getAcceptLanguage().end();
-        itServerEnd = getLanguage(_location).end();
+        itServerEnd = _config.find(_socket.getHost())->second.getLanguage(_location).end();
         while (itClientBegin != itClientEnd)
         {
-            itServer = std::find(getLanguage(_location).begin(), getLanguage(_location).end(), *itClientBegin);
+            itServer = std::find(_config.find(_socket.getHost())->second.getLanguage(_location).begin(), _config.find(_socket.getHost())->second.getLanguage(_location).end(), *itClientBegin);
             if (itServer != itServerEnd)
             {
                 _contentLanguage = *itServer;
@@ -208,8 +208,8 @@ std::string     Methods::acceptLanguage()
             }
             itClientBegin++;
         }
-        _contentLanguage = *(getLanguage(_location).begin());
-        str.append(*(getLanguage(_uri).begin()));
+        _contentLanguage = *(_config.find(_socket.getHost())->second.getLanguage(_location).begin());
+        str.append(*(_config.find(_socket.getHost())->second.getLanguage(_uri).begin()));
         stat(trydir.assign(_route).append(str).c_str(), &dir);
         if ((dir.st_mode & S_IFMT) == S_IFDIR)
             return (str);
@@ -249,7 +249,7 @@ void            Methods::setAutoindex(void)
             if (dirent->d_type == DT_DIR)
                 str.append("/");
             str.append("</a>\t\t\t\t");
-            timeinfo = localtime(&(directory.st_mtim.tv_sec));
+            timeinfo = localtime(&(directory.st_mtimespec.tv_sec)); // linux --> st_mtim - macos --> st_mtimespec
             strftime(lastModifications, 100, "%d-%b-20%y %OH:%OM", timeinfo);
             str.append(lastModifications);
             str.append("\t\t");
@@ -275,16 +275,16 @@ void            Methods::authorization()
     int     ret;
     char    *line;
 
-    if (getAuth_basic(_location).compare("off") != 0)
+    if (_config.find(_socket.getHost())->second.getAuth_basic(_location).compare("off") != 0)
     {
         if (_socket.getAuthorization().compare("") == 0)
         {
             _statusCode = UNAUTHORIZED;
-            _wwwAuthenticate.assign("Basic realm=").append(getAuth_basic(_location));
+            _wwwAuthenticate.assign("Basic realm=").append(_config.find(_socket.getHost())->second.getAuth_basic(_location));
         }
         else
         {
-            if ((fd = open(getAuth_basic_user_file(_location).c_str(), O_RDONLY)) >= 0)
+            if ((fd = open(_config.find(_socket.getHost())->second.getAuth_basic_user_file(_location).c_str(), O_RDONLY)) >= 0)
             {
                 while ((ret = get_next_line(fd, &line)) > 0)
                 {
@@ -299,7 +299,7 @@ void            Methods::authorization()
                 if (_wwwAuthenticate.compare("OK") != 0)
                 {
                     _statusCode = UNAUTHORIZED;
-                    _wwwAuthenticate.assign("Basic realm=").append(getAuth_basic(_location));
+                    _wwwAuthenticate.assign("Basic realm=").append(_config.find(_socket.getHost())->second.getAuth_basic(_location));
                 }
                 free(line);
             }

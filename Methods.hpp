@@ -13,6 +13,7 @@
 # include <stack>
 # include "TEST/Socket.hpp"
 # include "TEST/Config.hpp"
+# include "TEST/Compare.hpp"
 # include "utils/utils.hpp"
 # include "statusCodes.hpp"
 
@@ -30,10 +31,11 @@ enum
     NB_METHODS
 };
 
-class   Methods : public Config
+class   Methods
 {
     private:
 
+    std::map<std::string, Config, CompNormalOrder<std::string> >  _config;
     Socket                      _socket;
     std::string                 _uri;
     std::string                 _route;
@@ -124,7 +126,7 @@ class   Methods : public Config
 
     
     public:
-    Methods(Socket &socket);
+    Methods(std::map<std::string, Config, CompNormalOrder<std::string> > config, Socket &socket);
     Methods(Methods &copy);
     ~Methods();
 

@@ -1,98 +1,121 @@
 #include "Config.hpp"
 
+Config::Config(std::map<std::string, Location, CompLength<std::string> > locationList, std::string defaultRoot, std::vector<std::string> defaultAllow, std::string serverName,
+int port, std::list<std::string> defaultIndex, std::string defaultType, std::string defaultCharset, std::vector<std::string> defaultLanguage,
+std::list<std::string> mimeTypes, std::string configFilesRoot, std::string defaultAuth_basic, std::string defaultAuth_basic_user_file,
+std::string defaultAutoindex) :
+_locationList(locationList),
+_defaultRoot(defaultRoot),
+_defaultAllow(defaultAllow),
+_serverName(serverName),
+_port(port),
+_defaultIndex(defaultIndex),
+_defaultType(defaultType),
+_defaultCharset(defaultCharset),
+_defaultLanguage(defaultLanguage),
+_mimeTypes(mimeTypes),
+_configFilesRoot(configFilesRoot),
+_defaultAuth_basic(defaultAuth_basic),
+_defaultAuth_basic_user_file(defaultAuth_basic_user_file),
+_defaultAutoindex(defaultAutoindex) {}
+
 Config::Config() :
-_defaultRoot("/home/pauline/webserver/www"),
-_defaultServerName("localhost"),
+_locationList(),
+_defaultRoot(""),
+_defaultAllow(0),
+_serverName(""),
+_port(0),
 _defaultIndex(0),
-_defaultType("text/plain"),
-_defaultCharset("koi8-r"),
+_defaultType(""),
+_defaultCharset(""),
 _defaultLanguage(0),
-_configFilesRoot("/home/pauline/webserver/config"),
-_defaultAuth_basic("\"Authorization\""),
-_defaultAuth_basic_user_file("/home/pauline/webserver/config/.htpasswd"),
-_defaultAutoindex("off")
+_mimeTypes(0),
+_configFilesRoot(""),
+_defaultAuth_basic(""),
+_defaultAuth_basic_user_file(""),
+_defaultAutoindex("")
 {
-    _defaultAllow.push_back("GET");
-    _defaultAllow.push_back("HEAD");
-    _defaultAllow.push_back("POST");
-    _defaultAllow.push_back("PUT");
-    _defaultLanguage.push_back("fr");
-    // _defaultLanguage.push_back("en");
-    _defaultIndex.push_back("index.html");
-    // _defaultIndex.push_back("index.php");
+    // _defaultAllow.push_back("GET");
+    // _defaultAllow.push_back("HEAD");
+    // _defaultAllow.push_back("POST");
+    // _defaultAllow.push_back("PUT");
+    // _defaultLanguage.push_back("fr");
+    // // _defaultLanguage.push_back("en");
+    // _defaultIndex.push_back("index.html");
+    // // _defaultIndex.push_back("index.php");
 
-    //** open mime.types **
-    int         ret;
-    int         fd;
-    char        *line;
-    std::string string;
-    std::string file;
-    std::list<std::string>::iterator it;
-    std::string::iterator s_it;
+    // //** open mime.types **
+    // int         ret;
+    // int         fd;
+    // char        *line;
+    // std::string string;
+    // std::string file;
+    // std::list<std::string>::iterator it;
+    // std::string::iterator s_it;
 
-    file.append(_configFilesRoot);
-    file.append("/mime.types");
-    if ((fd = open(file.c_str(), O_RDONLY)) >= 0)
-    {
-        while ((ret = get_next_line(fd, &line)) > 0)
-        {
-            string = line;
-            _mimeTypes.push_back(string);
-        }
-        string = line;
-        _mimeTypes.push_back(string);
-        it = _mimeTypes.begin();
-        while (it != _mimeTypes.end())
-        {
-            s_it = (*it).begin();
-            while (*s_it == ' ')
-                s_it++;
-            (*it).erase((*it).begin(), s_it);
-            it++;
-        }
-        free(line);
-        close (fd);
-    }
+    // file.append(_configFilesRoot);
+    // file.append("/mime.types");
+    // if ((fd = open(file.c_str(), O_RDONLY)) >= 0)
+    // {
+    //     while ((ret = get_next_line(fd, &line)) > 0)
+    //     {
+    //         string = line;
+    //         _mimeTypes.push_back(string);
+    //     }
+    //     string = line;
+    //     _mimeTypes.push_back(string);
+    //     it = _mimeTypes.begin();
+    //     while (it != _mimeTypes.end())
+    //     {
+    //         s_it = (*it).begin();
+    //         while (*s_it == ' ')
+    //             s_it++;
+    //         (*it).erase((*it).begin(), s_it);
+    //         it++;
+    //     }
+    //     free(line);
+    //     close (fd);
+    // }
 
-    //** Locations **
+    // //** Locations **
 
-        //** first location **
+    //     //** first location **
 
-    std::list<std::string> index;
+    // std::list<std::string> index;
     
-    index.push_back("index.php");
+    // index.push_back("index.php");
 
-    Location loc1("/data/", "/home/pauline/webserver/www",
-    _defaultAllow, index,
-    "text/html", "utf-8", _defaultLanguage, _defaultAuth_basic, _defaultAuth_basic_user_file, _defaultAutoindex);
+    // Location loc1("/data/", "/home/pauline/webserver/www",
+    // _defaultAllow, index,
+    // "text/html", "utf-8", _defaultLanguage, _defaultAuth_basic, _defaultAuth_basic_user_file, _defaultAutoindex);
 
-    _locationList["/data/"] = loc1;
+    // _locationList["/data/"] = loc1;
 
-        //** second location **
+    //     //** second location **
 
-    std::list<std::string> index2;
+    // std::list<std::string> index2;
 
-    index2.push_back("42.png");
+    // index2.push_back("42.png");
 
-    Location loc2("/images/", "/home/pauline/webserver/www",
-    _defaultAllow, index2,
-    "text/html", "", _defaultLanguage, "off", "", _defaultAutoindex);
+    // Location loc2("/images/", "/home/pauline/webserver/www",
+    // _defaultAllow, index2,
+    // "text/html", "", _defaultLanguage, "off", "", _defaultAutoindex);
 
-    _locationList["/images/"] = loc2;
+    // _locationList["/images/"] = loc2;
 
-    Location loc3("/", "/home/pauline/webserver/www",
-    _defaultAllow, _defaultIndex,
-    _defaultType, _defaultCharset, _defaultLanguage, "off", "", "on");
+    // Location loc3("/", "/home/pauline/webserver/www",
+    // _defaultAllow, _defaultIndex,
+    // _defaultType, _defaultCharset, _defaultLanguage, "off", "", "on");
 
-    _locationList["/"] = loc3;
+    // _locationList["/"] = loc3;
 
 }
 
-Config::Config(Config &copy)
+Config::Config(Config const &copy)
 {
     _defaultRoot = copy._defaultRoot;
     _defaultAllow = copy._defaultAllow;
-    _defaultServerName = copy._defaultServerName;
+    _serverName = copy._serverName;
     _defaultIndex = copy._defaultIndex;
     _defaultType = copy._defaultType;
     _defaultLanguage = copy._defaultLanguage;
@@ -106,7 +129,7 @@ Config                  &Config::operator=(Config const &rhs)
 {
     _defaultRoot = rhs._defaultRoot;
     _defaultAllow = rhs._defaultAllow;
-    _defaultServerName = rhs._defaultServerName;
+    _serverName = rhs._serverName;
     _defaultIndex = rhs._defaultIndex;
     _defaultType = rhs._defaultType;
     _defaultLanguage = rhs._defaultLanguage;
@@ -117,10 +140,11 @@ Config                  &Config::operator=(Config const &rhs)
 
 std::string             Config::getLocation(std::string uri)
 {
-    std::map<std::string, Location, Compare<std::string> >::iterator itBegin;
-    std::map<std::string, Location, Compare<std::string> >::iterator itEnd;
+    std::map<std::string, Location, CompLength<std::string> >::iterator itBegin;
+    std::map<std::string, Location, CompLength<std::string> >::iterator itEnd;
 
     itBegin = _locationList.begin();
+        std::cout << "TEST: " << itBegin->first << std::endl;
     itEnd = _locationList.end();
     while (itBegin != itEnd)
     {
@@ -133,8 +157,8 @@ std::string             Config::getLocation(std::string uri)
 
 std::string             Config::getRoot(std::string location)
 {
-    std::map<std::string, Location, Compare<std::string> >::iterator itBegin;
-    std::map<std::string, Location, Compare<std::string> >::iterator itEnd;    
+    std::map<std::string, Location, CompLength<std::string> >::iterator itBegin;
+    std::map<std::string, Location, CompLength<std::string> >::iterator itEnd;    
     std::string str;
 
     itBegin = _locationList.begin();
@@ -150,13 +174,13 @@ std::string             Config::getRoot(std::string location)
 
 std::string             Config::getServerName(std::string location)
 {
-    return _defaultServerName;
+    return _serverName;
 }
 
 std::list<std::string>  &Config::getIndex(std::string location)
 {
-    std::map<std::string, Location, Compare<std::string> >::iterator itBegin;
-    std::map<std::string, Location, Compare<std::string> >::iterator itEnd;    
+    std::map<std::string, Location, CompLength<std::string> >::iterator itBegin;
+    std::map<std::string, Location, CompLength<std::string> >::iterator itEnd;    
 
     itBegin = _locationList.begin();
     itEnd = _locationList.end();
@@ -171,8 +195,8 @@ std::list<std::string>  &Config::getIndex(std::string location)
 
 std::string                 Config::getType(std::string location)
 {
-    std::map<std::string, Location, Compare<std::string> >::iterator itBegin;
-    std::map<std::string, Location, Compare<std::string> >::iterator itEnd;  
+    std::map<std::string, Location, CompLength<std::string> >::iterator itBegin;
+    std::map<std::string, Location, CompLength<std::string> >::iterator itEnd;  
 
     itBegin = _locationList.begin();
     itEnd = _locationList.end();
@@ -192,8 +216,8 @@ std::list<std::string>      &Config::getMimeTypes()
 
 std::vector<std::string>    &Config::getLanguage(std::string location)
 {
-    std::map<std::string, Location, Compare<std::string> >::iterator itBegin;
-    std::map<std::string, Location, Compare<std::string> >::iterator itEnd;  
+    std::map<std::string, Location, CompLength<std::string> >::iterator itBegin;
+    std::map<std::string, Location, CompLength<std::string> >::iterator itEnd;  
 
     itBegin = _locationList.begin();
     itEnd = _locationList.end();
@@ -208,8 +232,8 @@ std::vector<std::string>    &Config::getLanguage(std::string location)
 
 std::vector<std::string>    &Config::getAllow(std::string location)
 {
-    std::map<std::string, Location, Compare<std::string> >::iterator itBegin;
-    std::map<std::string, Location, Compare<std::string> >::iterator itEnd;  
+    std::map<std::string, Location, CompLength<std::string> >::iterator itBegin;
+    std::map<std::string, Location, CompLength<std::string> >::iterator itEnd;  
 
     itBegin = _locationList.begin();
     itEnd = _locationList.end();
@@ -224,8 +248,8 @@ std::vector<std::string>    &Config::getAllow(std::string location)
 
 std::string                 Config::getCharset(std::string location)
 {
-    std::map<std::string, Location, Compare<std::string> >::iterator itBegin;
-    std::map<std::string, Location, Compare<std::string> >::iterator itEnd;  
+    std::map<std::string, Location, CompLength<std::string> >::iterator itBegin;
+    std::map<std::string, Location, CompLength<std::string> >::iterator itEnd;  
 
     itBegin = _locationList.begin();
     itEnd = _locationList.end();
@@ -240,8 +264,8 @@ std::string                 Config::getCharset(std::string location)
 
 std::string                 Config::getAuth_basic(std::string location)
 {
-    std::map<std::string, Location, Compare<std::string> >::iterator itBegin;
-    std::map<std::string, Location, Compare<std::string> >::iterator itEnd;  
+    std::map<std::string, Location, CompLength<std::string> >::iterator itBegin;
+    std::map<std::string, Location, CompLength<std::string> >::iterator itEnd;  
 
     itBegin = _locationList.begin();
     itEnd = _locationList.end();
@@ -256,8 +280,8 @@ std::string                 Config::getAuth_basic(std::string location)
 
 std::string                 Config::getAuth_basic_user_file(std::string location)
 {
-    std::map<std::string, Location, Compare<std::string> >::iterator itBegin;
-    std::map<std::string, Location, Compare<std::string> >::iterator itEnd;  
+    std::map<std::string, Location, CompLength<std::string> >::iterator itBegin;
+    std::map<std::string, Location, CompLength<std::string> >::iterator itEnd;  
 
     itBegin = _locationList.begin();
     itEnd = _locationList.end();
@@ -272,8 +296,8 @@ std::string                 Config::getAuth_basic_user_file(std::string location
 
 std::string                 Config::getAutoindex(std::string location)
 {
-    std::map<std::string, Location, Compare<std::string> >::iterator itBegin;
-    std::map<std::string, Location, Compare<std::string> >::iterator itEnd;  
+    std::map<std::string, Location, CompLength<std::string> >::iterator itBegin;
+    std::map<std::string, Location, CompLength<std::string> >::iterator itEnd;  
 
     itBegin = _locationList.begin();
     itEnd = _locationList.end();

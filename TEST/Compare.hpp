@@ -17,7 +17,7 @@ struct  CompNormalOrder
 {
     bool operator() (const T& x, const T& y) const
     {
-        return true;
+        return x < y;
     }
 };
 
