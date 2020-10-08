@@ -20,7 +20,7 @@ OBJS = $(SRCS:.cpp=.o)
 NAME = methods
 RM = rm -f
 CC = clang++
-CFLAGS = -Wall -Wextra -Werror  -lcrypt
+CFLAGS = -Wall -Wextra -Werror  #-lcrypt
 
 all: $(NAME)
 

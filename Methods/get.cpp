@@ -54,7 +54,7 @@ void        Methods::setLastModified()
 {
     struct tm *timeinfo;
 
-    timeinfo = localtime(&(_stat.st_mtim.tv_sec));
+    timeinfo = localtime(&(_stat.st_mtimespec.tv_sec));
     strftime(_lastModified, 100, "%a %d %b 20%y %OH:%OM:%OS GMT", timeinfo);
 }
 
@@ -249,7 +249,7 @@ void            Methods::setAutoindex(void)
             if (dirent->d_type == DT_DIR)
                 str.append("/");
             str.append("</a>\t\t\t\t");
-            timeinfo = localtime(&(directory.st_mtim.tv_sec));
+            timeinfo = localtime(&(directory.st_mtimespec.tv_sec));
             strftime(lastModifications, 100, "%d-%b-20%y %OH:%OM", timeinfo);
             str.append(lastModifications);
             str.append("\t\t");
