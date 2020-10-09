@@ -6,7 +6,7 @@
 /*   By: trbonnes <trbonnes@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/09 12:19:51 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/10/09 14:56:07 by trbonnes         ###   ########.fr       */
+/*   Updated: 2020/10/09 15:39:43 by trbonnes         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,16 +41,14 @@ private:
     std::string                 _defaultAuth_basic_user_file;
     std::string                 _defaultAutoindex;
 
+    //PARSER VARIABLES
 	std::string					_cgi;
 	std::string					_cgi_method;
 	std::string					_cgi_root;
-
     int                         _port;
     std::vector<std::string>    _server_name;
-    std::string                 _alias;
-
     std::string                 _root;
-    std::string                 _index;
+    std::vector<std::string>    _index;
     bool                        _autoIndex;
     int                         _clientBodySize;
     std::vector<std::string>    _acceptedMethods;
@@ -61,18 +59,42 @@ public:
 	/*virtual*/ ~ConfigServer();
 	ConfigServer &operator=(const ConfigServer &c);
 
-    std::string                 getRoot(std::string _uri);
-    std::string                 getServerName(std::string location);
-    std::list<std::string>      &getIndex(std::string location);
-    std::string                 getType(std::string location);
-    std::string                 getCharset(std::string location);
-    std::vector<std::string>    &getLanguage(std::string location);
-    std::vector<std::string>    &getAllow(std::string location);
-    std::list<std::string>      &getMimeTypes();
-    std::string                 getLocation(std::string location);
-    std::string                 getAuth_basic(std::string location);
-    std::string                 getAuth_basic_user_file(std::string location);
-    std::string                 getAutoindex(std::string location);
+    std::string                 getDefaultRoot(std::string _uri);
+    std::string                 getDefaultServerName(std::string location);
+    std::list<std::string>      &getDefaultIndex(std::string location);
+    std::string                 getDefaultType(std::string location);
+    std::string                 getDefaultCharset(std::string location);
+    std::vector<std::string>    &getDefaultLanguage(std::string location);
+    std::vector<std::string>    &getDefaultAllow(std::string location);
+    std::list<std::string>      &getDefaultMimeTypes();
+    std::string                 getDefaultLocation(std::string location);
+    std::string                 getDefaultAuth_basic(std::string location);
+    std::string                 getDefaultAuth_basic_user_file(std::string location);
+    std::string                 getDefaultAutoindex(std::string location);
+
+    //PARSER VARIABLES GETTERS
+    std::string					getCgi();
+	std::string					getCgi_method();
+	std::string					getCgi_root();
+    int                         getPort();
+    std::vector<std::string>    getServer_name();
+    std::string                 getRoot();
+    std::vector<std::string>    getIndex();
+    bool                        getAutoIndex();
+    int                         getClientBodySize();
+    std::vector<std::string>    getAcceptedMethods();
+
+    //PARSER VARIABLES SETTERS
+    void					setCgi(std::string _cgi);
+	void					setCgi_method(std::string _cgi_method);
+	void					setCgi_root(std::string _cgi_root);
+    void                    setPort(int _port);
+    void                    setServer_name(std::vector<std::string> _server_name);
+    void                    setRoot(std::string _root);
+    void                    setIndex(std::vector<std::string> _index);
+    bool                    setAutoIndex(bool _autoIndex);
+    void                    setClientBodySize(int _clientBodySize);
+    void                    setAcceptedMethods(std::vector<std::string> _acceptedMethods);
 };
 
 #endif

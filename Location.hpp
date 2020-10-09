@@ -6,7 +6,7 @@
 /*   By: trbonnes <trbonnes@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/09 12:24:19 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/10/09 12:24:27 by trbonnes         ###   ########.fr       */
+/*   Updated: 2020/10/09 15:26:31 by trbonnes         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,8 @@ class   Location
     std::string                 _auth_basic;
     std::string                 _auth_basic_user_file;
     std::string                 _autoindex;
+
+    std::string                 _alias;
 
     Location(std::string location, std::string root, std::vector<std::string> allow, 
     std::list<std::string> index, std::string type, std::string charset, std::vector<std::string> language,
