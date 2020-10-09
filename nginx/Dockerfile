@@ -54,7 +54,7 @@ RUN 	chmod +x start.sh
 
 VOLUME 	/www
 
-# VOLUME 	/etc/nginx/nginx.conf
+#VOLUME 	/etc/nginx/nginx.conf
 
 EXPOSE	80 443 22
 
