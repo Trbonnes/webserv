@@ -23,9 +23,11 @@ class   Location
     std::string                 _auth_basic_user_file;
     std::string                 _autoindex;
 
+    std::string                 _alias;
+
     Location(std::string location, std::string root, std::vector<std::string> allow, 
     std::list<std::string> index, std::string type, std::string charset, std::vector<std::string> language,
-    std::string auth_basic, std::string auth_basic_user_file, std::string autoindex);
+    std::string auth_basic, std::string auth_basic_user_file, std::string autoindex, std::string alias);
     ~Location();
 
     Location();

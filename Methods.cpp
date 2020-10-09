@@ -181,7 +181,8 @@ int         Methods::checkAllowMethods(std::string method)
             ret = 1;
         itBegin++;
     }
-    _statusCode = METHOD_NOT_ALLOWED;
+    if (!ret)
+      _statusCode = METHOD_NOT_ALLOWED;
     return (ret);
 }
 
@@ -200,7 +201,9 @@ void        Methods::setLocation()
 //** absolute location route for the user agent **
 void        Methods::setContentLocation()
 {
-    _contentLocation.assign("http://").append(getServerName(_location)).append(_route);
+  _contentLocation.assign("http://").append(getServerName()).append(_route);
+  if (getAlias(_location).length() > 0)
+    _contentLocation.replace(_contentLocation.find(_location), _location.length(), getAlias(_location));
 }
 
 //** Copy file into body string **
@@ -224,7 +227,6 @@ void        Methods::setCharset(void)
 {
     _charset = getCharset(_location);
 }
-
 
 inline bool   Methods::is_base64(unsigned char c)
 {

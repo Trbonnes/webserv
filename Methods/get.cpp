@@ -37,7 +37,7 @@ void        Methods::get()
 
 void        Methods::setServerName()
 {
-    _server = getServerName(_location);
+    _server = getServerName();
 }
 
 void        Methods::setContentLength()
@@ -140,10 +140,10 @@ int         Methods::setRoot()
     {
         //** Absolute path **
 
-        find = _route.append(_socket.getRequestURI()).find(getServerName(_uri));
+        find = _route.append(_socket.getRequestURI()).find(getServerName());
         
         
-        _route.erase(0, find + getServerName(_uri).length());
+        _route.erase(0, find + getServerName().length());
         _route.insert(0, getRoot(_location));
         _route.insert(getRoot(_location).length(), acceptLanguage());
     }

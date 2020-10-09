@@ -40,7 +40,7 @@ class   Config
     Config                      &operator=(Config const &rhs);
 
     std::string                 getRoot(std::string _uri);
-    std::string                 getServerName(std::string location);
+    std::string                 getServerName(void);
     std::list<std::string>      &getIndex(std::string location);
     std::string                 getType(std::string location);
     std::string                 getCharset(std::string location);
@@ -51,6 +51,7 @@ class   Config
     std::string                 getAuth_basic(std::string location);
     std::string                 getAuth_basic_user_file(std::string location);
     std::string                 getAutoindex(std::string location);
+    std::string                 getAlias(std::string location);
 };
 
 #endif

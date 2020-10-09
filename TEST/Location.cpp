@@ -10,11 +10,12 @@ _charset(""),
 _language(0),
 _auth_basic(""),
 _auth_basic_user_file(""),
-_autoindex("off") {}
+_autoindex("off"),
+_alias("") {}
 
 Location::Location(std::string location, std::string root, std::vector<std::string> allow,
 std::list<std::string> index, std::string type, std::string charset, std::vector<std::string> language,
-std::string auth_basic, std::string auth_basic_user_file, std::string autoindex) :
+std::string auth_basic, std::string auth_basic_user_file, std::string autoindex, std::string alias) :
 _location(location),
 _root(root),
 _allow(allow),
@@ -24,6 +25,7 @@ _charset(charset),
 _language(language),
 _auth_basic(auth_basic),
 _auth_basic_user_file(auth_basic_user_file),
-_autoindex(autoindex) {}
+_autoindex(autoindex),
+_alias(alias) {}
 
 Location::~Location() {}
