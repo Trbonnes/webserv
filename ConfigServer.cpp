@@ -1,7 +1,7 @@
 #include "ConfigServer.hpp"
 
 ConfigServer::ConfigServer() :
-_defaultRoot("/Users/trbonnes/Documents/Tristan42/webserver/data/www"),
+_defaultRoot("/Users/trbonnes/Documents/Tristan42/webserver"),
 _defaultServerName("localhost"),
 _defaultIndex(0),
 _defaultType("text/plain"),

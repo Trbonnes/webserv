@@ -6,7 +6,7 @@
 /*   By: trbonnes <trbonnes@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/09 12:19:51 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/10/09 12:25:48 by trbonnes         ###   ########.fr       */
+/*   Updated: 2020/10/09 14:56:07 by trbonnes         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,21 @@ private:
     std::string                 _defaultAuth_basic;
     std::string                 _defaultAuth_basic_user_file;
     std::string                 _defaultAutoindex;
+
+	std::string					_cgi;
+	std::string					_cgi_method;
+	std::string					_cgi_root;
+
+    int                         _port;
+    std::vector<std::string>    _server_name;
+    std::string                 _alias;
+
+    std::string                 _root;
+    std::string                 _index;
+    bool                        _autoIndex;
+    int                         _clientBodySize;
+    std::vector<std::string>    _acceptedMethods;
+
 public:
 	ConfigServer();
 	ConfigServer(const ConfigServer &c);
