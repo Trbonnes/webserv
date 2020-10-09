@@ -6,7 +6,7 @@
 /*   By: trbonnes <trbonnes@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/09 12:19:51 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/10/09 15:39:43 by trbonnes         ###   ########.fr       */
+/*   Updated: 2020/10/09 16:54:27 by trbonnes         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ private:
     std::string                 _defaultRoot;
     std::vector<std::string>    _defaultAllow;
     std::string                 _defaultServerName;
-    std::list<std::string>      _defaultIndex;
+    std::vector<std::string>    _defaultIndex;
     std::string                 _defaultType;
     std::string                 _defaultCharset;
     std::vector<std::string>    _defaultLanguage;
@@ -39,11 +39,11 @@ private:
     std::string                 _configFilesRoot;
     std::string                 _defaultAuth_basic;
     std::string                 _defaultAuth_basic_user_file;
-    std::string                 _defaultAutoindex;
+    bool                        _defaultAutoindex;
 
     //PARSER VARIABLES
 	std::string					_cgi;
-	std::string					_cgi_method;
+	std::vector<std::string>	_cgi_method;
 	std::string					_cgi_root;
     int                         _port;
     std::vector<std::string>    _server_name;
@@ -52,6 +52,7 @@ private:
     bool                        _autoIndex;
     int                         _clientBodySize;
     std::vector<std::string>    _acceptedMethods;
+    //
 
 public:
 	ConfigServer();
@@ -61,7 +62,7 @@ public:
 
     std::string                 getDefaultRoot(std::string _uri);
     std::string                 getDefaultServerName(std::string location);
-    std::list<std::string>      &getDefaultIndex(std::string location);
+    std::vector<std::string>    &getDefaultIndex(std::string location);
     std::string                 getDefaultType(std::string location);
     std::string                 getDefaultCharset(std::string location);
     std::vector<std::string>    &getDefaultLanguage(std::string location);
@@ -70,11 +71,11 @@ public:
     std::string                 getDefaultLocation(std::string location);
     std::string                 getDefaultAuth_basic(std::string location);
     std::string                 getDefaultAuth_basic_user_file(std::string location);
-    std::string                 getDefaultAutoindex(std::string location);
+    bool                        getDefaultAutoindex(std::string location);
 
     //PARSER VARIABLES GETTERS
     std::string					getCgi();
-	std::string					getCgi_method();
+	std::vector<std::string>	getCgi_method();
 	std::string					getCgi_root();
     int                         getPort();
     std::vector<std::string>    getServer_name();
@@ -83,10 +84,11 @@ public:
     bool                        getAutoIndex();
     int                         getClientBodySize();
     std::vector<std::string>    getAcceptedMethods();
+    //
 
     //PARSER VARIABLES SETTERS
     void					setCgi(std::string _cgi);
-	void					setCgi_method(std::string _cgi_method);
+	void					setCgi_method(std::vector<std::string> _cgi_method);
 	void					setCgi_root(std::string _cgi_root);
     void                    setPort(int _port);
     void                    setServer_name(std::vector<std::string> _server_name);
@@ -95,6 +97,7 @@ public:
     bool                    setAutoIndex(bool _autoIndex);
     void                    setClientBodySize(int _clientBodySize);
     void                    setAcceptedMethods(std::vector<std::string> _acceptedMethods);
+    //
 };
 
 #endif

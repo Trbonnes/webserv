@@ -6,7 +6,7 @@
 /*   By: trbonnes <trbonnes@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/09 15:13:35 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/10/09 15:42:50 by trbonnes         ###   ########.fr       */
+/*   Updated: 2020/10/09 16:53:45 by trbonnes         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -190,7 +190,7 @@ std::string             ConfigServer::getDefaultRoot(std::string location)
     while (itBegin != itEnd)
     {
         if (location.compare(itBegin->first) == 0)
-            return (str.assign((itBegin->second._root)).append(itBegin->second._location));
+            return (str.assign((itBegin->second.getRoot())).append(itBegin->second.getLocation()));
         itBegin++;
     }
     return _defaultRoot;
@@ -201,7 +201,7 @@ std::string             ConfigServer::getDefaultServerName(std::string location)
     return _defaultServerName;
 }
 
-std::list<std::string>  &ConfigServer::getDefaultIndex(std::string location)
+std::vector<std::string>  &ConfigServer::getDefaultIndex(std::string location)
 {
     std::map<std::string, Location, Compare<std::string> >::iterator itBegin;
     std::map<std::string, Location, Compare<std::string> >::iterator itEnd;    
@@ -211,7 +211,7 @@ std::list<std::string>  &ConfigServer::getDefaultIndex(std::string location)
     while (itBegin != itEnd)
     {
         if (location.compare(itBegin->first) == 0)
-            return (itBegin->second._index);
+            return (itBegin->second.getIndex());
         itBegin++;
     }
     return _defaultIndex;
@@ -227,7 +227,7 @@ std::string                 ConfigServer::getDefaultType(std::string location)
     while (itBegin != itEnd)
     {
         if (location.compare(itBegin->first) == 0)
-            return (itBegin->second._type);
+            return (itBegin->second.getType());
         itBegin++;
     }
     return _defaultType;
@@ -248,7 +248,7 @@ std::vector<std::string>    &ConfigServer::getDefaultLanguage(std::string locati
     while (itBegin != itEnd)
     {
         if (location.compare(itBegin->first) == 0)
-            return (itBegin->second._language);
+            return (itBegin->second.getLanguage());
         itBegin++;
     }
     return _defaultLanguage;
@@ -264,7 +264,7 @@ std::vector<std::string>    &ConfigServer::getDefaultAllow(std::string location)
     while (itBegin != itEnd)
     {
         if (location.compare(itBegin->first) == 0)
-            return (itBegin->second._allow);
+            return (itBegin->second.getAllow());
         itBegin++;
     }
     return _defaultAllow;
@@ -280,7 +280,7 @@ std::string                 ConfigServer::getDefaultCharset(std::string location
     while (itBegin != itEnd)
     {
         if (location.compare(itBegin->first) == 0)
-            return (itBegin->second._charset);
+            return (itBegin->second.getCharset());
         itBegin++;
     }
     return _defaultCharset;   
@@ -296,7 +296,7 @@ std::string                 ConfigServer::getDefaultAuth_basic(std::string locat
     while (itBegin != itEnd)
     {
         if (location.compare(itBegin->first) == 0)
-            return (itBegin->second._auth_basic);
+            return (itBegin->second.getAuth_basic());
         itBegin++;
     }
     return _defaultAuth_basic;   
@@ -312,13 +312,13 @@ std::string                 ConfigServer::getDefaultAuth_basic_user_file(std::st
     while (itBegin != itEnd)
     {
         if (location.compare(itBegin->first) == 0)
-            return (itBegin->second._auth_basic_user_file);
+            return (itBegin->second.getAuth_basic_user_file());
         itBegin++;
     }
     return _defaultAuth_basic_user_file;   
 }
 
-std::string                 ConfigServer::getDefaultAutoindex(std::string location)
+bool                 ConfigServer::getDefaultAutoindex(std::string location)
 {
     std::map<std::string, Location, Compare<std::string> >::iterator itBegin;
     std::map<std::string, Location, Compare<std::string> >::iterator itEnd;  
@@ -328,7 +328,7 @@ std::string                 ConfigServer::getDefaultAutoindex(std::string locati
     while (itBegin != itEnd)
     {
         if (location.compare(itBegin->first) == 0)
-            return (itBegin->second._autoindex);
+            return (itBegin->second.getAutoIndex());
         itBegin++;
     }
     return _defaultAutoindex;   
@@ -339,7 +339,7 @@ std::string					ConfigServer::getCgi() {
     return _cgi;
 }
 
-std::string					ConfigServer::getCgi_method() {
+std::vector<std::string>			ConfigServer::getCgi_method() {
     return _cgi_method;
 }
 
@@ -381,7 +381,7 @@ void					ConfigServer::setCgi(std::string cgi) {
     _cgi = cgi;
 } 
 
-void					ConfigServer::setCgi_method(std::string cgi_method) {
+void					ConfigServer::setCgi_method(std::vector<std::string> cgi_method) {
     _cgi_method = cgi_method;
 }
 
