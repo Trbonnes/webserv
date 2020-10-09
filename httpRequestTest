@@ -7,20 +7,8 @@ Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.7
 Accept-Encoding: gzip, deflate
 Connection: keep-alive
 Upgrade-Insecure-Requests: 1
-Content-Type: multipart/form-data; boundary=some-ramdom-boundary
+Content-Type: plain/text
 Content-Length: 345
 
-blblblblblblblbl
---some-ramdom-boundary
 [...]
 this is a test
---some-ramdom-boundary
-Content-Type: text/plain; charset=us-ascii
-
-this is a test 2
---some-ramdom-boundary
-Content-Type: text/plain; charset=us-ascii
-
-this is a test again
---some-ramdom-boundary--
-blblblblblblblbl
