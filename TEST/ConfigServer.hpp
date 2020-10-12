@@ -1,5 +1,5 @@
-#ifndef CONFIG_HPP
-# define CONFIG_HPP
+#ifndef CONFIGSERVER_HPP
+# define CONFIGSERVER_HPP
 
 # include <iostream>
 # include <list>
@@ -13,7 +13,7 @@
 # include "Location.hpp"
 # include "../utils/utils.hpp"
 
-class   Config
+class   ConfigServer
 {
     private:
 
@@ -33,11 +33,11 @@ class   Config
 
     public:
 
-    Config();
-    Config(Config &copy);
-    ~Config();
+    ConfigServer();
+    ConfigServer(ConfigServer &copy);
+    ~ConfigServer();
 
-    Config                      &operator=(Config const &rhs);
+    ConfigServer                      &operator=(ConfigServer const &rhs);
 
     std::string                 getRoot(std::string _uri);
     std::string                 getServerName(void);

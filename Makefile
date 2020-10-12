@@ -1,6 +1,6 @@
 SRCS =	TEST/main.cpp 			\
 		TEST/Socket.cpp 		\
-		TEST/Config.cpp			\
+		TEST/ConfigServer.cpp	\
 		TEST/Location.cpp		\
 		utils/get_next_line.cpp \
 		utils/ft_strcpy.cpp		\
@@ -14,7 +14,8 @@ SRCS =	TEST/main.cpp 			\
 		Methods/patch.cpp		\
 		Methods/trace.cpp		\
 		Methods/delete.cpp		\
-		Methods/connect.cpp
+		Methods/connect.cpp		\
+		setHeaders.cpp
 
 OBJS = $(SRCS:.cpp=.o)
 NAME = methods
