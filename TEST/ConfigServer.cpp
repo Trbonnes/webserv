@@ -1,15 +1,15 @@
-#include "Config.hpp"
+#include "ConfigServer.hpp"
 
-Config::Config() :
-_defaultRoot("/sgoinfre/goinfre/Perso/pganglof/webserver/www"),
+ConfigServer::ConfigServer() :
+_defaultRoot("/home/pauline/webserver/www"),
 _defaultServerName("localhost"),
 _defaultIndex(0),
 _defaultType("text/plain"),
 _defaultCharset("koi8-r"),
 _defaultLanguage(0),
-_configFilesRoot("/sgoinfre/goinfre/Perso/pganglof/webserver/config"),
+_configFilesRoot("/home/pauline/webserver/ConfigServer"),
 _defaultAuth_basic("\"Authorization\""),
-_defaultAuth_basic_user_file("/sgoinfre/goinfre/Perso/pganglof/webserver/config/.htpasswd"),
+_defaultAuth_basic_user_file("/home/pauline/webserver/ConfigServer/.htpasswd"),
 _defaultAutoindex("off")
 {
     _defaultAllow.push_back("GET");
@@ -62,7 +62,7 @@ _defaultAutoindex("off")
     
     index.push_back("index.php");
 
-    Location loc1("/data/", "/sgoinfre/goinfre/Perso/pganglof/webserver/www",
+    Location loc1("/data/", "/home/pauline/webserver/www",
     _defaultAllow, index,
     "text/html", "utf-8", _defaultLanguage, _defaultAuth_basic, _defaultAuth_basic_user_file, _defaultAutoindex, "/blabla/");
 
@@ -74,13 +74,13 @@ _defaultAutoindex("off")
 
     index2.push_back("42.png");
 
-    Location loc2("/images/", "/sgoinfre/goinfre/Perso/pganglof/webserver/www",
+    Location loc2("/images/", "/home/pauline/webserver/www",
     _defaultAllow, index2,
     "text/html", "", _defaultLanguage, "off", "", _defaultAutoindex, "");
 
     _locationList["/images/"] = loc2;
 
-    Location loc3("/", "/sgoinfre/goinfre/Perso/pganglof/webserver/www",
+    Location loc3("/", "/home/pauline/webserver/www",
     _defaultAllow, _defaultIndex,
     _defaultType, _defaultCharset, _defaultLanguage, "off", "", "on", "");
 
@@ -88,7 +88,7 @@ _defaultAutoindex("off")
 
 }
 
-Config::Config(Config &copy)
+ConfigServer::ConfigServer(ConfigServer &copy)
 {
     _defaultRoot = copy._defaultRoot;
     _defaultAllow = copy._defaultAllow;
@@ -100,9 +100,9 @@ Config::Config(Config &copy)
     _configFilesRoot = copy._configFilesRoot;
 }
 
-Config::~Config() {}
+ConfigServer::~ConfigServer() {}
 
-Config                  &Config::operator=(Config const &rhs)
+ConfigServer                  &ConfigServer::operator=(ConfigServer const &rhs)
 {
     _defaultRoot = rhs._defaultRoot;
     _defaultAllow = rhs._defaultAllow;
@@ -115,7 +115,7 @@ Config                  &Config::operator=(Config const &rhs)
     return *this;
 }
 
-std::string             Config::getLocation(std::string uri)
+std::string             ConfigServer::getLocation(std::string uri)
 {
     std::map<std::string, Location, Compare<std::string> >::iterator itBegin;
     std::map<std::string, Location, Compare<std::string> >::iterator itEnd;
@@ -131,7 +131,7 @@ std::string             Config::getLocation(std::string uri)
     return (_defaultRoot);
 }
 
-std::string             Config::getRoot(std::string location)
+std::string             ConfigServer::getRoot(std::string location)
 {
     std::map<std::string, Location, Compare<std::string> >::iterator itBegin;
     std::map<std::string, Location, Compare<std::string> >::iterator itEnd;    
@@ -148,12 +148,12 @@ std::string             Config::getRoot(std::string location)
     return _defaultRoot;
 }
 
-std::string             Config::getServerName()
+std::string             ConfigServer::getServerName()
 {
     return _defaultServerName;
 }
 
-std::list<std::string>  &Config::getIndex(std::string location)
+std::list<std::string>  &ConfigServer::getIndex(std::string location)
 {
     std::map<std::string, Location, Compare<std::string> >::iterator itBegin;
     std::map<std::string, Location, Compare<std::string> >::iterator itEnd;    
@@ -169,7 +169,7 @@ std::list<std::string>  &Config::getIndex(std::string location)
     return _defaultIndex;
 }
 
-std::string                 Config::getType(std::string location)
+std::string                 ConfigServer::getType(std::string location)
 {
     std::map<std::string, Location, Compare<std::string> >::iterator itBegin;
     std::map<std::string, Location, Compare<std::string> >::iterator itEnd;  
@@ -185,12 +185,12 @@ std::string                 Config::getType(std::string location)
     return _defaultType;
 }
 
-std::list<std::string>      &Config::getMimeTypes()
+std::list<std::string>      &ConfigServer::getMimeTypes()
 {
     return _mimeTypes;
 }
 
-std::vector<std::string>    &Config::getLanguage(std::string location)
+std::vector<std::string>    &ConfigServer::getLanguage(std::string location)
 {
     std::map<std::string, Location, Compare<std::string> >::iterator itBegin;
     std::map<std::string, Location, Compare<std::string> >::iterator itEnd;  
@@ -206,7 +206,7 @@ std::vector<std::string>    &Config::getLanguage(std::string location)
     return _defaultLanguage;
 }
 
-std::vector<std::string>    &Config::getAllow(std::string location)
+std::vector<std::string>    &ConfigServer::getAllow(std::string location)
 {
     std::map<std::string, Location, Compare<std::string> >::iterator itBegin;
     std::map<std::string, Location, Compare<std::string> >::iterator itEnd;  
@@ -222,7 +222,7 @@ std::vector<std::string>    &Config::getAllow(std::string location)
     return _defaultAllow;
 }
 
-std::string                 Config::getCharset(std::string location)
+std::string                 ConfigServer::getCharset(std::string location)
 {
     std::map<std::string, Location, Compare<std::string> >::iterator itBegin;
     std::map<std::string, Location, Compare<std::string> >::iterator itEnd;  
@@ -238,7 +238,7 @@ std::string                 Config::getCharset(std::string location)
     return _defaultCharset;   
 }
 
-std::string                 Config::getAuth_basic(std::string location)
+std::string                 ConfigServer::getAuth_basic(std::string location)
 {
     std::map<std::string, Location, Compare<std::string> >::iterator itBegin;
     std::map<std::string, Location, Compare<std::string> >::iterator itEnd;  
@@ -254,7 +254,7 @@ std::string                 Config::getAuth_basic(std::string location)
     return _defaultAuth_basic;   
 }
 
-std::string                 Config::getAuth_basic_user_file(std::string location)
+std::string                 ConfigServer::getAuth_basic_user_file(std::string location)
 {
     std::map<std::string, Location, Compare<std::string> >::iterator itBegin;
     std::map<std::string, Location, Compare<std::string> >::iterator itEnd;  
@@ -270,7 +270,7 @@ std::string                 Config::getAuth_basic_user_file(std::string location
     return _defaultAuth_basic_user_file;   
 }
 
-std::string                 Config::getAutoindex(std::string location)
+std::string                 ConfigServer::getAutoindex(std::string location)
 {
     std::map<std::string, Location, Compare<std::string> >::iterator itBegin;
     std::map<std::string, Location, Compare<std::string> >::iterator itEnd;  
@@ -286,7 +286,7 @@ std::string                 Config::getAutoindex(std::string location)
     return _defaultAutoindex;   
 }
 
-std::string             Config::getAlias(std::string location)
+std::string             ConfigServer::getAlias(std::string location)
 {
     std::map<std::string, Location, Compare<std::string> >::iterator itBegin;
     std::map<std::string, Location, Compare<std::string> >::iterator itEnd;  

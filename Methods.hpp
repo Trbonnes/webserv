@@ -12,7 +12,7 @@
 # include <algorithm>
 # include <stack>
 # include "TEST/Socket.hpp"
-# include "TEST/Config.hpp"
+# include "TEST/ConfigServer.hpp"
 # include "utils/utils.hpp"
 # include "statusCodes.hpp"
 
@@ -30,11 +30,12 @@ enum
     NB_METHODS
 };
 
-class   Methods : public Config
+class   Methods
 {
     private:
 
     Socket                      _socket;
+    ConfigServer                _config;
     std::string                 _uri;
     std::string                 _route;
     std::string                 _location;
@@ -124,7 +125,7 @@ class   Methods : public Config
 
     
     public:
-    Methods(Socket &socket);
+    Methods(Socket &socket, ConfigServer &config);
     Methods(Methods &copy);
     ~Methods();
 
