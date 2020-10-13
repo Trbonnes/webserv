@@ -3,7 +3,7 @@
 Socket::Socket() :
 _fd(0),
 _method("GET"),
-_requestURI("/read.me"),
+_requestURI("/images/"),
 _httpVersion("HTTP/1.1"),
 _contentLength(""),
 _contentLocation(""),
@@ -100,7 +100,7 @@ std::string     Socket::gethttpVersion()
     return _httpVersion;
 }
 
-std::string     Socket::getContentLenght()
+std::string     Socket::getContentLength()
 {
     return _contentLength;
 }

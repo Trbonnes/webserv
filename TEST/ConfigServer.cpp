@@ -14,8 +14,6 @@ _defaultAutoindex("off")
 {
     _defaultAllow.push_back("GET");
     _defaultAllow.push_back("HEAD");
-    _defaultAllow.push_back("POST");
-    _defaultAllow.push_back("PUT");
     _defaultLanguage.push_back("en");
     _defaultLanguage.push_back("fr");
     _defaultIndex.push_back("index.html");
@@ -58,38 +56,51 @@ _defaultAutoindex("off")
 
         //** first location **
 
-    std::list<std::string> index;
+    std::vector<std::string> index;
+    std::vector<std::string> exe;
     
     index.push_back("index.php");
 
     Location loc1("/data/", "/home/pauline/webserver/www",
     _defaultAllow, index,
-    "text/html", "utf-8", _defaultLanguage, _defaultAuth_basic, _defaultAuth_basic_user_file, _defaultAutoindex, "/blabla/");
+    "text/html", "utf-8", _defaultLanguage, _defaultAuth_basic, _defaultAuth_basic_user_file, _defaultAutoindex, "/blabla/", exe, "");
 
     _locationList["/data/"] = loc1;
 
         //** second location **
 
-    std::list<std::string> index2;
+    std::vector<std::string> index2;
 
     index2.push_back("42.png");
 
     Location loc2("/images/", "/home/pauline/webserver/www",
     _defaultAllow, index2,
-    "text/html", "", _defaultLanguage, "off", "", _defaultAutoindex, "");
+    "text/html", "", _defaultLanguage, "off", "", _defaultAutoindex, "", exe, "");
 
     _locationList["/images/"] = loc2;
 
+        //** third location **
+
     Location loc3("/", "/home/pauline/webserver/www",
     _defaultAllow, _defaultIndex,
-    _defaultType, _defaultCharset, _defaultLanguage, "off", "", "on", "");
+    _defaultType, _defaultCharset, _defaultLanguage, "off", "", "on", "", exe, "");
 
     _locationList["/"] = loc3;
+
+        //** fourth location **
+
+    exe.push_back("cgi_tester");
+
+    Location loc4("/bin-cgi/", "/home/pauline/webserver/www", _defaultAllow, _defaultIndex, _defaultType, 
+    _defaultCharset, _defaultLanguage, "off", "", "off", "", exe, "/bin-cgi/");
+
+    _locationList["/bin-cgi/"] = loc4;
 
 }
 
 ConfigServer::ConfigServer(ConfigServer &copy)
 {
+    _locationList = copy._locationList;
     _defaultRoot = copy._defaultRoot;
     _defaultAllow = copy._defaultAllow;
     _defaultServerName = copy._defaultServerName;
@@ -104,6 +115,7 @@ ConfigServer::~ConfigServer() {}
 
 ConfigServer                  &ConfigServer::operator=(ConfigServer const &rhs)
 {
+    _locationList = rhs._locationList;
     _defaultRoot = rhs._defaultRoot;
     _defaultAllow = rhs._defaultAllow;
     _defaultServerName = rhs._defaultServerName;
@@ -153,7 +165,7 @@ std::string             ConfigServer::getServerName()
     return _defaultServerName;
 }
 
-std::list<std::string>  &ConfigServer::getIndex(std::string location)
+std::vector<std::string>  &ConfigServer::getIndex(std::string location)
 {
     std::map<std::string, Location, Compare<std::string> >::iterator itBegin;
     std::map<std::string, Location, Compare<std::string> >::iterator itEnd;    
@@ -297,6 +309,38 @@ std::string             ConfigServer::getAlias(std::string location)
     {
         if (location.compare(itBegin->first) == 0)
             return (itBegin->second._alias);
+        itBegin++;
+    }
+    return "";   
+}
+
+std::vector<std::string>             ConfigServer::getCGI(std::string location)
+{
+    std::map<std::string, Location, Compare<std::string> >::iterator itBegin;
+    std::map<std::string, Location, Compare<std::string> >::iterator itEnd;  
+
+    itBegin = _locationList.begin();
+    itEnd = _locationList.end();
+    while (itBegin != itEnd)
+    {
+        if (location.compare(itBegin->first) == 0)
+            return (itBegin->second._cgi);
+        itBegin++;
+    }
+    return std::vector<std::string>();   
+}
+
+std::string             ConfigServer::getCGI_root(std::string location)
+{
+    std::map<std::string, Location, Compare<std::string> >::iterator itBegin;
+    std::map<std::string, Location, Compare<std::string> >::iterator itEnd;  
+
+    itBegin = _locationList.begin();
+    itEnd = _locationList.end();
+    while (itBegin != itEnd)
+    {
+        if (location.compare(itBegin->first) == 0)
+            return (itBegin->second._cgi_root);
         itBegin++;
     }
     return "";   

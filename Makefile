@@ -5,16 +5,10 @@ SRCS =	TEST/main.cpp 			\
 		utils/get_next_line.cpp \
 		utils/ft_strcpy.cpp		\
 		utils/ft_strlen.cpp		\
-		Methods.cpp				\
+		HTTP.cpp				\
+		CGI.cpp					\
 		Methods/get.cpp			\
 		Methods/head.cpp		\
-		Methods/post.cpp		\
-		Methods/put.cpp			\
-		Methods/options.cpp		\
-		Methods/patch.cpp		\
-		Methods/trace.cpp		\
-		Methods/delete.cpp		\
-		Methods/connect.cpp		\
 		setHeaders.cpp
 
 OBJS = $(SRCS:.cpp=.o)

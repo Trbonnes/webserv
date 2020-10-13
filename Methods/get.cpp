@@ -1,6 +1,6 @@
-#include "../Methods.hpp"
+#include "../HTTP.hpp"
 
-void        Methods::get()
+void        HTTP::get()
 {
     std::string root;
     int         find;
@@ -36,7 +36,7 @@ void        Methods::get()
 }
 
 //** Define the language page **
-std::string     Methods::acceptLanguage()
+std::string     HTTP::acceptLanguage()
 {
     std::vector<std::string>::iterator itClientBegin;
     std::vector<std::string>::iterator itClientEnd;

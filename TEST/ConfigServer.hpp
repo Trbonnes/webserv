@@ -21,7 +21,7 @@ class   ConfigServer
     std::string                 _defaultRoot;
     std::vector<std::string>    _defaultAllow;
     std::string                 _defaultServerName;
-    std::list<std::string>      _defaultIndex;
+    std::vector<std::string>    _defaultIndex;
     std::string                 _defaultType;
     std::string                 _defaultCharset;
     std::vector<std::string>    _defaultLanguage;
@@ -31,17 +31,21 @@ class   ConfigServer
     std::string                 _defaultAuth_basic_user_file;
     std::string                 _defaultAutoindex;
 
+	std::vector<std::string>	_cgi;
+	std::vector<std::string>	_cgi_method;
+	std::string					_cgi_root;
+
     public:
 
     ConfigServer();
     ConfigServer(ConfigServer &copy);
     ~ConfigServer();
 
-    ConfigServer                      &operator=(ConfigServer const &rhs);
+    ConfigServer                &operator=(ConfigServer const &rhs);
 
     std::string                 getRoot(std::string _uri);
     std::string                 getServerName(void);
-    std::list<std::string>      &getIndex(std::string location);
+    std::vector<std::string>    &getIndex(std::string location);
     std::string                 getType(std::string location);
     std::string                 getCharset(std::string location);
     std::vector<std::string>    &getLanguage(std::string location);
@@ -52,6 +56,8 @@ class   ConfigServer
     std::string                 getAuth_basic_user_file(std::string location);
     std::string                 getAutoindex(std::string location);
     std::string                 getAlias(std::string location);
+    std::vector<std::string>    getCGI(std::string location);
+    std::string                 getCGI_root(std::string location);
 };
 
 #endif
