@@ -1,6 +1,6 @@
-#include "../Methods.hpp"
+#include "../HTTP.hpp"
 
-void    Methods::head(void)
+void    HTTP::head(void)
 {
     get();
     _body.clear();

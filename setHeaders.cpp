@@ -1,13 +1,13 @@
-#include "Methods.hpp"
+#include "HTTP.hpp"
 
 //** absolute location route for the server **
-void        Methods::setLocation()
+void        HTTP::setLocation()
 {
   _location = _config.getLocation(_uri);
 }
 
 //** absolute location route for the user agent **
-void        Methods::setContentLocation()
+void        HTTP::setContentLocation()
 {
   _contentLocation.assign("http://").append(_config.getServerName()).append(_route);
   if (_config.getAlias(_location).length() > 0)
@@ -15,7 +15,7 @@ void        Methods::setContentLocation()
 }
 
 //** Copy file into body string **
-void        Methods::setBody(int fd)
+void        HTTP::setBody(int fd)
 {
     int     ret;
     char    buf[1024 + 1];
@@ -31,27 +31,27 @@ void        Methods::setBody(int fd)
         close(fd);
 }
 
-void        Methods::setCharset(void)
+void        HTTP::setCharset(void)
 {
   _charset = _config.getCharset(_location);
 }
 
-void        Methods::setServerName()
+void        HTTP::setServerName()
 {
     _server = _config.getServerName();
 }
 
-void        Methods::setContentLength()
+void        HTTP::setContentLength()
 {
     _contentLength = _stat.st_size;
 }
 
-void        Methods::setStat()
+void        HTTP::setStat()
 {
     stat(_route.c_str(), &_stat);
 }
 
-void        Methods::setLastModified()
+void        HTTP::setLastModified()
 {
     struct tm *timeinfo;
 
@@ -59,7 +59,7 @@ void        Methods::setLastModified()
     strftime(_lastModified, 100, "%a %d %b 20%y %OH:%OM:%OS GMT", timeinfo);
 }
 
-void        Methods::setDate()
+void        HTTP::setDate()
 {
     struct timeval  tv;
     struct tm       *timeinfo;
@@ -71,7 +71,7 @@ void        Methods::setDate()
     }
 }
 
-void        Methods::setContentType()
+void        HTTP::setContentType()
 {
     int                     find;
     int                     length;
@@ -97,7 +97,7 @@ void        Methods::setContentType()
         _contentType = _config.getType(_location);
 }
 
-int         Methods::setRoot()
+int         HTTP::setRoot()
 {
     int         fd;
     int         find;

@@ -50,7 +50,7 @@ class   Socket
     std::string                 getMethod();
     std::string                 getRequestURI();
     std::string                 gethttpVersion();
-    std::string                 getContentLenght();
+    std::string                 getContentLength();
     std::string                 getContentLocation();
     std::string                 getContentType();
     std::string                 getDate();
