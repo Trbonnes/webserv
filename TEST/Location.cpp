@@ -10,14 +10,14 @@ _charset(""),
 _language(0),
 _auth_basic(""),
 _auth_basic_user_file(""),
-_autoindex("off"),
+_autoindex(false),
 _alias(""),
 _cgi(0),
 _cgi_root("") {}
 
 Location::Location(std::string location, std::string root, std::vector<std::string> allow,
 std::vector<std::string> index, std::string type, std::string charset, std::vector<std::string> language,
-std::string auth_basic, std::string auth_basic_user_file, std::string autoindex, std::string alias,
+std::string auth_basic, std::string auth_basic_user_file, bool autoindex, std::string alias,
 std::vector<std::string> cgi, std::string cgi_root) :
 _location(location),
 _root(root),

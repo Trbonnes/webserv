@@ -1,16 +1,17 @@
 #include "ConfigServer.hpp"
 
 ConfigServer::ConfigServer() :
-_defaultRoot("/home/pauline/webserver/www"),
+_defaultRoot("/sgoinfre/goinfre/Perso/pganglof/webserver/www"),
 _defaultServerName("localhost"),
+_defaultPort("80"),
 _defaultIndex(0),
 _defaultType("text/plain"),
 _defaultCharset("koi8-r"),
 _defaultLanguage(0),
-_configFilesRoot("/home/pauline/webserver/ConfigServer"),
+_configFilesRoot("/sgoinfre/goinfre/Perso/pganglof/webserver/ConfigServer"),
 _defaultAuth_basic("\"Authorization\""),
-_defaultAuth_basic_user_file("/home/pauline/webserver/ConfigServer/.htpasswd"),
-_defaultAutoindex("off")
+_defaultAuth_basic_user_file("/sgoinfre/goinfre/Perso/pganglof/webserver/ConfigServer/.htpasswd"),
+_defaultAutoindex(false)
 {
     _defaultAllow.push_back("GET");
     _defaultAllow.push_back("HEAD");
@@ -61,7 +62,7 @@ _defaultAutoindex("off")
     
     index.push_back("index.php");
 
-    Location loc1("/data/", "/home/pauline/webserver/www",
+    Location loc1("/data/", "/sgoinfre/goinfre/Perso/pganglof/webserver/www",
     _defaultAllow, index,
     "text/html", "utf-8", _defaultLanguage, _defaultAuth_basic, _defaultAuth_basic_user_file, _defaultAutoindex, "/blabla/", exe, "");
 
@@ -73,7 +74,7 @@ _defaultAutoindex("off")
 
     index2.push_back("42.png");
 
-    Location loc2("/images/", "/home/pauline/webserver/www",
+    Location loc2("/images/", "/sgoinfre/goinfre/Perso/pganglof/webserver/www",
     _defaultAllow, index2,
     "text/html", "", _defaultLanguage, "off", "", _defaultAutoindex, "", exe, "");
 
@@ -81,18 +82,18 @@ _defaultAutoindex("off")
 
         //** third location **
 
-    Location loc3("/", "/home/pauline/webserver/www",
+    Location loc3("/", "/sgoinfre/goinfre/Perso/pganglof/webserver/www",
     _defaultAllow, _defaultIndex,
-    _defaultType, _defaultCharset, _defaultLanguage, "off", "", "on", "", exe, "");
+    _defaultType, _defaultCharset, _defaultLanguage, "off", "", true, "", exe, "");
 
     _locationList["/"] = loc3;
 
         //** fourth location **
 
-    exe.push_back("cgi_tester");
+    exe.push_back("html");
 
-    Location loc4("/bin-cgi/", "/home/pauline/webserver/www", _defaultAllow, _defaultIndex, _defaultType, 
-    _defaultCharset, _defaultLanguage, "off", "", "off", "", exe, "/bin-cgi/");
+    Location loc4("/bin-cgi/", "/sgoinfre/goinfre/Perso/pganglof/webserver/bin-cgi", _defaultAllow, _defaultIndex, _defaultType, 
+    _defaultCharset, _defaultLanguage, "off", "", false, "", exe, "/sgoinfre/goinfre/Perso/pganglof/webserver/bin-cgi/cgi_tester");
 
     _locationList["/bin-cgi/"] = loc4;
 
@@ -163,6 +164,11 @@ std::string             ConfigServer::getRoot(std::string location)
 std::string             ConfigServer::getServerName()
 {
     return _defaultServerName;
+}
+
+std::string             ConfigServer::getPort()
+{
+    return _defaultPort;
 }
 
 std::vector<std::string>  &ConfigServer::getIndex(std::string location)
@@ -282,7 +288,7 @@ std::string                 ConfigServer::getAuth_basic_user_file(std::string lo
     return _defaultAuth_basic_user_file;   
 }
 
-std::string                 ConfigServer::getAutoindex(std::string location)
+bool                        ConfigServer::getAutoindex(std::string location)
 {
     std::map<std::string, Location, Compare<std::string> >::iterator itBegin;
     std::map<std::string, Location, Compare<std::string> >::iterator itEnd;  

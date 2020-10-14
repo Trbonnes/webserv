@@ -28,13 +28,6 @@ _transferEncoding(""),
 _body("") {
     _methodsName[GET] = "GET"; 
     _methodsName[HEAD] = "HEAD"; 
-    _methodsName[POST] = "POST"; 
-    _methodsName[PUT] = "PUT"; 
-    _methodsName[DELETE] = "DELETE"; 
-    _methodsName[CONNECT] = "CONNECT"; 
-    _methodsName[OPTIONS] = "OPTIONS"; 
-    _methodsName[TRACE] = "TRACE"; 
-    _methodsName[PATCH] = "PATCH"; 
 }
 
 HTTP::HTTP(Socket &socket, ConfigServer &config) :
@@ -62,7 +55,9 @@ _body("")
     _methodsName[GET] = "GET"; 
     _methodsName[HEAD] = "HEAD"; 
 
-    int     i;
+    int         i;
+    size_t      extension;
+    std::string str;
 
     _uri = socket.getRequestURI();
     setLocation();
@@ -75,7 +70,14 @@ _body("")
             if (checkAllowMethods(_methodsName[i]))
             {
                 if (_config.getCGI_root(_location).length() > 0)
-                    cgi();
+                {
+                    cgi_metaVariables();
+                    extension = _cgi._script_name.find_last_of('.');
+                    if (is_good_exe(str.assign(_cgi._script_name).erase(0, extension)))
+                        cgi_exe();
+                    else
+                        _statusCode = BAD_REQUEST;
+                }
                 else
                     callMethod(i);
                 return ;
@@ -115,7 +117,14 @@ HTTP::HTTP(HTTP &copy)
     }
 }
 
-HTTP::~HTTP() {}
+HTTP::~HTTP()
+{
+    int     i;
+
+    i = 0;
+    while (i < NB_METAVARIABLES)
+        free(_cgi_env[i++]);
+}
 
 HTTP     &HTTP::operator=(HTTP &rhs)
 {
@@ -243,7 +252,7 @@ void            HTTP::setAutoindex(void)
             if (dirent->d_type == DT_DIR)
                 str.append("/");
             str.append("</a>\t\t\t\t");
-            timeinfo = localtime(&(directory.st_mtim.tv_sec)); // st_mtimespec = apple ; st_mtime = linux
+            timeinfo = localtime(&(directory.st_mtimespec.tv_sec)); // st_mtimespec = apple ; st_mtime = linux
             strftime(lastModifications, 100, "%d-%b-20%y %OH:%OM", timeinfo);
             str.append(lastModifications);
             str.append("\t\t");

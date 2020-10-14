@@ -23,7 +23,7 @@ void        HTTP::get()
             setDate();
         }
     }
-    else if (_config.getAutoindex(_location).compare("on") == 0)
+    else if (_config.getAutoindex(_location) == true)
     {
         setAutoindex();
         setContentType();
