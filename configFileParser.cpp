@@ -6,7 +6,7 @@
 /*   By: trbonnes <trbonnes@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/14 08:46:39 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/10/14 12:09:31 by trbonnes         ###   ########.fr       */
+/*   Updated: 2020/10/14 15:53:57 by trbonnes         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,16 +34,93 @@ int		configFileParseServerLocation(std::string parseServer, ConfigServer server)
 	size_t pos;
 	size_t i;
 	std::string s;
+	Location location;
 
 	if ((pos = parseServer.find("location")) == parseServer.npos)
 		return 0;
-	while (parseServer[pos] != ' ') { pos++; }
-	while (parseServer[pos] == ' ') { pos++; }
-	while (parseServer[pos] != ' ') {
-		s.push_back(parseServer[pos++]);
+	if ((i = findClosingBracket(parseServer.find("{", pos), parseServer)) == parseServer.npos) {
+		throw Config::InvalidConfigException();
+	}
+	s = parseServer.substr(pos, i - pos + 1);
+	std::cout << s << std::endl;
+
+	//LOCATION
+	pos = 8;
+	while (s[pos] == ' ') { pos++; }
+	i = pos;
+	while (s[i] != ' ') { i++; }
+	location._location = s.substr(pos, i - pos);
+
+	//METHOD
+	if ((pos = s.find("method")) != s.npos) {
+		i = s.find(";", pos);
+		if (s.substr(pos, i - pos).find("GET") != s.npos)
+			location._allow.push_back("GET");
+		if (s.substr(pos, i - pos).find("HEAD") != s.npos)
+			location._allow.push_back("HEAD");
+		if (s.substr(pos, i - pos).find("POST") != s.npos)
+			location._allow.push_back("POST");
+		if (s.substr(pos, i - pos).find("PUT") != s.npos)
+			location._allow.push_back("PUT");
+		if (s.substr(pos, i - pos).find("DELETE") != s.npos)
+			location._allow.push_back("DELETE");
+		if (s.substr(pos, i - pos).find("CONNECT") != s.npos)
+			location._allow.push_back("CONNECT");
+		if (s.substr(pos, i - pos).find("OPTIONS") != s.npos)
+			location._allow.push_back("OPTIONS");
+		if (s.substr(pos, i - pos).find("TRACE") != s.npos)
+			location._allow.push_back("TRACE");
 	}
 
+	//ROOT
+	if ((pos = s.find("root")) != s.npos) {
+		pos += 4;
+		while (s[pos] == ' ') { pos++; }
+		i = s.find(";", pos);
+		location._root = s.substr(pos, i - pos);
+	}
 
+	//INDEX
+	if ((pos = s.find("index")) != s.npos) {
+		pos += 5;
+		i = pos;
+		while (s[i] != ';') {
+			while (s[pos] == ' ') { pos++; }
+			i = pos;
+			while (s[i] != ' ' && s[i] != ';') { i++; }
+			location._index.push_back(s.substr(pos, i - pos));
+			pos = i;
+		}
+	}
+
+	//AUTOINDEX
+	if ((pos = s.find("auto_index")) != s.npos) {
+		if ((i = s.find("on", pos)) != s.npos)
+			location._autoindex = true;
+		else if ((i = s.find("off", pos)) != s.npos)
+			location._autoindex = false;
+		else
+			throw Config::InvalidConfigException();
+	}
+
+	//CLIENTBODYSIZE
+	if ((pos = s.find("client_max_body_size")) != s.npos) {
+		pos += 20;
+		while (s[pos] == ' ') { pos++; }
+		i = s.find(";", pos);
+		location._clientBodySize = std::stoi(s.substr(pos, i - pos));
+	}
+
+	//ALIAS
+	if ((pos = s.find("alias")) != s.npos) {
+		pos += 5;
+		while (s[pos] == ' ') { pos++; }
+		i = s.find(";", pos);
+		location._alias = s.substr(pos, i - pos);
+	}
+
+	server.insertLocation(location._location, location);
+	return 0;
 }
 
 int		configFileParseServerUnit(std::string configFile, std::vector<ConfigServer> v) {
@@ -57,12 +134,12 @@ int		configFileParseServerUnit(std::string configFile, std::vector<ConfigServer>
 	}
 
 	parseServer = configFile.substr(pos, i - pos + 1);
-	//std::cout << parseServer << std::endl;
+	std::cout << parseServer << std::endl;
 	configFileParseServerLocation(parseServer, v.back());
 	
-	if ((pos = configFile.find("server {")) == configFile.npos)
-		return 0;
-	configFileParseServerUnit(configFile, v);
+	// if ((pos = configFile.find("server {")) == configFile.npos)
+	// 	return 0;
+	// return configFileParseServerUnit(configFile, v);
 
 	return 0;
 }

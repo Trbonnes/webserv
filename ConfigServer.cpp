@@ -6,7 +6,7 @@
 /*   By: trbonnes <trbonnes@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/09 15:13:35 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/10/14 13:43:15 by trbonnes         ###   ########.fr       */
+/*   Updated: 2020/10/14 13:45:06 by trbonnes         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -455,7 +455,7 @@ void                    ConfigServer::setAllow(std::vector<std::string> allow) {
     _defaultAllow = allow;
 }
 
-
 void                    ConfigServer::insertLocation(std::string s, Location location){
-
+    (void)s;
+    (void)location;
 }
