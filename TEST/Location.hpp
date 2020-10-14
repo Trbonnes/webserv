@@ -21,7 +21,7 @@ class   Location
     std::vector<std::string>    _language;
     std::string                 _auth_basic;
     std::string                 _auth_basic_user_file;
-    std::string                 _autoindex;
+    bool                        _autoindex;
     std::string                 _alias;
 
 	std::vector<std::string>	_cgi;
@@ -30,7 +30,7 @@ class   Location
 
     Location(std::string location, std::string root, std::vector<std::string> allow, 
     std::vector<std::string> index, std::string type, std::string charset, std::vector<std::string> language,
-    std::string auth_basic, std::string auth_basic_user_file, std::string autoindex, std::string alias,
+    std::string auth_basic, std::string auth_basic_user_file, bool autoindex, std::string alias,
     std::vector<std::string> cgi, std::string cgi_root);
     ~Location();
 

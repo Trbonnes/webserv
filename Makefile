@@ -5,6 +5,7 @@ SRCS =	TEST/main.cpp 			\
 		utils/get_next_line.cpp \
 		utils/ft_strcpy.cpp		\
 		utils/ft_strlen.cpp		\
+		utils/ft_strdup.cpp		\
 		HTTP.cpp				\
 		CGI.cpp					\
 		Methods/get.cpp			\
@@ -15,7 +16,7 @@ OBJS = $(SRCS:.cpp=.o)
 NAME = methods
 RM = rm -f
 CC = clang++
-CFLAGS = -Wall -Wextra -Werror  #-lcrypt
+CFLAGS = -Wall -Wextra -Werror # -fsanitize=address -g3 #-lcrypt
 
 all: $(NAME)
 
