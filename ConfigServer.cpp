@@ -6,7 +6,7 @@
 /*   By: trbonnes <trbonnes@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/09 15:13:35 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/10/14 12:14:42 by trbonnes         ###   ########.fr       */
+/*   Updated: 2020/10/14 13:43:15 by trbonnes         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,6 @@
 
 ConfigServer::ConfigServer() :
 _defaultRoot("/home/pauline/webserver/www"),
-_defaultServerName("localhost"),
 _defaultIndex(0),
 _defaultType("text/plain"),
 _defaultCharset("koi8-r"),
@@ -32,6 +31,7 @@ _defaultAutoindex("off") {
     _defaultIndex.push_back("index.html");
     _defaultIndex.push_back("index.html");
     _mimeTypes.push_back("plain/text");
+    _defaultServerName.push_back("localhost");
 
 /*
 
@@ -121,18 +121,17 @@ ConfigServer::ConfigServer(const ConfigServer &copy)
     _mimeTypes = copy._mimeTypes;
     _configFilesRoot = copy._configFilesRoot;
 
-    _cgi = copy._cgi;
-    _cgi_method = copy._cgi_method;
-    _cgi_root = copy._cgi_root;
+    _defaultCgi = copy._defaultCgi;
+    _defaultCgi_allow = copy._defaultCgi_allow;
+    _defaultCgi_root = copy._defaultCgi_root;
 
     _port = copy._port;
-    _server_name = copy._server_name;
+    _defaultServerName = copy._defaultServerName;
 
-    _root = copy._root;
-    _index = copy._index;
-    _autoIndex = copy._autoIndex;
-    _clientBodySize = copy._clientBodySize;
-    _acceptedMethods = copy._acceptedMethods;
+    _defaultRoot = copy._defaultRoot;
+    _defaultIndex = copy._defaultIndex;
+    _defaultAutoindex = copy._defaultAutoindex;
+    _defaultClientBodySize = copy._defaultClientBodySize;
 }
 
 ConfigServer::~ConfigServer() {}
@@ -148,22 +147,21 @@ ConfigServer                  &ConfigServer::operator=(ConfigServer const &rhs)
     _mimeTypes = rhs._mimeTypes;
     _configFilesRoot = rhs._configFilesRoot;
 
-    _cgi = rhs._cgi;
-    _cgi_method = rhs._cgi_method;
-    _cgi_root = rhs._cgi_root;
+    _defaultCgi = rhs._defaultCgi;
+    _defaultCgi_allow = rhs._defaultCgi_allow;
+    _defaultCgi_root = rhs._defaultCgi_root;
 
     _port = rhs._port;
-    _server_name = rhs._server_name;
+    _defaultServerName = rhs._defaultServerName;
 
-    _root = rhs._root;
-    _index = rhs._index;
-    _autoIndex = rhs._autoIndex;
-    _clientBodySize = rhs._clientBodySize;
-    _acceptedMethods = rhs._acceptedMethods;
+    _defaultRoot = rhs._defaultRoot;
+    _defaultIndex = rhs._defaultIndex;
+    _defaultAutoindex = rhs._defaultAutoindex;
+    _defaultClientBodySize = rhs._defaultClientBodySize;
     return *this;
 }
 
-std::string             ConfigServer::getDefaultLocation(std::string uri)
+std::string             ConfigServer::getLocation(std::string uri)
 {
     std::map<std::string, Location, Compare<std::string> >::iterator itBegin;
     std::map<std::string, Location, Compare<std::string> >::iterator itEnd;
@@ -179,7 +177,7 @@ std::string             ConfigServer::getDefaultLocation(std::string uri)
     return (_defaultRoot);
 }
 
-std::string             ConfigServer::getDefaultRoot(std::string location)
+std::string             ConfigServer::getRoot(std::string location)
 {
     std::map<std::string, Location, Compare<std::string> >::iterator itBegin;
     std::map<std::string, Location, Compare<std::string> >::iterator itEnd;    
@@ -190,18 +188,18 @@ std::string             ConfigServer::getDefaultRoot(std::string location)
     while (itBegin != itEnd)
     {
         if (location.compare(itBegin->first) == 0)
-            return (str.assign((itBegin->second.getRoot())).append(itBegin->second.getLocation()));
+            return (str.assign((itBegin->second._root)).append(itBegin->second._location));
         itBegin++;
     }
     return _defaultRoot;
 }
 
-std::string             ConfigServer::getDefaultServerName()
+std::vector<std::string>             ConfigServer::getServerName()
 {
     return _defaultServerName;
 }
 
-std::vector<std::string>  &ConfigServer::getDefaultIndex(std::string location)
+std::vector<std::string>  &ConfigServer::getIndex(std::string location)
 {
     std::map<std::string, Location, Compare<std::string> >::iterator itBegin;
     std::map<std::string, Location, Compare<std::string> >::iterator itEnd;    
@@ -211,13 +209,13 @@ std::vector<std::string>  &ConfigServer::getDefaultIndex(std::string location)
     while (itBegin != itEnd)
     {
         if (location.compare(itBegin->first) == 0)
-            return (itBegin->second.getIndex());
+            return (itBegin->second._index);
         itBegin++;
     }
     return _defaultIndex;
 }
 
-std::string                 ConfigServer::getDefaultType(std::string location)
+std::string                 ConfigServer::getType(std::string location)
 {
     std::map<std::string, Location, Compare<std::string> >::iterator itBegin;
     std::map<std::string, Location, Compare<std::string> >::iterator itEnd;  
@@ -227,18 +225,18 @@ std::string                 ConfigServer::getDefaultType(std::string location)
     while (itBegin != itEnd)
     {
         if (location.compare(itBegin->first) == 0)
-            return (itBegin->second.getType());
+            return (itBegin->second._type);
         itBegin++;
     }
     return _defaultType;
 }
 
-std::list<std::string>      &ConfigServer::getDefaultMimeTypes()
+std::list<std::string>      &ConfigServer::getMimeTypes()
 {
     return _mimeTypes;
 }
 
-std::vector<std::string>    &ConfigServer::getDefaultLanguage(std::string location)
+std::vector<std::string>    &ConfigServer::getLanguage(std::string location)
 {
     std::map<std::string, Location, Compare<std::string> >::iterator itBegin;
     std::map<std::string, Location, Compare<std::string> >::iterator itEnd;  
@@ -248,13 +246,13 @@ std::vector<std::string>    &ConfigServer::getDefaultLanguage(std::string locati
     while (itBegin != itEnd)
     {
         if (location.compare(itBegin->first) == 0)
-            return (itBegin->second.getLanguage());
+            return (itBegin->second._language);
         itBegin++;
     }
     return _defaultLanguage;
 }
 
-std::vector<std::string>    &ConfigServer::getDefaultAllow(std::string location)
+std::vector<std::string>    &ConfigServer::getAllow(std::string location)
 {
     std::map<std::string, Location, Compare<std::string> >::iterator itBegin;
     std::map<std::string, Location, Compare<std::string> >::iterator itEnd;  
@@ -264,13 +262,13 @@ std::vector<std::string>    &ConfigServer::getDefaultAllow(std::string location)
     while (itBegin != itEnd)
     {
         if (location.compare(itBegin->first) == 0)
-            return (itBegin->second.getAllow());
+            return (itBegin->second._allow);
         itBegin++;
     }
     return _defaultAllow;
 }
 
-std::string                 ConfigServer::getDefaultCharset(std::string location)
+std::string                 ConfigServer::getCharset(std::string location)
 {
     std::map<std::string, Location, Compare<std::string> >::iterator itBegin;
     std::map<std::string, Location, Compare<std::string> >::iterator itEnd;  
@@ -280,13 +278,13 @@ std::string                 ConfigServer::getDefaultCharset(std::string location
     while (itBegin != itEnd)
     {
         if (location.compare(itBegin->first) == 0)
-            return (itBegin->second.getCharset());
+            return (itBegin->second._charset);
         itBegin++;
     }
     return _defaultCharset;   
 }
 
-std::string                 ConfigServer::getDefaultAuth_basic(std::string location)
+std::string                 ConfigServer::getAuth_basic(std::string location)
 {
     std::map<std::string, Location, Compare<std::string> >::iterator itBegin;
     std::map<std::string, Location, Compare<std::string> >::iterator itEnd;  
@@ -296,13 +294,13 @@ std::string                 ConfigServer::getDefaultAuth_basic(std::string locat
     while (itBegin != itEnd)
     {
         if (location.compare(itBegin->first) == 0)
-            return (itBegin->second.getAuth_basic());
+            return (itBegin->second._auth_basic);
         itBegin++;
     }
     return _defaultAuth_basic;   
 }
 
-std::string                 ConfigServer::getDefaultAuth_basic_user_file(std::string location)
+std::string                 ConfigServer::getAuth_basic_user_file(std::string location)
 {
     std::map<std::string, Location, Compare<std::string> >::iterator itBegin;
     std::map<std::string, Location, Compare<std::string> >::iterator itEnd;  
@@ -312,13 +310,13 @@ std::string                 ConfigServer::getDefaultAuth_basic_user_file(std::st
     while (itBegin != itEnd)
     {
         if (location.compare(itBegin->first) == 0)
-            return (itBegin->second.getAuth_basic_user_file());
+            return (itBegin->second._auth_basic_user_file);
         itBegin++;
     }
     return _defaultAuth_basic_user_file;   
 }
 
-bool                 ConfigServer::getDefaultAutoindex(std::string location)
+bool                 ConfigServer::getAutoindex(std::string location)
 {
     std::map<std::string, Location, Compare<std::string> >::iterator itBegin;
     std::map<std::string, Location, Compare<std::string> >::iterator itEnd;  
@@ -328,65 +326,105 @@ bool                 ConfigServer::getDefaultAutoindex(std::string location)
     while (itBegin != itEnd)
     {
         if (location.compare(itBegin->first) == 0)
-            return (itBegin->second.getAutoIndex());
+            return (itBegin->second._autoindex);
         itBegin++;
     }
     return _defaultAutoindex;   
 }
 
+std::string             ConfigServer::getAlias(std::string location)
+{
+    std::map<std::string, Location, Compare<std::string> >::iterator itBegin;
+    std::map<std::string, Location, Compare<std::string> >::iterator itEnd;  
 
-std::string					ConfigServer::getCgi() {
-    return _cgi;
+    itBegin = _locationList.begin();
+    itEnd = _locationList.end();
+    while (itBegin != itEnd)
+    {
+        if (location.compare(itBegin->first) == 0)
+            return (itBegin->second._alias);
+        itBegin++;
+    }
+    return "";   
 }
 
-std::vector<std::string>			ConfigServer::getCgi_method() {
-    return _cgi_method;
+std::vector<std::string>             ConfigServer::getCGI(std::string location)
+{
+    std::map<std::string, Location, Compare<std::string> >::iterator itBegin;
+    std::map<std::string, Location, Compare<std::string> >::iterator itEnd;  
+
+    itBegin = _locationList.begin();
+    itEnd = _locationList.end();
+    while (itBegin != itEnd)
+    {
+        if (location.compare(itBegin->first) == 0)
+            return (itBegin->second._cgi);
+        itBegin++;
+    }
+    return _defaultCgi;   
 }
 
-std::string					ConfigServer::getCgi_root() {
-    return _cgi_root;
+std::string             ConfigServer::getCGI_root(std::string location)
+{
+    std::map<std::string, Location, Compare<std::string> >::iterator itBegin;
+    std::map<std::string, Location, Compare<std::string> >::iterator itEnd;  
+
+    itBegin = _locationList.begin();
+    itEnd = _locationList.end();
+    while (itBegin != itEnd)
+    {
+        if (location.compare(itBegin->first) == 0)
+            return (itBegin->second._cgi_root);
+        itBegin++;
+    }
+    return _defaultCgi_root;   
 }
 
+std::vector<std::string>	&ConfigServer::getCGI_allow(std::string location) {
+    std::map<std::string, Location, Compare<std::string> >::iterator itBegin;
+    std::map<std::string, Location, Compare<std::string> >::iterator itEnd;  
+
+    itBegin = _locationList.begin();
+    itEnd = _locationList.end();
+    while (itBegin != itEnd)
+    {
+        if (location.compare(itBegin->first) == 0)
+            return (itBegin->second._cgi_allow);
+        itBegin++;
+    }
+    return _defaultCgi_allow;  
+}
+
+int                         ConfigServer::getClientBodySize(std::string location) {
+    std::map<std::string, Location, Compare<std::string> >::iterator itBegin;
+    std::map<std::string, Location, Compare<std::string> >::iterator itEnd;  
+
+    itBegin = _locationList.begin();
+    itEnd = _locationList.end();
+    while (itBegin != itEnd)
+    {
+        if (location.compare(itBegin->first) == 0)
+            return (itBegin->second._clientBodySize);
+        itBegin++;
+    }
+    return _defaultClientBodySize;  
+
+}
 
 int                         ConfigServer::getPort() {
     return _port;
 }
 
-std::vector<std::string>    ConfigServer::getServer_name() {
-    return _server_name;
-}  
-
-
-std::string                 ConfigServer::getRoot() {
-    return _root;
+void					ConfigServer::setCGI(std::vector<std::string> cgi) {
+    _defaultCgi = cgi;
 }
 
-std::vector<std::string>    ConfigServer::getIndex() {
-    return _index;
+void					ConfigServer::setCGI_allow(std::vector<std::string> cgi_allow) {
+    _defaultCgi_allow = cgi_allow;
 }
 
-bool                        ConfigServer::getAutoIndex() {
-    return _autoIndex;
-}
-
-int                         ConfigServer::getClientBodySize() {
-    return _clientBodySize;
-}
-
-std::vector<std::string>    ConfigServer::getAcceptedMethods() {
-    return _acceptedMethods;
-}
-
-void					ConfigServer::setCgi(std::string cgi) {
-    _cgi = cgi;
-} 
-
-void					ConfigServer::setCgi_method(std::vector<std::string> cgi_method) {
-    _cgi_method = cgi_method;
-}
-
-void					ConfigServer::setCgi_root(std::string cgi_root) {
-    _cgi_root = cgi_root;
+void					ConfigServer::setCGI_root(std::string cgi_root) {
+    _defaultCgi_root = cgi_root;
 }
 
 void                    ConfigServer::setPort(int port) {
@@ -394,28 +432,29 @@ void                    ConfigServer::setPort(int port) {
 }
 
 void                    ConfigServer::setServer_name(std::vector<std::string> server_name) {
-    _server_name = server_name;
+    _defaultServerName = server_name;
 }
 
 void                    ConfigServer::setRoot(std::string root) {
-    _root = root;
+    _defaultRoot = root;
 }
 
 void                    ConfigServer::setIndex(std::vector<std::string> index) {
-    _index = index;
+    _defaultIndex = index;
 }
 
 void                    ConfigServer::setAutoIndex(bool autoIndex) {
-    _autoIndex = autoIndex;
+    _defaultAutoindex = autoIndex;
 }
 
 void                    ConfigServer::setClientBodySize(int clientBodySize) {
-    _clientBodySize = clientBodySize;
+    _defaultClientBodySize = clientBodySize;
 }
 
-void                    ConfigServer::setAcceptedMethods(std::vector<std::string> acceptedMethods) {
-    _acceptedMethods = acceptedMethods;
+void                    ConfigServer::setAllow(std::vector<std::string> allow) {
+    _defaultAllow = allow;
 }
+
 
 void                    ConfigServer::insertLocation(std::string s, Location location){
 

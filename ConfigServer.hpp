@@ -6,7 +6,7 @@
 /*   By: trbonnes <trbonnes@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/09 12:19:51 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/10/14 12:14:07 by trbonnes         ###   ########.fr       */
+/*   Updated: 2020/10/14 13:40:27 by trbonnes         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,8 +29,8 @@ class	ConfigServer {
 private:
 	std::map<std::string, Location, Compare<std::string> > _locationList;
     std::string                 _defaultRoot;
-    std::vector<std::string>    _defaultAllow;
-    std::string                 _defaultServerName;
+    std::vector<std::string>    _defaultAllow; // == Accepted Methods
+    std::vector<std::string>    _defaultServerName;
     std::vector<std::string>    _defaultIndex;
     std::string                 _defaultType;
     std::string                 _defaultCharset;
@@ -40,19 +40,12 @@ private:
     std::string                 _defaultAuth_basic;
     std::string                 _defaultAuth_basic_user_file;
     bool                        _defaultAutoindex;
-
-    //PARSER VARIABLES
-	std::string					_cgi;
-	std::vector<std::string>	_cgi_method;
-	std::string					_cgi_root;
+	std::vector<std::string>	_defaultCgi;
+	std::vector<std::string>	_defaultCgi_allow;
+	std::string					_defaultCgi_root;
     int                         _port;
-    std::vector<std::string>    _server_name;
-    std::string                 _root;
-    std::vector<std::string>    _index;
-    bool                        _autoIndex;
-    int                         _clientBodySize;
-    std::vector<std::string>    _acceptedMethods;
-    //
+    int                         _defaultClientBodySize;
+
 
 public:
 	ConfigServer();
@@ -60,44 +53,35 @@ public:
 	/*virtual*/ ~ConfigServer();
 	ConfigServer &operator=(const ConfigServer &c);
 
-    std::string                 getDefaultRoot(std::string _uri);
-    std::string                 getDefaultServerName();
-    std::vector<std::string>    &getDefaultIndex(std::string location);
-    std::string                 getDefaultType(std::string location);
-    std::string                 getDefaultCharset(std::string location);
-    std::vector<std::string>    &getDefaultLanguage(std::string location);
-    std::vector<std::string>    &getDefaultAllow(std::string location);
-    std::list<std::string>      &getDefaultMimeTypes();
-    std::string                 getDefaultLocation(std::string location);
-    std::string                 getDefaultAuth_basic(std::string location);
-    std::string                 getDefaultAuth_basic_user_file(std::string location);
-    bool                        getDefaultAutoindex(std::string location);
-
-    //PARSER VARIABLES GETTERS
-    std::string					getCgi();
-	std::vector<std::string>	getCgi_method();
-	std::string					getCgi_root();
+    std::string                 getRoot(std::string _uri);
+    std::vector<std::string>    getServerName(void);
+    std::vector<std::string>    &getIndex(std::string location);
+    std::string                 getType(std::string location);
+    std::string                 getCharset(std::string location);
+    std::vector<std::string>    &getLanguage(std::string location);
+    std::vector<std::string>    &getAllow(std::string location);
+    std::list<std::string>      &getMimeTypes();
+    std::string                 getLocation(std::string location);
+    std::string                 getAuth_basic(std::string location);
+    std::string                 getAuth_basic_user_file(std::string location);
+    bool                        getAutoindex(std::string location);
+    std::string                 getAlias(std::string location);
+    std::vector<std::string>    getCGI(std::string location);
+    std::string                 getCGI_root(std::string location);
+	std::vector<std::string>	&getCGI_allow(std::string location);
+    int                         getClientBodySize(std::string location);
     int                         getPort();
-    std::vector<std::string>    getServer_name();
-    std::string                 getRoot();
-    std::vector<std::string>    getIndex();
-    bool                        getAutoIndex();
-    int                         getClientBodySize();
-    std::vector<std::string>    getAcceptedMethods();
-    //
 
-    //PARSER VARIABLES SETTERS
-    void					setCgi(std::string _cgi);
-	void					setCgi_method(std::vector<std::string> _cgi_method);
-	void					setCgi_root(std::string _cgi_root);
-    void                    setPort(int _port);
-    void                    setServer_name(std::vector<std::string> _server_name);
-    void                    setRoot(std::string _root);
-    void                    setIndex(std::vector<std::string> _index);
-    void                    setAutoIndex(bool _autoIndex);
-    void                    setClientBodySize(int _clientBodySize);
-    void                    setAcceptedMethods(std::vector<std::string> _acceptedMethods);
-    //
+    void					setCGI(std::vector<std::string> cgi);
+	void					setCGI_allow(std::vector<std::string> cgi_allow);
+	void					setCGI_root(std::string cgi_root);
+    void                    setPort(int port);
+    void                    setServer_name(std::vector<std::string> server_name);
+    void                    setRoot(std::string root);
+    void                    setIndex(std::vector<std::string> index);
+    void                    setAutoIndex(bool autoIndex);
+    void                    setClientBodySize(int clientBodySize);
+    void                    setAllow(std::vector<std::string> allow);
 
     void                    insertLocation(std::string s, Location location);
 };
