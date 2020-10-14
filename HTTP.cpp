@@ -58,10 +58,13 @@ _body("")
     int         i;
     size_t      extension;
     std::string str;
+    int         fd; 
 
     _uri = socket.getRequestURI();
     setLocation();
+    std::cout << "_location: " << _location << std::endl;
     replaceURI(); 
+    std::cout << "_uri: " << _uri << std::endl;
     i = 0;
     while (i < NB_METHODS)
     {
@@ -71,9 +74,13 @@ _body("")
             {
                 if (_config.getCGI_root(_location).length() > 0)
                 {
+                    fd = setRoot(); // setRoot a modifier, juste setRoot et pas open
+                    close(fd);
                     cgi_metaVariables();
-                    extension = _cgi._script_name.find_last_of('.');
-                    if (is_good_exe(str.assign(_cgi._script_name).erase(0, extension)))
+                    extension = _route.find_last_of('.');
+                    std::cout << "script name: " << _cgi._script_name << std::endl;
+                    std::cout << "exe: " << str.assign(_route).erase(0, extension + 1) << std::endl;
+                    if (is_good_exe(str.assign(_route).erase(0, extension + 1)))
                         cgi_exe();
                     else
                         _statusCode = BAD_REQUEST;

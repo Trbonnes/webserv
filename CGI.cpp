@@ -34,6 +34,8 @@ void        HTTP::cgi_metaVariables()
     query = str.assign(_route).find('?', 0);
     if (query != -1)
         _cgi._path_info = str.erase(query, str.length());
+    else
+        _cgi._path_info = _route;
     _cgi._path_translated = _cgi._path_info;
     if (query != -1)
        _cgi._query_string = str.assign(_route).erase(0, query);
@@ -42,10 +44,13 @@ void        HTTP::cgi_metaVariables()
     _cgi._remote_user = ""; // Default
     _cgi._request_method = _socket.getMethod();
     _cgi._request_uri = _socket.getRequestURI();
-    query = str.assign(_config.getCGI_root(_location)).find_last_of('/');
-    _cgi._script_name = str.erase(0, query);
+    // query = str.assign(_config.getCGI_root(_location)).find_last_of('/');
+    // _cgi._script_name = str.erase(0, query);
+    _cgi._script_name = _config.getCGI_root(_location);
     _cgi._server_name = _config.getServerName();
-    _cgi._server_port = _config.getPort();
+    _cgi._server_port = "80";
+    // _cgi._server_port = _config.getPort();
+    // std::cout << "Port: " << _config.getPort() << std::endl;
     _cgi._server_protocol = "HTTP/1.1";
     _cgi._server_software = "SuperServer/1.0";
     setEnv();
@@ -72,6 +77,12 @@ void        HTTP::setEnv()
     _cgi_env[SERVER_PROTOCOL] = ft_strdup(_cgi._server_protocol.insert(0, "SERVER_PROTOCOL=").c_str());
     _cgi_env[SERVER_SOFTWARE] = ft_strdup(_cgi._server_software.insert(0, "SERVER_SOFTWARE=").c_str());
     _cgi_env[NB_METAVARIABLES] = NULL;
+    int i = 0;
+    while (i < NB_METAVARIABLES)
+    {
+        dprintf(2, "%s\n", _cgi_env[i]);
+        i++;
+    }
 }
 
 int         HTTP::is_good_exe(std::string exe)
@@ -98,6 +109,8 @@ void        HTTP::cgi_exe()
     char    *line;
     size_t  space;
     int     ret;
+    char    buf[1025];
+    std::string str;
 
     pipe(fd);
     pid = fork();
@@ -105,18 +118,41 @@ void        HTTP::cgi_exe()
         _statusCode = INTERNAL_SERVER_ERROR;
     else if (pid == 0)
     {
+        dprintf(2, "STDOUT_FILENO: %d\n", STDOUT_FILENO);
         dup2(fd[SIDE_IN], STDOUT_FILENO);
         execve(_config.getCGI_root(_location).c_str(), NULL, _cgi_env);
     }
     else
     {
         waitpid(-1, &status, 0);
+        dup2(fd[SIDE_OUT], STDIN_FILENO);
+        // ret = read(fd[SIDE_OUT], buf, 1024);
+        // dprintf(2, "ret: %d\n", ret);
+        // buf[ret] = '\0';
+        // dprintf(2, "\nBUFFER: \n%s\n", buf);
         ret = get_next_line(fd[SIDE_OUT], &line);
+        
+        // dprintf(2,"%d\n", ret);
+        dprintf(2,"%s\n", line);
         _contentType = line;
+        dprintf(2,"%s\n", _contentType.c_str());
         space = _contentType.find(' ');
-        _contentType.erase(0, space);
+        if (space != -1)
+            _contentType.erase(0, space + 1);
+        dprintf(2,"%s\n", _contentType.c_str());
         while ((ret = get_next_line(fd[SIDE_OUT], &line)) > 0)
-            _body.append(line);
+        {
+            str = line;
+            // dprintf(2,"ret: %d\n", ret);
+            dprintf(2,"%s\n", line);
+            
+            _body.append(str);
+        }
+        dprintf(2,"TEST\n");
+        str = line;
+        _body.append(str);
+        _body.append("\0");
+        dprintf(2,"%s\n", _body.c_str());
         close(fd[SIDE_IN]);
         close(fd[SIDE_OUT]);
     }
