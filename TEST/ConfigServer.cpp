@@ -92,8 +92,8 @@ _defaultAutoindex(false)
 
     exe.push_back("html");
 
-    Location loc4("/bin-cgi/", "/sgoinfre/goinfre/Perso/pganglof/webserver/bin-cgi", _defaultAllow, _defaultIndex, _defaultType, 
-    _defaultCharset, _defaultLanguage, "off", "", false, "", exe, "/sgoinfre/goinfre/Perso/pganglof/webserver/bin-cgi/cgi_tester");
+    Location loc4("/cgi/", "/sgoinfre/goinfre/Perso/pganglof/webserver/www", _defaultAllow, _defaultIndex, _defaultType, 
+    _defaultCharset, _defaultLanguage, "off", "", false, "", exe, "/sgoinfre/goinfre/Perso/pganglof/webserver/bin-cgi/a.out");
 
     _locationList["/bin-cgi/"] = loc4;
 
