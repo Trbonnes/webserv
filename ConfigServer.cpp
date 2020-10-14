@@ -6,7 +6,7 @@
 /*   By: trbonnes <trbonnes@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/09 15:13:35 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/10/14 09:27:50 by trbonnes         ###   ########.fr       */
+/*   Updated: 2020/10/14 12:14:42 by trbonnes         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -417,3 +417,6 @@ void                    ConfigServer::setAcceptedMethods(std::vector<std::string
     _acceptedMethods = acceptedMethods;
 }
 
+void                    ConfigServer::insertLocation(std::string s, Location location){
+
+}

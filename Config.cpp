@@ -6,7 +6,7 @@
 /*   By: trbonnes <trbonnes@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/09 10:32:47 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/10/14 09:22:47 by trbonnes         ###   ########.fr       */
+/*   Updated: 2020/10/14 10:43:20 by trbonnes         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,4 +57,8 @@ void						Config::setWorker(int worker) {
 
 void						Config::setWorkerConnections(int worckerConections) {
 	_workerConnections = worckerConections;
+}
+
+const char	*Config::InvalidConfigException::what() const throw() {
+	return "Webserver configuration file is invalid";
 }

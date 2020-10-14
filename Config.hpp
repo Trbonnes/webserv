@@ -6,7 +6,7 @@
 /*   By: trbonnes <trbonnes@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/09 10:32:53 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/10/14 09:23:26 by trbonnes         ###   ########.fr       */
+/*   Updated: 2020/10/14 10:43:27 by trbonnes         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,11 @@ public:
 	void						setServer(std::vector<ConfigServer> server);
 	void						setWorker(int worker);
 	void						setWorkerConnections(int worckerConections);
+
+	class	InvalidConfigException: public std::exception {
+		public:
+			virtual const char* what() const throw();
+	};
 };
 
 Config	*configFileParser(int fd);

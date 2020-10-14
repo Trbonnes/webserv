@@ -6,7 +6,7 @@
 /*   By: trbonnes <trbonnes@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/09 12:19:51 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/10/14 09:28:04 by trbonnes         ###   ########.fr       */
+/*   Updated: 2020/10/14 12:14:07 by trbonnes         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,6 +98,8 @@ public:
     void                    setClientBodySize(int _clientBodySize);
     void                    setAcceptedMethods(std::vector<std::string> _acceptedMethods);
     //
+
+    void                    insertLocation(std::string s, Location location);
 };
 
 #endif
