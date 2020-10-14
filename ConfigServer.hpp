@@ -6,7 +6,7 @@
 /*   By: trbonnes <trbonnes@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/09 12:19:51 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/10/09 16:54:27 by trbonnes         ###   ########.fr       */
+/*   Updated: 2020/10/14 09:28:04 by trbonnes         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,7 @@ public:
 	ConfigServer &operator=(const ConfigServer &c);
 
     std::string                 getDefaultRoot(std::string _uri);
-    std::string                 getDefaultServerName(std::string location);
+    std::string                 getDefaultServerName();
     std::vector<std::string>    &getDefaultIndex(std::string location);
     std::string                 getDefaultType(std::string location);
     std::string                 getDefaultCharset(std::string location);
@@ -94,7 +94,7 @@ public:
     void                    setServer_name(std::vector<std::string> _server_name);
     void                    setRoot(std::string _root);
     void                    setIndex(std::vector<std::string> _index);
-    bool                    setAutoIndex(bool _autoIndex);
+    void                    setAutoIndex(bool _autoIndex);
     void                    setClientBodySize(int _clientBodySize);
     void                    setAcceptedMethods(std::vector<std::string> _acceptedMethods);
     //

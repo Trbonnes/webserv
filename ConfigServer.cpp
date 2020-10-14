@@ -6,7 +6,7 @@
 /*   By: trbonnes <trbonnes@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/09 15:13:35 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/10/09 16:53:45 by trbonnes         ###   ########.fr       */
+/*   Updated: 2020/10/14 09:27:50 by trbonnes         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@ _defaultAutoindex("off") {
 
     -----mime.types test not for configfile parsing-----
 
-    //** open mime.types **
+    // open mime.types **
     int         ret;
     int         fd;
     char        *line;
@@ -75,9 +75,9 @@ _defaultAutoindex("off") {
 
     -----Test Locations without config file parsing-----
 
-    //** Locations **
+    // Locations **
 
-        //** first location **
+        // first location **
 
     std::list<std::string> index;
     
@@ -89,7 +89,7 @@ _defaultAutoindex("off") {
 
     _locationList["/data/"] = loc1;
 
-        //** second location **
+        // second location **
 
     std::list<std::string> index2;
 
@@ -196,7 +196,7 @@ std::string             ConfigServer::getDefaultRoot(std::string location)
     return _defaultRoot;
 }
 
-std::string             ConfigServer::getDefaultServerName(std::string location)
+std::string             ConfigServer::getDefaultServerName()
 {
     return _defaultServerName;
 }
@@ -405,7 +405,7 @@ void                    ConfigServer::setIndex(std::vector<std::string> index) {
     _index = index;
 }
 
-bool                    ConfigServer::setAutoIndex(bool autoIndex) {
+void                    ConfigServer::setAutoIndex(bool autoIndex) {
     _autoIndex = autoIndex;
 }
 

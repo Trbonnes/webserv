@@ -6,7 +6,7 @@
 /*   By: trbonnes <trbonnes@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/09 10:32:47 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/10/09 12:30:19 by trbonnes         ###   ########.fr       */
+/*   Updated: 2020/10/14 09:22:47 by trbonnes         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,3 +33,28 @@ Config &Config::operator=(const Config &c) {
 	return *this;
 }
 
+
+
+std::vector<ConfigServer>	&Config::getServer() {
+	return _server;
+}
+
+int							Config::getWorker() {
+	return _worker;
+}
+
+int							Config::getWorkerConnections() {
+	return _workerConnections;
+}
+
+void						Config::setServer(std::vector<ConfigServer> server) {
+	_server = server;
+}
+
+void						Config::setWorker(int worker) {
+	_worker = worker;
+}
+
+void						Config::setWorkerConnections(int worckerConections) {
+	_workerConnections = worckerConections;
+}
