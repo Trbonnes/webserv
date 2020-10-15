@@ -25,10 +25,7 @@ _contentType(""),
 _date(""),
 _retryAfter(""),
 _transferEncoding(""),
-_body("") {
-    _methodsName[GET] = "GET"; 
-    _methodsName[HEAD] = "HEAD"; 
-}
+_body("") {}
 
 HTTP::HTTP(Socket &socket, ConfigServer &config) :
 _socket(socket),
@@ -52,9 +49,6 @@ _retryAfter(""),
 _transferEncoding(""),
 _body("")
 {
-    _methodsName[GET] = "GET"; 
-    _methodsName[HEAD] = "HEAD"; 
-
     int         i;
     size_t      extension;
     std::string str;
@@ -63,40 +57,20 @@ _body("")
     _uri = socket.getRequestURI();
     setLocation();
     replaceURI(); 
-    i = 0;
-    while (i < NB_METHODS)
+    if (_config.getCGI_root(_location).length() > 0 && checkCGImethods(_socket.getMethod()))
     {
-        if (_socket.getMethod().compare(_methodsName[i]) == 0)
-        {
-            if (checkAllowMethods(_methodsName[i]))
-            {
-                if (_config.getCGI_root(_location).length() > 0)
-                {
-                    fd = setRoot(); // setRoot a modifier, juste setRoot et pas open
-                    close(fd);
-                    cgi_metaVariables();
-                    extension = _route.find_last_of('.');
-                    if (is_good_exe(str.assign(_route).erase(0, extension + 1)))
-                    {
-                        std::cout << "CGI is running" << std::endl;
-                        cgi_exe();
-                    }
-                    else
-                    {
-                        std::cout << "CGI is not running" << std::endl;
-                        _statusCode = BAD_REQUEST;
-                    }
-                }
-                else
-                    callMethod(i);
-                return ;
-            }
-            else
-                return ;
-        }
-        i++;
+        fd = setRoot(); // setRoot a modifier, juste setRoot et pas open
+        close(fd);
+        cgi_metaVariables();
+        extension = _route.find_last_of('.');
+        if (is_good_exe(str.assign(_route).erase(0, extension + 1)))
+            cgi_exe();
+        else
+            _statusCode = BAD_REQUEST;
     }
-    _statusCode = BAD_REQUEST;
+    else if (checkAllowMethods(_socket.getMethod()))
+        callMethod(_socket.getMethod());
+    // _statusCode = BAD_REQUEST;
 }
 
 HTTP::HTTP(HTTP &copy)
@@ -119,11 +93,6 @@ HTTP::HTTP(HTTP &copy)
     _retryAfter = copy._retryAfter;
     _transferEncoding = copy._transferEncoding;
     _body = copy._body;
-    for (int i = 0; i < NB_METHODS; i++)
-    {
-        _methodsName[i].assign(copy._methodsName[i]);
-        _method[i] = copy._method[i];
-    }
 }
 
 HTTP::~HTTP()
@@ -155,19 +124,14 @@ HTTP     &HTTP::operator=(HTTP &rhs)
     _retryAfter = rhs._retryAfter;
     _transferEncoding = rhs._transferEncoding;
     _body = rhs._body;
-    for (int i = 0; i < NB_METHODS; i++)
-    {
-        _methodsName[i].assign(rhs._methodsName[i]);
-        _method[i] = rhs._method[i];
-    }
     return *this;
 }
 
-void        HTTP::callMethod(int method)
+void        HTTP::callMethod(std::string method)
 {
-    if (method == GET)
+    if (method.compare("GET") == 0)
         get();
-    else if (method == HEAD)
+    else if (method.compare("HEAD") == 0)
         head();
 }
 

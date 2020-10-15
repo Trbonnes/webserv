@@ -3,7 +3,7 @@
 ConfigServer::ConfigServer() :
 _defaultRoot("/home/pauline/webserver/www"),
 _defaultServerName("localhost"),
-_defaultPort("80"),
+_defaultPort("8080"),
 _defaultIndex(0),
 _defaultType("text/plain"),
 _defaultCharset("koi8-r"),
@@ -12,7 +12,8 @@ _configFilesRoot("/home/pauline/webserver/ConfigServer"),
 _defaultAuth_basic("\"Authorization\""),
 _defaultAuth_basic_user_file("/home/pauline/webserver/ConfigServer/.htpasswd"),
 _defaultAutoindex(false),
-_defaultCgi(0)
+_defaultCgi(0),
+_defaultCgi_methods(0)
 {
     _defaultAllow.push_back("GET");
     _defaultAllow.push_back("HEAD");
@@ -63,12 +64,18 @@ _defaultCgi(0)
 
     std::vector<std::string> index;
     std::vector<std::string> exe;
-    
+    std::vector<std::string> cgi_methods;
+
+    cgi_methods.push_back("GET");
+    cgi_methods.push_back("HEAD");
+    cgi_methods.push_back("PUT");
+    cgi_methods.push_back("POST");
+    cgi_methods.push_back("DELETE");
     index.push_back("index.php");
 
     Location loc1("/data/", "/home/pauline/webserver/www",
     _defaultAllow, index,
-    "text/html", "utf-8", _defaultLanguage, _defaultAuth_basic, _defaultAuth_basic_user_file, _defaultAutoindex, "/blabla/", exe, "");
+    "text/html", "utf-8", _defaultLanguage, _defaultAuth_basic, _defaultAuth_basic_user_file, _defaultAutoindex, "/blabla/", exe, cgi_methods, "");
 
     _locationList["/data/"] = loc1;
 
@@ -81,7 +88,7 @@ _defaultCgi(0)
 
     Location loc2("/images/", "/home/pauline/webserver/www",
     _defaultAllow, index2,
-    "text/html", "", _defaultLanguage, "off", "", _defaultAutoindex, "", exe1, "");
+    "text/html", "", _defaultLanguage, "off", "", _defaultAutoindex, "", exe1, cgi_methods, "");
 
     _locationList["/images/"] = loc2;
 
@@ -90,7 +97,7 @@ _defaultCgi(0)
 
     Location loc3("/", "/home/pauline/webserver/www",
     _defaultAllow, _defaultIndex,
-    _defaultType, _defaultCharset, _defaultLanguage, "off", "", true, "", exe2, "");
+    _defaultType, _defaultCharset, _defaultLanguage, "off", "", true, "", exe2, cgi_methods, "");
 
     _locationList["/"] = loc3;
 
@@ -100,7 +107,7 @@ _defaultCgi(0)
     exe3.push_back("bla");
 
     Location loc4("/cgi/", "/home/pauline/webserver/www", _defaultAllow, _defaultIndex, _defaultType, 
-    _defaultCharset, _defaultLanguage, "off", "", false, "", exe3, "/home/pauline/webserver/bin-cgi/ubuntu_cgi_tester");
+    _defaultCharset, _defaultLanguage, "off", "", false, "", exe3, cgi_methods, "/home/pauline/webserver/bin-cgi/ubuntu_cgi_tester");
 
     _locationList["/cgi/"] = loc4;
 
@@ -175,6 +182,7 @@ std::string             ConfigServer::getServerName()
 
 std::string             ConfigServer::getPort()
 {
+    std::cout << "GET PORT: " << _defaultPort << std::endl;
     return _defaultPort;
 }
 
@@ -246,6 +254,23 @@ std::vector<std::string>    &ConfigServer::getAllow(std::string location)
     }
     return _defaultAllow;
 }
+
+std::vector<std::string>    &ConfigServer::getCGImethods(std::string location)
+{
+    std::map<std::string, Location, Compare<std::string> >::iterator itBegin;
+    std::map<std::string, Location, Compare<std::string> >::iterator itEnd;  
+
+    itBegin = _locationList.begin();
+    itEnd = _locationList.end();
+    while (itBegin != itEnd)
+    {
+        if (location.compare(itBegin->first) == 0)
+            return (itBegin->second._cgi_methods);
+        itBegin++;
+    }
+    return _defaultCgi_methods;
+}
+
 
 std::string                 ConfigServer::getCharset(std::string location)
 {
