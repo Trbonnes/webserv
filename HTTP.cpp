@@ -54,6 +54,7 @@ _body("")
     std::string str;
     int         fd; 
 
+    ft_bzero(_cgi_env, sizeof(_cgi_env));
     _uri = socket.getRequestURI();
     setLocation();
     replaceURI(); 
