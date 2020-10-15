@@ -33,7 +33,7 @@ class   ConfigServer
     bool                        _defaultAutoindex;
 
 	std::vector<std::string>	_defaultCgi;
-	std::vector<std::string>	_cgi_method;
+	std::vector<std::string>	_defaultCgi_methods;
 	std::string					_cgi_root;
 
     public:
@@ -59,6 +59,7 @@ class   ConfigServer
     bool                        getAutoindex(std::string location);
     std::string                 getAlias(std::string location);
     std::vector<std::string>    &getCGI(std::string location);
+    std::vector<std::string>    &getCGImethods(std::string location);
     std::string                 getCGI_root(std::string location);
 };
 

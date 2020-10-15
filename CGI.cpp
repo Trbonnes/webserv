@@ -22,6 +22,27 @@ _server_software("") {}
 
 CGI::~CGI() {}
 
+int         HTTP::checkCGImethods(std::string method)
+{
+    std::vector<std::string>::iterator itBegin;
+    std::vector<std::string>::iterator itEnd;
+    int ret;
+
+    ret = 0;
+    itBegin = _config.getCGImethods(_location).begin();
+    itEnd = _config.getCGImethods(_location).end();
+    while (itBegin != itEnd)
+    {
+        _allow.push_back(*itBegin);
+        if ((*itBegin).compare(method) == 0)
+            ret = 1;
+        itBegin++;
+    }
+    if (!ret)
+      _statusCode = METHOD_NOT_ALLOWED;
+    return (ret);
+}
+
 void        HTTP::cgi_metaVariables()
 {
     std::string str;
@@ -44,13 +65,10 @@ void        HTTP::cgi_metaVariables()
     _cgi._remote_user = ""; // Default
     _cgi._request_method = _socket.getMethod();
     _cgi._request_uri = _socket.getRequestURI();
-    // query = str.assign(_config.getCGI_root(_location)).find_last_of('/');
-    // _cgi._script_name = str.erase(0, query);
     _cgi._script_name = _config.getCGI_root(_location);
     _cgi._server_name = _config.getServerName();
-    // _cgi._server_port = "80";
-    _cgi._server_port = _config.getPort();
-    // std::cout << "Port: " << _config.getPort() << std::endl;
+    _cgi._server_port = "80"; // _config.getPort() ne fonctionne pas pour des raisons obscures
+    // _cgi._server_port = _config.getPort();
     _cgi._server_protocol = "HTTP/1.1";
     _cgi._server_software = "SuperServer/1.0";
     setEnv();
@@ -99,7 +117,6 @@ int         HTTP::is_good_exe(std::string exe)
                     return (1);
                 cgi_begin++;
             }
-
         }
     }
     return (0);

@@ -87,13 +87,14 @@ class   HTTP
     
     // methods
 
-    std::string                 _methodsName[NB_METHODS];
-    void                        (*_method[NB_METHODS])(void);
+    // std::string                 _methodsName[NB_METHODS];
+    // void                        (*_method[NB_METHODS])(void);
 
     HTTP();
 
-    void            callMethod(int method);
+    void            callMethod(std::string method);
     int             checkAllowMethods(std::string method);
+    int             checkCGImethods(std::string method);
     void            setConfigURI(void);
     void            setLocation(void);
     void            replaceURI(void);
@@ -128,28 +129,6 @@ class   HTTP
     // HEAD
     void            head(void);
 
-    // POST
-    void            post(void);
-
-    // PUT
-    void            put(void);
-
-    // DEL
-    void            del(void);
-
-    // CONNECT
-    void            connect(void);
-
-    // OPTIONS
-    void            options(void);
-
-    // TRACE
-    void            trace(void);
-
-    // PATCH
-    void            patch(void);
-
-    
     public:
     HTTP(Socket &socket, ConfigServer &config);
     HTTP(HTTP &copy);

@@ -3,7 +3,7 @@
 Socket::Socket() :
 _fd(0),
 _method("GET"),
-_requestURI("/cgi/cgi.bla"),
+_requestURI("/images/42.png"),
 _httpVersion("HTTP/1.1"),
 _contentLength(""),
 _contentLocation(""),
