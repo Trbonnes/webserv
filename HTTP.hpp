@@ -7,6 +7,7 @@
 # include <sys/wait.h>
 # include <sys/stat.h>
 # include <sys/time.h>
+# include <strings.h>
 # include <dirent.h>
 # include <string>
 # include <fcntl.h>
@@ -85,11 +86,6 @@ class   HTTP
 
     std::string                 _body;
     
-    // methods
-
-    // std::string                 _methodsName[NB_METHODS];
-    // void                        (*_method[NB_METHODS])(void);
-
     HTTP();
 
     void            callMethod(std::string method);
