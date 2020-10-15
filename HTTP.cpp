@@ -62,9 +62,7 @@ _body("")
 
     _uri = socket.getRequestURI();
     setLocation();
-    std::cout << "_location: " << _location << std::endl;
     replaceURI(); 
-    std::cout << "_uri: " << _uri << std::endl;
     i = 0;
     while (i < NB_METHODS)
     {
@@ -78,8 +76,6 @@ _body("")
                     close(fd);
                     cgi_metaVariables();
                     extension = _route.find_last_of('.');
-                    std::cout << "script name: " << _cgi._script_name << std::endl;
-                    std::cout << "exe: " << str.assign(_route).erase(0, extension + 1) << std::endl;
                     if (is_good_exe(str.assign(_route).erase(0, extension + 1)))
                         cgi_exe();
                     else
@@ -259,7 +255,7 @@ void            HTTP::setAutoindex(void)
             if (dirent->d_type == DT_DIR)
                 str.append("/");
             str.append("</a>\t\t\t\t");
-            timeinfo = localtime(&(directory.st_mtimespec.tv_sec)); // st_mtimespec = apple ; st_mtime = linux
+            timeinfo = localtime(&(directory.st_mtime)); // st_mtimespec.tv.sec = macos ; st_mtime = linux
             strftime(lastModifications, 100, "%d-%b-20%y %OH:%OM", timeinfo);
             str.append(lastModifications);
             str.append("\t\t");

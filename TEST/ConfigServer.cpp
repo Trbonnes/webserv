@@ -1,17 +1,18 @@
 #include "ConfigServer.hpp"
 
 ConfigServer::ConfigServer() :
-_defaultRoot("/sgoinfre/goinfre/Perso/pganglof/webserver/www"),
+_defaultRoot("/home/pauline/webserver/www"),
 _defaultServerName("localhost"),
 _defaultPort("80"),
 _defaultIndex(0),
 _defaultType("text/plain"),
 _defaultCharset("koi8-r"),
 _defaultLanguage(0),
-_configFilesRoot("/sgoinfre/goinfre/Perso/pganglof/webserver/ConfigServer"),
+_configFilesRoot("/home/pauline/webserver/ConfigServer"),
 _defaultAuth_basic("\"Authorization\""),
-_defaultAuth_basic_user_file("/sgoinfre/goinfre/Perso/pganglof/webserver/ConfigServer/.htpasswd"),
-_defaultAutoindex(false)
+_defaultAuth_basic_user_file("/home/pauline/webserver/ConfigServer/.htpasswd"),
+_defaultAutoindex(false),
+_defaultCgi(0)
 {
     _defaultAllow.push_back("GET");
     _defaultAllow.push_back("HEAD");
@@ -62,7 +63,7 @@ _defaultAutoindex(false)
     
     index.push_back("index.php");
 
-    Location loc1("/data/", "/sgoinfre/goinfre/Perso/pganglof/webserver/www",
+    Location loc1("/data/", "/home/pauline/webserver/www",
     _defaultAllow, index,
     "text/html", "utf-8", _defaultLanguage, _defaultAuth_basic, _defaultAuth_basic_user_file, _defaultAutoindex, "/blabla/", exe, "");
 
@@ -71,29 +72,32 @@ _defaultAutoindex(false)
         //** second location **
 
     std::vector<std::string> index2;
+    std::vector<std::string> exe1;
 
     index2.push_back("42.png");
 
-    Location loc2("/images/", "/sgoinfre/goinfre/Perso/pganglof/webserver/www",
+    Location loc2("/images/", "/home/pauline/webserver/www",
     _defaultAllow, index2,
-    "text/html", "", _defaultLanguage, "off", "", _defaultAutoindex, "", exe, "");
+    "text/html", "", _defaultLanguage, "off", "", _defaultAutoindex, "", exe1, "");
 
     _locationList["/images/"] = loc2;
 
         //** third location **
+    std::vector<std::string> exe2;
 
-    Location loc3("/", "/sgoinfre/goinfre/Perso/pganglof/webserver/www",
+    Location loc3("/", "/home/pauline/webserver/www",
     _defaultAllow, _defaultIndex,
-    _defaultType, _defaultCharset, _defaultLanguage, "off", "", true, "", exe, "");
+    _defaultType, _defaultCharset, _defaultLanguage, "off", "", true, "", exe2, "");
 
     _locationList["/"] = loc3;
 
         //** fourth location **
+    std::vector<std::string> exe3;
 
-    exe.push_back("html");
+    exe3.push_back("html");
 
-    Location loc4("/cgi/", "/sgoinfre/goinfre/Perso/pganglof/webserver/www", _defaultAllow, _defaultIndex, _defaultType, 
-    _defaultCharset, _defaultLanguage, "off", "", false, "", exe, "/sgoinfre/goinfre/Perso/pganglof/webserver/bin-cgi/a.out");
+    Location loc4("/bin-cgi/", "/home/pauline/webserver/www", _defaultAllow, _defaultIndex, _defaultType, 
+    _defaultCharset, _defaultLanguage, "off", "", false, "", exe3, "/home/pauline/webserver/bin-cgi/a.out");
 
     _locationList["/bin-cgi/"] = loc4;
 
@@ -320,10 +324,11 @@ std::string             ConfigServer::getAlias(std::string location)
     return "";   
 }
 
-std::vector<std::string>             ConfigServer::getCGI(std::string location)
+std::vector<std::string>             &ConfigServer::getCGI(std::string location)
 {
     std::map<std::string, Location, Compare<std::string> >::iterator itBegin;
     std::map<std::string, Location, Compare<std::string> >::iterator itEnd;  
+    std::vector<std::string> ret;
 
     itBegin = _locationList.begin();
     itEnd = _locationList.end();
@@ -333,7 +338,7 @@ std::vector<std::string>             ConfigServer::getCGI(std::string location)
             return (itBegin->second._cgi);
         itBegin++;
     }
-    return std::vector<std::string>();   
+    return _defaultCgi;   
 }
 
 std::string             ConfigServer::getCGI_root(std::string location)

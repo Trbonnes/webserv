@@ -12,7 +12,7 @@ _auth_basic(""),
 _auth_basic_user_file(""),
 _autoindex(false),
 _alias(""),
-_cgi(0),
+_cgi(),
 _cgi_root("") {}
 
 Location::Location(std::string location, std::string root, std::vector<std::string> allow,

@@ -32,7 +32,7 @@ class   ConfigServer
     std::string                 _defaultAuth_basic_user_file;
     bool                        _defaultAutoindex;
 
-	std::vector<std::string>	_cgi;
+	std::vector<std::string>	_defaultCgi;
 	std::vector<std::string>	_cgi_method;
 	std::string					_cgi_root;
 
@@ -58,7 +58,7 @@ class   ConfigServer
     std::string                 getAuth_basic_user_file(std::string location);
     bool                        getAutoindex(std::string location);
     std::string                 getAlias(std::string location);
-    std::vector<std::string>    getCGI(std::string location);
+    std::vector<std::string>    &getCGI(std::string location);
     std::string                 getCGI_root(std::string location);
 };
 
