@@ -18,6 +18,7 @@ _defaultCgi(0)
     _defaultAllow.push_back("HEAD");
     _defaultLanguage.push_back("en");
     _defaultLanguage.push_back("fr");
+    _defaultIndex.push_back("cgi.bla");
     _defaultIndex.push_back("index.html");
     // _defaultIndex.push_back("index.php");
 
@@ -53,6 +54,8 @@ _defaultCgi(0)
         free(line);
         close (fd);
     }
+
+    std::cout << "Default port: " << _defaultPort << std::endl;
 
     //** Locations **
 
@@ -94,12 +97,12 @@ _defaultCgi(0)
         //** fourth location **
     std::vector<std::string> exe3;
 
-    exe3.push_back("html");
+    exe3.push_back("bla");
 
-    Location loc4("/bin-cgi/", "/home/pauline/webserver/www", _defaultAllow, _defaultIndex, _defaultType, 
-    _defaultCharset, _defaultLanguage, "off", "", false, "", exe3, "/home/pauline/webserver/bin-cgi/a.out");
+    Location loc4("/cgi/", "/home/pauline/webserver/www", _defaultAllow, _defaultIndex, _defaultType, 
+    _defaultCharset, _defaultLanguage, "off", "", false, "", exe3, "/home/pauline/webserver/bin-cgi/ubuntu_cgi_tester");
 
-    _locationList["/bin-cgi/"] = loc4;
+    _locationList["/cgi/"] = loc4;
 
 }
 
