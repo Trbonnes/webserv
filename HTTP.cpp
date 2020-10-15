@@ -60,8 +60,7 @@ _body("")
     replaceURI(); 
     if (_config.getCGI_root(_location).length() > 0 && checkCGImethods(_socket.getMethod()))
     {
-        fd = setRoot(); // setRoot a modifier, juste setRoot et pas open
-        close(fd);
+        setRoot();
         cgi_metaVariables();
         extension = _route.find_last_of('.');
         if (is_good_exe(str.assign(_route).erase(0, extension + 1)))
@@ -157,10 +156,21 @@ int         HTTP::checkAllowMethods(std::string method)
     return (ret);
 }
 
+//** absolute location route for the server **
+void        HTTP::setLocation()
+{
+  _location = _config.getLocation(_uri);
+}
+
 //** replace URI by the location **
 void        HTTP::replaceURI()
 {
   _uri.assign(_config.getRoot(_location));
+}
+
+void        HTTP::setStat()
+{
+    stat(_route.c_str(), &_stat);
 }
 
 int         HTTP::openFile()
@@ -175,25 +185,65 @@ int         HTTP::openFile()
     itIndexBegin = _config.getIndex(_location).begin();
     itIndexEnd = _config.getIndex(_location).end();
     stat(_route.c_str(), &file);
-    str.assign(_route);
-    while (itIndexBegin != itIndexEnd && (file.st_mode & S_IFMT) != S_IFREG)
-    {
-        str.assign(_route);
-        if (str.back() != '/')
-            str.append("/");
-        str.append(*itIndexBegin);
-        stat(str.c_str(), &file);
-        itIndexBegin++;
-    }
-    _route.assign(str);
     if ((file.st_mode & S_IFMT) == S_IFREG)
     {
         fd = open(_route.c_str(), O_RDONLY);
-       _statusCode = OK;
+        _statusCode = OK;
     }
     else
-        _statusCode = FORBIDDEN;
+    {
+        str.assign(_route);
+        while (itIndexBegin != itIndexEnd && (file.st_mode & S_IFMT) != S_IFREG)
+        {
+            str.assign(_route);
+            if (str.back() != '/')
+                str.append("/");
+            str.append(*itIndexBegin);
+            stat(str.c_str(), &file);
+            itIndexBegin++;
+        }
+        _route.assign(str);
+        if ((file.st_mode & S_IFMT) == S_IFREG)
+        {
+            fd = open(_route.c_str(), O_RDONLY);
+        _statusCode = OK;
+        }
+        else
+            _statusCode = FORBIDDEN;
+    }
     return fd;
+}
+
+void         HTTP::setRoot()
+{
+    int         fd;
+    int         find;
+    std::string str;
+    struct stat file;
+
+    if (_uri.compare(0, 4, "http") == 0)
+    {
+        //** Absolute path **
+
+        find = _route.append(_socket.getRequestURI()).find(_config.getServerName());
+        _route.erase(0, find + _config.getServerName().length());
+        _route.insert(0, _config.getRoot(_location));
+        _route.insert(_config.getRoot(_location).length(), acceptLanguage());
+    }
+    else
+    {
+        //** Relative path **
+
+        _route.assign(_config.getRoot(_location));
+        _route.append(_socket.getRequestURI());
+        stat(_route.c_str(), &file);
+        if ((file.st_mode & S_IFMT) == S_IFREG)
+            return ;
+        _route.assign(_config.getRoot(_location));
+        _route.append(acceptLanguage());
+        _route.append(str.assign(_socket.getRequestURI()).erase(0, _location.length()));
+    }
+    return ;
 }
 
 void            HTTP::setAutoindex(void)

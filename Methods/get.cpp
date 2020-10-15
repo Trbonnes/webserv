@@ -6,7 +6,8 @@ void        HTTP::get()
     int         find;
     int         fd;
 
-    fd = setRoot();
+    setRoot();
+    fd = openFile();
     if (_statusCode == OK)
     {
         authorization();
