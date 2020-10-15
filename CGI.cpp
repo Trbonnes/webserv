@@ -48,8 +48,8 @@ void        HTTP::cgi_metaVariables()
     // _cgi._script_name = str.erase(0, query);
     _cgi._script_name = _config.getCGI_root(_location);
     _cgi._server_name = _config.getServerName();
-    _cgi._server_port = "80";
-    // _cgi._server_port = _config.getPort();
+    // _cgi._server_port = "80";
+    _cgi._server_port = _config.getPort();
     // std::cout << "Port: " << _config.getPort() << std::endl;
     _cgi._server_protocol = "HTTP/1.1";
     _cgi._server_software = "SuperServer/1.0";
@@ -77,12 +77,9 @@ void        HTTP::setEnv()
     _cgi_env[SERVER_PROTOCOL] = ft_strdup(_cgi._server_protocol.insert(0, "SERVER_PROTOCOL=").c_str());
     _cgi_env[SERVER_SOFTWARE] = ft_strdup(_cgi._server_software.insert(0, "SERVER_SOFTWARE=").c_str());
     _cgi_env[NB_METAVARIABLES] = NULL;
-    // int i = 0;
-    // while (i < NB_METAVARIABLES)
-    // {
-    //     dprintf(2, "%s\n", _cgi_env[i]);
-    //     i++;
-    // }
+    int i = 0;
+    while (i < NB_METAVARIABLES)
+        printf("%s\n", _cgi_env[i++]);
 }
 
 int         HTTP::is_good_exe(std::string exe)
@@ -108,6 +105,13 @@ int         HTTP::is_good_exe(std::string exe)
     return (0);
 }
 
+bool        mypred(char val1, char val2)
+{
+    if (val1 == '\n' && val2 == '\r')
+        return true;
+    return false;
+}
+
 void        HTTP::cgi_exe()
 {
     int         pid;
@@ -120,6 +124,7 @@ void        HTTP::cgi_exe()
     std::string str;
     char        *args[2];
     struct stat stat;
+    std::string::iterator it;
 
     pipe(fd);
     pid = fork();
@@ -127,14 +132,12 @@ void        HTTP::cgi_exe()
         _statusCode = INTERNAL_SERVER_ERROR;
     else if (pid == 0)
     {
-        dprintf(2, "STDOUT_FILENO: %d\n", STDOUT_FILENO);
         dup2(fd[SIDE_IN], STDOUT_FILENO);
         close(fd[SIDE_IN]);
         close(fd[SIDE_OUT]);
         args[0] = ft_strdup(_config.getCGI_root(_location).c_str());
-        dprintf(2, "args[0]: %s\n", args[0]);
         args[1] = NULL;
-        execve(args[0], args, _cgi_env);
+        execve(args[0], args, _cgi_env); // protection mauvais executable a faire
     }
     else
     {
@@ -144,13 +147,11 @@ void        HTTP::cgi_exe()
             _body.append(buf);
         close(fd[SIDE_OUT]);
         size_t find;
+        find = _body.find("Status: ");
+        _statusCode = stoi(_body.substr(find + 8, 3));
         find = _body.find("Content-Type: ");
-        std::string::iterator it = _body.begin() + find + 14;
-        while (*it != '\n')
-        {
-            _contentType.append(1, *it);
-            it++;
-        }
-        _body = _body.substr(find + 14 + _contentType.length() + 2, _body.length());
+        _contentType = _body.substr(find + 14, _body.find('\n', find + 14) - find - 14);
+        it = std::adjacent_find(_body.begin(), _body.end(), mypred);
+        _body.erase(_body.begin(), it + 3);
     }
 }

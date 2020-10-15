@@ -77,9 +77,15 @@ _body("")
                     cgi_metaVariables();
                     extension = _route.find_last_of('.');
                     if (is_good_exe(str.assign(_route).erase(0, extension + 1)))
+                    {
+                        std::cout << "CGI is running" << std::endl;
                         cgi_exe();
+                    }
                     else
+                    {
+                        std::cout << "CGI is not running" << std::endl;
                         _statusCode = BAD_REQUEST;
+                    }
                 }
                 else
                     callMethod(i);
