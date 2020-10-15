@@ -111,14 +111,15 @@ bool        mypred(char val1, char val2)
 void        HTTP::cgi_exe()
 {
     int         pid;
-    int         status;
-    int         fd[2];
-    char        *line;
-    size_t      space;
     int         ret;
-    char        buf[1024];
-    std::string str;
+    int         fd[2];
+    int         status;
+    char        *line;
     char        *args[2];
+    char        buf[1024];
+    size_t      space;
+    size_t      find;
+    std::string str;
     struct stat stat;
     std::string::iterator it;
 
@@ -142,7 +143,6 @@ void        HTTP::cgi_exe()
         while ((read(fd[SIDE_OUT], buf, sizeof(buf))) != 0)
             _body.append(buf);
         close(fd[SIDE_OUT]);
-        size_t find;
         find = _body.find("Status: ");
         _statusCode = stoi(_body.substr(find + 8, 3));
         find = _body.find("Content-Type: ");
