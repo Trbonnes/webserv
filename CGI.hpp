@@ -3,9 +3,8 @@
 
 # include <iostream>
 
-class   CGI
+struct              CGI
 {
-    public:
     std::string     _auth_type;
     std::string     _content_length;
     std::string     _content_type;
@@ -24,8 +23,6 @@ class   CGI
     std::string     _server_protocol;
     std::string     _server_software;
 
-    CGI();
-    ~CGI();
 };
 
 #endif

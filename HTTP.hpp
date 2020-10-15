@@ -98,7 +98,7 @@ class   HTTP
     // GET
     void            get(void);
     int             openFile(void);
-    int             setRoot(void);
+    void            setRoot(void);
     void            setBody(int fd);
     void            setContentType(void);
     std::string     acceptLanguage(void);

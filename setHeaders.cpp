@@ -1,11 +1,5 @@
 #include "HTTP.hpp"
 
-//** absolute location route for the server **
-void        HTTP::setLocation()
-{
-  _location = _config.getLocation(_uri);
-}
-
 //** absolute location route for the user agent **
 void        HTTP::setContentLocation()
 {
@@ -44,11 +38,6 @@ void        HTTP::setServerName()
 void        HTTP::setContentLength()
 {
     _contentLength = _stat.st_size;
-}
-
-void        HTTP::setStat()
-{
-    stat(_route.c_str(), &_stat);
 }
 
 void        HTTP::setLastModified()
@@ -95,42 +84,4 @@ void        HTTP::setContentType()
         _contentType = (*it).substr(0, (*it).find(" "));
     else
         _contentType = _config.getType(_location);
-}
-
-int         HTTP::setRoot()
-{
-    int         fd;
-    int         find;
-    std::string str;
-    struct stat file;
-
-    if (_uri.compare(0, 4, "http") == 0)
-    {
-        //** Absolute path **
-
-        find = _route.append(_socket.getRequestURI()).find(_config.getServerName());
-        _route.erase(0, find + _config.getServerName().length());
-        _route.insert(0, _config.getRoot(_location));
-        _route.insert(_config.getRoot(_location).length(), acceptLanguage());
-    }
-    else
-    {
-        //** Relative path **
-
-        _route.assign(_config.getRoot(_location));
-        _route.append(_socket.getRequestURI());
-        stat(_route.c_str(), &file);
-        if ((file.st_mode & S_IFMT) == S_IFREG)
-        {
-            fd = open(_route.c_str(), O_RDONLY);
-            _statusCode = OK;
-            return (fd);
-        }
-        _route.assign(_config.getRoot(_location));
-        _route.append(acceptLanguage());
-        _route.append(str.assign(_socket.getRequestURI()).erase(0, _location.length()));
-    }
-    //** Open and test if the file exist **
-    fd = openFile();
-    return (fd);
 }
