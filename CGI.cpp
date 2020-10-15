@@ -77,12 +77,12 @@ void        HTTP::setEnv()
     _cgi_env[SERVER_PROTOCOL] = ft_strdup(_cgi._server_protocol.insert(0, "SERVER_PROTOCOL=").c_str());
     _cgi_env[SERVER_SOFTWARE] = ft_strdup(_cgi._server_software.insert(0, "SERVER_SOFTWARE=").c_str());
     _cgi_env[NB_METAVARIABLES] = NULL;
-    int i = 0;
-    while (i < NB_METAVARIABLES)
-    {
-        dprintf(2, "%s\n", _cgi_env[i]);
-        i++;
-    }
+    // int i = 0;
+    // while (i < NB_METAVARIABLES)
+    // {
+    //     dprintf(2, "%s\n", _cgi_env[i]);
+    //     i++;
+    // }
 }
 
 int         HTTP::is_good_exe(std::string exe)
@@ -90,27 +90,36 @@ int         HTTP::is_good_exe(std::string exe)
     std::vector<std::string>::iterator cgi_begin;
     std::vector<std::string>::iterator cgi_end;
 
-    cgi_begin = _config.getCGI(_location).begin();
-    cgi_end = _config.getCGI(_location).end();
-    while (cgi_begin != cgi_end)
+    if (_config.getCGI_root(_location).length() > 0)
     {
-        if (exe.compare(*cgi_begin) == 0)
-            return (1);
-        cgi_begin++;
+        if (_config.getCGI(_location).empty() == false)
+        {
+            cgi_begin = _config.getCGI(_location).begin();
+            cgi_end = _config.getCGI(_location).end();
+            while (cgi_begin != cgi_end)
+            {
+                if (exe.compare(*cgi_begin) == 0)
+                    return (1);
+                cgi_begin++;
+            }
+
+        }
     }
     return (0);
 }
 
 void        HTTP::cgi_exe()
 {
-    int     pid;
-    int     status;
-    int     fd[2];
-    char    *line;
-    size_t  space;
-    int     ret;
-    char    buf[1025];
+    int         pid;
+    int         status;
+    int         fd[2];
+    char        *line;
+    size_t      space;
+    int         ret;
+    char        *buf;
     std::string str;
+    char        *args[2];
+    struct stat stat;
 
     pipe(fd);
     pid = fork();
@@ -120,39 +129,47 @@ void        HTTP::cgi_exe()
     {
         dprintf(2, "STDOUT_FILENO: %d\n", STDOUT_FILENO);
         dup2(fd[SIDE_IN], STDOUT_FILENO);
-        execve(_config.getCGI_root(_location).c_str(), NULL, _cgi_env);
+        args[0] = ft_strdup(_config.getCGI_root(_location).c_str());
+        dprintf(2, "args[0]: %s\n", args[0]);
+        args[1] = NULL;
+        execve(args[0], args, _cgi_env);
     }
     else
     {
+        dprintf(2, "TEST\n");
         waitpid(-1, &status, 0);
-        dup2(fd[SIDE_OUT], STDIN_FILENO);
-        // ret = read(fd[SIDE_OUT], buf, 1024);
-        // dprintf(2, "ret: %d\n", ret);
+        // dup2(fd[SIDE_OUT], STDIN_FILENO);
+        fstat(fd[SIDE_OUT], &stat);
+        dprintf(2, "stat.st_size: %ld\n", stat.st_size);
+        buf = (char*)malloc(sizeof(char) * (stat.st_size + 1));
+        buf[stat.st_size] = '\0';
+        ret = read(fd[SIDE_OUT], buf, stat.st_size);
+        dprintf(2, "ret: %d\n", ret);
         // buf[ret] = '\0';
-        // dprintf(2, "\nBUFFER: \n%s\n", buf);
-        ret = get_next_line(fd[SIDE_OUT], &line);
+        dprintf(2, "\nBUFFER: \n%s\n", buf);
+        // ret = get_next_line(fd[SIDE_OUT], &line);
         
         // dprintf(2,"%d\n", ret);
-        dprintf(2,"%s\n", line);
-        _contentType = line;
-        dprintf(2,"%s\n", _contentType.c_str());
-        space = _contentType.find(' ');
-        if (space != -1)
-            _contentType.erase(0, space + 1);
-        dprintf(2,"%s\n", _contentType.c_str());
-        while ((ret = get_next_line(fd[SIDE_OUT], &line)) > 0)
-        {
-            str = line;
-            // dprintf(2,"ret: %d\n", ret);
-            dprintf(2,"%s\n", line);
+        // dprintf(2,"%s\n", line);
+        // _contentType = line;
+        // dprintf(2,"%s\n", _contentType.c_str());
+        // space = _contentType.find(' ');
+        // if (space != -1)
+        //     _contentType.erase(0, space + 1);
+        // dprintf(2,"%s\n", _contentType.c_str());
+        // while ((ret = get_next_line(fd[SIDE_OUT], &line)) > 0)
+        // {
+        //     str = line;
+        //     // dprintf(2,"ret: %d\n", ret);
+        //     dprintf(2,"%s\n", line);
             
-            _body.append(str);
-        }
-        dprintf(2,"TEST\n");
-        str = line;
-        _body.append(str);
-        _body.append("\0");
-        dprintf(2,"%s\n", _body.c_str());
+        //     _body.append(str);
+        // }
+        // dprintf(2,"TEST\n");
+        // str = line;
+        // _body.append(str);
+        // _body.append("\0");
+        // dprintf(2,"%s\n", _body.c_str());
         close(fd[SIDE_IN]);
         close(fd[SIDE_OUT]);
     }
