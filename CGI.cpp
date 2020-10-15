@@ -116,7 +116,7 @@ void        HTTP::cgi_exe()
     char        *line;
     size_t      space;
     int         ret;
-    char        *buf;
+    char        buf[1024];
     std::string str;
     char        *args[2];
     struct stat stat;
@@ -129,6 +129,8 @@ void        HTTP::cgi_exe()
     {
         dprintf(2, "STDOUT_FILENO: %d\n", STDOUT_FILENO);
         dup2(fd[SIDE_IN], STDOUT_FILENO);
+        close(fd[SIDE_IN]);
+        close(fd[SIDE_OUT]);
         args[0] = ft_strdup(_config.getCGI_root(_location).c_str());
         dprintf(2, "args[0]: %s\n", args[0]);
         args[1] = NULL;
@@ -136,41 +138,19 @@ void        HTTP::cgi_exe()
     }
     else
     {
-        dprintf(2, "TEST\n");
         waitpid(-1, &status, 0);
-        // dup2(fd[SIDE_OUT], STDIN_FILENO);
-        fstat(fd[SIDE_OUT], &stat);
-        dprintf(2, "stat.st_size: %ld\n", stat.st_size);
-        buf = (char*)malloc(sizeof(char) * (stat.st_size + 1));
-        buf[stat.st_size] = '\0';
-        ret = read(fd[SIDE_OUT], buf, stat.st_size);
-        dprintf(2, "ret: %d\n", ret);
-        // buf[ret] = '\0';
-        dprintf(2, "\nBUFFER: \n%s\n", buf);
-        // ret = get_next_line(fd[SIDE_OUT], &line);
-        
-        // dprintf(2,"%d\n", ret);
-        // dprintf(2,"%s\n", line);
-        // _contentType = line;
-        // dprintf(2,"%s\n", _contentType.c_str());
-        // space = _contentType.find(' ');
-        // if (space != -1)
-        //     _contentType.erase(0, space + 1);
-        // dprintf(2,"%s\n", _contentType.c_str());
-        // while ((ret = get_next_line(fd[SIDE_OUT], &line)) > 0)
-        // {
-        //     str = line;
-        //     // dprintf(2,"ret: %d\n", ret);
-        //     dprintf(2,"%s\n", line);
-            
-        //     _body.append(str);
-        // }
-        // dprintf(2,"TEST\n");
-        // str = line;
-        // _body.append(str);
-        // _body.append("\0");
-        // dprintf(2,"%s\n", _body.c_str());
         close(fd[SIDE_IN]);
+        while ((read(fd[SIDE_OUT], buf, sizeof(buf))) != 0)
+            _body.append(buf);
         close(fd[SIDE_OUT]);
+        size_t find;
+        find = _body.find("Content-Type: ");
+        std::string::iterator it = _body.begin() + find + 14;
+        while (*it != '\n')
+        {
+            _contentType.append(1, *it);
+            it++;
+        }
+        _body = _body.substr(find + 14 + _contentType.length() + 2, _body.length());
     }
 }
