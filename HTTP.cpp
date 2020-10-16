@@ -58,7 +58,7 @@ _body("")
     _uri = socket.getRequestURI();
     setLocation();
     replaceURI(); 
-    if (_config.getCGI_root(_location).length() > 0 && checkCGImethods(_socket.getMethod()))
+    if (_config.getCGI_root(_location).length() > 0 && checkCGImethods(_socket.getMethod())) // HEAD a tester --> est ce quil faut transformer HEAD en GET avec CGI ?
     {
         setRoot();
         cgi_metaVariables();
@@ -70,7 +70,6 @@ _body("")
     }
     else if (checkAllowMethods(_socket.getMethod()))
         callMethod(_socket.getMethod());
-    // _statusCode = BAD_REQUEST;
 }
 
 HTTP::HTTP(HTTP &copy)
@@ -127,6 +126,7 @@ HTTP     &HTTP::operator=(HTTP &rhs)
     return *this;
 }
 
+//** Call the non CGI methods, GET and HEAD **  // ADD OPTIONS? 
 void        HTTP::callMethod(std::string method)
 {
     if (method.compare("GET") == 0)
@@ -135,6 +135,7 @@ void        HTTP::callMethod(std::string method)
         head();
 }
 
+//** Check if the method is autorized for the non CGI locations **
 int         HTTP::checkAllowMethods(std::string method)
 {
     std::vector<std::string>::iterator itBegin;
@@ -168,11 +169,13 @@ void        HTTP::replaceURI()
   _uri.assign(_config.getRoot(_location));
 }
 
+//** Set stat to know all the details of the requested file **
 void        HTTP::setStat()
 {
     stat(_route.c_str(), &_stat);
 }
 
+//** Open file with the default index if no specific file is specify **
 int         HTTP::openFile()
 {
     int         fd;
@@ -214,6 +217,7 @@ int         HTTP::openFile()
     return fd;
 }
 
+// ** Set the root with language and location directory if needed **
 void         HTTP::setRoot()
 {
     int         fd;
@@ -246,6 +250,7 @@ void         HTTP::setRoot()
     return ;
 }
 
+// ** Create the default html page when any page is not found and autoindex is on **
 void            HTTP::setAutoindex(void)
 {
     std::string     str;
@@ -276,7 +281,7 @@ void            HTTP::setAutoindex(void)
             if (dirent->d_type == DT_DIR)
                 str.append("/");
             str.append("</a>\t\t\t\t");
-            timeinfo = localtime(&(directory.st_mtime)); // st_mtimespec.tv.sec = macos ; st_mtime = linux
+            timeinfo = localtime(&(directory.st_mtimespec.tv_sec)); // st_mtimespec.tv_sec = macos ; st_mtime = linux
             strftime(lastModifications, 100, "%d-%b-20%y %OH:%OM", timeinfo);
             str.append(lastModifications);
             str.append("\t\t");
@@ -296,6 +301,7 @@ void            HTTP::setAutoindex(void)
     _body.append("</pre><hr></body>\n</html>\n");
 }
 
+// ** Check if the autorization mode is on and if the user is authorized to do the request **
 void            HTTP::authorization()
 {
     int     fd;
@@ -425,6 +431,7 @@ std::string   HTTP::base64_decode(std::string const& encoded_string) {
   return ret;
 }
 
+// ** Create the response socket **
 int         HTTP::getResponse()
 {
     std::vector<std::string>::iterator it;
