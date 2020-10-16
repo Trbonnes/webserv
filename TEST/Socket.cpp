@@ -17,6 +17,7 @@ _host("localhost"),
 _userAgent("Mozilla/5."" (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/8""."".3987.149 Safari/537.36"),
 _body("") {
     _acceptLanguage.push_back("de");
+    _acceptLanguage.push_back("fr");
     _acceptLanguage.push_back("en");
 }
 

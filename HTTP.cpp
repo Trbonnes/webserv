@@ -281,7 +281,7 @@ void            HTTP::setAutoindex(void)
             if (dirent->d_type == DT_DIR)
                 str.append("/");
             str.append("</a>\t\t\t\t");
-            timeinfo = localtime(&(directory.st_mtimespec.tv_sec)); // st_mtimespec.tv_sec = macos ; st_mtime = linux
+            timeinfo = localtime(&(directory.st_mtime)); // st_mtimespec.tv_sec = macos ; st_mtime = linux
             strftime(lastModifications, 100, "%d-%b-20%y %OH:%OM", timeinfo);
             str.append(lastModifications);
             str.append("\t\t");
