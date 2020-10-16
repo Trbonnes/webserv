@@ -1,16 +1,16 @@
 #include "ConfigServer.hpp"
 
 ConfigServer::ConfigServer() :
-_defaultRoot("/home/pauline/webserver/www"),
+_defaultRoot("/sgoinfre/goinfre/Perso/pganglof/webserv/www"),
 _defaultServerName("localhost"),
 _defaultPort("8080"),
 _defaultIndex(0),
 _defaultType("text/plain"),
 _defaultCharset("koi8-r"),
 _defaultLanguage(0),
-_configFilesRoot("/home/pauline/webserver/ConfigServer"),
+_configFilesRoot("/sgoinfre/goinfre/Perso/pganglof/webserv/config"),
 _defaultAuth_basic("\"Authorization\""),
-_defaultAuth_basic_user_file("/home/pauline/webserver/ConfigServer/.htpasswd"),
+_defaultAuth_basic_user_file("/sgoinfre/goinfre/Perso/pganglof/webserv/config/.htpasswd"),
 _defaultAutoindex(false),
 _defaultCgi(0),
 _defaultCgi_methods(0)
@@ -73,7 +73,7 @@ _defaultCgi_methods(0)
     cgi_methods.push_back("DELETE");
     index.push_back("index.php");
 
-    Location loc1("/data/", "/home/pauline/webserver/www",
+    Location loc1("/data/", "/sgoinfre/goinfre/Perso/pganglof/webserv/www",
     _defaultAllow, index,
     "text/html", "utf-8", _defaultLanguage, _defaultAuth_basic, _defaultAuth_basic_user_file, _defaultAutoindex, "/blabla/", exe, cgi_methods, "");
 
@@ -86,7 +86,7 @@ _defaultCgi_methods(0)
 
     index2.push_back("42.png");
 
-    Location loc2("/images/", "/home/pauline/webserver/www",
+    Location loc2("/images/", "/sgoinfre/goinfre/Perso/pganglof/webserv/www",
     _defaultAllow, index2,
     "text/html", "", _defaultLanguage, "off", "", _defaultAutoindex, "", exe1, cgi_methods, "");
 
@@ -95,7 +95,7 @@ _defaultCgi_methods(0)
         //** third location **
     std::vector<std::string> exe2;
 
-    Location loc3("/", "/home/pauline/webserver/www",
+    Location loc3("/", "/sgoinfre/goinfre/Perso/pganglof/webserv/www",
     _defaultAllow, _defaultIndex,
     _defaultType, _defaultCharset, _defaultLanguage, "off", "", true, "", exe2, cgi_methods, "");
 
@@ -106,8 +106,8 @@ _defaultCgi_methods(0)
 
     exe3.push_back("bla");
 
-    Location loc4("/cgi/", "/home/pauline/webserver/www", _defaultAllow, _defaultIndex, _defaultType, 
-    _defaultCharset, _defaultLanguage, "off", "", false, "", exe3, cgi_methods, "/home/pauline/webserver/bin-cgi/ubuntu_cgi_tester");
+    Location loc4("/cgi/", "/sgoinfre/goinfre/Perso/pganglof/webserv/www", _defaultAllow, _defaultIndex, _defaultType, 
+    _defaultCharset, _defaultLanguage, "off", "", false, "", exe3, cgi_methods, "/sgoinfre/goinfre/Perso/pganglof/webserv/bin-cgi/cgi_tester");
 
     _locationList["/cgi/"] = loc4;
 

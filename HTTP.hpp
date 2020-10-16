@@ -121,6 +121,7 @@ class   HTTP
     void            cgi_exe();
     void            setEnv();
     int             is_good_exe(std::string exe);
+    static bool     mypred(char val1, char val2);
 
     // HEAD
     void            head(void);

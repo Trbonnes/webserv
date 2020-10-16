@@ -1,6 +1,7 @@
 #include "HTTP.hpp"
 #include "CGI.hpp"
 
+//** Check if the method is autorized for the CGI locations **
 int         HTTP::checkCGImethods(std::string method)
 {
     std::vector<std::string>::iterator itBegin;
@@ -22,6 +23,7 @@ int         HTTP::checkCGImethods(std::string method)
     return (ret);
 }
 
+// ** Define the meta variables for the CGI script **
 void        HTTP::cgi_metaVariables()
 {
     std::string str;
@@ -54,6 +56,7 @@ void        HTTP::cgi_metaVariables()
     return ;
 }
 
+// ** Set the environnement variables in a char** table **
 void        HTTP::setEnv()
 {
     _cgi_env[AUTH_TYPE] = ft_strdup(_cgi._auth_type.insert(0, "AUTH_TYPE=").c_str());
@@ -79,6 +82,7 @@ void        HTTP::setEnv()
         printf("%s\n", _cgi_env[i++]);
 }
 
+// ** Verify if the extensions correspond to the config file (CGI) ** 
 int         HTTP::is_good_exe(std::string exe)
 {
     std::vector<std::string>::iterator cgi_begin;
@@ -101,13 +105,15 @@ int         HTTP::is_good_exe(std::string exe)
     return (0);
 }
 
-bool        mypred(char val1, char val2)
+// ** Function for the std::adjacent_find, to find the first two \n in CGI response and separate the body from the headers **
+bool        HTTP::mypred(char val1, char val2)
 {
     if (val1 == '\n' && val2 == '\r')
         return true;
     return false;
 }
 
+// ** Execute the CGI script and get the body and headers **
 void        HTTP::cgi_exe()
 {
     int         pid;
@@ -134,6 +140,7 @@ void        HTTP::cgi_exe()
         close(fd[SIDE_OUT]);
         args[0] = ft_strdup(_config.getCGI_root(_location).c_str());
         args[1] = NULL;
+        dprintf(2, "args[0]: %s\n", args[0]);
         execve(args[0], args, _cgi_env); // protection mauvais executable a faire
     }
     else
@@ -143,8 +150,9 @@ void        HTTP::cgi_exe()
         while ((read(fd[SIDE_OUT], buf, sizeof(buf))) != 0)
             _body.append(buf);
         close(fd[SIDE_OUT]);
+        // std::cout << _body << std::endl;
         find = _body.find("Status: ");
-        _statusCode = stoi(_body.substr(find + 8, 3));
+        _statusCode = ft_atoi(_body.substr(find + 8, 3).c_str());
         find = _body.find("Content-Type: ");
         _contentType = _body.substr(find + 14, _body.find('\n', find + 14) - find - 14);
         it = std::adjacent_find(_body.begin(), _body.end(), mypred);
