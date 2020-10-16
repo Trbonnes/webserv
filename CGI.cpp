@@ -50,6 +50,7 @@ void        HTTP::cgi_metaVariables()
     _cgi._server_name = _config.getServerName();
     _cgi._server_port = "80"; // _config.getPort() ne fonctionne pas pour des raisons obscures
     // _cgi._server_port = _config.getPort();
+    // std::cout << "server port: " << _cgi._server_port << std::endl;
     _cgi._server_protocol = "HTTP/1.1";
     _cgi._server_software = "SuperServer/1.0";
     setEnv();
@@ -141,21 +142,32 @@ void        HTTP::cgi_exe()
         args[0] = ft_strdup(_config.getCGI_root(_location).c_str());
         args[1] = NULL;
         dprintf(2, "args[0]: %s\n", args[0]);
-        execve(args[0], args, _cgi_env); // protection mauvais executable a faire
+        if ((ret = execve(args[0], args, _cgi_env)) == -1)
+            exit(EXIT_FAILURE);
     }
     else
     {
         waitpid(-1, &status, 0);
+        if (WIFEXITED(status))
+            ret = WEXITSTATUS(status);
         close(fd[SIDE_IN]);
-        while ((read(fd[SIDE_OUT], buf, sizeof(buf))) != 0)
-            _body.append(buf);
-        close(fd[SIDE_OUT]);
-        // std::cout << _body << std::endl;
-        find = _body.find("Status: ");
-        _statusCode = ft_atoi(_body.substr(find + 8, 3).c_str());
-        find = _body.find("Content-Type: ");
-        _contentType = _body.substr(find + 14, _body.find('\n', find + 14) - find - 14);
-        it = std::adjacent_find(_body.begin(), _body.end(), mypred);
-        _body.erase(_body.begin(), it + 3);
+        if (ret == EXIT_SUCCESS)
+        {
+            while ((ret = read(fd[SIDE_OUT], buf, sizeof(buf))) != 0)
+            {
+                buf[ret] = '\0';
+                _body.append(buf);
+            }
+            close(fd[SIDE_OUT]);
+            // std::cout << _body << std::endl;
+            find = _body.find("Status: ");
+            _statusCode = ft_atoi(_body.substr(find + 8, 3).c_str());
+            find = _body.find("Content-Type: ");
+            _contentType = _body.substr(find + 14, _body.find('\n', find + 14) - find - 14);
+            it = std::adjacent_find(_body.begin(), _body.end(), mypred);
+            _body.erase(_body.begin(), it + 3);
+        }
+        else
+            _statusCode = BAD_GATEWAY;
     }
 }
