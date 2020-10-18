@@ -2,6 +2,7 @@
 #define HTTPSERVER
 
 #include "HttpConf.hpp"
+#include "HttpWorker.hpp"
 
 #include <sys/time.h>
 #include <sys/types.h>
@@ -11,6 +12,17 @@
 #include <netinet/in.h>
 #include <unistd.h>
 #include <cstring>
+
+
+class WorkersInitException: public std::exception
+{
+	public:
+		const char * what () const throw ()
+    	{
+    		return "Workers failed to initialize";
+    	}
+};
+
 
 class HttpServer
 {
@@ -23,13 +35,16 @@ public:
 	~HttpServer();
 
 private:
-	HttpConf conf;
-	
+	HttpConf	conf;
+	fd_set		_sockset;
+	pid_t*		_workers_pid;
+
 
 public:
-	void initConf();
-	void initListenSocket();
-	void initWorkers();
+	void			initConf();
+	void			initListenSocket();
+	void			initWorkers();
+	static	void	launchProcess();
 };
 #endif // HTTPSERVER
 
