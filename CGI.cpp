@@ -42,8 +42,8 @@ void        HTTP::cgi_metaVariables()
     if (query != -1)
        _cgi._query_string = str.assign(_route).erase(0, query);
     _cgi._remote_addr = "127.0.0.1"; // Default 
-    _cgi._remote_ident = ""; // Default
-    _cgi._remote_user = ""; // Default
+    _cgi._remote_ident = _socket.getAuthorization(); // Default
+    _cgi._remote_user = _socket.getUserAgent(); // Default
     _cgi._request_method = _socket.getMethod();
     _cgi._request_uri = _socket.getRequestURI();
     _cgi._script_name = _config.getCGI_root(_location);
@@ -141,7 +141,6 @@ void        HTTP::cgi_exe()
         close(fd[SIDE_OUT]);
         args[0] = ft_strdup(_config.getCGI_root(_location).c_str());
         args[1] = NULL;
-        dprintf(2, "args[0]: %s\n", args[0]);
         if ((ret = execve(args[0], args, _cgi_env)) == -1)
             exit(EXIT_FAILURE);
     }
