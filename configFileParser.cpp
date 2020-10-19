@@ -6,7 +6,7 @@
 /*   By: trbonnes <trbonnes@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/14 08:46:39 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/10/19 08:43:42 by trbonnes         ###   ########.fr       */
+/*   Updated: 2020/10/19 08:52:25 by trbonnes         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -136,8 +136,6 @@ int		configFileParseServerLocation(std::string parseServer, ConfigServer server)
 		}
 	}
 
-	std::cout << location._cgi.front() << std::endl;
-
 	if ((pos = s.find("cgi_method")) != s.npos) {
 		i = s.find(";", pos);
 		if (s.substr(pos, i - pos).find("GET") != s.npos)
@@ -165,8 +163,16 @@ int		configFileParseServerLocation(std::string parseServer, ConfigServer server)
 		location._cgi_root = s.substr(pos, i - pos);
 	}
 
-
 	server.insertLocation(location._location, location);
+
+	pos = parseServer.find(s);
+	i = pos;
+	while (parseServer[i] != '{') { i++; }
+	i = findClosingBracket(i, parseServer);
+	parseServer.erase(pos, i - pos + 1);
+
+	if (parseServer.find("location") != parseServer.npos) 
+		return configFileParseServerLocation(parseServer, server);
 	return 0;
 }
 
