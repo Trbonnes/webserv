@@ -1,17 +1,19 @@
-SRCS =	TEST/main.cpp 			\
-		TEST/Socket.cpp 		\
-		TEST/ConfigServer.cpp	\
-		TEST/Location.cpp		\
-		utils/get_next_line.cpp \
-		utils/ft_strcpy.cpp		\
-		utils/ft_strlen.cpp		\
-		utils/ft_strdup.cpp		\
-		utils/ft_bzero.cpp		\
-		utils/ft_atoi.cpp		\
-		HTTP.cpp				\
-		CGI.cpp					\
-		Methods/get.cpp			\
-		Methods/head.cpp		\
+SRCS =	TEST/main.cpp 					\
+		TEST/ConfigServer.cpp			\
+		TEST/Location.cpp				\
+		Socket/httpRequestParser.cpp	\
+		Socket/parseHeaders.cpp	 	\
+		Socket/Socket.cpp 				\
+		utils/get_next_line.cpp 		\
+		utils/ft_strcpy.cpp				\
+		utils/ft_strlen.cpp				\
+		utils/ft_strdup.cpp				\
+		utils/ft_bzero.cpp				\
+		utils/ft_atoi.cpp				\
+		HTTP.cpp						\
+		CGI.cpp							\
+		Methods/get.cpp					\
+		Methods/head.cpp				\
 		setHeaders.cpp
 
 OBJS = $(SRCS:.cpp=.o)
