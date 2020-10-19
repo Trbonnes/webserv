@@ -6,7 +6,7 @@
 /*   By: trbonnes <trbonnes@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/14 08:46:39 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/10/14 15:53:57 by trbonnes         ###   ########.fr       */
+/*   Updated: 2020/10/19 08:43:42 by trbonnes         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -118,6 +118,53 @@ int		configFileParseServerLocation(std::string parseServer, ConfigServer server)
 		i = s.find(";", pos);
 		location._alias = s.substr(pos, i - pos);
 	}
+
+	//CGI
+	if ((pos = s.find("cgi")) != s.npos) {
+		pos += 3;
+		std::string tmp;
+		size_t j;
+		i = s.find(";", pos);
+		while (pos != i) {
+			while (s[pos] == ' ') { pos++; }
+			j = pos;
+			while (s[j] &&s[j] != ' ' && s[j] != ';' && s[j] != '\n') { j++; }
+			if (!s[j] || s[j] == '\n')
+				throw Config::InvalidConfigException();
+			location._cgi.push_back(s.substr(pos, j - pos));
+			pos = j;
+		}
+	}
+
+	std::cout << location._cgi.front() << std::endl;
+
+	if ((pos = s.find("cgi_method")) != s.npos) {
+		i = s.find(";", pos);
+		if (s.substr(pos, i - pos).find("GET") != s.npos)
+			location._cgi_allow.push_back("GET");
+		if (s.substr(pos, i - pos).find("HEAD") != s.npos)
+			location._cgi_allow.push_back("HEAD");
+		if (s.substr(pos, i - pos).find("POST") != s.npos)
+			location._cgi_allow.push_back("POST");
+		if (s.substr(pos, i - pos).find("PUT") != s.npos)
+			location._cgi_allow.push_back("PUT");
+		if (s.substr(pos, i - pos).find("DELETE") != s.npos)
+			location._cgi_allow.push_back("DELETE");
+		if (s.substr(pos, i - pos).find("CONNECT") != s.npos)
+			location._cgi_allow.push_back("CONNECT");
+		if (s.substr(pos, i - pos).find("OPTIONS") != s.npos)
+			location._cgi_allow.push_back("OPTIONS");
+		if (s.substr(pos, i - pos).find("TRACE") != s.npos)
+			location._cgi_allow.push_back("TRACE");
+	}
+
+	if ((pos = s.find("cgi_root")) != s.npos) {
+		pos += 4;
+		while (s[pos] == ' ') { pos++; }
+		i = s.find(";", pos);
+		location._cgi_root = s.substr(pos, i - pos);
+	}
+
 
 	server.insertLocation(location._location, location);
 	return 0;
