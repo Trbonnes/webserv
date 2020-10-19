@@ -6,7 +6,7 @@
 /*   By: trbonnes <trbonnes@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/09 15:13:35 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/10/19 14:32:46 by trbonnes         ###   ########.fr       */
+/*   Updated: 2020/10/19 15:31:34 by trbonnes         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -138,6 +138,7 @@ ConfigServer::ConfigServer(const ConfigServer &copy)
 	_defaultCgi_root = copy._defaultCgi_root;
     _port = copy._port;
     _defaultClientBodySize = copy._defaultClientBodySize;
+    _errorPages = copy._errorPages;
 }
 
 ConfigServer::~ConfigServer() {}
@@ -162,6 +163,8 @@ ConfigServer                  &ConfigServer::operator=(ConfigServer const &rhs)
 	_defaultCgi_root = rhs._defaultCgi_root;
     _port = rhs._port;
     _defaultClientBodySize = rhs._defaultClientBodySize;
+    _errorPages = rhs._errorPages;
+
     return *this;
 }
 
@@ -419,6 +422,16 @@ int                         ConfigServer::getPort() {
     return _port;
 }
 
+std::map<int, std::string>  ConfigServer::getErrorPages() {
+    return _errorPages;
+}
+
+std::string                 ConfigServer::getHTMLErrorPage(int error) {
+    std::map<int, std::string>::iterator it;
+
+    it = _errorPages.find(error);
+    return it->second;
+}
 
 std::map<std::string, Location, Compare<std::string> > ConfigServer::getLocationList() {
     return _locationList;
@@ -462,6 +475,10 @@ void                    ConfigServer::setClientBodySize(int clientBodySize) {
 
 void                    ConfigServer::setAllow(std::vector<std::string> allow) {
     _defaultAllow = allow;
+}
+
+void                    ConfigServer::setErrorPages(int error, std::string page) {
+    _errorPages.emplace(error, page);
 }
 
 void                    ConfigServer::insertLocation(std::string s, Location location) {

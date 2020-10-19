@@ -6,7 +6,7 @@
 /*   By: trbonnes <trbonnes@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/14 08:46:39 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/10/19 14:29:09 by trbonnes         ###   ########.fr       */
+/*   Updated: 2020/10/19 15:58:17 by trbonnes         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -333,6 +333,29 @@ int		configFileParseServerUnit(std::string configFile, std::vector<ConfigServer>
 		v->back().setCGI_root(parseServer.substr(pos, i - pos));
 	}
 
+	//ERROR PAGES
+	i = 0;
+	if ((pos = parseServer.find("error_page", i)) != parseServer.npos) {
+		while ((pos = parseServer.find("error_page", i)) != parseServer.npos) {
+			std::string page;
+			pos += 10;
+			while (parseServer[pos] == ' ') { pos++; }
+			if ((i = parseServer.find("/", pos)) == parseServer.npos)
+				throw Config::InvalidConfigException();
+			size_t j = parseServer.find(";", i);
+			page = parseServer.substr(i, j - i);
+			while (pos != i) {
+				j = pos;
+				while (parseServer[j] != ' ' && j != i) { j++; }
+				v->back().setErrorPages(std::stoi(parseServer.substr(pos, j - pos)), page);
+				std::cout << v->back().getHTMLErrorPage(std::stoi(parseServer.substr(pos, j - pos))) << std::endl;
+				pos = j;
+				while (parseServer[pos] == ' ') { pos++; }
+			}
+		}
+		std::cout << "OUT" << std::endl;
+	}
+
 	pos = configFile.find("server {");
 	if ((i = findClosingBracket(configFile.find("{", pos), configFile)) == configFile.npos) {
 		throw Config::InvalidConfigException();
@@ -360,7 +383,7 @@ int		configFileParseServers(std::string configFile, Config *config) {
 	}
 
 	configFileParseServerUnit(configFile, &v);
-	config->setServer(&v);
+	config->setServer(v);
 
 	return 0;
 }
@@ -369,13 +392,14 @@ int		configFileParseWorkers(std::string configFile, Config *config) {
 	size_t pos;
 	size_t i;
 
-	pos = configFile.find("worker_processes");
+	if ((pos = configFile.find("worker_processes")) == configFile.npos)
+		throw Config::InvalidConfigException();
 	while (!isdigit(configFile[pos]) && configFile[pos] != ';') { pos++; }
 	i = pos;
 	while (configFile[i] != ';') { i++; }
 	config->setWorker(std::stoi(configFile.substr(pos, i)));
 	
-	if (configFile.find("events")) {
+	if (configFile.find("events") != configFile.npos) {
 		pos = configFile.find("worker_connections");
 		while (!isdigit(configFile[pos]) && configFile[pos] != ';') { pos++; }
 		i = pos;

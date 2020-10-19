@@ -6,7 +6,7 @@
 /*   By: trbonnes <trbonnes@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/14 09:20:21 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/10/19 14:29:51 by trbonnes         ###   ########.fr       */
+/*   Updated: 2020/10/19 15:55:23 by trbonnes         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,12 +91,17 @@ void	ConfigServer::printServer() {
 	std::cout << "--CGI ROOT--" << std::endl;
 	std::cout << _defaultCgi_root << std::endl;
 
-	std::cout << "\033[0;35mLocation List: " << _locationList.size() << std::endl;
+	std::cout << "--ERROR PAGES--" << std::endl;
+	for (auto& x: _errorPages)
+		std::cout << " [" << x.first << ':' << x.second << ']';
+	std::cout << '\n';
 
+	std::cout << "\033[0;35mLocation List: " << _locationList.size() << std::endl;
+	
 	std::cout << "Locations :";
-  for (auto& x: _locationList)
-    std::cout << " [" << x.first << ':' << x.second._location << ']';
-  std::cout << '\n';
+	for (auto& x: _locationList)
+		std::cout << " [" << x.first << ':' << x.second._location << ']';
+	std::cout << '\n';
 
 	for (std::map<std::string, Location, Compare<std::string> >::iterator it = _locationList.begin(); it != _locationList.end(); it++) {
 			it->second.printLocation();
@@ -104,7 +109,7 @@ void	ConfigServer::printServer() {
 }
 
 int main() {
-	int fd = open("./config/webserv.conf", O_RDWR);
+	int fd = open("./config/webservsimplecgi.conf", O_RDWR);
 
 	try {
 		Config *config = configFileParser(fd);

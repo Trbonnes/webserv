@@ -6,7 +6,7 @@
 /*   By: trbonnes <trbonnes@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/09 12:19:51 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/10/19 12:09:35 by trbonnes         ###   ########.fr       */
+/*   Updated: 2020/10/19 15:05:38 by trbonnes         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,7 @@ private:
 	std::string					_defaultCgi_root;
     int                         _port;
     int                         _defaultClientBodySize;
+    std::map<int, std::string>  _errorPages;
 
 
 public:
@@ -71,6 +72,8 @@ public:
 	std::vector<std::string>	&getCGI_allow(std::string location);
     int                         getClientBodySize(std::string location);
     int                         getPort();
+    std::map<int, std::string>  getErrorPages();
+    std::string                 getHTMLErrorPage(int error);
 
     std::map<std::string, Location, Compare<std::string> > getLocationList();
 
@@ -84,6 +87,7 @@ public:
     void                    setAutoIndex(bool autoIndex);
     void                    setClientBodySize(int clientBodySize);
     void                    setAllow(std::vector<std::string> allow);
+    void                    setErrorPages(int error, std::string page);
 
     void                    insertLocation(std::string s, Location location);
 
