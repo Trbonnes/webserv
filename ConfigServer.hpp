@@ -6,7 +6,7 @@
 /*   By: trbonnes <trbonnes@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/09 12:19:51 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/10/14 13:40:27 by trbonnes         ###   ########.fr       */
+/*   Updated: 2020/10/19 12:09:35 by trbonnes         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,6 +72,8 @@ public:
     int                         getClientBodySize(std::string location);
     int                         getPort();
 
+    std::map<std::string, Location, Compare<std::string> > getLocationList();
+
     void					setCGI(std::vector<std::string> cgi);
 	void					setCGI_allow(std::vector<std::string> cgi_allow);
 	void					setCGI_root(std::string cgi_root);
@@ -84,6 +86,8 @@ public:
     void                    setAllow(std::vector<std::string> allow);
 
     void                    insertLocation(std::string s, Location location);
+
+    void                    printServer();
 };
 
 #endif

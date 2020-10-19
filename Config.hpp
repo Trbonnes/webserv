@@ -6,7 +6,7 @@
 /*   By: trbonnes <trbonnes@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/09 10:32:53 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/10/14 10:43:27 by trbonnes         ###   ########.fr       */
+/*   Updated: 2020/10/19 14:04:59 by trbonnes         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ public:
 	int							getWorker();
 	int							getWorkerConnections();
 
-	void						setServer(std::vector<ConfigServer> server);
+	void						setServer(std::vector<ConfigServer> *server);
 	void						setWorker(int worker);
 	void						setWorkerConnections(int worckerConections);
 

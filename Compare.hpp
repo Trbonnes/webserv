@@ -6,7 +6,7 @@
 /*   By: trbonnes <trbonnes@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/09 12:25:32 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/10/09 12:25:36 by trbonnes         ###   ########.fr       */
+/*   Updated: 2020/10/19 11:25:05 by trbonnes         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ struct   Compare
 {
     bool operator() (const T& x, const T& y) const
     {
-        if (x.length() > y.length())
+        if (x.length() >= y.length())
             return true;
         return false;
     }

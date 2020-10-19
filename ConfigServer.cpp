@@ -6,32 +6,40 @@
 /*   By: trbonnes <trbonnes@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/09 15:13:35 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/10/14 13:45:06 by trbonnes         ###   ########.fr       */
+/*   Updated: 2020/10/19 14:32:46 by trbonnes         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ConfigServer.hpp"
 
 ConfigServer::ConfigServer() :
-_defaultRoot("/home/pauline/webserver/www"),
-_defaultIndex(0),
-_defaultType("text/plain"),
-_defaultCharset("koi8-r"),
-_defaultLanguage(0),
-_configFilesRoot("/home/pauline/webserver/config"),
-_defaultAuth_basic("\"Authorization\""),
-_defaultAuth_basic_user_file("/home/pauline/webserver/config/.htpasswd"),
-_defaultAutoindex("off") {
-    _defaultAllow.push_back("GET");
-    _defaultAllow.push_back("HEAD");
-    _defaultAllow.push_back("POST");
-    _defaultAllow.push_back("PUT");
-    _defaultLanguage.push_back("fr");
-    _defaultLanguage.push_back("en");
-    _defaultIndex.push_back("index.html");
-    _defaultIndex.push_back("index.html");
-    _mimeTypes.push_back("plain/text");
-    _defaultServerName.push_back("localhost");
+_defaultRoot(""),
+// _defaultIndex(0),
+// _defaultType(""),
+// _defaultCharset(""),
+// _defaultLanguage(0),
+// _configFilesRoot(""),
+// _defaultAuth_basic(""),
+// _defaultAuth_basic_user_file(""),
+// _defaultServerName(0),
+// _defaultCgi(0),
+// _defaultCgi_allow(0),
+// _defaultCgi_root(""),
+// _defaultAutoindex(0),
+// _defaultAllow(0),
+_defaultClientBodySize(-1)
+// _port(0) 
+{
+    // _defaultAllow.push_back("GET");
+    // _defaultAllow.push_back("HEAD");
+    // _defaultAllow.push_back("POST");
+    // _defaultAllow.push_back("PUT");
+    // _defaultLanguage.push_back("fr");
+    // _defaultLanguage.push_back("en");
+    // _defaultIndex.push_back("index.html");
+    // _defaultIndex.push_back("index.html");
+    // _mimeTypes.push_back("plain/text");
+    // _defaultServerName.push_back("localhost");
 
 /*
 
@@ -112,25 +120,23 @@ _defaultAutoindex("off") {
 
 ConfigServer::ConfigServer(const ConfigServer &copy)
 {
+    _locationList = copy._locationList;
     _defaultRoot = copy._defaultRoot;
     _defaultAllow = copy._defaultAllow;
     _defaultServerName = copy._defaultServerName;
     _defaultIndex = copy._defaultIndex;
     _defaultType = copy._defaultType;
+    _defaultCharset = copy._defaultCharset;
     _defaultLanguage = copy._defaultLanguage;
     _mimeTypes = copy._mimeTypes;
     _configFilesRoot = copy._configFilesRoot;
-
-    _defaultCgi = copy._defaultCgi;
-    _defaultCgi_allow = copy._defaultCgi_allow;
-    _defaultCgi_root = copy._defaultCgi_root;
-
-    _port = copy._port;
-    _defaultServerName = copy._defaultServerName;
-
-    _defaultRoot = copy._defaultRoot;
-    _defaultIndex = copy._defaultIndex;
+    _defaultAuth_basic = copy._defaultAuth_basic;
+    _defaultAuth_basic_user_file = copy._defaultAuth_basic_user_file;
     _defaultAutoindex = copy._defaultAutoindex;
+	_defaultCgi = copy._defaultCgi;
+	_defaultCgi_allow = copy._defaultCgi_allow;
+	_defaultCgi_root = copy._defaultCgi_root;
+    _port = copy._port;
     _defaultClientBodySize = copy._defaultClientBodySize;
 }
 
@@ -138,25 +144,23 @@ ConfigServer::~ConfigServer() {}
 
 ConfigServer                  &ConfigServer::operator=(ConfigServer const &rhs)
 {
+    _locationList = rhs._locationList;
     _defaultRoot = rhs._defaultRoot;
     _defaultAllow = rhs._defaultAllow;
     _defaultServerName = rhs._defaultServerName;
     _defaultIndex = rhs._defaultIndex;
     _defaultType = rhs._defaultType;
+    _defaultCharset = rhs._defaultCharset;
     _defaultLanguage = rhs._defaultLanguage;
     _mimeTypes = rhs._mimeTypes;
     _configFilesRoot = rhs._configFilesRoot;
-
-    _defaultCgi = rhs._defaultCgi;
-    _defaultCgi_allow = rhs._defaultCgi_allow;
-    _defaultCgi_root = rhs._defaultCgi_root;
-
-    _port = rhs._port;
-    _defaultServerName = rhs._defaultServerName;
-
-    _defaultRoot = rhs._defaultRoot;
-    _defaultIndex = rhs._defaultIndex;
+    _defaultAuth_basic = rhs._defaultAuth_basic;
+    _defaultAuth_basic_user_file = rhs._defaultAuth_basic_user_file;
     _defaultAutoindex = rhs._defaultAutoindex;
+	_defaultCgi = rhs._defaultCgi;
+	_defaultCgi_allow = rhs._defaultCgi_allow;
+	_defaultCgi_root = rhs._defaultCgi_root;
+    _port = rhs._port;
     _defaultClientBodySize = rhs._defaultClientBodySize;
     return *this;
 }
@@ -415,6 +419,11 @@ int                         ConfigServer::getPort() {
     return _port;
 }
 
+
+std::map<std::string, Location, Compare<std::string> > ConfigServer::getLocationList() {
+    return _locationList;
+}
+
 void					ConfigServer::setCGI(std::vector<std::string> cgi) {
     _defaultCgi = cgi;
 }
@@ -455,7 +464,6 @@ void                    ConfigServer::setAllow(std::vector<std::string> allow) {
     _defaultAllow = allow;
 }
 
-void                    ConfigServer::insertLocation(std::string s, Location location){
-    (void)s;
-    (void)location;
+void                    ConfigServer::insertLocation(std::string s, Location location) {
+    _locationList.emplace(s, location);
 }

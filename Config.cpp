@@ -6,7 +6,7 @@
 /*   By: trbonnes <trbonnes@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/09 10:32:47 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/10/14 10:43:20 by trbonnes         ###   ########.fr       */
+/*   Updated: 2020/10/19 14:24:17 by trbonnes         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,6 @@ Config::Config(): _server(0), _worker(1), _workerConnections(1024) {
 }
 
 Config::Config(const Config &c) {
-	_server.clear();
 	_server = c._server;
 	_worker = c._worker;
 	_workerConnections = c._workerConnections;
@@ -26,14 +25,11 @@ Config::~Config() {
 }
 
 Config &Config::operator=(const Config &c) {
-	_server.clear();
 	_server = c._server;
 	_worker = c._worker;
 	_workerConnections = c._workerConnections;
 	return *this;
 }
-
-
 
 std::vector<ConfigServer>	&Config::getServer() {
 	return _server;
@@ -47,8 +43,8 @@ int							Config::getWorkerConnections() {
 	return _workerConnections;
 }
 
-void						Config::setServer(std::vector<ConfigServer> server) {
-	_server = server;
+void						Config::setServer(std::vector<ConfigServer> *server) {
+	_server = *server;
 }
 
 void						Config::setWorker(int worker) {

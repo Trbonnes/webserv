@@ -34,6 +34,8 @@ public:
 	Location(const Location &c);
 	/*virtual*/ ~Location();
 	Location &operator=(const Location &c);
+
+    void                    printLocation();
 };
 
 #endif
