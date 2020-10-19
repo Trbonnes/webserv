@@ -3,6 +3,7 @@
 
 #include "HttpConf.hpp"
 #include "HttpWorker.hpp"
+#include "ProcessManager.hpp"
 
 #include <sys/time.h>
 #include <sys/types.h>
@@ -36,8 +37,8 @@ public:
 
 private:
 	HttpConf	conf;
-	fd_set		_sockset;
-	pid_t*		_workers_pid;
+	fd_set		_listen_sockset;
+	pid_t*		_workers_pid; // might put into ProcessManager.hpp
 
 
 public:

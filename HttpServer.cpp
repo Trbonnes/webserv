@@ -21,7 +21,7 @@ void HttpServer::initListenSocket() {
 
 
 	// Initialize listening sockets that will be shared between workers
-	FD_ZERO(&_sockset);
+	FD_ZERO(&_listen_sockset);
 	int s = socket(AF_INET, SOCK_STREAM, 0);
 	int opt = 1;
 	
@@ -29,7 +29,7 @@ void HttpServer::initListenSocket() {
                                                   &opt, sizeof(opt)); // WItchcraft
 	struct sockaddr_in address;
 	address.sin_family = AF_INET;
-    address.sin_addr.s_addr = INADDR_ANY; 
+    address.sin_addr.s_addr = INADDR_ANY;
     address.sin_port = htons( 3256 );
 	int addrlen = sizeof(address);
 	(void) addrlen;
@@ -37,23 +37,28 @@ void HttpServer::initListenSocket() {
 	bind(s, (struct sockaddr *)&address,
                                  sizeof(address));
 	listen(s, 3);
-	FD_SET(s, &_sockset);
-
-	// if (select(FD_SETSIZE, &_sockset, NULL, NULL, NULL) == -1)
-	// 	return; // throw something
-
-
-
+	FD_SET(s, &_listen_sockset);
 }
+
+//Define numver of workers
+
+#include <signal.h>
 
 void HttpServer::initWorkers() {
 
-	pid_t pid;
-	HttpWorker HttpWorker()
+	int status;
+	HttpWorker worker;
 
+	//init worker
+
+	_workers_pid = new pid_t[2];
     std::cout << "Initializing workers" << std::endl;
 	for (size_t i = 0; i < 2; i++)
 	{
-		
+		_workers_pid[i] = ProcessManager::launchProcess(worker);
+	}
+	for (size_t i = 0; i < 2; i++)
+	{
+		wait(&status);
 	}
 }

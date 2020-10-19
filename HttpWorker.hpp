@@ -16,9 +16,12 @@ public:
 	~HttpWorker();
 
 private:
-
+	fd_set _listen_sockset;
+	fd_set _active_sockset;
+	bool is_on_listen_sockset();
 public:
-	void run();
+	void run() override;
+
 
 };
 #endif // HTTPWORKER

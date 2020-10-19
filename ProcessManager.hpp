@@ -11,6 +11,7 @@
 #include <netinet/in.h>
 #include <unistd.h>
 #include <cstring>
+#include <sys/wait.h>
 
 class ProcessManager
 {
