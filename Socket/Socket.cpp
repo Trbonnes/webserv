@@ -113,7 +113,7 @@ std::string     Socket::getRequestURI()
     return _requestURI;
 }
 
-std::string     Socket::getHttpVersion()
+std::string     Socket::gethttpVersion()
 {
     return _httpVersion;
 }
@@ -128,7 +128,7 @@ std::string     Socket::getContentLocation()
     return _contentLocation;
 }
 
-std::vector<std::string>     Socket::getContentType()
+std::vector<std::string>     &Socket::getContentType()
 {
     return _contentType;
 }

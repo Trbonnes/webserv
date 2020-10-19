@@ -2,7 +2,7 @@ SRCS =	TEST/main.cpp 					\
 		TEST/ConfigServer.cpp			\
 		TEST/Location.cpp				\
 		Socket/httpRequestParser.cpp	\
-		Socket/parseHeaders.cpp	 	\
+		Socket/parseHeaders.cpp	 		\
 		Socket/Socket.cpp 				\
 		utils/get_next_line.cpp 		\
 		utils/ft_strcpy.cpp				\

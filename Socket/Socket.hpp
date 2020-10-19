@@ -68,10 +68,10 @@ class   Socket
     int             			getFd();
     std::string     			getMethod();
     std::string     			getRequestURI();
-    std::string     			getHttpVersion();
+    std::string     			gethttpVersion();
     std::string	                getContentLength();
     std::string	                getContentLocation();
-    std::vector<std::string>    getContentType();
+    std::vector<std::string>    &getContentType();
     bool                        getMultipartContent();
     std::string                 getContentBoundary();
     std::string	                getDate();
