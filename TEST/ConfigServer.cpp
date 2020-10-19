@@ -39,9 +39,13 @@ _defaultCgi_methods(0)
         while ((ret = get_next_line(fd, &line)) > 0)
         {
             string = line;
+            free(line);
+            line = NULL;
             _mimeTypes.push_back(string);
         }
         string = line;
+        free(line);
+        line = NULL;
         _mimeTypes.push_back(string);
         it = _mimeTypes.begin();
         while (it != _mimeTypes.end())
@@ -52,7 +56,6 @@ _defaultCgi_methods(0)
             (*it).erase((*it).begin(), s_it);
             it++;
         }
-        free(line);
         close (fd);
     }
 

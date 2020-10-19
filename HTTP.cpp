@@ -135,7 +135,7 @@ void        HTTP::callMethod(std::string method)
         head();
 }
 
-//** Check if the method is autorized for the non CGI locations **
+//** Check if the method is authorized for the non CGI locations **
 int         HTTP::checkAllowMethods(std::string method)
 {
     std::vector<std::string>::iterator itBegin;
@@ -326,6 +326,8 @@ void            HTTP::authorization()
                         _wwwAuthenticate.assign("OK");
                         break ;
                     }
+                    free(line);
+                    line = NULL;
                 }
                 if (base64_decode(_socket.getAuthorization()).compare(line) == 0)
                     _wwwAuthenticate.assign("OK");
@@ -335,6 +337,7 @@ void            HTTP::authorization()
                     _wwwAuthenticate.assign("Basic realm=").append(_config.getAuth_basic(_location));
                 }
                 free(line);
+                line = NULL;
             }
         }
     }

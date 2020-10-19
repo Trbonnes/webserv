@@ -2,41 +2,37 @@
 #include <fstream>
 #include <fcntl.h>
 #include "../HTTP.hpp"
-#include "../Socket/Socket.hpp"
+#include "../TEST/Socket.hpp"
+// #include "../Socket/Socket.hpp"
 
-Socket	*httpRequestParser(int fd);
+// Socket	*httpRequestParser(int fd);
 
 int     main(void)
 {
-    size_t i = 0;
+    // size_t i = 0;
 
-	int fd = open("/home/pauline/webserver/Socket/httpRequestTest", O_RDWR);
-    Socket *socket = httpRequestParser(fd);
+	// int fd = open("/home/pauline/webserver/Socket/httpRequestTest", O_RDWR);
+    // Socket *socket = httpRequestParser(fd);
 
 
-    std::cout << "Fd: " << socket->getFd() << std::endl;
-    std::cout << "Method: " << socket->getMethod() << std::endl;
-	std::cout << "URI: " << socket->getRequestURI() << std::endl;
-    std::cout << "Version: " << socket->gethttpVersion() << std::endl;
+    // std::cout << "Fd: " << socket->getFd() << std::endl;
+    // std::cout << "Method: " << socket->getMethod() << std::endl;
+	// std::cout << "URI: " << socket->getRequestURI() << std::endl;
+    // std::cout << "Version: " << socket->gethttpVersion() << std::endl;
 
-    // std::vector<std::string>::iterator it;
-
-    // it = (socket->getContentType()).begin();
     // std::cout << "ContentType: " << std::endl;
     // while (i < socket->getContentType().size()){
-    //     std::cout << *it << std::endl;
-    //     it++;
-    //     // std::cout << socket->getContentType()[i] << std::endl;
+        // std::cout << socket->getContentType()[i] << std::endl;
     //     i++;
     // }
     // std::cout << "getDate: " << socket->getDate() << std::endl;
-    std::cout << "TransferEncoding: " << socket->getTransferEncoding() << std::endl;
-    i = 0;
-    std::cout << "AcceptCharset: " << std::endl;
-    while (i < socket->getAcceptCharset().size()){
-        std::cout << socket->getAcceptCharset()[i] << std::endl;
-        i++;
-    }
+    // std::cout << "TransferEncoding: " << socket->getTransferEncoding() << std::endl;
+    // i = 0;
+    // std::cout << "AcceptCharset: " << std::endl;
+    // while (i < socket->getAcceptCharset().size()){
+    //     std::cout << socket->getAcceptCharset()[i] << std::endl;
+    //     i++;
+    // }
     // i = 0;
     // std::cout << "AcceptLanguage: " << std::endl;
     // while (i < socket->getAcceptLanguage().size()){
@@ -57,11 +53,11 @@ int     main(void)
     //     i++;
     // }
 
-    // // Socket          socket;
-    // ConfigServer    config;
+    Socket          socket;
+    ConfigServer    config;
 
-    // HTTP method(*socket, config);
+    HTTP method(socket, config);
 
-    // method.getResponse();
+    method.getResponse();
     return 0;
 }

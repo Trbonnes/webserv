@@ -1,9 +1,7 @@
 SRCS =	TEST/main.cpp 					\
 		TEST/ConfigServer.cpp			\
 		TEST/Location.cpp				\
-		Socket/httpRequestParser.cpp	\
-		Socket/parseHeaders.cpp	 		\
-		Socket/Socket.cpp 				\
+		TEST/Socket.cpp					\
 		utils/get_next_line.cpp 		\
 		utils/ft_strcpy.cpp				\
 		utils/ft_strlen.cpp				\
@@ -20,7 +18,7 @@ OBJS = $(SRCS:.cpp=.o)
 NAME = methods
 RM = rm -f
 CC = clang++
-CFLAGS = -Wall -Wextra -Werror # -fsanitize=address -g3 #-lcrypt
+CFLAGS = -Wall -Wextra -Werror  -fsanitize=address -g3 #-lcrypt
 
 all: $(NAME)
 

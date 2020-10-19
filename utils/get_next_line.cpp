@@ -42,6 +42,7 @@ char	*ft_strnjoin(char *s1, char *s2, int n)
 	return (s3);
 }
 
+
 static char		*ft_strcpy_gnl(char *dest, const char *src)
 {
 	int		i;
