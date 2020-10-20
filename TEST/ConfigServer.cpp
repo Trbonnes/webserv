@@ -11,6 +11,7 @@ _defaultType("text/plain"),
 _defaultCharset("koi8-r"),
 _defaultLanguage(0),
 _configFilesRoot("/sgoinfre/goinfre/Perso/pganglof/webserv/config"),
+_errorFilesRoot("/sgoinfre/goinfre/Perso/pganglof/webserv/error"),
 _defaultAuth_basic("\"Authorization\""),
 _defaultAuth_basic_user_file("/sgoinfre/goinfre/Perso/pganglof/webserv/config/.htpasswd"),
 _defaultAutoindex(false),
@@ -130,6 +131,7 @@ ConfigServer::ConfigServer(ConfigServer &copy)
     _defaultLanguage = copy._defaultLanguage;
     _mimeTypes = copy._mimeTypes;
     _configFilesRoot = copy._configFilesRoot;
+    _errorFilesRoot = copy._errorFilesRoot;
     _defaultAuth_basic = copy._defaultAuth_basic;
     _defaultAuth_basic_user_file = copy._defaultAuth_basic_user_file;
     _defaultAutoindex = copy._defaultAutoindex;
@@ -155,6 +157,7 @@ ConfigServer                  &ConfigServer::operator=(ConfigServer const &rhs)
     _defaultLanguage = rhs._defaultLanguage;
     _mimeTypes = rhs._mimeTypes;
     _configFilesRoot = rhs._configFilesRoot;
+    _errorFilesRoot = rhs._errorFilesRoot;
     _defaultAuth_basic = rhs._defaultAuth_basic;
     _defaultAuth_basic_user_file = rhs._defaultAuth_basic_user_file;
     _defaultAutoindex = rhs._defaultAutoindex;
@@ -217,6 +220,10 @@ std::string             ConfigServer::getServerSoftware()
     return _serverSoftware;
 }
 
+std::string             ConfigServer::getErrorFilesRoot()
+{
+    return _errorFilesRoot;
+}
 
 std::vector<std::string>  &ConfigServer::getIndex(std::string location)
 {

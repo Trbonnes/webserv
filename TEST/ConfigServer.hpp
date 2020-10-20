@@ -17,25 +17,32 @@ class   ConfigServer
 {
     private:
 
-    std::map<std::string, Location, Compare<std::string> > _locationList;
 
+    // Server Software 
     std::string                 _httpVersion;
     std::string                 _serverSoftware;
+    std::list<std::string>      _mimeTypes;
+    std::string                 _configFilesRoot;
+    std::string                 _errorFilesRoot;
 
+    // Default Server
+    std::string                 _defaultPort;
+    std::string                 _defaultServerName;
+
+    // Config Server
+    std::map<std::string, Location, Compare<std::string> > 
+                                _locationList;
     std::string                 _defaultRoot;
     std::vector<std::string>    _defaultAllow;
-    std::string                 _defaultServerName;
-    std::string                 _defaultPort;
     std::vector<std::string>    _defaultIndex;
     std::string                 _defaultType;
     std::string                 _defaultCharset;
     std::vector<std::string>    _defaultLanguage;
-    std::list<std::string>      _mimeTypes;
-    std::string                 _configFilesRoot;
     std::string                 _defaultAuth_basic;
     std::string                 _defaultAuth_basic_user_file;
     bool                        _defaultAutoindex;
 
+    // CGI
 	std::vector<std::string>	_defaultCgi;
 	std::vector<std::string>	_defaultCgi_methods;
 	std::string					_cgi_root;
@@ -59,6 +66,7 @@ class   ConfigServer
     std::vector<std::string>    &getLanguage(std::string location);
     std::vector<std::string>    &getAllow(std::string location);
     std::list<std::string>      &getMimeTypes();
+    std::string                 getErrorFilesRoot();
     std::string                 getLocation(std::string location);
     std::string                 getAuth_basic(std::string location);
     std::string                 getAuth_basic_user_file(std::string location);
