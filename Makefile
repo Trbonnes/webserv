@@ -14,6 +14,10 @@ SRCS =	TEST/main.cpp 					\
 		Methods/head.cpp				\
 		setHeaders.cpp
 
+		# Socket/httpRequestParser.cpp	\
+		# Socket/parseHeaders.cpp			\
+		# Socket/Socket.cpp
+
 OBJS = $(SRCS:.cpp=.o)
 NAME = methods
 RM = rm -f

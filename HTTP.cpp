@@ -157,13 +157,13 @@ int         HTTP::checkAllowMethods(std::string method)
     return (ret);
 }
 
-//** absolute location route for the server **
+//** Absolute location route for the server **
 void        HTTP::setLocation()
 {
   _location = _config.getLocation(_uri);
 }
 
-//** replace URI by the location **
+//** Replace URI by the location **
 void        HTTP::replaceURI()
 {
   _uri.assign(_config.getRoot(_location));
@@ -209,7 +209,7 @@ int         HTTP::openFile()
         if ((file.st_mode & S_IFMT) == S_IFREG)
         {
             fd = open(_route.c_str(), O_RDONLY);
-        _statusCode = OK;
+            _statusCode = OK;
         }
         else
             _statusCode = FORBIDDEN;
@@ -250,7 +250,7 @@ void         HTTP::setRoot()
     return ;
 }
 
-// ** Create the default html page when any page is not found and autoindex is on **
+// ** Create the default html page when file is not found and autoindex is on **
 void            HTTP::setAutoindex(void)
 {
     std::string     str;
@@ -281,7 +281,7 @@ void            HTTP::setAutoindex(void)
             if (dirent->d_type == DT_DIR)
                 str.append("/");
             str.append("</a>\t\t\t\t");
-            timeinfo = localtime(&(directory.st_mtime)); // st_mtimespec.tv_sec = macos ; st_mtime = linux
+            timeinfo = localtime(&(directory.st_mtimespec.tv_sec)); // st_mtimespec.tv_sec = macos ; st_mtime = linux
             strftime(lastModifications, 100, "%d-%b-20%y %OH:%OM", timeinfo);
             str.append(lastModifications);
             str.append("\t\t");
@@ -301,7 +301,7 @@ void            HTTP::setAutoindex(void)
     _body.append("</pre><hr></body>\n</html>\n");
 }
 
-// ** Check if the autorization mode is on and if the user is authorized to do the request **
+// ** Check if the autorization mode is on and if the user is authorized to make the request **
 void            HTTP::authorization()
 {
     int     fd;

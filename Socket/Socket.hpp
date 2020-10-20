@@ -28,13 +28,13 @@ class   Socket
 
     // SOCKET
 
-    int             _fd;
+    int                         _fd;
 
     // REQUEST LINE
 
-    std::string     _method;
-    std::string     _requestURI;
-    std::string     _httpVersion;
+    std::string                 _method;
+    std::string                 _requestURI;
+    std::string                 _httpVersion;
 
     // HEADERS
 

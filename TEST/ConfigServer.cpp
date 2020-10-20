@@ -1,16 +1,16 @@
 #include "ConfigServer.hpp"
 
 ConfigServer::ConfigServer() :
-_defaultRoot("/home/pauline/webserver/www"),
+_defaultRoot("/sgoinfre/goinfre/Perso/pganglof/webserv/www"),
 _defaultServerName("localhost"),
-_defaultPort("8080"),
+_defaultPort("80"),
 _defaultIndex(0),
 _defaultType("text/plain"),
 _defaultCharset("koi8-r"),
 _defaultLanguage(0),
-_configFilesRoot("/home/pauline/webserver/config"),
+_configFilesRoot("/sgoinfre/goinfre/Perso/pganglof/webserv/config"),
 _defaultAuth_basic("\"Authorization\""),
-_defaultAuth_basic_user_file("/home/pauline/webserver/config/.htpasswd"),
+_defaultAuth_basic_user_file("/sgoinfre/goinfre/Perso/pganglof/webserv/config/.htpasswd"),
 _defaultAutoindex(false),
 _defaultCgi(0),
 _defaultCgi_methods(0)
@@ -59,8 +59,6 @@ _defaultCgi_methods(0)
         close (fd);
     }
 
-    std::cout << "Default port: " << _defaultPort << std::endl;
-
     //** Locations **
 
         //** first location **
@@ -76,20 +74,19 @@ _defaultCgi_methods(0)
     cgi_methods.push_back("DELETE");
     index.push_back("index.php");
 
-    Location loc1("/data/", "/home/pauline/webserver/www",
+    Location loc1("/data/", "/sgoinfre/goinfre/Perso/pganglof/webserv/www",
     _defaultAllow, index,
     "text/html", "utf-8", _defaultLanguage, _defaultAuth_basic, _defaultAuth_basic_user_file, _defaultAutoindex, "/blabla/", exe, cgi_methods, "");
 
     _locationList["/data/"] = loc1;
 
         //** second location **
-
     std::vector<std::string> index2;
     std::vector<std::string> exe1;
 
     index2.push_back("42.png");
 
-    Location loc2("/images/", "/home/pauline/webserver/www",
+    Location loc2("/images/", "/sgoinfre/goinfre/Perso/pganglof/webserv/www",
     _defaultAllow, index2,
     "text/html", "", _defaultLanguage, "off", "", _defaultAutoindex, "", exe1, cgi_methods, "");
 
@@ -98,7 +95,7 @@ _defaultCgi_methods(0)
         //** third location **
     std::vector<std::string> exe2;
 
-    Location loc3("/", "/home/pauline/webserver/www",
+    Location loc3("/", "/sgoinfre/goinfre/Perso/pganglof/webserv/www",
     _defaultAllow, _defaultIndex,
     _defaultType, _defaultCharset, _defaultLanguage, "off", "", true, "", exe2, cgi_methods, "");
 
@@ -109,8 +106,8 @@ _defaultCgi_methods(0)
 
     exe3.push_back("bla");
 
-    Location loc4("/cgi/", "/home/pauline/webserver/www", _defaultAllow, _defaultIndex, _defaultType, 
-    _defaultCharset, _defaultLanguage, "off", "", false, "", exe3, cgi_methods, "/home/pauline/webserver/bin-cgi/ubuntu_cgi_tester");
+    Location loc4("/cgi/", "/sgoinfre/goinfre/Perso/pganglof/webserv/www", _defaultAllow, _defaultIndex, _defaultType, 
+    _defaultCharset, _defaultLanguage, "off", "", false, "", exe3, cgi_methods, "/sgoinfre/goinfre/Perso/pganglof/webserv/bin-cgi/ubuntu_cgi_tester");
 
     _locationList["/cgi/"] = loc4;
 
@@ -122,11 +119,19 @@ ConfigServer::ConfigServer(ConfigServer &copy)
     _defaultRoot = copy._defaultRoot;
     _defaultAllow = copy._defaultAllow;
     _defaultServerName = copy._defaultServerName;
+    _defaultPort = copy._defaultPort;
     _defaultIndex = copy._defaultIndex;
     _defaultType = copy._defaultType;
+    _defaultCharset = copy._defaultCharset;
     _defaultLanguage = copy._defaultLanguage;
     _mimeTypes = copy._mimeTypes;
     _configFilesRoot = copy._configFilesRoot;
+    _defaultAuth_basic = copy._defaultAuth_basic;
+    _defaultAuth_basic_user_file = copy._defaultAuth_basic_user_file;
+    _defaultAutoindex = copy._defaultAutoindex;
+    _defaultCgi = copy._defaultCgi;
+    _defaultCgi_methods = copy._defaultCgi_methods;
+    _cgi_root = copy._cgi_root;
 }
 
 ConfigServer::~ConfigServer() {}
@@ -137,11 +142,19 @@ ConfigServer                  &ConfigServer::operator=(ConfigServer const &rhs)
     _defaultRoot = rhs._defaultRoot;
     _defaultAllow = rhs._defaultAllow;
     _defaultServerName = rhs._defaultServerName;
+    _defaultPort = rhs._defaultPort;
     _defaultIndex = rhs._defaultIndex;
     _defaultType = rhs._defaultType;
+    _defaultCharset = rhs._defaultCharset;
     _defaultLanguage = rhs._defaultLanguage;
     _mimeTypes = rhs._mimeTypes;
     _configFilesRoot = rhs._configFilesRoot;
+    _defaultAuth_basic = rhs._defaultAuth_basic;
+    _defaultAuth_basic_user_file = rhs._defaultAuth_basic_user_file;
+    _defaultAutoindex = rhs._defaultAutoindex;
+    _defaultCgi = rhs._defaultCgi;
+    _defaultCgi_methods = rhs._defaultCgi_methods;
+    _cgi_root = rhs._cgi_root;
     return *this;
 }
 
@@ -185,7 +198,6 @@ std::string             ConfigServer::getServerName()
 
 std::string             ConfigServer::getPort()
 {
-    std::cout << "GET PORT: " << _defaultPort << std::endl;
     return _defaultPort;
 }
 

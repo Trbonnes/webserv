@@ -41,16 +41,14 @@ void        HTTP::cgi_metaVariables()
     _cgi._path_translated = _cgi._path_info;
     if (query != -1)
        _cgi._query_string = str.assign(_route).erase(0, query);
-    _cgi._remote_addr = "127.0.0.1"; // Default 
+    _cgi._remote_addr = _socket.getRemoteAddr(); // Default 
     _cgi._remote_ident = _socket.getAuthorization(); // Default
-    _cgi._remote_user = _socket.getUserAgent(); // Default
+    _cgi._remote_user = _socket.getUserAgent(); // Default 
     _cgi._request_method = _socket.getMethod();
     _cgi._request_uri = _socket.getRequestURI();
     _cgi._script_name = _config.getCGI_root(_location);
     _cgi._server_name = _config.getServerName();
-    _cgi._server_port = "80"; // _config.getPort() ne fonctionne pas pour des raisons obscures
-    // _cgi._server_port = _config.getPort();
-    // std::cout << "server port: " << _cgi._server_port << std::endl;
+    _cgi._server_port = _config.getPort();
     _cgi._server_protocol = "HTTP/1.1";
     _cgi._server_software = "SuperServer/1.0";
     setEnv();

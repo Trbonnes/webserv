@@ -10,7 +10,9 @@ class   Socket
 
     // SOCKET
 
-    int             _fd;
+    int                         _fd;
+
+    std::string                 _addr;
 
     // REQUEST LINE
 
@@ -47,6 +49,7 @@ class   Socket
 
     Socket                      &operator=(Socket const &rhs);
     int                         getFd();
+    std::string                 getRemoteAddr();
     std::string                 getMethod();
     std::string                 getRequestURI();
     std::string                 gethttpVersion();

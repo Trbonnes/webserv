@@ -2,8 +2,9 @@
 
 Socket::Socket() :
 _fd(0),
+_addr("127.0.0.1"),
 _method("GET"),
-_requestURI("/data/en/"),
+_requestURI("/images/"),
 _httpVersion("HTTP/1.1"),
 _contentLength(""),
 _contentLocation(""),
@@ -23,6 +24,7 @@ _body("") {
 
 Socket::Socket(int fd) :
 _fd(fd),
+_addr(""),
 _method(""),
 _requestURI(""),
 _httpVersion(""),
@@ -43,6 +45,7 @@ _body("") {
 Socket::Socket(Socket const &copy)
 {
     _fd = copy._fd;
+    _addr = copy._addr;
     _method = copy._method;
     _requestURI = copy._requestURI;
     _httpVersion = copy._httpVersion;
@@ -64,6 +67,7 @@ Socket::~Socket() {}
 Socket      &Socket::operator=(Socket const &rhs)
 {
     _fd = rhs._fd;
+    _addr = rhs._addr;
     _method = rhs._method;
     _requestURI = rhs._requestURI;
     _httpVersion = rhs._httpVersion;
@@ -81,7 +85,7 @@ Socket      &Socket::operator=(Socket const &rhs)
     return *this;
 }
 
-void        Socket::parser(void)
+void            Socket::parser(void)
 {
     return ;
 }
@@ -89,6 +93,11 @@ void        Socket::parser(void)
 std::string     Socket::getMethod()
 {
     return _method;
+}
+
+std::string     Socket::getRemoteAddr()
+{
+    return _addr;
 }
 
 std::string     Socket::getRequestURI()

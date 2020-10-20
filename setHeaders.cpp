@@ -3,9 +3,9 @@
 //** absolute location route for the user agent **
 void        HTTP::setContentLocation()
 {
-  _contentLocation.assign("http://").append(_config.getServerName()).append(_route);
-  if (_config.getAlias(_location).length() > 0)
-    _contentLocation.replace(_contentLocation.find(_location), _location.length(), _config.getAlias(_location));
+    _contentLocation.assign("http://").append(_config.getServerName()).append(_route);
+    if (_config.getAlias(_location).length() > 0)
+        _contentLocation.replace(_contentLocation.find(_location), _location.length(), _config.getAlias(_location));
 }
 
 //** Copy file into body string **
@@ -27,7 +27,7 @@ void        HTTP::setBody(int fd)
 
 void        HTTP::setCharset(void)
 {
-  _charset = _config.getCharset(_location);
+    _charset = _config.getCharset(_location);
 }
 
 void        HTTP::setServerName()
@@ -44,7 +44,7 @@ void        HTTP::setLastModified()
 {
     struct tm *timeinfo;
 
-    timeinfo = localtime(&(_stat.st_mtime)); // st_mtimespec.tv_sec = macos ; st_mtime = linux
+    timeinfo = localtime(&(_stat.st_mtimespec.tv_sec)); // st_mtimespec.tv_sec = macos ; st_mtime = linux
     strftime(_lastModified, 100, "%a %d %b 20%y %OH:%OM:%OS GMT", timeinfo);
 }
 
