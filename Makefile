@@ -8,6 +8,7 @@ SRCS =	TEST/main.cpp 					\
 		utils/ft_strdup.cpp				\
 		utils/ft_bzero.cpp				\
 		utils/ft_atoi.cpp				\
+		utils/ft_itoa.cpp 				\
 		HTTP.cpp						\
 		CGI.cpp							\
 		Methods/get.cpp					\

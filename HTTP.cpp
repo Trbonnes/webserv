@@ -8,6 +8,7 @@ const std::string HTTP::_base64_chars =
 HTTP::HTTP() :
 _socket(0),
 _config(),
+_mapCodes(),
 _cgi(),
 _stat(),
 _response(0),
@@ -30,6 +31,7 @@ _body("") {}
 HTTP::HTTP(Socket &socket, ConfigServer &config) :
 _socket(socket),
 _config(config),
+_mapCodes(),
 _cgi(),
 _stat(),
 _response(0),
@@ -464,6 +466,22 @@ int         HTTP::getResponse()
     std::cout << "LAST MODIFIED: " << _lastModified << std::endl << std::endl;
     std::cout << "DATE: " << _date << std::endl << std::endl;
     std::cout << "BODY: " << std::endl << _body << std::endl << std::endl;
+
+
+
+
+    std::string socket;
+
+    socket.append(_config.getHttpVersion());
+    socket.append(" ");
+
+    // std::cout << "map size: " << _mapCodes.codes.size() << std::endl;
+    socket.append(ft_itoa(_statusCode));
+    socket.append(" ");
+    socket.append(_mapCodes.codes[_statusCode]);
+
+
+    std::cout << "SOCKET: " << std::endl << socket << std::endl << std::endl;
 
     return (1);
 }

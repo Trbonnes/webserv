@@ -18,6 +18,9 @@ class   ConfigServer
     private:
 
     std::map<std::string, Location, Compare<std::string> > _locationList;
+
+    std::string                 _httpVersion;
+
     std::string                 _defaultRoot;
     std::vector<std::string>    _defaultAllow;
     std::string                 _defaultServerName;
@@ -47,6 +50,7 @@ class   ConfigServer
     std::string                 getRoot(std::string _uri);
     std::string                 getServerName(void);
     std::string                 getPort(void);
+    std::string                 getHttpVersion(void);
     std::vector<std::string>    &getIndex(std::string location);
     std::string                 getType(std::string location);
     std::string                 getCharset(std::string location);

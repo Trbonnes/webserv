@@ -57,4 +57,15 @@
 # define GATEWAY_TIMEOUT                    504
 # define HTTP_VERSION_NOT_SUPPORTED         505 
 
+class  StatusCode
+{
+    public:
+    std::map<int, std::string> codes;
+
+    StatusCode() {
+        codes[OK] = "OK";
+    }
+};
+
+
 #endif

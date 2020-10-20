@@ -56,6 +56,7 @@ class   HTTP
 
     Socket                      _socket;
     ConfigServer                _config;
+    StatusCode                  _mapCodes;
     CGI                         _cgi;
     std::string                 _uri;
     std::string                 _route;
