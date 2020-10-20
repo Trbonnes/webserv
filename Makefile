@@ -20,7 +20,7 @@ SRCS =	TEST/main.cpp 					\
 		# Socket/Socket.cpp
 
 OBJS = $(SRCS:.cpp=.o)
-NAME = methods
+NAME = meth
 RM = rm -f
 CC = clang++
 CFLAGS = -Wall -Wextra -Werror  -fsanitize=address -g3 #-lcrypt

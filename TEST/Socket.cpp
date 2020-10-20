@@ -4,7 +4,7 @@ Socket::Socket() :
 _fd(0),
 _addr("127.0.0.1"),
 _method("GET"),
-_requestURI("/data/"),
+_requestURI("/cgi/"),
 _httpVersion("HTTP/1.1"),
 _contentLength(""),
 _contentLocation(""),
@@ -13,7 +13,7 @@ _date(""),
 _transferEncoding(""),
 _acceptCharset(""),
 _acceptLanguage(0),
-_authorization("YWxiYW46YWxiYW4="),
+_authorization("YWxiYW46YWxiYW4="), // YWxiYW46YWxiYW4=
 _host("localhost"),
 _userAgent("Mozilla/5."" (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/8""."".3987.149 Safari/537.36"),
 _body("") {

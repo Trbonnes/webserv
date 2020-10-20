@@ -30,6 +30,8 @@ void        HTTP::get()
         setContentType();
         setCharset();
         setDate();
+        _contentLanguage = "";
+        _charset = "";
         // TransferEncoding();
         _statusCode = OK;
     }

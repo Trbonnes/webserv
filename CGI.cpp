@@ -42,8 +42,8 @@ void        HTTP::cgi_metaVariables()
     if (query != -1)
        _cgi._query_string = str.assign(_route).erase(0, query);
     _cgi._remote_addr = _socket.getRemoteAddr(); // Default 
-    _cgi._remote_ident = _socket.getAuthorization(); // Default
-    _cgi._remote_user = _socket.getUserAgent(); // Default 
+    _cgi._remote_ident = "user"; // Default
+    _cgi._remote_user = "user"; // Default 
     _cgi._request_method = _socket.getMethod();
     _cgi._request_uri = _socket.getRequestURI();
     _cgi._script_name = _config.getCGI_root(_location);
@@ -156,7 +156,7 @@ void        HTTP::cgi_exe()
                 _body.append(buf);
             }
             close(fd[SIDE_OUT]);
-            // std::cout << _body << std::endl;
+            std::cout << std::endl << "CGI BODY: " << std::endl << _body << std::endl;
             find = _body.find("Status: ");
             _statusCode = ft_atoi(_body.substr(find + 8, 3).c_str());
             find = _body.find("Content-Type: ");

@@ -57,7 +57,7 @@ _body("")
     int         fd; 
 
     ft_bzero(_cgi_env, sizeof(_cgi_env));
-    _uri = socket.getRequestURI();
+    _uri = _socket.getRequestURI();
     setLocation();
     replaceURI(); 
     if (_config.getCGI_root(_location).length() > 0 && checkCGImethods(_socket.getMethod())) // HEAD a tester --> est ce quil faut transformer HEAD en GET avec CGI ?
@@ -177,18 +177,13 @@ void        HTTP::setStat()
     stat(_route.c_str(), &_stat);
 }
 
-//** Open file with the default index if no specific file is specify **
+//** Open file **
 int         HTTP::openFile()
 {
     int         fd;
     struct stat file;
-    std::string str;
-    std::vector<std::string>::iterator itIndexBegin;
-    std::vector<std::string>::iterator itIndexEnd;
 
     fd = -1;
-    itIndexBegin = _config.getIndex(_location).begin();
-    itIndexEnd = _config.getIndex(_location).end();
     stat(_route.c_str(), &file);
     if ((file.st_mode & S_IFMT) == S_IFREG)
     {
@@ -196,26 +191,7 @@ int         HTTP::openFile()
         _statusCode = OK;
     }
     else
-    {
-        str.assign(_route);
-        while (itIndexBegin != itIndexEnd && (file.st_mode & S_IFMT) != S_IFREG)
-        {
-            str.assign(_route);
-            if (str.back() != '/')
-                str.append("/");
-            str.append(*itIndexBegin);
-            stat(str.c_str(), &file);
-            itIndexBegin++;
-        }
-        _route.assign(str);
-        if ((file.st_mode & S_IFMT) == S_IFREG)
-        {
-            fd = open(_route.c_str(), O_RDONLY);
-            _statusCode = OK;
-        }
-        else
-            _statusCode = FORBIDDEN;
-    }
+        _statusCode = FORBIDDEN;
     return fd;
 }
 
@@ -226,7 +202,9 @@ void         HTTP::setRoot()
     int         find;
     std::string str;
     struct stat file;
-
+    std::vector<std::string>::iterator itIndexBegin;
+    std::vector<std::string>::iterator itIndexEnd;
+    
     if (_uri.compare(0, 4, "http") == 0)
     {
         //** Absolute path **
@@ -248,6 +226,25 @@ void         HTTP::setRoot()
         _route.assign(_config.getRoot(_location));
         _route.append(acceptLanguage());
         _route.append(str.assign(_socket.getRequestURI()).erase(0, _location.length()));
+        if ((file.st_mode & S_IFMT) == S_IFREG)
+            return ;
+
+        // ** If necessary, add index **
+
+        itIndexBegin = _config.getIndex(_location).begin();
+        itIndexEnd = _config.getIndex(_location).end();
+        stat(_route.c_str(), &file);
+        str.assign(_route);
+        while (itIndexBegin != itIndexEnd && (file.st_mode & S_IFMT) != S_IFREG)
+        {
+            str.assign(_route);
+            if (str.back() != '/')
+                str.append("/");
+            str.append(*itIndexBegin);
+            stat(str.c_str(), &file);
+            itIndexBegin++;
+        }
+        _route.assign(str);
     }
     return ;
 }
@@ -262,6 +259,8 @@ void            HTTP::setAutoindex(void)
     struct tm       *timeinfo;
     char            lastModifications[100];
     std::stack<std::string> files;
+
+    // Verifier que DIR marche bien sur linux, car bug sur MACOS
 
     _body.assign("<html>\n<head><title>Index of /</title></head>\n<body>\n<h1>Index of /</h1><hr><pre>\n");
     dir = opendir(_uri.c_str());
@@ -301,6 +300,7 @@ void            HTTP::setAutoindex(void)
         }
     }
     _body.append("</pre><hr></body>\n</html>\n");
+    _contentLength = _body.length();
 }
 
 // ** Check if the autorization mode is on and if the user is authorized to make the request **
@@ -439,28 +439,30 @@ std::string   HTTP::base64_decode(std::string const& encoded_string) {
 // ** Create the response socket **
 int         HTTP::getResponse()
 {
-    // if (_statusCode >= 300)
-    // {
-    //     int     ret;
-    //     char    buf[1024 + 1];
-    //     int     fd;
+    if (_statusCode >= 300)
+    {
+        int     ret;
+        char    buf[1024 + 1];
+        int     fd;
 
-    //     _route = _config.getErrorFilesRoot().append("/").append(ft_itoa(_statusCode));
-    //     fd = open(_route.c_str(), O_RDONLY);
-    //     while ((ret = read(fd, buf, 1024)) > 0)
-    //     {
-    //         buf[ret] = '\0';
-    //         _body.append(buf);
-    //     }
-    //     if (ret == -1)
-    //         _statusCode = INTERNAL_SERVER_ERROR;
-    //     else
-    //         close(fd);
-    //     setStat();
-    //     setContentType();
-    //     setContentLength();
-    //     setDate();
-    // }
+        _route = _config.getErrorFilesRoot().append("/").append(ft_itoa(_statusCode));
+        fd = open(_route.c_str(), O_RDONLY);
+        _body.assign("");
+        while ((ret = read(fd, buf, 1024)) > 0)
+        {
+            buf[ret] = '\0';
+            _body.append(buf);
+        }
+        if (ret == -1)
+            _statusCode = INTERNAL_SERVER_ERROR;
+        else
+            close(fd);
+        setStat();
+        _contentType = "text/html";
+        _charset = "utf-8";
+        setContentLength();
+        setDate();
+    }
 
     std::vector<std::string>::iterator it;
     std::cout << std::endl;
@@ -504,15 +506,37 @@ int         HTTP::getResponse()
     socket.append(_mapCodes.codes[_statusCode]).append("\n");
     socket.append("Server: ").append(_config.getServerSoftware()).append("\n");
     socket.append("Content-Type: ").append(_contentType).append("\n");
-    socket.append("Date: ").append(_date).append("\n");
+    if (_charset.length() > 0)
+        socket.append("Charset: ").append(_charset).append("\n");
     socket.append("Content-Length: ").append(ft_itoa(_contentLength)).append("\n");
+    socket.append("Date: ").append(_date).append("\n");
     if (_statusCode < 300)
     {
-        socket.append("Last-Modified: ").append(_lastModified).append("\n");
-        socket.append("Content-Location: ").append(_contentLocation).append("\n");
+        if (ft_strlen(_lastModified) > 0)
+            socket.append("Last-Modified: ").append(_lastModified).append("\n");
+        if (_contentLocation.length() > 0)
+            socket.append("Content-Location: ").append(_contentLocation).append("\n");
         if (_contentLanguage.length() > 0)
             socket.append("Content-Language: ").append(_contentLanguage).append("\n");
     }
+    else if (_statusCode == METHOD_NOT_ALLOWED)
+    {
+        std::vector<std::string>::iterator itBegin;
+        std::vector<std::string>::iterator itEnd;
+
+        itBegin = _allow.begin();
+        itEnd = _allow.end();
+        socket.append("Allow: ");
+        while (itBegin != itEnd)
+        {
+            socket.append(*itBegin).append(" ");
+            itBegin++;
+        }
+        socket.append("\n");
+    }
+    else if (_statusCode == UNAUTHORIZED)
+        socket.append("WWW-Authenticate: ").append("Basic ").append(_config.getAuth_basic(_location)).append("\n");
+
     socket.append("\n\n");
     socket.append(_body);
 

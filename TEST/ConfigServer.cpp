@@ -8,7 +8,7 @@ _httpVersion("HTTP/1.1"),
 _serverSoftware("SuperServer/1.0"),
 _defaultIndex(0),
 _defaultType("text/plain"),
-_defaultCharset("koi8-r"),
+_defaultCharset("utf-8"),
 _defaultLanguage(0),
 _configFilesRoot("/sgoinfre/goinfre/Perso/pganglof/webserv/config"),
 _errorFilesRoot("/sgoinfre/goinfre/Perso/pganglof/webserv/error"),
@@ -22,9 +22,9 @@ _defaultCgi_methods(0)
     _defaultAllow.push_back("HEAD");
     _defaultLanguage.push_back("en");
     _defaultLanguage.push_back("fr");
-    _defaultIndex.push_back("cgi.bla");
+    // _defaultIndex.push_back("cgi.bla");
     _defaultIndex.push_back("index.html");
-    // _defaultIndex.push_back("index.php");
+    _defaultIndex.push_back("index.php");
 
     //** open mime.types **
     int         ret;
@@ -107,10 +107,11 @@ _defaultCgi_methods(0)
         //** fourth location **
     std::vector<std::string> exe3;
 
-    exe3.push_back("bla");
+    // exe3.push_back("bla");
+    exe3.push_back("php");
 
     Location loc4("/cgi/", "/sgoinfre/goinfre/Perso/pganglof/webserv/www", _defaultAllow, _defaultIndex, _defaultType, 
-    _defaultCharset, _defaultLanguage, "off", "", false, "", exe3, cgi_methods, "/sgoinfre/goinfre/Perso/pganglof/webserv/bin-cgi/ubuntu_cgi_tester");
+    _defaultCharset, _defaultLanguage, "off", "", false, "", exe3, cgi_methods, "/sgoinfre/goinfre/Perso/pganglof/webserv/bin-cgi/cgi_tester");
 
     _locationList["/cgi/"] = loc4;
 
