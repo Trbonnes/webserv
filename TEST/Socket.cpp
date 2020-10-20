@@ -4,7 +4,7 @@ Socket::Socket() :
 _fd(0),
 _addr("127.0.0.1"),
 _method("GET"),
-_requestURI("/images/"),
+_requestURI("/images/index.html"),
 _httpVersion("HTTP/1.1"),
 _contentLength(""),
 _contentLocation(""),

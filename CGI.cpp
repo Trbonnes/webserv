@@ -49,8 +49,8 @@ void        HTTP::cgi_metaVariables()
     _cgi._script_name = _config.getCGI_root(_location);
     _cgi._server_name = _config.getServerName();
     _cgi._server_port = _config.getPort();
-    _cgi._server_protocol = "HTTP/1.1";
-    _cgi._server_software = "SuperServer/1.0";
+    _cgi._server_protocol = _config.getHttpVersion();
+    _cgi._server_software = _config.getServerSoftware();
     setEnv();
     return ;
 }

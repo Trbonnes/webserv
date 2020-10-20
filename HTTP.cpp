@@ -472,16 +472,24 @@ int         HTTP::getResponse()
 
     std::string socket;
 
+
     socket.append(_config.getHttpVersion());
     socket.append(" ");
 
-    // std::cout << "map size: " << _mapCodes.codes.size() << std::endl;
-    socket.append(ft_itoa(_statusCode));
-    socket.append(" ");
-    socket.append(_mapCodes.codes[_statusCode]);
+    socket.append(ft_itoa(_statusCode)).append(" ");
+    socket.append(_mapCodes.codes[_statusCode]).append("\n");
+    socket.append("Server: ").append(_config.getServerSoftware()).append("\n");
+    socket.append("Content-Type: ").append(_contentType).append("\n");
+    socket.append("Date: ").append(_date).append("\n");
+    socket.append("Last-Modified: ").append(_lastModified).append("\n");
+    socket.append("Content-Length: ").append(ft_itoa(_contentLength)).append("\n");
+    if (_contentLanguage.length() > 0)
+        socket.append("Content-Language: ").append("\n");
+    socket.append("\n\n");
+    socket.append(_body);
 
 
-    std::cout << "SOCKET: " << std::endl << socket << std::endl << std::endl;
+    std::cout << "SOCKET: " << std::endl << std::endl << socket << std::endl << std::endl;
 
     return (1);
 }

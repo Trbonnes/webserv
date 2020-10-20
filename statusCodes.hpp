@@ -63,7 +63,46 @@ class  StatusCode
     std::map<int, std::string> codes;
 
     StatusCode() {
+        codes[CONTINUE] = "CONTINUE";
+        codes[SWITCHING_PROTOCOLS] = "SWITCHING_PROTOCOLS";
         codes[OK] = "OK";
+        codes[CREATED] = "CREATED";
+        codes[ACCEPTED] = "ACCEPTED";
+        codes[NON_AUTHORITATIVE_INFORMATION] = "NON_AUTHORITATIVE_INFORMATION";
+        codes[NO_CONTENT] = "NO_CONTENT";
+        codes[RESET_CONTENT] = "RESET_CONTENT";
+        codes[PARTIAL_CONTENT] = "PARTIAL_CONTENT";
+        codes[MULTIPLE_CHOICES] = "MULTIPLE_CHOICES";
+        codes[MOVED_PERMANENTLY] = "MOVED_PERMANENTLY";
+        codes[FOUND] = "FOUND";
+        codes[SEE_OTHER] = "SEE_OTHER";
+        codes[NOT_MODIFIED] = "NOT_MODIFIED";
+        codes[USE_PROXY] = "USE_PROXY";
+        codes[UNUSED] = "UNUSED";
+        codes[TEMPORARY_REDIRECT] = "TEMPORARY_REDIRECT";
+        codes[BAD_REQUEST] = "BAD_REQUEST";
+        codes[UNAUTHORIZED] = "UNAUTHORIZED";
+        codes[PAYMENT_REQUIRED] = "PAYMENT_REQUIRED";
+        codes[FORBIDDEN] = "FORBIDDEN";
+        codes[NOT_FOUND] = "NOT_FOUND";
+        codes[METHOD_NOT_ALLOWED] = "METHOD_NOT_ALLOWED";
+        codes[NOT_ACCEPTABLE] = "NOT_ACCEPTABLE";
+        codes[PROXY_AUTHENTICATION_REQUIRED] = "PROXY_AUTHENTICATION_REQUIRED";
+        codes[REQUEST_TIMEOUT] = "REQUEST_TIMEOUT";
+        codes[CONFLICT] = "CONFLICT";
+        codes[GONE] = "GONE";
+        codes[LENGTH_REQUIRED] = "LENGTH_REQUIRED";
+        codes[PRECONFITION_FAILED] = "PRECONFITION_FAILED";
+        codes[REQUEST_ENTITY_TOO_LARGE] = "REQUEST_ENTITY_TOO_LARGE";
+        codes[REQUEST_URL_TOO_LONG] = "REQUEST_URL_TOO_LONG";
+        codes[REQUESTED_RANGE_NOT_SATISFIABLE] = "REQUESTED_RANGE_NOT_SATISFIABLE";
+        codes[EXPECTATION_FAILED] = "EXPECTATION_FAILED";
+        codes[INTERNAL_SERVER_ERROR] = "INTERNAL_SERVER_ERROR";
+        codes[NOT_IMPLEMENTED] = "NOT_IMPLEMENTED";
+        codes[BAD_GATEWAY] = "BAD_GATEWAY";
+        codes[SERVICE_UNAVAILABLE] = "SERVICE_UNAVAILABLE";
+        codes[GATEWAY_TIMEOUT] = "GATEWAY_TIMEOUT";
+        codes[HTTP_VERSION_NOT_SUPPORTED] = "HTTP_VERSION_NOT_SUPPORTED";
     }
 };
 

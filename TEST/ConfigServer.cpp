@@ -5,6 +5,7 @@ _defaultRoot("/sgoinfre/goinfre/Perso/pganglof/webserv/www"),
 _defaultServerName("localhost"),
 _defaultPort("80"),
 _httpVersion("HTTP/1.1"),
+_serverSoftware("SuperServer/1.0"),
 _defaultIndex(0),
 _defaultType("text/plain"),
 _defaultCharset("koi8-r"),
@@ -122,6 +123,7 @@ ConfigServer::ConfigServer(ConfigServer &copy)
     _defaultServerName = copy._defaultServerName;
     _defaultPort = copy._defaultPort;
     _httpVersion = copy._httpVersion;
+    _serverSoftware = copy._serverSoftware;
     _defaultIndex = copy._defaultIndex;
     _defaultType = copy._defaultType;
     _defaultCharset = copy._defaultCharset;
@@ -146,6 +148,7 @@ ConfigServer                  &ConfigServer::operator=(ConfigServer const &rhs)
     _defaultServerName = rhs._defaultServerName;
     _defaultPort = rhs._defaultPort;
     _httpVersion = rhs._httpVersion;
+    _serverSoftware = rhs._serverSoftware;
     _defaultIndex = rhs._defaultIndex;
     _defaultType = rhs._defaultType;
     _defaultCharset = rhs._defaultCharset;
@@ -208,6 +211,12 @@ std::string             ConfigServer::getHttpVersion()
 {
     return _httpVersion;
 }
+
+std::string             ConfigServer::getServerSoftware()
+{
+    return _serverSoftware;
+}
+
 
 std::vector<std::string>  &ConfigServer::getIndex(std::string location)
 {
