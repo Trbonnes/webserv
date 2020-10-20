@@ -68,7 +68,7 @@ void        HTTP::setContentType()
     std::list<std::string>  mimeTypes;
     std::list<std::string>::iterator it;
 
-    find = _route.find('.', 0);
+    find = _route.find_last_of('.');
     find += 1;
     length = _route.length() - find;
     _contentType = _route.substr(find, length);

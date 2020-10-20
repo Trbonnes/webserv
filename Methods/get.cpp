@@ -59,12 +59,12 @@ std::string     HTTP::acceptLanguage()
             if (itServer != itServerEnd)
             {
                 _contentLanguage = *itServer;
-                str.append(*itServer);
+                str.assign(*itServer);
                 stat(trydir.assign(_route).append(str).c_str(), &dir);
                 if ((dir.st_mode & S_IFMT) == S_IFDIR)
                     return (str);
                 else
-                    return (_contentLanguage.assign(""));
+                    _contentLanguage.assign("");
             }
             itClientBegin++;
         }

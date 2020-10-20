@@ -439,6 +439,29 @@ std::string   HTTP::base64_decode(std::string const& encoded_string) {
 // ** Create the response socket **
 int         HTTP::getResponse()
 {
+    // if (_statusCode >= 300)
+    // {
+    //     int     ret;
+    //     char    buf[1024 + 1];
+    //     int     fd;
+
+    //     _route = _config.getErrorFilesRoot().append("/").append(ft_itoa(_statusCode));
+    //     fd = open(_route.c_str(), O_RDONLY);
+    //     while ((ret = read(fd, buf, 1024)) > 0)
+    //     {
+    //         buf[ret] = '\0';
+    //         _body.append(buf);
+    //     }
+    //     if (ret == -1)
+    //         _statusCode = INTERNAL_SERVER_ERROR;
+    //     else
+    //         close(fd);
+    //     setStat();
+    //     setContentType();
+    //     setContentLength();
+    //     setDate();
+    // }
+
     std::vector<std::string>::iterator it;
     std::cout << std::endl;
 
@@ -468,22 +491,7 @@ int         HTTP::getResponse()
     std::cout << "BODY: " << std::endl << _body << std::endl << std::endl;
 
 
-    if (_statusCode >= 300)
-    {
-        int     ret;
-        char    buf[1024 + 1];
-        int     fd;
-        fd = open(_config.getErrorFilesRoot().append("/").append(ft_itoa(_statusCode)).c_str(), O_RDONLY);
-        while ((ret = read(fd, buf, 1024)) > 0)
-        {
-            buf[ret] = '\0';
-            _body.append(buf);
-        }
-        if (ret == -1)
-            _statusCode = INTERNAL_SERVER_ERROR;
-        else
-            close(fd);
-    }
+
 
 
     std::string socket;
@@ -497,10 +505,14 @@ int         HTTP::getResponse()
     socket.append("Server: ").append(_config.getServerSoftware()).append("\n");
     socket.append("Content-Type: ").append(_contentType).append("\n");
     socket.append("Date: ").append(_date).append("\n");
-    socket.append("Last-Modified: ").append(_lastModified).append("\n");
     socket.append("Content-Length: ").append(ft_itoa(_contentLength)).append("\n");
-    if (_contentLanguage.length() > 0)
-        socket.append("Content-Language: ").append(_contentLanguage).append("\n");
+    if (_statusCode < 300)
+    {
+        socket.append("Last-Modified: ").append(_lastModified).append("\n");
+        socket.append("Content-Location: ").append(_contentLocation).append("\n");
+        if (_contentLanguage.length() > 0)
+            socket.append("Content-Language: ").append(_contentLanguage).append("\n");
+    }
     socket.append("\n\n");
     socket.append(_body);
 

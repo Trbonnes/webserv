@@ -65,8 +65,8 @@ class   ConfigServer
     std::string                 getCharset(std::string location);
     std::vector<std::string>    &getLanguage(std::string location);
     std::vector<std::string>    &getAllow(std::string location);
-    std::list<std::string>      &getMimeTypes();
-    std::string                 getErrorFilesRoot();
+    std::list<std::string>      &getMimeTypes(void);
+    std::string                 getErrorFilesRoot(void);
     std::string                 getLocation(std::string location);
     std::string                 getAuth_basic(std::string location);
     std::string                 getAuth_basic_user_file(std::string location);
