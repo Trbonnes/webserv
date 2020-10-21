@@ -6,7 +6,7 @@
 /*   By: trbonnes <trbonnes@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/14 08:46:39 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/10/21 10:49:10 by trbonnes         ###   ########.fr       */
+/*   Updated: 2020/10/21 10:57:25 by trbonnes         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -175,7 +175,7 @@ std::string		configFileParseServerLocation(std::string parseServer, ConfigServer
 			throw Config::InvalidConfigException();
 
 		if ((pos = s.find("cgi_root")) != s.npos) {
-			pos += 4;
+			pos += 8;
 			checkEndLine(pos, s);
 			while (s[pos] == ' ') { pos++; }
 			i = s.find(";", pos);
@@ -360,7 +360,7 @@ int		configFileParseServerUnit(std::string configFile, std::vector<ConfigServer>
 			throw Config::InvalidConfigException();
 
 		if ((pos = parseServer.find("cgi_root")) != parseServer.npos) {
-			pos += 4;
+			pos += 8;
 			checkEndLine(pos, parseServer);
 			while (parseServer[pos] == ' ') { pos++; }
 			i = parseServer.find(";", pos);
