@@ -6,7 +6,7 @@
 /*   By: trbonnes <trbonnes@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/30 15:45:46 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/10/08 18:05:21 by trbonnes         ###   ########.fr       */
+/*   Updated: 2020/10/21 12:16:48 by trbonnes         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@ int		httpRequestParseChunckedBody(std::string request, Socket *socket, size_t po
 	std::string convert;
 	std::string s = request.substr(pos, request.npos);
 	std::vector<std::string>	bodyV;
+	std::string body;
 
 	try {
 		pos = s.find("\r\n") - 1;
@@ -30,6 +31,12 @@ int		httpRequestParseChunckedBody(std::string request, Socket *socket, size_t po
 			convert = s.substr(pos, 1);
 			chunkSize = std::stol(convert);
 		}
+		for (size_t i = 0; i < bodyV.size(); i++) {
+			body.append(bodyV[i]);
+			body.append("\n");
+		}
+		bodyV.clear();
+		bodyV.push_back(body);
 		socket->setBody(bodyV);
 	}
 	catch (std::exception &e) {

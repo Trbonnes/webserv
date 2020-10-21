@@ -6,7 +6,7 @@
 /*   By: trbonnes <trbonnes@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/30 15:30:52 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/10/09 09:14:20 by trbonnes         ###   ########.fr       */
+/*   Updated: 2020/10/21 12:17:15 by trbonnes         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 
 int main() {
     size_t i = 0;
-	int fd = open("./httpRequestTest", O_RDWR);
+	int fd = open("./httpRequestTestChuncked", O_RDWR);
     Socket *socket = httpRequestParser(fd);
 
     std::cout << "Fd: " << socket->getFd() << std::endl;
