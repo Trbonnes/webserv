@@ -6,13 +6,23 @@
 /*   By: trbonnes <trbonnes@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/14 08:46:39 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/10/19 15:58:17 by trbonnes         ###   ########.fr       */
+/*   Updated: 2020/10/21 09:36:11 by trbonnes         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Config.hpp"
 #include "ConfigServer.hpp"
 #include "Location.hpp"
+
+void	checkEndLine(size_t pos, std::string configFile) {
+	size_t	i;
+
+	for (i = configFile.find("\n", pos); pos < i; pos++) {
+		if (configFile[pos] == ';')
+			return ;
+	}
+	throw Config::InvalidConfigException();
+}
 
 size_t	findClosingBracket(size_t pos, std::string configFile) {
 	size_t	i;
@@ -53,6 +63,7 @@ std::string		configFileParseServerLocation(std::string parseServer, ConfigServer
 	//METHOD
 	if ((pos = s.find("	method")) != s.npos) {
 		i = s.find(";", pos);
+		checkEndLine(pos, s);
 		if (s.substr(pos, i - pos).find("GET") != s.npos)
 			location._allow.push_back("GET");
 		if (s.substr(pos, i - pos).find("HEAD") != s.npos)
@@ -74,6 +85,7 @@ std::string		configFileParseServerLocation(std::string parseServer, ConfigServer
 	//ROOT
 	if ((pos = s.find("root")) != s.npos) {
 		pos += 4;
+		checkEndLine(pos, s);
 		while (s[pos] == ' ') { pos++; }
 		i = s.find(";", pos);
 		location._root = s.substr(pos, i - pos);
@@ -82,6 +94,7 @@ std::string		configFileParseServerLocation(std::string parseServer, ConfigServer
 	//INDEX
 	if ((pos = s.find("	index")) != s.npos) {
 		pos += 6;
+		checkEndLine(pos, s);
 		i = pos;
 		while (s[i] != ';') {
 			while (s[pos] == ' ') { pos++; }
@@ -94,6 +107,7 @@ std::string		configFileParseServerLocation(std::string parseServer, ConfigServer
 
 	//AUTOINDEX
 	if ((pos = s.find("auto_index")) != s.npos) {
+		checkEndLine(pos, s);
 		if ((i = s.find("on", pos)) != s.npos)
 			location._autoindex = true;
 		else if ((i = s.find("off", pos)) != s.npos)
@@ -105,6 +119,7 @@ std::string		configFileParseServerLocation(std::string parseServer, ConfigServer
 	//CLIENTBODYSIZE
 	if ((pos = s.find("client_max_body_size")) != s.npos) {
 		pos += 20;
+		checkEndLine(pos, s);
 		while (s[pos] == ' ') { pos++; }
 		i = s.find(";", pos);
 		location._clientBodySize = std::stoi(s.substr(pos, i - pos));
@@ -113,6 +128,7 @@ std::string		configFileParseServerLocation(std::string parseServer, ConfigServer
 	//ALIAS
 	if ((pos = s.find("alias")) != s.npos) {
 		pos += 5;
+		checkEndLine(pos, s);
 		while (s[pos] == ' ') { pos++; }
 		i = s.find(";", pos);
 		location._alias = s.substr(pos, i - pos);
@@ -121,6 +137,7 @@ std::string		configFileParseServerLocation(std::string parseServer, ConfigServer
 	//CGI
 	if ((pos = s.find("cgi")) != s.npos) {
 		pos += 3;
+		checkEndLine(pos, s);
 		std::string tmp;
 		size_t j;
 		i = s.find(";", pos);
@@ -137,6 +154,7 @@ std::string		configFileParseServerLocation(std::string parseServer, ConfigServer
 
 	if ((pos = s.find("cgi_method")) != s.npos) {
 		i = s.find(";", pos);
+		checkEndLine(pos, s);
 		if (s.substr(pos, i - pos).find("GET") != s.npos)
 			location._cgi_allow.push_back("GET");
 		if (s.substr(pos, i - pos).find("HEAD") != s.npos)
@@ -157,6 +175,7 @@ std::string		configFileParseServerLocation(std::string parseServer, ConfigServer
 
 	if ((pos = s.find("cgi_root")) != s.npos) {
 		pos += 4;
+		checkEndLine(pos, s);
 		while (s[pos] == ' ') { pos++; }
 		i = s.find(";", pos);
 		location._cgi_root = s.substr(pos, i - pos);
@@ -193,6 +212,7 @@ int		configFileParseServerUnit(std::string configFile, std::vector<ConfigServer>
 	//PORT
 	if ((pos = parseServer.find("listen")) != parseServer.npos) {
 		pos += 6;
+		checkEndLine(pos, parseServer);
 		while (parseServer[pos] == ' ') { pos++; }
 		i = parseServer.find(";", pos);
 		v->back().setPort(std::stoi(parseServer.substr(pos, i - pos)));
@@ -206,6 +226,7 @@ int		configFileParseServerUnit(std::string configFile, std::vector<ConfigServer>
 		size_t j;
 		std::vector<std::string> vs;
 		pos += 11;
+		checkEndLine(pos, parseServer);
 		i = parseServer.find(";", pos);
 		while (pos != i) {
 			while (parseServer[pos] == ' ') { pos++; }
@@ -225,6 +246,7 @@ int		configFileParseServerUnit(std::string configFile, std::vector<ConfigServer>
 	if ((pos = parseServer.find("	method")) != parseServer.npos) {
 		std::vector<std::string> allow;
 		i = parseServer.find(";", pos);
+		checkEndLine(pos, parseServer);
 		if (parseServer.substr(pos, i - pos).find("GET") != parseServer.npos)
 			allow.push_back("GET");
 		if (parseServer.substr(pos, i - pos).find("HEAD") != parseServer.npos)
@@ -247,6 +269,7 @@ int		configFileParseServerUnit(std::string configFile, std::vector<ConfigServer>
 	//ROOT
 	if ((pos = parseServer.find("root")) != parseServer.npos) {
 		pos += 4;
+		checkEndLine(pos, parseServer);
 		while (parseServer[pos] == ' ') { pos++; }
 		i = parseServer.find(";", pos);
 		v->back().setRoot(parseServer.substr(pos, i - pos));
@@ -256,6 +279,7 @@ int		configFileParseServerUnit(std::string configFile, std::vector<ConfigServer>
 	if ((pos = parseServer.find("	index")) != parseServer.npos) {
 		std::vector<std::string> vi;
 		pos += 6;
+		checkEndLine(pos, parseServer);
 		i = pos;
 		while (parseServer[i] != ';') {
 			while (parseServer[pos] == ' ') { pos++; }
@@ -269,6 +293,7 @@ int		configFileParseServerUnit(std::string configFile, std::vector<ConfigServer>
 
 	//AUTOINDEX
 	if ((pos = parseServer.find("auto_index")) != parseServer.npos) {
+		checkEndLine(pos, parseServer);
 		if ((i = parseServer.find("on", pos)) != parseServer.npos)
 			v->back().setAutoIndex(true);
 		else if ((i = parseServer.find("off", pos)) != parseServer.npos)
@@ -280,6 +305,7 @@ int		configFileParseServerUnit(std::string configFile, std::vector<ConfigServer>
 	//CLIENTBODYSIZE
 	if ((pos = parseServer.find("client_max_body_size")) != parseServer.npos) {
 		pos += 20;
+		checkEndLine(pos, parseServer);
 		while (parseServer[pos] == ' ') { pos++; }
 		i = parseServer.find(";", pos);
 		v->back().setClientBodySize(std::stoi(parseServer.substr(pos, i - pos)));
@@ -288,6 +314,7 @@ int		configFileParseServerUnit(std::string configFile, std::vector<ConfigServer>
 	//CGI
 	if ((pos = parseServer.find("cgi")) != parseServer.npos) {
 		pos += 3;
+		checkEndLine(pos, parseServer);
 		std::string tmp;
 		size_t j;
 		std::vector<std::string> vc;
@@ -307,6 +334,7 @@ int		configFileParseServerUnit(std::string configFile, std::vector<ConfigServer>
 	if ((pos = parseServer.find("cgi_method")) != parseServer.npos) {
 		std::vector<std::string> vc;
 		i = parseServer.find(";", pos);
+		checkEndLine(pos, parseServer);
 		if (parseServer.substr(pos, i - pos).find("GET") != parseServer.npos)
 			vc.push_back("GET");
 		if (parseServer.substr(pos, i - pos).find("HEAD") != parseServer.npos)
@@ -328,6 +356,7 @@ int		configFileParseServerUnit(std::string configFile, std::vector<ConfigServer>
 
 	if ((pos = parseServer.find("cgi_root")) != parseServer.npos) {
 		pos += 4;
+		checkEndLine(pos, parseServer);
 		while (parseServer[pos] == ' ') { pos++; }
 		i = parseServer.find(";", pos);
 		v->back().setCGI_root(parseServer.substr(pos, i - pos));
@@ -339,6 +368,7 @@ int		configFileParseServerUnit(std::string configFile, std::vector<ConfigServer>
 		while ((pos = parseServer.find("error_page", i)) != parseServer.npos) {
 			std::string page;
 			pos += 10;
+			checkEndLine(pos, parseServer);
 			while (parseServer[pos] == ' ') { pos++; }
 			if ((i = parseServer.find("/", pos)) == parseServer.npos)
 				throw Config::InvalidConfigException();
@@ -372,11 +402,15 @@ int		configFileParseServers(std::string configFile, Config *config) {
 	size_t pos;
 	size_t i;
 
-	i = configFile.find("http");
-	if (i == configFile.npos) {
+	pos = configFile.find("http {");
+	if (pos == configFile.npos) {
 		throw Config::InvalidConfigException();
 	}
-	configFile.erase(0, i);
+	if ((i = findClosingBracket(configFile.find("{", pos), configFile)) == configFile.npos) {
+		throw Config::InvalidConfigException();
+	}
+	configFile.erase(i);
+	configFile.erase(0, pos + 7);
 	
 	if ((pos = configFile.find("server {")) == configFile.npos) {
 		throw Config::InvalidConfigException();
@@ -394,6 +428,7 @@ int		configFileParseWorkers(std::string configFile, Config *config) {
 
 	if ((pos = configFile.find("worker_processes")) == configFile.npos)
 		throw Config::InvalidConfigException();
+	checkEndLine(pos, configFile);
 	while (!isdigit(configFile[pos]) && configFile[pos] != ';') { pos++; }
 	i = pos;
 	while (configFile[i] != ';') { i++; }
@@ -401,6 +436,7 @@ int		configFileParseWorkers(std::string configFile, Config *config) {
 	
 	if (configFile.find("events") != configFile.npos) {
 		pos = configFile.find("worker_connections");
+		checkEndLine(pos, configFile);
 		while (!isdigit(configFile[pos]) && configFile[pos] != ';') { pos++; }
 		i = pos;
 		while (configFile[i] != ';') { i++; }
