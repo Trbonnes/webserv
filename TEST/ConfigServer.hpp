@@ -74,6 +74,7 @@ class   ConfigServer
     std::vector<std::string>    &getCGI(std::string location);
     std::vector<std::string>    &getCGImethods(std::string location);
     std::string                 getCGI_root(std::string location);
+    int                         getClientBodySize(std::string location);
 };
 
 #endif

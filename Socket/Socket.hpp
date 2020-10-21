@@ -37,12 +37,12 @@ class   Socket
     std::string                 _method;
     std::string                 _requestURI;
     std::string                 _httpVersion;
-
+ 
     // HEADERS
 
     std::string	                _contentLength;
     std::string	                _contentLocation;
-    std::vector<std::string>    _contentType;
+    std::string                 _contentType;
     bool                        _multipartContent;
     std::string                 _contentBoundary;
     std::string	                _date;
@@ -66,14 +66,14 @@ class   Socket
     Socket(Socket const &copy);
     ~Socket();
 
-    Socket          &operator=(Socket const &rhs);
+    Socket                      &operator=(Socket const &rhs);
     int             			getFd();
     std::string     			getMethod();
     std::string     			getRequestURI();
     std::string     			gethttpVersion();
     std::string	                getContentLength();
     std::string	                getContentLocation();
-    std::vector<std::string>    &getContentType();
+    std::string                 getContentType();
     bool                        getMultipartContent();
     std::string                 getContentBoundary();
     std::string	                getDate();

@@ -128,9 +128,12 @@ std::string     Socket::getContentLocation()
     return _contentLocation;
 }
 
-std::vector<std::string>     &Socket::getContentType()
+std::string     Socket::getContentType()
 {
-    return _contentType;
+    if (_contentType.size() > 0)
+        return *(_contentType.begin());
+    else
+        return ("");
 }
 
 bool    Socket::getMultipartContent()
