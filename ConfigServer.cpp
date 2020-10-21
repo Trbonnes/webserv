@@ -6,7 +6,7 @@
 /*   By: trbonnes <trbonnes@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/09 15:13:35 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/10/19 15:31:34 by trbonnes         ###   ########.fr       */
+/*   Updated: 2020/10/21 16:37:32 by trbonnes         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -430,6 +430,8 @@ std::string                 ConfigServer::getHTMLErrorPage(int error) {
     std::map<int, std::string>::iterator it;
 
     it = _errorPages.find(error);
+	if (it == _errorPages.end())
+		return ("");
     return it->second;
 }
 

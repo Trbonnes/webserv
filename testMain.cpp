@@ -6,7 +6,7 @@
 /*   By: trbonnes <trbonnes@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/14 09:20:21 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/10/21 10:55:53 by trbonnes         ###   ########.fr       */
+/*   Updated: 2020/10/21 16:40:21 by trbonnes         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,6 +95,8 @@ void	ConfigServer::printServer() {
 	for (auto& x: _errorPages)
 		std::cout << " [" << x.first << ':' << x.second << ']';
 	std::cout << '\n';
+	std::cout << "404 Error code: " << getHTMLErrorPage(404) << std::endl;
+	std::cout << "202 Error code: " << getHTMLErrorPage(202) << std::endl;
 
 	std::cout << "\033[0;35mLocation List: " << _locationList.size() << std::endl;
 	
