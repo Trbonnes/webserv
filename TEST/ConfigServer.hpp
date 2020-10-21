@@ -47,6 +47,9 @@ class   ConfigServer
 	std::vector<std::string>	_defaultCgi_methods;
 	std::string					_defaultCgi_root;
 
+    // PUT
+    std::string                 _putRequestRoot;
+
     public:
 
     ConfigServer();
@@ -76,6 +79,7 @@ class   ConfigServer
     std::vector<std::string>    &getCGImethods(std::string location);
     std::string                 getCGI_root(std::string location);
     int                         getClientBodySize(std::string location);
+    std::string                 getPutRequestRoot(void);
 };
 
 #endif

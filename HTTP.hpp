@@ -127,6 +127,9 @@ class   HTTP
 
     // HEAD
     void            head(void);
+
+    // PUT
+    void            put(void);
     
     // RESPONSE
     void            configureErrorFile(void);

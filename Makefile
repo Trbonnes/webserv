@@ -15,6 +15,7 @@ SRCS =	TEST/main.cpp 					\
 		CGI.cpp							\
 		Methods/get.cpp					\
 		Methods/head.cpp				\
+		Methods/put.cpp 				\
 		setHeaders.cpp
 
 

@@ -16,10 +16,12 @@ _defaultAuth_basic("\"Authorization\""),
 _defaultAuth_basic_user_file("/sgoinfre/goinfre/Perso/pganglof/webserv/config/.htpasswd"),
 _defaultAutoindex(false),
 _defaultMaxBody(-1),
-_defaultCgi_root("/sgoinfre/goinfre/Perso/pganglof/webserv/bin-cgi/cgi_tester")
+_defaultCgi_root("/sgoinfre/goinfre/Perso/pganglof/webserv/bin-cgi/cgi_tester"),
+_putRequestRoot("/sgoinfre/goinfre/Perso/pganglof/webserv/put_files")
 {
     _defaultAllow.push_back("GET");
     _defaultAllow.push_back("HEAD");
+    _defaultAllow.push_back("PUT");
     _defaultLanguage.push_back("en");
     _defaultLanguage.push_back("fr");
     // _defaultIndex.push_back("cgi.bla");
@@ -106,7 +108,7 @@ _defaultCgi_root("/sgoinfre/goinfre/Perso/pganglof/webserv/bin-cgi/cgi_tester")
     Location loc3("/", "/sgoinfre/goinfre/Perso/pganglof/webserv/www",
     _defaultAllow, _defaultIndex,
     _defaultType, _defaultCharset, _defaultLanguage, "off", "", true, "", exe2, cgi_methods, "",
-    5);
+    100);
 
     _locationList["/"] = loc3;
 
@@ -263,6 +265,7 @@ ConfigServer::ConfigServer(ConfigServer &copy)
     _defaultCgi = copy._defaultCgi;
     _defaultCgi_methods = copy._defaultCgi_methods;
     _defaultCgi_root = copy._defaultCgi_root;
+    _putRequestRoot = copy._putRequestRoot;
 }
 
 ConfigServer::~ConfigServer() {}
@@ -289,6 +292,7 @@ ConfigServer                  &ConfigServer::operator=(ConfigServer const &rhs)
     _defaultCgi = rhs._defaultCgi;
     _defaultCgi_methods = rhs._defaultCgi_methods;
     _defaultCgi_root = rhs._defaultCgi_root;
+    _putRequestRoot = rhs._putRequestRoot;
     return *this;
 }
 
@@ -563,4 +567,9 @@ int                  ConfigServer::getClientBodySize(std::string location)
         itBegin++;
     }
     return _defaultMaxBody;   
+}
+
+std::string          ConfigServer::getPutRequestRoot()
+{
+    return _putRequestRoot;
 }

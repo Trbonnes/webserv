@@ -139,6 +139,8 @@ void        HTTP::callMethod(std::string method)
         get();
     else if (method.compare("HEAD") == 0)
         head();
+    else if (method.compare("PUT") == 0)
+        put();
 }
 
 //** Check if the method is authorized for the non CGI locations **
@@ -529,9 +531,11 @@ int         HTTP::getResponse()
     response.append(ft_itoa(_statusCode)).append(" ");
     response.append(_mapCodes.codes[_statusCode]).append("\n");
     response.append("Server: ").append(_config.getServerSoftware()).append("\n");
-    response.append("Content-Type: ").append(_contentType).append("\n");
+    if (_contentType.length() > 0)
+        response.append("Content-Type: ").append(_contentType).append("\n");
     if (_charset.length() > 0)
         response.append("Charset: ").append(_charset).append("\n");
+    if (_contentLength > 0)
     response.append("Content-Length: ").append(ft_itoa(_contentLength)).append("\n");
     if (ft_strlen(_date) > 0)
         response.append("Date: ").append(_date).append("\n");
@@ -541,7 +545,7 @@ int         HTTP::getResponse()
             response.append("Last-Modified: ").append(_lastModified).append("\n");
         if (_contentLocation.length() > 0)
             response.append("Content-Location: ").append(_contentLocation).append("\n");
-        if (_contentLanguage.length() > 0)
+        if (_contentLanguage.length() > 0 && _socket.getMethod().compare("PUT"))
             response.append("Content-Language: ").append(_contentLanguage).append("\n");
     }
     else if (_statusCode == METHOD_NOT_ALLOWED)
