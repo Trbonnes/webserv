@@ -6,7 +6,7 @@
 /*   By: trbonnes <trbonnes@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/09 12:19:51 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/10/19 15:05:38 by trbonnes         ###   ########.fr       */
+/*   Updated: 2020/10/21 10:04:43 by trbonnes         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,6 @@ private:
     int                         _port;
     int                         _defaultClientBodySize;
     std::map<int, std::string>  _errorPages;
-
 
 public:
 	ConfigServer();
