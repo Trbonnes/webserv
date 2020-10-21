@@ -6,7 +6,7 @@
 /*   By: trbonnes <trbonnes@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/14 08:46:39 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/10/21 10:08:04 by trbonnes         ###   ########.fr       */
+/*   Updated: 2020/10/21 10:49:10 by trbonnes         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -135,7 +135,7 @@ std::string		configFileParseServerLocation(std::string parseServer, ConfigServer
 	}
 
 	//CGI
-	if ((pos = s.find("cgi")) != s.npos) {
+	if ((pos = s.find("cgi ")) != s.npos) {
 		pos += 3;
 		checkEndLine(pos, s);
 		std::string tmp;
@@ -150,35 +150,39 @@ std::string		configFileParseServerLocation(std::string parseServer, ConfigServer
 			location._cgi.push_back(s.substr(pos, j - pos));
 			pos = j;
 		}
-	}
 
-	if ((pos = s.find("cgi_method")) != s.npos) {
-		i = s.find(";", pos);
-		checkEndLine(pos, s);
-		if (s.substr(pos, i - pos).find("GET") != s.npos)
-			location._cgi_allow.push_back("GET");
-		if (s.substr(pos, i - pos).find("HEAD") != s.npos)
-			location._cgi_allow.push_back("HEAD");
-		if (s.substr(pos, i - pos).find("POST") != s.npos)
-			location._cgi_allow.push_back("POST");
-		if (s.substr(pos, i - pos).find("PUT") != s.npos)
-			location._cgi_allow.push_back("PUT");
-		if (s.substr(pos, i - pos).find("DELETE") != s.npos)
-			location._cgi_allow.push_back("DELETE");
-		if (s.substr(pos, i - pos).find("CONNECT") != s.npos)
-			location._cgi_allow.push_back("CONNECT");
-		if (s.substr(pos, i - pos).find("OPTIONS") != s.npos)
-			location._cgi_allow.push_back("OPTIONS");
-		if (s.substr(pos, i - pos).find("TRACE") != s.npos)
-			location._cgi_allow.push_back("TRACE");
-	}
+		if ((pos = s.find("cgi_method")) != s.npos) {
+			i = s.find(";", pos);
+			checkEndLine(pos, s);
+			if (s.substr(pos, i - pos).find("GET") != s.npos)
+				location._cgi_allow.push_back("GET");
+			if (s.substr(pos, i - pos).find("HEAD") != s.npos)
+				location._cgi_allow.push_back("HEAD");
+			if (s.substr(pos, i - pos).find("POST") != s.npos)
+				location._cgi_allow.push_back("POST");
+			if (s.substr(pos, i - pos).find("PUT") != s.npos)
+				location._cgi_allow.push_back("PUT");
+			if (s.substr(pos, i - pos).find("DELETE") != s.npos)
+				location._cgi_allow.push_back("DELETE");
+			if (s.substr(pos, i - pos).find("CONNECT") != s.npos)
+				location._cgi_allow.push_back("CONNECT");
+			if (s.substr(pos, i - pos).find("OPTIONS") != s.npos)
+				location._cgi_allow.push_back("OPTIONS");
+			if (s.substr(pos, i - pos).find("TRACE") != s.npos)
+				location._cgi_allow.push_back("TRACE");
+		}
+		else
+			throw Config::InvalidConfigException();
 
-	if ((pos = s.find("cgi_root")) != s.npos) {
-		pos += 4;
-		checkEndLine(pos, s);
-		while (s[pos] == ' ') { pos++; }
-		i = s.find(";", pos);
-		location._cgi_root = s.substr(pos, i - pos);
+		if ((pos = s.find("cgi_root")) != s.npos) {
+			pos += 4;
+			checkEndLine(pos, s);
+			while (s[pos] == ' ') { pos++; }
+			i = s.find(";", pos);
+			location._cgi_root = s.substr(pos, i - pos);
+		}
+		else
+			throw Config::InvalidConfigException();
 	}
 
 	server->insertLocation(location._location, location);
@@ -312,7 +316,7 @@ int		configFileParseServerUnit(std::string configFile, std::vector<ConfigServer>
 	}
 
 	//CGI
-	if ((pos = parseServer.find("cgi")) != parseServer.npos) {
+	if ((pos = parseServer.find("cgi ")) != parseServer.npos) {
 		pos += 3;
 		checkEndLine(pos, parseServer);
 		std::string tmp;
@@ -329,37 +333,41 @@ int		configFileParseServerUnit(std::string configFile, std::vector<ConfigServer>
 			pos = j;
 		}
 		v->back().setCGI(vc);
-	}
 
-	if ((pos = parseServer.find("cgi_method")) != parseServer.npos) {
-		std::vector<std::string> vc;
-		i = parseServer.find(";", pos);
-		checkEndLine(pos, parseServer);
-		if (parseServer.substr(pos, i - pos).find("GET") != parseServer.npos)
-			vc.push_back("GET");
-		if (parseServer.substr(pos, i - pos).find("HEAD") != parseServer.npos)
-			vc.push_back("HEAD");
-		if (parseServer.substr(pos, i - pos).find("POST") != parseServer.npos)
-			vc.push_back("POST");
-		if (parseServer.substr(pos, i - pos).find("PUT") != parseServer.npos)
-			vc.push_back("PUT");
-		if (parseServer.substr(pos, i - pos).find("DELETE") != parseServer.npos)
-			vc.push_back("DELETE");
-		if (parseServer.substr(pos, i - pos).find("CONNECT") != parseServer.npos)
-			vc.push_back("CONNECT");
-		if (parseServer.substr(pos, i - pos).find("OPTIONS") != parseServer.npos)
-			vc.push_back("OPTIONS");
-		if (parseServer.substr(pos, i - pos).find("TRACE") != parseServer.npos)
-			vc.push_back("TRACE");
-		v->back().setCGI_allow(vc);
-	}
+		if ((pos = parseServer.find("cgi_method")) != parseServer.npos) {
+			std::vector<std::string> vc;
+			i = parseServer.find(";", pos);
+			checkEndLine(pos, parseServer);
+			if (parseServer.substr(pos, i - pos).find("GET") != parseServer.npos)
+				vc.push_back("GET");
+			if (parseServer.substr(pos, i - pos).find("HEAD") != parseServer.npos)
+				vc.push_back("HEAD");
+			if (parseServer.substr(pos, i - pos).find("POST") != parseServer.npos)
+				vc.push_back("POST");
+			if (parseServer.substr(pos, i - pos).find("PUT") != parseServer.npos)
+				vc.push_back("PUT");
+			if (parseServer.substr(pos, i - pos).find("DELETE") != parseServer.npos)
+				vc.push_back("DELETE");
+			if (parseServer.substr(pos, i - pos).find("CONNECT") != parseServer.npos)
+				vc.push_back("CONNECT");
+			if (parseServer.substr(pos, i - pos).find("OPTIONS") != parseServer.npos)
+				vc.push_back("OPTIONS");
+			if (parseServer.substr(pos, i - pos).find("TRACE") != parseServer.npos)
+				vc.push_back("TRACE");
+			v->back().setCGI_allow(vc);
+		}
+		else
+			throw Config::InvalidConfigException();
 
-	if ((pos = parseServer.find("cgi_root")) != parseServer.npos) {
-		pos += 4;
-		checkEndLine(pos, parseServer);
-		while (parseServer[pos] == ' ') { pos++; }
-		i = parseServer.find(";", pos);
-		v->back().setCGI_root(parseServer.substr(pos, i - pos));
+		if ((pos = parseServer.find("cgi_root")) != parseServer.npos) {
+			pos += 4;
+			checkEndLine(pos, parseServer);
+			while (parseServer[pos] == ' ') { pos++; }
+			i = parseServer.find(";", pos);
+			v->back().setCGI_root(parseServer.substr(pos, i - pos));
+		}
+		else
+			throw Config::InvalidConfigException();
 	}
 
 	//ERROR PAGES
