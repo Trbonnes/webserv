@@ -268,6 +268,7 @@ std::vector<std::string>    &ConfigServer::getLanguage(std::string location)
     std::map<std::string, Location, Compare<std::string> >::iterator itBegin;
     std::map<std::string, Location, Compare<std::string> >::iterator itEnd;  
 
+    std::cout << "LOcation:" << location << std::endl;
     itBegin = _locationList.begin();
     itEnd = _locationList.end();
     while (itBegin != itEnd)

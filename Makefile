@@ -1,7 +1,9 @@
 SRCS =	TEST/main.cpp 					\
 		TEST/ConfigServer.cpp			\
 		TEST/Location.cpp				\
-		TEST/Socket.cpp					\
+		Socket/httpRequestParser.cpp	\
+		Socket/parseHeaders.cpp			\
+		Socket/Socket.cpp				\
 		utils/get_next_line.cpp 		\
 		utils/ft_strcpy.cpp				\
 		utils/ft_strlen.cpp				\
@@ -15,12 +17,9 @@ SRCS =	TEST/main.cpp 					\
 		Methods/head.cpp				\
 		setHeaders.cpp
 
-		# Socket/httpRequestParser.cpp	\
-		# Socket/parseHeaders.cpp			\
-		# Socket/Socket.cpp
 
 OBJS = $(SRCS:.cpp=.o)
-NAME = meth
+NAME = Server
 RM = rm -f
 CC = clang++
 CFLAGS = -Wall -Wextra -Werror  -fsanitize=address -g3 #-lcrypt

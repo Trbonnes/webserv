@@ -62,6 +62,7 @@ std::string     HTTP::acceptLanguage()
             {
                 _contentLanguage = *itServer;
                 str.assign(*itServer);
+                str.append("/");
                 stat(trydir.assign(_route).append(str).c_str(), &dir);
                 if ((dir.st_mode & S_IFMT) == S_IFDIR)
                     return (str);

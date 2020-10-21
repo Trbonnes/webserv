@@ -13,7 +13,8 @@
 # include <fcntl.h>
 # include <algorithm>
 # include <stack>
-# include "TEST/Socket.hpp"
+// # include "TEST/Socket.hpp"
+# include "Socket/Socket.hpp"
 # include "TEST/ConfigServer.hpp"
 # include "utils/utils.hpp"
 # include "statusCodes.hpp"
@@ -128,7 +129,7 @@ class   HTTP
     void            head(void);
 
     public:
-    HTTP(Socket &socket, ConfigServer &config);
+    HTTP(Socket *socket, ConfigServer &config);
     HTTP(HTTP &copy);
     ~HTTP();
 

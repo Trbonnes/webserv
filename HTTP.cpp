@@ -28,8 +28,8 @@ _retryAfter(""),
 _transferEncoding(""),
 _body("") {}
 
-HTTP::HTTP(Socket &socket, ConfigServer &config) :
-_socket(socket),
+HTTP::HTTP(Socket *socket, ConfigServer &config) :
+_socket(*socket),
 _config(config),
 _mapCodes(),
 _cgi(),
@@ -58,6 +58,7 @@ _body("")
 
     ft_bzero(_cgi_env, sizeof(_cgi_env));
     _uri = _socket.getRequestURI();
+    std::cout << _socket.getRequestURI() << std::endl;
     setLocation();
     replaceURI(); 
     if (_config.getCGI_root(_location).length() > 0 && checkCGImethods(_socket.getMethod())) // HEAD a tester --> est ce quil faut transformer HEAD en GET avec CGI ?

@@ -1,6 +1,9 @@
 #ifndef STATUSCODES_HPP
 # define STATUSCODES_HPP
 
+# include <map>
+# include <iostream>
+
 // INFORMATIONAL
 
 # define CONTINUE                           100

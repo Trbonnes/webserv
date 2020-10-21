@@ -17,7 +17,6 @@ class   ConfigServer
 {
     private:
 
-
     // Server Software 
     std::string                 _httpVersion;
     std::string                 _serverSoftware;

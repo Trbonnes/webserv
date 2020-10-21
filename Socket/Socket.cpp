@@ -153,12 +153,12 @@ std::string     Socket::getTransferEncoding()
     return _transferEncoding;
 }
 
-std::vector<std::string>     Socket::getAcceptCharset()
+std::vector<std::string>     &Socket::getAcceptCharset()
 {
     return _acceptCharset;
 }
 
-std::vector<std::string>     Socket::getAcceptLanguage()
+std::vector<std::string>     &Socket::getAcceptLanguage()
 {
     return _acceptLanguage;
 }
@@ -187,8 +187,6 @@ std::vector<std::string>     Socket::getBody()
 {
     return _body;
 }
-
-
 
 void	Socket::setFd(int fd) {
 	_fd = fd;
@@ -262,4 +260,9 @@ void	Socket::setReferer(std::string Referer) {
 
 void	Socket::setBody(std::vector<std::string> Body) {
 	_body = Body;
+}
+
+std::string     Socket::getRemoteAddr()
+{
+    return _addr;
 }

@@ -30,6 +30,8 @@ class   Socket
 
     int                         _fd;
 
+    std::string                 _addr;
+
     // REQUEST LINE
 
     std::string                 _method;
@@ -76,13 +78,14 @@ class   Socket
     std::string                 getContentBoundary();
     std::string	                getDate();
     std::string	                getTransferEncoding();
-    std::vector<std::string>	getAcceptCharset();
-    std::vector<std::string>	getAcceptLanguage();
+    std::vector<std::string>	&getAcceptCharset();
+    std::vector<std::string>	&getAcceptLanguage();
     std::string	                getAuthorization();
     std::string	                getHost();
     std::string	                getUserAgent();
 	std::string	                getReferer();
     std::vector<std::string>    getBody();
+    std::string                 getRemoteAddr();
 
 
     void	setFd(int fd);
