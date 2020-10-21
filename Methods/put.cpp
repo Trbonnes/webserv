@@ -18,6 +18,8 @@ void        HTTP::put()
     }
     else
     {
+        _route = _contentLocation;
+        setStat();
         _statusCode = NO_CONTENT;
         
     }
