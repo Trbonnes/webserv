@@ -18,7 +18,7 @@ _cgi_root("") {}
 Location::Location(std::string location, std::string root, std::vector<std::string> allow,
 std::vector<std::string> index, std::string type, std::string charset, std::vector<std::string> language,
 std::string auth_basic, std::string auth_basic_user_file, bool autoindex, std::string alias,
-std::vector<std::string> cgi, std::vector<std::string> cgi_methods, std::string cgi_root) :
+std::vector<std::string> cgi, std::vector<std::string> cgi_methods, std::string cgi_root, int maxBody) :
 _location(location),
 _root(root),
 _allow(allow),
@@ -32,6 +32,7 @@ _autoindex(autoindex),
 _alias(alias),
 _cgi(cgi),
 _cgi_methods(cgi_methods),
-_cgi_root(cgi_root) {}
+_cgi_root(cgi_root),
+_maxBody(maxBody) {}
 
 Location::~Location() {}

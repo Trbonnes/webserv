@@ -101,6 +101,7 @@ int         HTTP::is_good_exe(std::string exe)
             }
         }
     }
+    std::cout << " == 0 " << std::endl;
     return (0);
 }
 

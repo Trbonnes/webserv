@@ -58,21 +58,34 @@ _body("")
 
     ft_bzero(_cgi_env, sizeof(_cgi_env));
     _uri = _socket.getRequestURI();
-    std::cout << _socket.getRequestURI() << std::endl;
     setLocation();
     replaceURI(); 
-    if (_config.getCGI_root(_location).length() > 0 && checkCGImethods(_socket.getMethod())) // HEAD a tester --> est ce quil faut transformer HEAD en GET avec CGI ?
+
+    setRoot();
+    extension = _route.find_last_of('.');
+    if (is_good_exe(str.assign(_route).erase(0, extension + 1)) && checkCGImethods(_socket.getMethod()))
     {
-        setRoot();
         cgi_metaVariables();
-        extension = _route.find_last_of('.');
-        if (is_good_exe(str.assign(_route).erase(0, extension + 1)))
-            cgi_exe();
-        else
-            _statusCode = BAD_REQUEST;
+        cgi_exe();
     }
     else if (checkAllowMethods(_socket.getMethod()))
         callMethod(_socket.getMethod());
+    else
+        _statusCode = BAD_REQUEST;
+
+
+    // if (_config.getCGI_root(_location).length() > 0 && checkCGImethods(_socket.getMethod())) // HEAD a tester --> est ce quil faut transformer HEAD en GET avec CGI ?
+    // {
+    //     setRoot();
+    //     cgi_metaVariables();
+    //     extension = _route.find_last_of('.');
+    //     if (is_good_exe(str.assign(_route).erase(0, extension + 1)))
+    //         cgi_exe();
+    //     else
+    //         _statusCode = BAD_REQUEST;
+    // }
+    // else if (checkAllowMethods(_socket.getMethod()))
+    //     callMethod(_socket.getMethod());
 }
 
 HTTP::HTTP(HTTP &copy)
@@ -448,21 +461,32 @@ int         HTTP::getResponse()
 
         _route = _config.getErrorFilesRoot().append("/").append(ft_itoa(_statusCode));
         fd = open(_route.c_str(), O_RDONLY);
-        _body.assign("");
-        while ((ret = read(fd, buf, 1024)) > 0)
+        if (fd == -1)
         {
-            buf[ret] = '\0';
-            _body.append(buf);
+            _body.assign("<!DOCTYPE html>\n<html>\n<body>\n\n<h1>");
+            _body.append(ft_itoa(_statusCode)).append(" ").append(_mapCodes.codes[_statusCode]);
+            _body.append("</h1>\n\n</body>\n</html>\n");
+            _contentType = "text/html";
+            _charset = "utf-8";
+            _contentLength = _body.length();
         }
-        if (ret == -1)
-            _statusCode = INTERNAL_SERVER_ERROR;
         else
-            close(fd);
-        setStat();
-        _contentType = "text/html";
-        _charset = "utf-8";
-        setContentLength();
-        setDate();
+        {
+            _body.assign("");
+            while ((ret = read(fd, buf, 1024)) > 0)
+            {
+                buf[ret] = '\0';
+                _body.append(buf);
+            }
+            if (ret == -1)
+                _statusCode = INTERNAL_SERVER_ERROR;
+            else
+                close(fd);
+            setStat();
+            setContentType();
+            setContentLength();
+            setDate();
+        }
     }
 
     std::vector<std::string>::iterator it;
@@ -510,7 +534,8 @@ int         HTTP::getResponse()
     if (_charset.length() > 0)
         socket.append("Charset: ").append(_charset).append("\n");
     socket.append("Content-Length: ").append(ft_itoa(_contentLength)).append("\n");
-    socket.append("Date: ").append(_date).append("\n");
+    if (ft_strlen(_date) > 0)
+        socket.append("Date: ").append(_date).append("\n");
     if (_statusCode < 300)
     {
         if (ft_strlen(_lastModified) > 0)

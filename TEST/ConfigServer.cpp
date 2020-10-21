@@ -1,7 +1,7 @@
 #include "ConfigServer.hpp"
 
 // ConfigServer::ConfigServer() :
-// _defaultRoot("/sgoinfre/goinfre/Perso/pganglof/webserv/www"),
+// _defaultRoot("/sgoinfre/goinfre/Perso/pganglof/webserv/YoupiBanane"),
 // _defaultServerName("localhost"),
 // _defaultPort("80"),
 // _httpVersion("HTTP/1.1"),
@@ -77,7 +77,7 @@
 //     cgi_methods.push_back("DELETE");
 //     index.push_back("index.php");
 
-//     Location loc1("/data/", "/sgoinfre/goinfre/Perso/pganglof/webserv/www",
+//     Location loc1("/data/", "/sgoinfre/goinfre/Perso/pganglof/webserv/YoupiBanane",
 //     _defaultAllow, index,
 //     "text/html", "utf-8", _defaultLanguage, _defaultAuth_basic, _defaultAuth_basic_user_file, _defaultAutoindex, "/blabla/", exe, cgi_methods, "");
 
@@ -89,7 +89,7 @@
 
 //     index2.push_back("42.png");
 
-//     Location loc2("/images/", "/sgoinfre/goinfre/Perso/pganglof/webserv/www",
+//     Location loc2("/images/", "/sgoinfre/goinfre/Perso/pganglof/webserv/YoupiBanane",
 //     _defaultAllow, index2,
 //     "text/html", "", _defaultLanguage, "off", "", _defaultAutoindex, "", exe1, cgi_methods, "");
 
@@ -98,7 +98,7 @@
 //         //** third location **
 //     std::vector<std::string> exe2;
 
-//     Location loc3("/", "/sgoinfre/goinfre/Perso/pganglof/webserv/www",
+//     Location loc3("/", "/sgoinfre/goinfre/Perso/pganglof/webserv/YoupiBanane",
 //     _defaultAllow, _defaultIndex,
 //     _defaultType, _defaultCharset, _defaultLanguage, "off", "", true, "", exe2, cgi_methods, "");
 
@@ -110,7 +110,7 @@
 //     // exe3.push_back("bla");
 //     exe3.push_back("php");
 
-//     Location loc4("/cgi/", "/sgoinfre/goinfre/Perso/pganglof/webserv/www", _defaultAllow, _defaultIndex, _defaultType, 
+//     Location loc4("/cgi/", "/sgoinfre/goinfre/Perso/pganglof/webserv/YoupiBanane", _defaultAllow, _defaultIndex, _defaultType, 
 //     _defaultCharset, _defaultLanguage, "off", "", false, "", exe3, cgi_methods, "/sgoinfre/goinfre/Perso/pganglof/webserv/bin-cgi/cgi_tester");
 
 //     _locationList["/cgi/"] = loc4;
@@ -119,7 +119,7 @@
 
 
 ConfigServer::ConfigServer() :
-_defaultRoot("/sgoinfre/goinfre/Perso/pganglof/webserv/www"),
+_defaultRoot("/sgoinfre/goinfre/Perso/pganglof/webserv/YoupiBanane"),
 _defaultServerName("localhost"),
 _defaultPort("80"),
 _httpVersion("HTTP/1.1"),
@@ -132,7 +132,9 @@ _configFilesRoot("/sgoinfre/goinfre/Perso/pganglof/webserv/config"),
 _errorFilesRoot("/sgoinfre/goinfre/Perso/pganglof/webserv/error"),
 _defaultAuth_basic("\"Authorization\""),
 _defaultAuth_basic_user_file("/sgoinfre/goinfre/Perso/pganglof/webserv/config/.htpasswd"),
-_defaultAutoindex(false)
+_defaultAutoindex(false),
+_defaultMaxBody(-1),
+_defaultCgi_root("/sgoinfre/goinfre/Perso/pganglof/webserv/bin-cgi/cgi_tester")
 {
     _defaultAllow.push_back("GET");
     _defaultAllow.push_back("HEAD");
@@ -143,7 +145,7 @@ _defaultAutoindex(false)
     _defaultIndex.push_back("index.php");
 
     _defaultCgi.push_back("bla");
-    _defaultCgi_methods.push_back("PoST");
+    _defaultCgi_methods.push_back("POST");
 
     //** open mime.types **
     int         ret;
@@ -152,7 +154,7 @@ _defaultAutoindex(false)
     std::string string;
     std::string file;
     std::list<std::string>::iterator it;
-    std::string::iterator s_it;
+    std::string::iterator   s_it;
 
     file.append(_configFilesRoot);
     file.append("/mime.types");
@@ -189,9 +191,10 @@ _defaultAutoindex(false)
 
     allow1.push_back("GET");
 
-    Location loc1("/", "/sgoinfre/goinfre/Perso/pganglof/webserv/www",
+    Location loc1("/", "/sgoinfre/goinfre/Perso/pganglof/webserv/YoupiBanane",
     allow1, _defaultIndex,
-    _defaultType, _defaultCharset, _defaultLanguage, "off", "", true, "", _defaultCgi, _defaultCgi_methods, "");
+    _defaultType, _defaultCharset, _defaultLanguage, "off", "", true, "", _defaultCgi, _defaultCgi_methods, _defaultCgi_root,
+    _defaultMaxBody);
 
     _locationList["/"] = loc1;
 
@@ -200,8 +203,9 @@ _defaultAutoindex(false)
 
     allow2.push_back("PUT");
 
-    Location loc2("/put_test/*", "/sgoinfre/goinfre/Perso/pganglof/webserv/www", allow2, _defaultIndex, _defaultType, 
-    _defaultCharset, _defaultLanguage, "off", "", false, "", _defaultCgi, _defaultCgi_methods, "");
+    Location loc2("/put_test/*", "/sgoinfre/goinfre/Perso/pganglof/webserv/YoupiBanane", allow2, _defaultIndex, _defaultType, 
+    _defaultCharset, _defaultLanguage, "off", "", false, "", _defaultCgi, _defaultCgi_methods, _defaultCgi_root,
+    _defaultMaxBody);
 
     _locationList["/put_test/"] = loc2;
 
@@ -210,8 +214,8 @@ _defaultAutoindex(false)
 
     allow3.push_back("POST");
 
-    Location loc3("/post_body", "/sgoinfre/goinfre/Perso/pganglof/webserv/www", allow3, _defaultIndex, _defaultType, 
-    _defaultCharset, _defaultLanguage, "off", "", false, "", _defaultCgi, _defaultCgi_methods, "");
+    Location loc3("/post_body", "/sgoinfre/goinfre/Perso/pganglof/webserv/YoupiBanane", allow3, _defaultIndex, _defaultType, 
+    _defaultCharset, _defaultLanguage, "off", "", false, "", _defaultCgi, _defaultCgi_methods, _defaultCgi_root, 100);
 
     _locationList["/post_body"] = loc3;
 
@@ -223,7 +227,8 @@ _defaultAutoindex(false)
     index.push_back("youpi.bad_extension");
 
     Location loc4("/directory/", "/sgoinfre/goinfre/Perso/pganglof/webserv/YoupiBanane", allow4, index, _defaultType, 
-    _defaultCharset, _defaultLanguage, "off", "", false, "", _defaultCgi, _defaultCgi_methods, "");
+    _defaultCharset, _defaultLanguage, "off", "", false, "", _defaultCgi, _defaultCgi_methods, _defaultCgi_root, 
+    _defaultMaxBody);
 
     _locationList["/directory/"] = loc4;
 
@@ -250,7 +255,7 @@ ConfigServer::ConfigServer(ConfigServer &copy)
     _defaultAutoindex = copy._defaultAutoindex;
     _defaultCgi = copy._defaultCgi;
     _defaultCgi_methods = copy._defaultCgi_methods;
-    _cgi_root = copy._cgi_root;
+    _defaultCgi_root = copy._defaultCgi_root;
 }
 
 ConfigServer::~ConfigServer() {}
@@ -276,7 +281,7 @@ ConfigServer                  &ConfigServer::operator=(ConfigServer const &rhs)
     _defaultAutoindex = rhs._defaultAutoindex;
     _defaultCgi = rhs._defaultCgi;
     _defaultCgi_methods = rhs._defaultCgi_methods;
-    _cgi_root = rhs._cgi_root;
+    _defaultCgi_root = rhs._defaultCgi_root;
     return *this;
 }
 
@@ -380,7 +385,6 @@ std::vector<std::string>    &ConfigServer::getLanguage(std::string location)
     std::map<std::string, Location, Compare<std::string> >::iterator itBegin;
     std::map<std::string, Location, Compare<std::string> >::iterator itEnd;  
 
-    std::cout << "LOcation:" << location << std::endl;
     itBegin = _locationList.begin();
     itEnd = _locationList.end();
     while (itBegin != itEnd)
@@ -535,5 +539,5 @@ std::string             ConfigServer::getCGI_root(std::string location)
             return (itBegin->second._cgi_root);
         itBegin++;
     }
-    return "";   
+    return _defaultCgi_root;   
 }

@@ -6,7 +6,7 @@ void        HTTP::get()
     int         find;
     int         fd;
 
-    setRoot();
+    // setRoot();
     fd = openFile();
     if (_statusCode == OK)
     {

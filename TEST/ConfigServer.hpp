@@ -40,11 +40,12 @@ class   ConfigServer
     std::string                 _defaultAuth_basic;
     std::string                 _defaultAuth_basic_user_file;
     bool                        _defaultAutoindex;
+    int                         _defaultMaxBody;
 
     // CGI
 	std::vector<std::string>	_defaultCgi;
 	std::vector<std::string>	_defaultCgi_methods;
-	std::string					_cgi_root;
+	std::string					_defaultCgi_root;
 
     public:
 
