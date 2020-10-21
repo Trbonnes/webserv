@@ -6,7 +6,7 @@
 /*   By: trbonnes <trbonnes@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/30 15:30:52 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/10/21 12:17:15 by trbonnes         ###   ########.fr       */
+/*   Updated: 2020/10/21 14:10:59 by trbonnes         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 
 int main() {
     size_t i = 0;
-	int fd = open("./httpRequestTestChuncked", O_RDWR);
+	int fd = open("./httpRequestTest", O_RDWR);
     Socket *socket = httpRequestParser(fd);
 
     std::cout << "Fd: " << socket->getFd() << std::endl;
@@ -24,11 +24,7 @@ int main() {
 	std::cout << "URI: " << socket->getRequestURI() << std::endl;
     std::cout << "Version: " << socket->getHttpVersion() << std::endl;
 
-    std::cout << "ContentType: " << std::endl;
-    while (i < socket->getContentType().size()){
-        std::cout << socket->getContentType()[i] << std::endl;
-        i++;
-    }
+    std::cout << "ContentType: " << socket->getContentType() << std::endl;
     std::cout << "getDate: " << socket->getDate() << std::endl;
     std::cout << "TransferEncoding: " << socket->getTransferEncoding() << std::endl;
     i = 0;
@@ -51,9 +47,5 @@ int main() {
     std::cout << "ContentLocation: " << socket->getContentLocation() << std::endl;
     std::cout << "ContentLength: " << socket->getContentLength() << std::endl;
     i = 0;
-    std::cout << "Body: " << std::endl;
-    while (i < socket->getBody().size()){
-        std::cout << socket->getBody()[i] << std::endl;
-        i++;
-    }
+    std::cout << "Body: " << std::endl << socket->getBody() << std::endl;
 }

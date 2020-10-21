@@ -6,7 +6,7 @@
 /*   By: trbonnes <trbonnes@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/30 15:10:55 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/10/02 12:42:31 by trbonnes         ###   ########.fr       */
+/*   Updated: 2020/10/21 14:03:09 by trbonnes         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -128,7 +128,7 @@ std::string     Socket::getContentLocation()
     return _contentLocation;
 }
 
-std::vector<std::string>     Socket::getContentType()
+std::string     Socket::getContentType()
 {
     return _contentType;
 }
@@ -183,7 +183,7 @@ std::string Socket::getReferer()
 	return _referer;
 }
 
-std::vector<std::string>     Socket::getBody()
+std::string     Socket::getBody()
 {
     return _body;
 }
@@ -214,7 +214,7 @@ void	Socket::setContentLocation(std::string ContentLocation) {
 	_contentLocation = ContentLocation;
 }
 
-void	Socket::setContentType(std::vector<std::string> ContentType) {
+void	Socket::setContentType(std::string ContentType) {
 	_contentType = ContentType;
 }
 
@@ -260,6 +260,6 @@ void	Socket::setReferer(std::string Referer) {
 	_referer = Referer;
 }
 
-void	Socket::setBody(std::vector<std::string> Body) {
+void	Socket::setBody(std::string Body) {
 	_body = Body;
 }

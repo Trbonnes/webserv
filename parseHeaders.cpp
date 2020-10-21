@@ -6,7 +6,7 @@
 /*   By: trbonnes <trbonnes@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/30 18:55:18 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/10/02 13:25:35 by trbonnes         ###   ########.fr       */
+/*   Updated: 2020/10/21 14:01:43 by trbonnes         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,18 +112,21 @@ void ParseContentLocation(Socket *socket, std::string request, size_t pos) {
 }
 
 void ParseContentType(Socket *socket, std::string request, size_t pos) {
-	std::vector<std::string> v;
+	//std::vector<std::string> v;
 	std::string s = ParseStdHeaders(request, pos);
-	pos = s.find("multipart");
-	if (pos == s.npos)
-		socket->setMultipartContent(false);
-	else {
-		socket->setMultipartContent(true);
-		pos = s.find("boundary=");
-		socket->setContentBoundary(s.substr(pos + 9, s.npos));
-	}
-	v.push_back(s);
-	socket->setContentType(v);
+
+	//FOR MULPART BODY : NOT USEFUL IN OUR IMPLEMENTATION
+	// pos = s.find("multipart");
+	// if (pos == s.npos)
+	// 	socket->setMultipartContent(false);
+	// else {
+	// 	socket->setMultipartContent(true);
+	// 	pos = s.find("boundary=");
+	// 	socket->setContentBoundary(s.substr(pos + 9, s.npos));
+	// }
+	// v.push_back(s);
+
+	socket->setContentType(s);
 }
 
 void ParseDate(Socket *socket, std::string request, size_t pos) {

@@ -40,7 +40,7 @@ class   Socket
 
     std::string	                _contentLength;
     std::string	                _contentLocation;
-    std::vector<std::string>    _contentType;
+    std::string   				_contentType;
     bool                        _multipartContent;
     std::string                 _contentBoundary;
     std::string	                _date;
@@ -54,7 +54,7 @@ class   Socket
 
     // BODY
 
-    std::vector<std::string>     _body;
+    std::string					_body;
 
     // PRIVATE FUNCTIONS
 
@@ -71,7 +71,7 @@ class   Socket
     std::string     			getHttpVersion();
     std::string	                getContentLength();
     std::string	                getContentLocation();
-    std::vector<std::string>    getContentType();
+    std::string					getContentType();
     bool                        getMultipartContent();
     std::string                 getContentBoundary();
     std::string	                getDate();
@@ -82,7 +82,7 @@ class   Socket
     std::string	                getHost();
     std::string	                getUserAgent();
 	std::string	                getReferer();
-    std::vector<std::string>    getBody();
+    std::string					getBody();
 
 
     void	setFd(int fd);
@@ -91,7 +91,7 @@ class   Socket
     void	setHttpVersion(std::string httpVersion);
     void	setContentLength(std::string ContentLength);
     void	setContentLocation(std::string ContentLocation);
-    void	setContentType(std::vector<std::string> ContentType);
+    void	setContentType(std::string ContentType);
     void    setMultipartContent(bool multipart);
     void    setContentBoundary(std::string boundary);
     void	setDate(std::string Date);
@@ -102,7 +102,7 @@ class   Socket
     void	setHost(std::string Host);
     void	setUserAgent(std::string UserAgent);
 	void	setReferer(std::string Referer);
-    void	setBody(std::vector<std::string> Body);
+    void	setBody(std::string sBody);
 };
 
 Socket	*httpRequestParser(int fd);
