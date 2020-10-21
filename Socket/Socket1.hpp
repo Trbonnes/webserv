@@ -37,12 +37,12 @@ class   Socket
     std::string                 _method;
     std::string                 _requestURI;
     std::string                 _httpVersion;
-
+ 
     // HEADERS
 
     std::string	                _contentLength;
     std::string	                _contentLocation;
-    std::string   				_contentType;
+    std::string                 _contentType;
     bool                        _multipartContent;
     std::string                 _contentBoundary;
     std::string	                _date;
@@ -56,7 +56,7 @@ class   Socket
 
     // BODY
 
-    std::string					_body;
+    std::vector<std::string>    _body;
 
     // PRIVATE FUNCTIONS
 
@@ -70,10 +70,10 @@ class   Socket
     int             			getFd();
     std::string     			getMethod();
     std::string     			getRequestURI();
-    std::string     			getHttpVersion();
+    std::string     			gethttpVersion();
     std::string	                getContentLength();
     std::string	                getContentLocation();
-    std::string					getContentType();
+    std::string                 getContentType();
     bool                        getMultipartContent();
     std::string                 getContentBoundary();
     std::string	                getDate();
@@ -84,7 +84,7 @@ class   Socket
     std::string	                getHost();
     std::string	                getUserAgent();
 	std::string	                getReferer();
-    std::string					getBody();
+    std::vector<std::string>    &getBody();
     std::string                 getRemoteAddr();
 
 
@@ -94,7 +94,7 @@ class   Socket
     void	setHttpVersion(std::string httpVersion);
     void	setContentLength(std::string ContentLength);
     void	setContentLocation(std::string ContentLocation);
-    void	setContentType(std::string ContentType);
+    void	setContentType(std::vector<std::string> ContentType);
     void    setMultipartContent(bool multipart);
     void    setContentBoundary(std::string boundary);
     void	setDate(std::string Date);
@@ -105,7 +105,7 @@ class   Socket
     void	setHost(std::string Host);
     void	setUserAgent(std::string UserAgent);
 	void	setReferer(std::string Referer);
-    void	setBody(std::string sBody);
+    void	setBody(std::vector<std::string> Body);
 };
 
 Socket	*httpRequestParser(int fd);

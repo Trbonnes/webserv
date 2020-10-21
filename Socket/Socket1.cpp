@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Socket.cpp                                         :+:      :+:    :+:   */
+/*   socket.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: pganglof <pganglof@student.42.fr>          +#+  +:+       +#+        */
+/*   By: trbonnes <trbonnes@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/30 15:10:55 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/10/21 15:12:10 by pganglof         ###   ########.fr       */
+/*   Updated: 2020/10/02 12:42:31 by trbonnes         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,7 +113,7 @@ std::string     Socket::getRequestURI()
     return _requestURI;
 }
 
-std::string     Socket::getHttpVersion()
+std::string     Socket::gethttpVersion()
 {
     return _httpVersion;
 }
@@ -130,7 +130,10 @@ std::string     Socket::getContentLocation()
 
 std::string     Socket::getContentType()
 {
-    return _contentType;
+    if (_contentType.size() > 0)
+        return *(_contentType.begin());
+    else
+        return ("");
 }
 
 bool    Socket::getMultipartContent()
@@ -183,12 +186,13 @@ std::string Socket::getReferer()
 	return _referer;
 }
 
-std::string     Socket::getBody()
+std::vector<std::string>     &Socket::getBody()
 {
-    return _body;
+    if (_body.size() > 0)
+        return *(_body.begin());
+    else
+        return ("");
 }
-
-
 
 void	Socket::setFd(int fd) {
 	_fd = fd;
@@ -214,7 +218,7 @@ void	Socket::setContentLocation(std::string ContentLocation) {
 	_contentLocation = ContentLocation;
 }
 
-void	Socket::setContentType(std::string ContentType) {
+void	Socket::setContentType(std::vector<std::string> ContentType) {
 	_contentType = ContentType;
 }
 
@@ -260,7 +264,7 @@ void	Socket::setReferer(std::string Referer) {
 	_referer = Referer;
 }
 
-void	Socket::setBody(std::string Body) {
+void	Socket::setBody(std::vector<std::string> Body) {
 	_body = Body;
 }
 

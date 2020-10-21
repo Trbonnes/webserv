@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   httpRequestParser.cpp                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: pganglof <pganglof@student.42.fr>          +#+  +:+       +#+        */
+/*   By: trbonnes <trbonnes@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/30 15:45:46 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/10/21 15:06:54 by pganglof         ###   ########.fr       */
+/*   Updated: 2020/10/08 18:05:21 by trbonnes         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,6 @@ int		httpRequestParseChunckedBody(std::string request, Socket *socket, size_t po
 	std::string s = request.substr(pos, request.npos);
 	std::vector<std::string>	bodyV;
 	std::string body;
-
 	try {
 		pos = s.find("\r\n") - 1;
 		convert = s.substr(pos, 1);
@@ -36,84 +35,72 @@ int		httpRequestParseChunckedBody(std::string request, Socket *socket, size_t po
 			body.append("\n");
 		}
 		bodyV.clear();
-		socket->setBody(body);
+		bodyV.push_back(body);
+		socket->setBody(bodyV);
 	}
 	catch (std::exception &e) {
 		std::cout << "Exception: " << e.what() << std::endl;
 	}
-	
 	return 0;
 }
 
 int		httpRequestParseBody(std::string request, Socket *socket) {
-	std::string					content;
-	std::string					body;
+	std::vector<std::string>	contentV;
+	std::vector<std::string>	bodyV;
 	size_t						chunkedPos = socket->getTransferEncoding().find("chunked");
-	
 	if (!socket->getContentLength().size() && chunkedPos == std::string::npos)
 		return 0;
 	
 	size_t pos = request.find("\r\n\r\n");
+	pos += 4;
 	if (pos == request.npos) {
 		pos = request.find("\n\n");
 		pos += 2;
 	}
-	else 
-		pos += 4;
 	if (chunkedPos != std::string::npos)
 		return httpRequestParseChunckedBody(request, socket, pos);
 
 	try {
-		body = request.substr(pos, request.npos);
-		socket->setBody(body);
+		if (!socket->getMultipartContent()) {
+			bodyV.push_back(request.substr(pos, request.npos));
+		}
+		else {
+			std::string s = request;
+			std::string boundary = "--" + socket->getContentBoundary();
+			std::string endBoundary = "--" + socket->getContentBoundary() + "--";
+			size_t endPos = s.find(endBoundary);
+			size_t boundPos;
+
+			contentV = socket->getContentType();
+			bodyV.push_back("");
+			s.erase(0, pos);
+			endPos = s.find(endBoundary);
+			while ((pos = s.find(boundary)) != endPos) {
+				s.erase(0, pos + boundary.length() + 1);
+				endPos = s.find(endBoundary);
+				boundPos = s.find(boundary);
+				pos = s.find("Content-Type");
+				if (pos >= boundPos) {
+					contentV.push_back("text/plain");
+					bodyV.push_back(s.substr(0, boundPos - 1));
+				}
+				else {
+					pos += 14;
+					contentV.push_back(s.substr(pos, s.find("\n", pos) - 14));
+					s.erase(0, s.find("\n", pos) + 1);;
+					boundPos = s.find(boundary);
+					bodyV.push_back(s.substr(0, boundPos - 1));
+				}
+				s.erase(0, boundPos);
+				endPos = s.find(endBoundary);
+			}
+			socket->setContentType(contentV);
+		}
 	}
 	catch (std::exception &e) {
 		std::cout << "Exception: " << e.what() << std::endl;
 	}
-
-	//FOR MULPART BODY : NOT USEFUL IN OUR IMPLEMENTATION
-	// try {
-	// 	if (!socket->getMultipartContent()) {
-	// 		bodyV.push_back(request.substr(pos, request.npos));
-	// 	}
-	// 	else {
-	// 		std::string s = request;
-	// 		std::string boundary = "--" + socket->getContentBoundary();
-	// 		std::string endBoundary = "--" + socket->getContentBoundary() + "--";
-	// 		size_t endPos = s.find(endBoundary);
-	// 		size_t boundPos;
-
-	// 		content = socket->getContentType();
-	// 		bodyV.push_back("");
-	// 		s.erase(0, pos);
-	// 		endPos = s.find(endBoundary);
-	// 		while ((pos = s.find(boundary)) != endPos) {
-	// 			s.erase(0, pos + boundary.length() + 1);
-	// 			endPos = s.find(endBoundary);
-	// 			boundPos = s.find(boundary);
-	// 			pos = s.find("Content-Type");
-	// 			if (pos >= boundPos) {
-	// 				content.push_back("text/plain");
-	// 				bodyV.push_back(s.substr(0, boundPos - 1));
-	// 			}
-	// 			else {
-	// 				pos += 14;
-	// 				content.push_back(s.substr(pos, s.find("\n", pos) - 14));
-	// 				s.erase(0, s.find("\n", pos) + 1);;
-	// 				boundPos = s.find(boundary);
-	// 				bodyV.push_back(s.substr(0, boundPos - 1));
-	// 			}
-	// 			s.erase(0, boundPos);
-	// 			endPos = s.find(endBoundary);
-	// 		}
-	// 		socket->setContentType(content);
-	// 	}
-	// }
-	// catch (std::exception &e) {
-	// 	std::cout << "Exception: " << e.what() << std::endl;
-	// }
-	//socket->setBody(bodyV);
-	
+	socket->setBody(bodyV);
 	return 0;
 }
 
@@ -227,4 +214,3 @@ Socket	*httpRequestParser(int fd) {
 
 	return socket;
 }
-

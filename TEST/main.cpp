@@ -2,17 +2,17 @@
 #include <fstream>
 #include <fcntl.h>
 #include "../HTTP.hpp"
-// #include "../Socket/Socket.hpp"
-#include "Socket.hpp"
+#include "../Socket/Socket.hpp"
+// #include "Socket.hpp"
 
 // Socket	*httpRequestParser(int fd);
 
 int     main(void)
 {
-    // size_t i = 0;
+    size_t i = 0;
 
-	// int fd = open("/sgoinfre/goinfre/Perso/pganglof/webserv/Socket/httpRequestTest", O_RDWR);
-    // Socket *socket = httpRequestParser(fd);
+	int fd = open("/sgoinfre/goinfre/Perso/pganglof/webserv/Socket/httpRequestTest", O_RDWR);
+    Socket *socket = httpRequestParser(fd);
 
 
     // std::cout << "Fd: " << socket->getFd() << std::endl;
@@ -70,7 +70,7 @@ int     main(void)
     //     i++;
     // }
 
-    Socket          socket;
+    // Socket          socket;
     ConfigServer    config;
 
     HTTP method(socket, config);
