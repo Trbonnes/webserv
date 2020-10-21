@@ -6,7 +6,7 @@
 /*   By: trbonnes <trbonnes@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/14 09:20:21 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/10/21 08:38:41 by trbonnes         ###   ########.fr       */
+/*   Updated: 2020/10/21 10:05:59 by trbonnes         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,7 +109,7 @@ void	ConfigServer::printServer() {
 }
 
 int main() {
-	int fd = open("./config/test.conf", O_RDWR);
+	int fd = open("./config/webserv.conf", O_RDWR);
 
 	try {
 		Config *config = configFileParser(fd);

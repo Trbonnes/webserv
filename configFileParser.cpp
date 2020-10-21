@@ -6,7 +6,7 @@
 /*   By: trbonnes <trbonnes@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/14 08:46:39 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/10/21 10:04:17 by trbonnes         ###   ########.fr       */
+/*   Updated: 2020/10/21 10:08:04 by trbonnes         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -378,12 +378,10 @@ int		configFileParseServerUnit(std::string configFile, std::vector<ConfigServer>
 				j = pos;
 				while (parseServer[j] != ' ' && j != i) { j++; }
 				v->back().setErrorPages(std::stoi(parseServer.substr(pos, j - pos)), page);
-				std::cout << v->back().getHTMLErrorPage(std::stoi(parseServer.substr(pos, j - pos))) << std::endl;
 				pos = j;
 				while (parseServer[pos] == ' ') { pos++; }
 			}
 		}
-		std::cout << "OUT" << std::endl;
 	}
 
 	pos = configFile.find("server {");
@@ -463,7 +461,7 @@ Config *configFileParser(int fd) {
 			c[i] = '\0';
 	}
 	
-	std::cout << configFile << std::endl << std::endl;
+	//std::cout << configFile << std::endl << std::endl;
 
 	configFileParseWorkers(configFile, config);
 	configFileParseServers(configFile, config);
