@@ -101,7 +101,6 @@ int         HTTP::is_good_exe(std::string exe)
             }
         }
     }
-    std::cout << " == 0 " << std::endl;
     return (0);
 }
 
@@ -136,6 +135,7 @@ void        HTTP::cgi_exe()
     else if (pid == 0)
     {
         dup2(fd[SIDE_IN], STDOUT_FILENO);
+        dup2(fd[SIDE_OUT], STDIN_FILENO);
         write(STDIN_FILENO, _socket.getBody().c_str(), _socket.getBody().length());
         args[0] = ft_strdup(_config.getCGI_root(_location).c_str());
         args[1] = NULL;
@@ -156,7 +156,7 @@ void        HTTP::cgi_exe()
                 _body.append(buf);
             }
             close(fd[SIDE_OUT]);
-            std::cout << std::endl << "CGI BODY: " << std::endl << _body << std::endl;
+            std::cout << std::endl << std::endl << "CGI BODY: " << std::endl << _body << std::endl;
             find = _body.find("Status: ");
             _statusCode = ft_atoi(_body.substr(find + 8, 3).c_str());
             find = _body.find("Content-Type: ");

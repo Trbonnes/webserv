@@ -59,8 +59,12 @@ _body("")
     ft_bzero(_cgi_env, sizeof(_cgi_env));
     _uri = _socket.getRequestURI();
     setLocation();
+    if (_config.getClientBodySize(_location) != -1 && _socket.getBody().length() > _config.getClientBodySize(_location))
+    {
+        _statusCode = REQUEST_ENTITY_TOO_LARGE;
+        return ;
+    }
     replaceURI(); 
-
     setRoot();
     extension = _route.find_last_of('.');
     if (is_good_exe(str.assign(_route).erase(0, extension + 1)) && checkCGImethods(_socket.getMethod()))
@@ -72,20 +76,6 @@ _body("")
         callMethod(_socket.getMethod());
     else
         _statusCode = BAD_REQUEST;
-
-
-    // if (_config.getCGI_root(_location).length() > 0 && checkCGImethods(_socket.getMethod())) // HEAD a tester --> est ce quil faut transformer HEAD en GET avec CGI ?
-    // {
-    //     setRoot();
-    //     cgi_metaVariables();
-    //     extension = _route.find_last_of('.');
-    //     if (is_good_exe(str.assign(_route).erase(0, extension + 1)))
-    //         cgi_exe();
-    //     else
-    //         _statusCode = BAD_REQUEST;
-    // }
-    // else if (checkAllowMethods(_socket.getMethod()))
-    //     callMethod(_socket.getMethod());
 }
 
 HTTP::HTTP(HTTP &copy)
@@ -235,16 +225,21 @@ void         HTTP::setRoot()
         _route.assign(_config.getRoot(_location));
         _route.append(_socket.getRequestURI());
         stat(_route.c_str(), &file);
+
+        // ** If file exist return **
         if ((file.st_mode & S_IFMT) == S_IFREG)
             return ;
+
+        // ** Else, add the language **
         _route.assign(_config.getRoot(_location));
         _route.append(acceptLanguage());
         _route.append(str.assign(_socket.getRequestURI()).erase(0, _location.length()));
+        
+        // ** If file exist return **
         if ((file.st_mode & S_IFMT) == S_IFREG)
             return ;
 
-        // ** If necessary, add index **
-
+        // ** Else, add index **
         itIndexBegin = _config.getIndex(_location).begin();
         itIndexEnd = _config.getIndex(_location).end();
         stat(_route.c_str(), &file);
@@ -266,12 +261,12 @@ void         HTTP::setRoot()
 // ** Create the default html page when file is not found and autoindex is on **
 void            HTTP::setAutoindex(void)
 {
-    std::string     str;
-    struct stat     directory;
-    DIR             *dir;
-    struct dirent   *dirent;
-    struct tm       *timeinfo;
-    char            lastModifications[100];
+    std::string             str;
+    struct stat             directory;
+    DIR                     *dir;
+    struct dirent           *dirent;
+    struct tm               *timeinfo;
+    char                    lastModifications[100];
     std::stack<std::string> files;
 
     // Verifier que DIR marche bien sur linux, car bug sur MACOS
@@ -450,44 +445,46 @@ std::string   HTTP::base64_decode(std::string const& encoded_string) {
   return ret;
 }
 
+void        HTTP::configureErrorFile()
+{
+    int     ret;
+    char    buf[1024 + 1];
+    int     fd;
+
+    _route = _config.getErrorFilesRoot().append("/").append(ft_itoa(_statusCode));
+    fd = open(_route.c_str(), O_RDONLY);
+    if (fd == -1)
+    {
+        _body.assign("<!DOCTYPE html>\n<html>\n<body>\n\n<h1>");
+        _body.append(ft_itoa(_statusCode)).append(" ").append(_mapCodes.codes[_statusCode]);
+        _body.append("</h1>\n\n</body>\n</html>\n");
+        _contentType = "text/html";
+        _charset = "utf-8";
+        _contentLength = _body.length();
+    }
+    else
+    {
+        _body.assign("");
+        while ((ret = read(fd, buf, 1024)) > 0)
+        {
+            buf[ret] = '\0';
+            _body.append(buf);
+        }
+        if (ret == -1)
+            _statusCode = INTERNAL_SERVER_ERROR;
+        else
+            close(fd);
+        setStat();
+        setContentType();
+        setContentLength();
+        setDate();
+    }
+}
+
 // ** Create the response socket **
 int         HTTP::getResponse()
 {
-    if (_statusCode >= 300)
-    {
-        int     ret;
-        char    buf[1024 + 1];
-        int     fd;
 
-        _route = _config.getErrorFilesRoot().append("/").append(ft_itoa(_statusCode));
-        fd = open(_route.c_str(), O_RDONLY);
-        if (fd == -1)
-        {
-            _body.assign("<!DOCTYPE html>\n<html>\n<body>\n\n<h1>");
-            _body.append(ft_itoa(_statusCode)).append(" ").append(_mapCodes.codes[_statusCode]);
-            _body.append("</h1>\n\n</body>\n</html>\n");
-            _contentType = "text/html";
-            _charset = "utf-8";
-            _contentLength = _body.length();
-        }
-        else
-        {
-            _body.assign("");
-            while ((ret = read(fd, buf, 1024)) > 0)
-            {
-                buf[ret] = '\0';
-                _body.append(buf);
-            }
-            if (ret == -1)
-                _statusCode = INTERNAL_SERVER_ERROR;
-            else
-                close(fd);
-            setStat();
-            setContentType();
-            setContentLength();
-            setDate();
-        }
-    }
 
     std::vector<std::string>::iterator it;
     std::cout << std::endl;
@@ -521,29 +518,31 @@ int         HTTP::getResponse()
 
 
 
-    std::string socket;
+    std::string response;
 
+    if (_statusCode >= 300)
+        configureErrorFile();
 
-    socket.append(_config.getHttpVersion());
-    socket.append(" ");
+    response.append(_config.getHttpVersion());
+    response.append(" ");
 
-    socket.append(ft_itoa(_statusCode)).append(" ");
-    socket.append(_mapCodes.codes[_statusCode]).append("\n");
-    socket.append("Server: ").append(_config.getServerSoftware()).append("\n");
-    socket.append("Content-Type: ").append(_contentType).append("\n");
+    response.append(ft_itoa(_statusCode)).append(" ");
+    response.append(_mapCodes.codes[_statusCode]).append("\n");
+    response.append("Server: ").append(_config.getServerSoftware()).append("\n");
+    response.append("Content-Type: ").append(_contentType).append("\n");
     if (_charset.length() > 0)
-        socket.append("Charset: ").append(_charset).append("\n");
-    socket.append("Content-Length: ").append(ft_itoa(_contentLength)).append("\n");
+        response.append("Charset: ").append(_charset).append("\n");
+    response.append("Content-Length: ").append(ft_itoa(_contentLength)).append("\n");
     if (ft_strlen(_date) > 0)
-        socket.append("Date: ").append(_date).append("\n");
+        response.append("Date: ").append(_date).append("\n");
     if (_statusCode < 300)
     {
         if (ft_strlen(_lastModified) > 0)
-            socket.append("Last-Modified: ").append(_lastModified).append("\n");
+            response.append("Last-Modified: ").append(_lastModified).append("\n");
         if (_contentLocation.length() > 0)
-            socket.append("Content-Location: ").append(_contentLocation).append("\n");
+            response.append("Content-Location: ").append(_contentLocation).append("\n");
         if (_contentLanguage.length() > 0)
-            socket.append("Content-Language: ").append(_contentLanguage).append("\n");
+            response.append("Content-Language: ").append(_contentLanguage).append("\n");
     }
     else if (_statusCode == METHOD_NOT_ALLOWED)
     {
@@ -552,22 +551,22 @@ int         HTTP::getResponse()
 
         itBegin = _allow.begin();
         itEnd = _allow.end();
-        socket.append("Allow: ");
+        response.append("Allow: ");
         while (itBegin != itEnd)
         {
-            socket.append(*itBegin).append(" ");
+            response.append(*itBegin).append(" ");
             itBegin++;
         }
-        socket.append("\n");
+        response.append("\n");
     }
     else if (_statusCode == UNAUTHORIZED)
-        socket.append("WWW-Authenticate: ").append("Basic ").append(_config.getAuth_basic(_location)).append("\n");
+        response.append("WWW-Authenticate: ").append("Basic ").append(_config.getAuth_basic(_location)).append("\n");
 
-    socket.append("\n\n");
-    socket.append(_body);
+    response.append("\n\n");
+    response.append(_body);
 
 
-    std::cout << "SOCKET: " << std::endl << std::endl << socket << std::endl << std::endl;
+    std::cout << "response: " << std::endl << std::endl << response << std::endl << std::endl;
 
     return (1);
 }

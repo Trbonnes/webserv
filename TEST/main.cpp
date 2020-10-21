@@ -17,7 +17,7 @@ int     main(void)
 
     // std::cout << "Fd: " << socket->getFd() << std::endl;
     // std::cout << "Method: " << socket->getMethod() << std::endl;
-	std::cout << "URI: " << socket->getRequestURI() << std::endl;
+	// std::cout << "URI: " << socket->getRequestURI() << std::endl;
     // std::cout << "Version: " << socket->gethttpVersion() << std::endl;
 
     // std::cout << "ContentType: " << std::endl;

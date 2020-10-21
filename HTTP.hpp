@@ -13,7 +13,6 @@
 # include <fcntl.h>
 # include <algorithm>
 # include <stack>
-// # include "TEST/Socket.hpp"
 # include "Socket/Socket.hpp"
 # include "TEST/ConfigServer.hpp"
 # include "utils/utils.hpp"
@@ -23,11 +22,14 @@
 # define SIDE_OUT 0
 # define SIDE_IN 1
 
-# define GET 0
-# define HEAD 1
-# define NB_METHODS 2
+enum methods
+{
+    GET,
+    HEAD,
+    NB_METHODS
+};
 
-enum
+enum cgi_variables
 {
     AUTH_TYPE,
     CONTENT_LENGTH,
@@ -48,8 +50,6 @@ enum
     SERVER_SOFTWARE,
     NB_METAVARIABLES
 };
-
-
 
 class   HTTP
 {
@@ -127,6 +127,9 @@ class   HTTP
 
     // HEAD
     void            head(void);
+    
+    // RESPONSE
+    void            configureErrorFile(void);
 
     public:
     HTTP(Socket *socket, ConfigServer &config);
