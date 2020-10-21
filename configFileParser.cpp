@@ -6,7 +6,7 @@
 /*   By: trbonnes <trbonnes@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/14 08:46:39 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/10/21 10:57:25 by trbonnes         ###   ########.fr       */
+/*   Updated: 2020/10/21 12:38:44 by trbonnes         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -375,6 +375,9 @@ int		configFileParseServerUnit(std::string configFile, std::vector<ConfigServer>
 	if ((pos = parseServer.find("error_page", i)) != parseServer.npos) {
 		while ((pos = parseServer.find("error_page", i)) != parseServer.npos) {
 			std::string page;
+			std::string errorCode;
+			bool isX = false;
+			
 			pos += 10;
 			checkEndLine(pos, parseServer);
 			while (parseServer[pos] == ' ') { pos++; }
@@ -382,10 +385,18 @@ int		configFileParseServerUnit(std::string configFile, std::vector<ConfigServer>
 				throw Config::InvalidConfigException();
 			size_t j = parseServer.find(";", i);
 			page = parseServer.substr(i, j - i);
+			size_t tmp = page.find(".");
+			if (page[tmp - 1] == 'x')
+				isX = true;
 			while (pos != i) {
 				j = pos;
 				while (parseServer[j] != ' ' && j != i) { j++; }
-				v->back().setErrorPages(std::stoi(parseServer.substr(pos, j - pos)), page);
+				errorCode = parseServer.substr(pos, j - pos);
+				std::cout << '"' << errorCode << '"' << errorCode[errorCode.size() - 1] << std::endl;
+				if (isX) {
+					page[tmp - 1] = errorCode[errorCode.size() - 1];
+				}
+				v->back().setErrorPages(std::stoi(errorCode), page);
 				pos = j;
 				while (parseServer[pos] == ' ') { pos++; }
 			}
