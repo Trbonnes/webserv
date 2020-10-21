@@ -56,7 +56,7 @@ class   Socket
 
     // BODY
 
-    std::vector<std::string>     _body;
+    std::vector<std::string>    _body;
 
     // PRIVATE FUNCTIONS
 
@@ -84,7 +84,7 @@ class   Socket
     std::string	                getHost();
     std::string	                getUserAgent();
 	std::string	                getReferer();
-    std::vector<std::string>    getBody();
+    std::vector<std::string>    &getBody();
     std::string                 getRemoteAddr();
 
 

@@ -17,7 +17,7 @@ int		httpRequestParseChunckedBody(std::string request, Socket *socket, size_t po
 	std::string convert;
 	std::string s = request.substr(pos, request.npos);
 	std::vector<std::string>	bodyV;
-
+	std::string body;
 	try {
 		pos = s.find("\r\n") - 1;
 		convert = s.substr(pos, 1);
@@ -30,12 +30,17 @@ int		httpRequestParseChunckedBody(std::string request, Socket *socket, size_t po
 			convert = s.substr(pos, 1);
 			chunkSize = std::stol(convert);
 		}
+		for (size_t i = 0; i < bodyV.size(); i++) {
+			body.append(bodyV[i]);
+			body.append("\n");
+		}
+		bodyV.clear();
+		bodyV.push_back(body);
 		socket->setBody(bodyV);
 	}
 	catch (std::exception &e) {
 		std::cout << "Exception: " << e.what() << std::endl;
 	}
-	
 	return 0;
 }
 

@@ -186,9 +186,12 @@ std::string Socket::getReferer()
 	return _referer;
 }
 
-std::vector<std::string>     Socket::getBody()
+std::vector<std::string>     &Socket::getBody()
 {
-    return _body;
+    if (_body.size() > 0)
+        return *(_body.begin());
+    else
+        return ("");
 }
 
 void	Socket::setFd(int fd) {

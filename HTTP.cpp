@@ -28,8 +28,8 @@ _retryAfter(""),
 _transferEncoding(""),
 _body("") {}
 
-HTTP::HTTP(Socket *socket, ConfigServer &config) :
-_socket(*socket),
+HTTP::HTTP(Socket socket, ConfigServer &config) :
+_socket(socket),
 _config(config),
 _mapCodes(),
 _cgi(),

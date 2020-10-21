@@ -135,8 +135,7 @@ void        HTTP::cgi_exe()
     else if (pid == 0)
     {
         dup2(fd[SIDE_IN], STDOUT_FILENO);
-        close(fd[SIDE_IN]);
-        close(fd[SIDE_OUT]);
+        write(STDIN_FILENO, _socket.getBody().c_str(), _socket.getBody().length());
         args[0] = ft_strdup(_config.getCGI_root(_location).c_str());
         args[1] = NULL;
         if ((ret = execve(args[0], args, _cgi_env)) == -1)

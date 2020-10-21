@@ -1,5 +1,123 @@
 #include "ConfigServer.hpp"
 
+// ConfigServer::ConfigServer() :
+// _defaultRoot("/sgoinfre/goinfre/Perso/pganglof/webserv/www"),
+// _defaultServerName("localhost"),
+// _defaultPort("80"),
+// _httpVersion("HTTP/1.1"),
+// _serverSoftware("SuperServer/1.0"),
+// _defaultIndex(0),
+// _defaultType("text/plain"),
+// _defaultCharset("utf-8"),
+// _defaultLanguage(0),
+// _configFilesRoot("/sgoinfre/goinfre/Perso/pganglof/webserv/config"),
+// _errorFilesRoot("/sgoinfre/goinfre/Perso/pganglof/webserv/error"),
+// _defaultAuth_basic("\"Authorization\""),
+// _defaultAuth_basic_user_file("/sgoinfre/goinfre/Perso/pganglof/webserv/config/.htpasswd"),
+// _defaultAutoindex(false),
+// _defaultCgi(0),
+// _defaultCgi_methods(0)
+// {
+//     _defaultAllow.push_back("GET");
+//     _defaultAllow.push_back("HEAD");
+//     _defaultLanguage.push_back("en");
+//     _defaultLanguage.push_back("fr");
+//     // _defaultIndex.push_back("cgi.bla");
+//     _defaultIndex.push_back("index.html");
+//     _defaultIndex.push_back("index.php");
+
+//     //** open mime.types **
+//     int         ret;
+//     int         fd;
+//     char        *line;
+//     std::string string;
+//     std::string file;
+//     std::list<std::string>::iterator it;
+//     std::string::iterator s_it;
+
+//     file.append(_configFilesRoot);
+//     file.append("/mime.types");
+//     if ((fd = open(file.c_str(), O_RDONLY)) >= 0)
+//     {
+//         while ((ret = get_next_line(fd, &line)) > 0)
+//         {
+//             string = line;
+//             free(line);
+//             line = NULL;
+//             _mimeTypes.push_back(string);
+//         }
+//         string = line;
+//         free(line);
+//         line = NULL;
+//         _mimeTypes.push_back(string);
+//         it = _mimeTypes.begin();
+//         while (it != _mimeTypes.end())
+//         {
+//             s_it = (*it).begin();
+//             while (*s_it == ' ')
+//                 s_it++;
+//             (*it).erase((*it).begin(), s_it);
+//             it++;
+//         }
+//         close (fd);
+//     }
+
+//     //** Locations **
+
+//         //** first location **
+
+//     std::vector<std::string> index;
+//     std::vector<std::string> exe;
+//     std::vector<std::string> cgi_methods;
+
+//     cgi_methods.push_back("GET");
+//     cgi_methods.push_back("HEAD");
+//     cgi_methods.push_back("PUT");
+//     cgi_methods.push_back("POST");
+//     cgi_methods.push_back("DELETE");
+//     index.push_back("index.php");
+
+//     Location loc1("/data/", "/sgoinfre/goinfre/Perso/pganglof/webserv/www",
+//     _defaultAllow, index,
+//     "text/html", "utf-8", _defaultLanguage, _defaultAuth_basic, _defaultAuth_basic_user_file, _defaultAutoindex, "/blabla/", exe, cgi_methods, "");
+
+//     _locationList["/data/"] = loc1;
+
+//         //** second location **
+//     std::vector<std::string> index2;
+//     std::vector<std::string> exe1;
+
+//     index2.push_back("42.png");
+
+//     Location loc2("/images/", "/sgoinfre/goinfre/Perso/pganglof/webserv/www",
+//     _defaultAllow, index2,
+//     "text/html", "", _defaultLanguage, "off", "", _defaultAutoindex, "", exe1, cgi_methods, "");
+
+//     _locationList["/images/"] = loc2;
+
+//         //** third location **
+//     std::vector<std::string> exe2;
+
+//     Location loc3("/", "/sgoinfre/goinfre/Perso/pganglof/webserv/www",
+//     _defaultAllow, _defaultIndex,
+//     _defaultType, _defaultCharset, _defaultLanguage, "off", "", true, "", exe2, cgi_methods, "");
+
+//     _locationList["/"] = loc3;
+
+//         //** fourth location **
+//     std::vector<std::string> exe3;
+
+//     // exe3.push_back("bla");
+//     exe3.push_back("php");
+
+//     Location loc4("/cgi/", "/sgoinfre/goinfre/Perso/pganglof/webserv/www", _defaultAllow, _defaultIndex, _defaultType, 
+//     _defaultCharset, _defaultLanguage, "off", "", false, "", exe3, cgi_methods, "/sgoinfre/goinfre/Perso/pganglof/webserv/bin-cgi/cgi_tester");
+
+//     _locationList["/cgi/"] = loc4;
+
+// }
+
+
 ConfigServer::ConfigServer() :
 _defaultRoot("/sgoinfre/goinfre/Perso/pganglof/webserv/www"),
 _defaultServerName("localhost"),
@@ -14,9 +132,7 @@ _configFilesRoot("/sgoinfre/goinfre/Perso/pganglof/webserv/config"),
 _errorFilesRoot("/sgoinfre/goinfre/Perso/pganglof/webserv/error"),
 _defaultAuth_basic("\"Authorization\""),
 _defaultAuth_basic_user_file("/sgoinfre/goinfre/Perso/pganglof/webserv/config/.htpasswd"),
-_defaultAutoindex(false),
-_defaultCgi(0),
-_defaultCgi_methods(0)
+_defaultAutoindex(false)
 {
     _defaultAllow.push_back("GET");
     _defaultAllow.push_back("HEAD");
@@ -25,6 +141,9 @@ _defaultCgi_methods(0)
     // _defaultIndex.push_back("cgi.bla");
     _defaultIndex.push_back("index.html");
     _defaultIndex.push_back("index.php");
+
+    _defaultCgi.push_back("bla");
+    _defaultCgi_methods.push_back("PoST");
 
     //** open mime.types **
     int         ret;
@@ -64,56 +183,49 @@ _defaultCgi_methods(0)
 
     //** Locations **
 
-        //** first location **
+        //** First location **
+    std::vector<std::string> no_exe;
+    std::vector<std::string> allow1;
 
+    allow1.push_back("GET");
+
+    Location loc1("/", "/sgoinfre/goinfre/Perso/pganglof/webserv/www",
+    allow1, _defaultIndex,
+    _defaultType, _defaultCharset, _defaultLanguage, "off", "", true, "", _defaultCgi, _defaultCgi_methods, "");
+
+    _locationList["/"] = loc1;
+
+        //** Second location **
+    std::vector<std::string> allow2;
+
+    allow2.push_back("PUT");
+
+    Location loc2("/put_test/*", "/sgoinfre/goinfre/Perso/pganglof/webserv/www", allow2, _defaultIndex, _defaultType, 
+    _defaultCharset, _defaultLanguage, "off", "", false, "", _defaultCgi, _defaultCgi_methods, "");
+
+    _locationList["/put_test/"] = loc2;
+
+    //** Third location **
+    std::vector<std::string> allow3;
+
+    allow3.push_back("POST");
+
+    Location loc3("/post_body", "/sgoinfre/goinfre/Perso/pganglof/webserv/www", allow3, _defaultIndex, _defaultType, 
+    _defaultCharset, _defaultLanguage, "off", "", false, "", _defaultCgi, _defaultCgi_methods, "");
+
+    _locationList["/post_body"] = loc3;
+
+   //** Fourth location **
+    std::vector<std::string> allow4;
     std::vector<std::string> index;
-    std::vector<std::string> exe;
-    std::vector<std::string> cgi_methods;
+    
+    allow4.push_back("GET");
+    index.push_back("youpi.bad_extension");
 
-    cgi_methods.push_back("GET");
-    cgi_methods.push_back("HEAD");
-    cgi_methods.push_back("PUT");
-    cgi_methods.push_back("POST");
-    cgi_methods.push_back("DELETE");
-    index.push_back("index.php");
+    Location loc4("/directory/", "/sgoinfre/goinfre/Perso/pganglof/webserv/YoupiBanane", allow4, index, _defaultType, 
+    _defaultCharset, _defaultLanguage, "off", "", false, "", _defaultCgi, _defaultCgi_methods, "");
 
-    Location loc1("/data/", "/sgoinfre/goinfre/Perso/pganglof/webserv/www",
-    _defaultAllow, index,
-    "text/html", "utf-8", _defaultLanguage, _defaultAuth_basic, _defaultAuth_basic_user_file, _defaultAutoindex, "/blabla/", exe, cgi_methods, "");
-
-    _locationList["/data/"] = loc1;
-
-        //** second location **
-    std::vector<std::string> index2;
-    std::vector<std::string> exe1;
-
-    index2.push_back("42.png");
-
-    Location loc2("/images/", "/sgoinfre/goinfre/Perso/pganglof/webserv/www",
-    _defaultAllow, index2,
-    "text/html", "", _defaultLanguage, "off", "", _defaultAutoindex, "", exe1, cgi_methods, "");
-
-    _locationList["/images/"] = loc2;
-
-        //** third location **
-    std::vector<std::string> exe2;
-
-    Location loc3("/", "/sgoinfre/goinfre/Perso/pganglof/webserv/www",
-    _defaultAllow, _defaultIndex,
-    _defaultType, _defaultCharset, _defaultLanguage, "off", "", true, "", exe2, cgi_methods, "");
-
-    _locationList["/"] = loc3;
-
-        //** fourth location **
-    std::vector<std::string> exe3;
-
-    // exe3.push_back("bla");
-    exe3.push_back("php");
-
-    Location loc4("/cgi/", "/sgoinfre/goinfre/Perso/pganglof/webserv/www", _defaultAllow, _defaultIndex, _defaultType, 
-    _defaultCharset, _defaultLanguage, "off", "", false, "", exe3, cgi_methods, "/sgoinfre/goinfre/Perso/pganglof/webserv/bin-cgi/cgi_tester");
-
-    _locationList["/cgi/"] = loc4;
+    _locationList["/directory/"] = loc4;
 
 }
 
