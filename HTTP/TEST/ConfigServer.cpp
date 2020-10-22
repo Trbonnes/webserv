@@ -1,7 +1,7 @@
 #include "ConfigServer.hpp"
 
 ConfigServer::ConfigServer() :
-_defaultRoot("/sgoinfre/goinfre/Perso/pganglof/webserv/YoupiBanane"),
+_defaultRoot("/sgoinfre/goinfre/Perso/pganglof/webserv/HTTP/YoupiBanane"),
 _defaultServerName("localhost"),
 _defaultPort("80"),
 _httpVersion("HTTP/1.1"),
@@ -10,14 +10,14 @@ _defaultIndex(0),
 _defaultType("text/plain"),
 _defaultCharset("utf-8"),
 _defaultLanguage(0),
-_configFilesRoot("/sgoinfre/goinfre/Perso/pganglof/webserv/config"),
-_errorFilesRoot("/sgoinfre/goinfre/Perso/pganglof/webserv/error"),
+_configFilesRoot("/sgoinfre/goinfre/Perso/pganglof/webserv/HTTP/config"),
+_errorFilesRoot("/sgoinfre/goinfre/Perso/pganglof/webserv/HTTP/error"),
 _defaultAuth_basic("\"Authorization\""),
-_defaultAuth_basic_user_file("/sgoinfre/goinfre/Perso/pganglof/webserv/config/.htpasswd"),
+_defaultAuth_basic_user_file("/sgoinfre/goinfre/Perso/pganglof/webserv/HTTP/config/.htpasswd"),
 _defaultAutoindex(false),
 _defaultMaxBody(-1),
-_defaultCgi_root("/sgoinfre/goinfre/Perso/pganglof/webserv/bin-cgi/cgi_tester"),
-_putRequestRoot("/sgoinfre/goinfre/Perso/pganglof/webserv/put_files")
+_defaultCgi_root("/sgoinfre/goinfre/Perso/pganglof/webserv/HTTP/bin-cgi/cgi_tester"),
+_putRequestRoot("/sgoinfre/goinfre/Perso/pganglof/webserv/HTTP/put_files")
 {
     _defaultAllow.push_back("GET");
     _defaultAllow.push_back("HEAD");
@@ -82,7 +82,7 @@ _putRequestRoot("/sgoinfre/goinfre/Perso/pganglof/webserv/put_files")
     cgi_methods.push_back("DELETE");
     index.push_back("index.php");
 
-    Location loc1("/data/", "/sgoinfre/goinfre/Perso/pganglof/webserv/YoupiBanane",
+    Location loc1("/data/", "/sgoinfre/goinfre/Perso/pganglof/webserv/HTTP/YoupiBanane",
     _defaultAllow, index,
     "text/html", "utf-8", _defaultLanguage, _defaultAuth_basic, _defaultAuth_basic_user_file, _defaultAutoindex, "/blabla/", exe, cgi_methods, "",
     _defaultMaxBody);
@@ -95,7 +95,7 @@ _putRequestRoot("/sgoinfre/goinfre/Perso/pganglof/webserv/put_files")
 
     index2.push_back("42.png");
 
-    Location loc2("/images/", "/sgoinfre/goinfre/Perso/pganglof/webserv/www",
+    Location loc2("/images/", "/sgoinfre/goinfre/Perso/pganglof/webserv/HTTP/www",
     _defaultAllow, index2,
     "text/html", "", _defaultLanguage, "off", "", _defaultAutoindex, "", exe1, cgi_methods, "",
     _defaultMaxBody);
@@ -105,7 +105,7 @@ _putRequestRoot("/sgoinfre/goinfre/Perso/pganglof/webserv/put_files")
         //** third location **
     std::vector<std::string> exe2;
 
-    Location loc3("/", "/sgoinfre/goinfre/Perso/pganglof/webserv/www",
+    Location loc3("/", "/sgoinfre/goinfre/Perso/pganglof/webserv/HTTP/www",
     _defaultAllow, _defaultIndex,
     _defaultType, _defaultCharset, _defaultLanguage, "off", "", true, "", exe2, cgi_methods, "",
     100);
@@ -118,8 +118,8 @@ _putRequestRoot("/sgoinfre/goinfre/Perso/pganglof/webserv/put_files")
     // exe3.push_back("bla");
     exe3.push_back("php");
 
-    Location loc4("/cgi/", "/sgoinfre/goinfre/Perso/pganglof/webserv/www", _defaultAllow, _defaultIndex, _defaultType, 
-    _defaultCharset, _defaultLanguage, "off", "", false, "", exe3, cgi_methods, "/sgoinfre/goinfre/Perso/pganglof/webserv/bin-cgi/cgi_tester",
+    Location loc4("/cgi/", "/sgoinfre/goinfre/Perso/pganglof/webserv/HTTP/www", _defaultAllow, _defaultIndex, _defaultType, 
+    _defaultCharset, _defaultLanguage, "off", "", false, "", exe3, cgi_methods, "/sgoinfre/goinfre/Perso/pganglof/webserv/HTTP/bin-cgi/cgi_tester",
     _defaultMaxBody);
 
     _locationList["/cgi/"] = loc4;
@@ -128,7 +128,7 @@ _putRequestRoot("/sgoinfre/goinfre/Perso/pganglof/webserv/put_files")
 
 
 // ConfigServer::ConfigServer() :
-// _defaultRoot("/sgoinfre/goinfre/Perso/pganglof/webserv/YoupiBanane"),
+// _defaultRoot("/sgoinfre/goinfre/Perso/pganglof/webserv/HTTP/YoupiBanane"),
 // _defaultServerName("localhost"),
 // _defaultPort("80"),
 // _httpVersion("HTTP/1.1"),
@@ -137,13 +137,13 @@ _putRequestRoot("/sgoinfre/goinfre/Perso/pganglof/webserv/put_files")
 // _defaultType("text/plain"),
 // _defaultCharset("utf-8"),
 // _defaultLanguage(0),
-// _configFilesRoot("/sgoinfre/goinfre/Perso/pganglof/webserv/config"),
-// _errorFilesRoot("/sgoinfre/goinfre/Perso/pganglof/webserv/error"),
+// _configFilesRoot("/sgoinfre/goinfre/Perso/pganglof/webserv/HTTP/config"),
+// _errorFilesRoot("/sgoinfre/goinfre/Perso/pganglof/webserv/HTTP/error"),
 // _defaultAuth_basic("\"Authorization\""),
-// _defaultAuth_basic_user_file("/sgoinfre/goinfre/Perso/pganglof/webserv/config/.htpasswd"),
+// _defaultAuth_basic_user_file("/sgoinfre/goinfre/Perso/pganglof/webserv/HTTP/config/.htpasswd"),
 // _defaultAutoindex(false),
 // _defaultMaxBody(-1),
-// _defaultCgi_root("/sgoinfre/goinfre/Perso/pganglof/webserv/bin-cgi/cgi_tester")
+// _defaultCgi_root("/sgoinfre/goinfre/Perso/pganglof/webserv/HTTP/bin-cgi/cgi_tester")
 // {
 //     _defaultAllow.push_back("GET");
 //     _defaultAllow.push_back("HEAD");
@@ -200,7 +200,7 @@ _putRequestRoot("/sgoinfre/goinfre/Perso/pganglof/webserv/put_files")
 
 //     allow1.push_back("GET");
 
-//     Location loc1("/", "/sgoinfre/goinfre/Perso/pganglof/webserv/YoupiBanane",
+//     Location loc1("/", "/sgoinfre/goinfre/Perso/pganglof/webserv/HTTP/YoupiBanane",
 //     allow1, _defaultIndex,
 //     _defaultType, _defaultCharset, _defaultLanguage, "off", "", true, "", _defaultCgi, _defaultCgi_methods, _defaultCgi_root,
 //     _defaultMaxBody);
@@ -212,7 +212,7 @@ _putRequestRoot("/sgoinfre/goinfre/Perso/pganglof/webserv/put_files")
 
 //     allow2.push_back("PUT");
 
-//     Location loc2("/put_test/*", "/sgoinfre/goinfre/Perso/pganglof/webserv/YoupiBanane", allow2, _defaultIndex, _defaultType, 
+//     Location loc2("/put_test/*", "/sgoinfre/goinfre/Perso/pganglof/webserv/HTTP/YoupiBanane", allow2, _defaultIndex, _defaultType, 
 //     _defaultCharset, _defaultLanguage, "off", "", false, "", _defaultCgi, _defaultCgi_methods, _defaultCgi_root,
 //     _defaultMaxBody);
 
@@ -223,7 +223,7 @@ _putRequestRoot("/sgoinfre/goinfre/Perso/pganglof/webserv/put_files")
 
 //     allow3.push_back("POST");
 
-//     Location loc3("/post_body", "/sgoinfre/goinfre/Perso/pganglof/webserv/YoupiBanane", allow3, _defaultIndex, _defaultType, 
+//     Location loc3("/post_body", "/sgoinfre/goinfre/Perso/pganglof/webserv/HTTP/YoupiBanane", allow3, _defaultIndex, _defaultType, 
 //     _defaultCharset, _defaultLanguage, "off", "", false, "", _defaultCgi, _defaultCgi_methods, _defaultCgi_root, 100);
 
 //     _locationList["/post_body"] = loc3;
@@ -235,7 +235,7 @@ _putRequestRoot("/sgoinfre/goinfre/Perso/pganglof/webserv/put_files")
 //     allow4.push_back("GET");
 //     index.push_back("youpi.bad_extension");
 
-//     Location loc4("/directory/", "/sgoinfre/goinfre/Perso/pganglof/webserv/YoupiBanane", allow4, index, _defaultType, 
+//     Location loc4("/directory/", "/sgoinfre/goinfre/Perso/pganglof/webserv/HTTP/YoupiBanane", allow4, index, _defaultType, 
 //     _defaultCharset, _defaultLanguage, "off", "", false, "", _defaultCgi, _defaultCgi_methods, _defaultCgi_root, 
 //     _defaultMaxBody);
 

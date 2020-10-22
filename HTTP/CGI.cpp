@@ -104,7 +104,7 @@ int         HTTP::is_good_exe(std::string exe)
     return (0);
 }
 
-// ** Function for the std::adjacent_find, to find the first two \n in CGI response and separate the body from the headers **
+// ** Function for the std::adjacent_find, to find the first two \n \r in CGI response and separate the body from the headers **
 bool        HTTP::mypred(char val1, char val2)
 {
     if (val1 == '\n' && val2 == '\r')

@@ -71,6 +71,7 @@ _body("")
     {
         cgi_metaVariables();
         cgi_exe();
+        setDate();
     }
     else if (checkAllowMethods(_socket.getMethod()))
         callMethod(_socket.getMethod());
@@ -132,13 +133,11 @@ HTTP     &HTTP::operator=(HTTP &rhs)
     return *this;
 }
 
-//** Call the non CGI methods, GET and HEAD **  // ADD OPTIONS? 
+//** Call the non CGI methods, GET, HEAD and PUT **  // ADD OPTIONS? 
 void        HTTP::callMethod(std::string method)
 {
-    if (method.compare("GET") == 0)
+    if (method.compare("GET") == 0 || method.compare("HEAD") == 0)
         get();
-    else if (method.compare("HEAD") == 0)
-        head();
     else if (method.compare("PUT") == 0)
         put();
 }
@@ -486,90 +485,87 @@ void        HTTP::configureErrorFile()
 // ** Create the response socket **
 std::string         HTTP::getResponse()
 {
+    // std::vector<std::string>::iterator it;
+    // std::cout << std::endl;
 
+    // std::cout << "ORIGINALE URI: " << _socket.getRequestURI() << std::endl << std::endl;
+    // std::cout << "LOCATION: " << _location << std::endl << std::endl;
+    // std::cout << "URI: " << _uri << std::endl << std::endl;
+    // std::cout << "ROUTE: " << _route << std::endl << std::endl;
+    // std::cout << "CONTENT-LOCATION: " << _contentLocation << std::endl << std::endl;
+    // std::cout << "SERVER NAME: " << _server << std::endl << std::endl;
+    // std::cout << "STATUS CODE: " << _statusCode << std::endl << std::endl;
 
-    std::vector<std::string>::iterator it;
-    std::cout << std::endl;
-
-    std::cout << "ORIGINALE URI: " << _socket.getRequestURI() << std::endl << std::endl;
-    std::cout << "LOCATION: " << _location << std::endl << std::endl;
-    std::cout << "URI: " << _uri << std::endl << std::endl;
-    std::cout << "ROUTE: " << _route << std::endl << std::endl;
-    std::cout << "CONTENT-LOCATION: " << _contentLocation << std::endl << std::endl;
-    std::cout << "SERVER NAME: " << _server << std::endl << std::endl;
-    std::cout << "STATUS CODE: " << _statusCode << std::endl << std::endl;
-
-    it = _allow.begin();
-    std::cout << "ALLOW: ";
-    while (it != _allow.end())
-    {
-        std::cout << *it << " ";
-        it++;
-    }
-    std::cout << std::endl << std::endl;
-    std::cout << "CONTENT TYPE: " << _contentType << std::endl << std::endl;
-    std::cout << "CHARSET: " << _charset << std::endl << std::endl;
-    std::cout << "CONTENT LENGTH: " << _contentLength << std::endl << std::endl;
-    std::cout << "CONTENT LANGUAGE: " << _contentLanguage << std::endl << std::endl;
-    std::cout << "WWW AUTHENTICATE: " << _wwwAuthenticate << std::endl << std::endl;
-    std::cout << "LAST MODIFIED: " << _lastModified << std::endl << std::endl;
-    std::cout << "DATE: " << _date << std::endl << std::endl;
-    std::cout << "BODY: " << std::endl << _body << std::endl << std::endl;
-
-
-
-
+    // it = _allow.begin();
+    // std::cout << "ALLOW: ";
+    // while (it != _allow.end())
+    // {
+    //     std::cout << *it << " ";
+    //     it++;
+    // }
+    // std::cout << std::endl << std::endl;
+    // std::cout << "CONTENT TYPE: " << _contentType << std::endl << std::endl;
+    // std::cout << "CHARSET: " << _charset << std::endl << std::endl;
+    // std::cout << "CONTENT LENGTH: " << _contentLength << std::endl << std::endl;
+    // std::cout << "CONTENT LANGUAGE: " << _contentLanguage << std::endl << std::endl;
+    // std::cout << "WWW AUTHENTICATE: " << _wwwAuthenticate << std::endl << std::endl;
+    // std::cout << "LAST MODIFIED: " << _lastModified << std::endl << std::endl;
+    // std::cout << "DATE: " << _date << std::endl << std::endl;
+    // std::cout << "BODY: " << std::endl << _body << std::endl << std::endl;
 
     std::string response;
 
     if (_statusCode >= 300)
         configureErrorFile();
-
-    response.append(_config.getHttpVersion());
-    response.append(" ");
-
-    response.append(ft_itoa(_statusCode)).append(" ");
-    response.append(_mapCodes.codes[_statusCode]).append("\n");
-    response.append("Server: ").append(_config.getServerSoftware()).append("\n");
-    if (_contentType.length() > 0)
-        response.append("Content-Type: ").append(_contentType).append("\n");
-    if (_charset.length() > 0)
-        response.append("Charset: ").append(_charset).append("\n");
-    if (_contentLength > 0)
-    response.append("Content-Length: ").append(ft_itoa(_contentLength)).append("\n");
-    if (ft_strlen(_date) > 0)
-        response.append("Date: ").append(_date).append("\n");
-    if (_statusCode < 300)
+    if (_statusCode == 200 && _socket.getMethod().compare("DELETE") == 0)
     {
-        if (ft_strlen(_lastModified) > 0)
-            response.append("Last-Modified: ").append(_lastModified).append("\n");
-        if (_contentLocation.length() > 0)
-            response.append("Content-Location: ").append(_contentLocation).append("\n");
-        if (_contentLanguage.length() > 0 && _socket.getMethod().compare("PUT"))
-            response.append("Content-Language: ").append(_contentLanguage).append("\n");
+        if (ft_strlen(_date) > 0)
+            response.append("Date: ").append(_date).append("\n");
     }
-    else if (_statusCode == METHOD_NOT_ALLOWED)
+    else
     {
-        std::vector<std::string>::iterator itBegin;
-        std::vector<std::string>::iterator itEnd;
-
-        itBegin = _allow.begin();
-        itEnd = _allow.end();
-        response.append("Allow: ");
-        while (itBegin != itEnd)
+        response.append(_config.getHttpVersion());
+        response.append(" ");
+        response.append(ft_itoa(_statusCode)).append(" ");
+        response.append(_mapCodes.codes[_statusCode]).append("\n");
+        response.append("Server: ").append(_config.getServerSoftware()).append("\n");
+        if (_contentType.length() > 0)
+            response.append("Content-Type: ").append(_contentType).append("\n");
+        if (_charset.length() > 0)
+            response.append("Charset: ").append(_charset).append("\n");
+        if (_contentLength > 0)
+        response.append("Content-Length: ").append(ft_itoa(_contentLength)).append("\n");
+        if (ft_strlen(_date) > 0)
+            response.append("Date: ").append(_date).append("\n");
+        if (_statusCode < 300)
         {
-            response.append(*itBegin).append(" ");
-            itBegin++;
+            if (ft_strlen(_lastModified) > 0)
+                response.append("Last-Modified: ").append(_lastModified).append("\n");
+            if (_contentLocation.length() > 0)
+                response.append("Content-Location: ").append(_contentLocation).append("\n");
+            if (_contentLanguage.length() > 0 && _socket.getMethod().compare("PUT"))
+                response.append("Content-Language: ").append(_contentLanguage).append("\n");
         }
-        response.append("\n");
+        else if (_statusCode == METHOD_NOT_ALLOWED)
+        {
+            std::vector<std::string>::iterator itBegin;
+            std::vector<std::string>::iterator itEnd;
+
+            itBegin = _allow.begin();
+            itEnd = _allow.end();
+            response.append("Allow: ");
+            while (itBegin != itEnd)
+            {
+                response.append(*itBegin).append(" ");
+                itBegin++;
+            }
+            response.append("\n");
+        }
+        else if (_statusCode == UNAUTHORIZED)
+            response.append("WWW-Authenticate: ").append("Basic ").append(_config.getAuth_basic(_location)).append("\n");
     }
-    else if (_statusCode == UNAUTHORIZED)
-        response.append("WWW-Authenticate: ").append("Basic ").append(_config.getAuth_basic(_location)).append("\n");
-
     response.append("\n\n");
-    response.append(_body);
-
-
-
+    if (_socket.getMethod().compare("HEAD"))
+        response.append(_body);
     return (response);
 }
