@@ -240,21 +240,24 @@ void         HTTP::setRoot()
         if ((file.st_mode & S_IFMT) == S_IFREG)
             return ;
 
-        // ** Else, add index **
-        itIndexBegin = _config.getIndex(_location).begin();
-        itIndexEnd = _config.getIndex(_location).end();
-        stat(_route.c_str(), &file);
-        str.assign(_route);
-        while (itIndexBegin != itIndexEnd && (file.st_mode & S_IFMT) != S_IFREG)
+        // ** Else, add index if it is not a put request **
+        if (_socket.getMethod().compare("PUT"))
         {
+            itIndexBegin = _config.getIndex(_location).begin();
+            itIndexEnd = _config.getIndex(_location).end();
+            stat(_route.c_str(), &file);
             str.assign(_route);
-            if (str.back() != '/')
-                str.append("/");
-            str.append(*itIndexBegin);
-            stat(str.c_str(), &file);
-            itIndexBegin++;
+            while (itIndexBegin != itIndexEnd && (file.st_mode & S_IFMT) != S_IFREG)
+            {
+                str.assign(_route);
+                if (str.back() != '/')
+                    str.append("/");
+                str.append(*itIndexBegin);
+                stat(str.c_str(), &file);
+                itIndexBegin++;
+            }
+            _route.assign(str);
         }
-        _route.assign(str);
     }
     return ;
 }

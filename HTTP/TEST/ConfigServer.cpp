@@ -16,8 +16,7 @@ _defaultAuth_basic("\"Authorization\""),
 _defaultAuth_basic_user_file("/sgoinfre/goinfre/Perso/pganglof/webserv/HTTP/config/.htpasswd"),
 _defaultAutoindex(false),
 _defaultMaxBody(-1),
-_defaultCgi_root("/sgoinfre/goinfre/Perso/pganglof/webserv/HTTP/bin-cgi/cgi_tester"),
-_putRequestRoot("/sgoinfre/goinfre/Perso/pganglof/webserv/HTTP/put_files")
+_defaultCgi_root("/sgoinfre/goinfre/Perso/pganglof/webserv/HTTP/bin-cgi/cgi_tester")
 {
     _defaultAllow.push_back("GET");
     _defaultAllow.push_back("HEAD");
@@ -265,7 +264,6 @@ ConfigServer::ConfigServer(ConfigServer &copy)
     _defaultCgi = copy._defaultCgi;
     _defaultCgi_methods = copy._defaultCgi_methods;
     _defaultCgi_root = copy._defaultCgi_root;
-    _putRequestRoot = copy._putRequestRoot;
 }
 
 ConfigServer::~ConfigServer() {}
@@ -292,7 +290,6 @@ ConfigServer                  &ConfigServer::operator=(ConfigServer const &rhs)
     _defaultCgi = rhs._defaultCgi;
     _defaultCgi_methods = rhs._defaultCgi_methods;
     _defaultCgi_root = rhs._defaultCgi_root;
-    _putRequestRoot = rhs._putRequestRoot;
     return *this;
 }
 
@@ -567,9 +564,4 @@ int                  ConfigServer::getClientBodySize(std::string location)
         itBegin++;
     }
     return _defaultMaxBody;   
-}
-
-std::string          ConfigServer::getPutRequestRoot()
-{
-    return _putRequestRoot;
 }

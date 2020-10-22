@@ -5,7 +5,6 @@ void        HTTP::put()
     int         fd;
     std::string str;
 
-    _route.assign(_config.getPutRequestRoot()).append(_socket.getRequestURI());
     fd = open(_route.c_str(), O_WRONLY | O_TRUNC);
     if (fd == -1)
     {
