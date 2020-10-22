@@ -1,11 +1,8 @@
-#include "ConfigServer.hpp"
+#include "HTTP/TEST/ConfigServer.hpp"
 #include <fstream>
 #include <fcntl.h>
-#include "../HTTP.hpp"
-#include "../Socket/Socket.hpp"
-// #include "Socket.hpp"
-
-// Socket	*httpRequestParser(int fd);
+#include "HTTP//HTTP.hpp"
+#include "Socket/Socket.hpp"
 
 int     main(void)
 {

@@ -18,9 +18,22 @@ void        HTTP::put()
     }
     else
     {
+        struct tm *timeinfo;
+        char file[100];
+        char modification[100];
+
         _route = _contentLocation;
         setStat();
         _statusCode = NO_CONTENT;
-        
+        timeinfo = localtime(&(_stat.st_ctime));
+        strftime(file, 100, "%a %d %b %y %OH %OM %OS", timeinfo);
+        write(fd, _socket.getBody().c_str(), _socket.getBody().length());
+        setStat();
+        timeinfo = localtime(&(_stat.st_ctime));
+        strftime(modification, 100, "%a %d %b %y %OH %OM %OS", timeinfo);
+        printf("File: %s\n", file);
+        printf("Modification: %s\n", modification);
+        if (strcmp(file, modification))
+            _statusCode = OK;
     }
 }
