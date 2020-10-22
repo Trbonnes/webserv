@@ -3,6 +3,8 @@
 
 #include <iostream>
 #include <vector>
+#include <errno.h>
+#include <string.h>
 
 #include "ListenSocket.hpp"
 #include "HttpConnection.hpp"

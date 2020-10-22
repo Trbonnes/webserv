@@ -4,6 +4,7 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <unistd.h>
 
 class HttpConnection
 {
@@ -17,11 +18,11 @@ public:
 
 private:
 	int				_sock;
-	struct sockaddr	client_name;
+	struct sockaddr	_client_name;
 
 public:
-	void	accept(int connection_sock);
-	void	write(void *data, size_t size);
+	void	acceptOnSocket(int connection_sock);
+	void	write(char *data, size_t size);
 	int		getSock();
 	
 };

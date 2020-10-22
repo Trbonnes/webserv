@@ -17,6 +17,8 @@ ListenSocket::ListenSocket() {
 	bind(_sock, (struct sockaddr *)&address,
                                  sizeof(address));
 	listen(_sock, 3);
+
+	// TO DO error management
 }
 
 ListenSocket::~ListenSocket() {

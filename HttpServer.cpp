@@ -19,7 +19,7 @@ void HttpServer::initConf() {
 void HttpServer::initListenSocket() {
 	std::cout << "Initializing listening sockets" << std::endl;
 
-	_listen_sockset.push_front(ListenSocket());
+	_listen_sockset.push_back(ListenSocket());
 	// Initialize listening sockets that will be shared between workers
 }
 
