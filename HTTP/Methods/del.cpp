@@ -5,6 +5,7 @@ void    HTTP::del()
     int ret;
 
     setStat();
+    setDate();
     ret = -1;
     if ((_stat.st_mode & S_IFMT) == S_IFREG)
         ret = unlink(_route.c_str());

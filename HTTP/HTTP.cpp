@@ -230,7 +230,7 @@ void         HTTP::setRoot()
         stat(_route.c_str(), &file);
 
         // ** If file exist return **
-        if ((file.st_mode & S_IFMT) == S_IFREG)
+        if ((file.st_mode & S_IFMT) == S_IFREG || (((file.st_mode & S_IFMT) == S_IFDIR) && _socket.getMethod().compare("DELETE") == 0))
             return ;
 
         // ** Else, add the language **
@@ -243,7 +243,7 @@ void         HTTP::setRoot()
             return ;
 
         // ** Else, add index if it is not a put request **
-        if (_socket.getMethod().compare("PUT"))
+        if (_socket.getMethod().compare("PUT") && _socket.getMethod().compare("DELETE"))
         {
             itIndexBegin = _config.getIndex(_location).begin();
             itIndexEnd = _config.getIndex(_location).end();
