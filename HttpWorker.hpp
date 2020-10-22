@@ -2,13 +2,16 @@
 #define HTTPWORKER
 
 #include <iostream>
+#include <vector>
 
+#include "ListenSocket.hpp"
+#include "HttpConnection.hpp"
 #include "Runnable.hpp"
 
 class HttpWorker : public Runnable
 {
 public:
-	HttpWorker();
+	HttpWorker(std::vector<ListenSocket> &listen);
 	HttpWorker(HttpWorker &&) = default;
 	HttpWorker(const HttpWorker &) = default;
 	HttpWorker &operator=(HttpWorker &&) = default;
@@ -16,9 +19,8 @@ public:
 	~HttpWorker();
 
 private:
-	fd_set _listen_sockset;
-	fd_set _active_sockset;
-	bool is_on_listen_sockset();
+	std::vector<ListenSocket> _listen_socket;
+
 public:
 	void run() override;
 

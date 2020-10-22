@@ -4,15 +4,15 @@
 #include "HttpConf.hpp"
 #include "HttpWorker.hpp"
 #include "ProcessManager.hpp"
+#include "ListenSocket.hpp"
 
 #include <sys/time.h>
 #include <sys/types.h>
 #include <sys/select.h>
 #include <iostream>
-#include <sys/socket.h>
-#include <netinet/in.h>
 #include <unistd.h>
 #include <cstring>
+#include <vector>
 
 
 class WorkersInitException: public std::exception
@@ -36,9 +36,9 @@ public:
 	~HttpServer();
 
 private:
-	HttpConf	conf;
-	fd_set		_listen_sockset;
-	pid_t*		_workers_pid; // might put into ProcessManager.hpp
+	HttpConf					conf;
+	std::vector<ListenSocket>	_listen_sockset;
+	pid_t*						_workers_pid; // might put into ProcessManager.hpp
 
 
 public:
