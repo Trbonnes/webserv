@@ -76,7 +76,7 @@ _body("")
     else if (checkAllowMethods(_socket.getMethod()))
         callMethod(_socket.getMethod());
     else
-        _statusCode = BAD_REQUEST;
+        _statusCode = METHOD_NOT_ALLOWED;
 }
 
 HTTP::HTTP(HTTP &copy)
@@ -140,6 +140,8 @@ void        HTTP::callMethod(std::string method)
         get();
     else if (method.compare("PUT") == 0)
         put();
+    else if (method.compare("DELETE") == 0)
+        del();
 }
 
 //** Check if the method is authorized for the non CGI locations **
@@ -520,7 +522,7 @@ std::string         HTTP::getResponse()
 
     if (_statusCode >= 300)
         configureErrorFile();
-    if (_statusCode == 200 && _socket.getMethod().compare("DELETE") == 0)
+    if (_statusCode == 200 && _socket.getMethod().compare("PUT") == 0)
     {
         if (ft_strlen(_date) > 0)
             response.append("Date: ").append(_date).append("\n");
@@ -546,7 +548,7 @@ std::string         HTTP::getResponse()
                 response.append("Last-Modified: ").append(_lastModified).append("\n");
             if (_contentLocation.length() > 0)
                 response.append("Content-Location: ").append(_contentLocation).append("\n");
-            if (_contentLanguage.length() > 0 && _socket.getMethod().compare("PUT"))
+            if (_contentLanguage.length() > 0 && _socket.getMethod().compare("PUT") && _socket.getMethod().compare("DELETE"))
                 response.append("Content-Language: ").append(_contentLanguage).append("\n");
         }
         else if (_statusCode == METHOD_NOT_ALLOWED)

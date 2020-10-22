@@ -131,6 +131,9 @@ class   HTTP
     // PUT
     void            put(void);
     
+    // DELETE
+    void            del(void);
+
     // RESPONSE
     void            configureErrorFile(void);
 

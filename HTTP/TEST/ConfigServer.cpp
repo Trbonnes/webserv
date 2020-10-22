@@ -21,6 +21,7 @@ _defaultCgi_root("/sgoinfre/goinfre/Perso/pganglof/webserv/HTTP/bin-cgi/cgi_test
     _defaultAllow.push_back("GET");
     _defaultAllow.push_back("HEAD");
     _defaultAllow.push_back("PUT");
+    _defaultAllow.push_back("DELETE");
     _defaultLanguage.push_back("en");
     _defaultLanguage.push_back("fr");
     // _defaultIndex.push_back("cgi.bla");

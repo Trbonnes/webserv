@@ -15,6 +15,7 @@ SRCS =	main.cpp 						\
 		HTTP/CGI.cpp					\
 		HTTP/Methods/get.cpp			\
 		HTTP/Methods/put.cpp 			\
+		HTTP/Methods/del.cpp			\
 		HTTP/setHeaders.cpp
 
 
