@@ -548,10 +548,10 @@ std::string             ConfigServer::getCGI_root(std::string location)
             return (itBegin->second._cgi_root);
         itBegin++;
     }
-    return _defaultCgi_root;   
+    return _defaultCgi_root;
 }
 
-int                  ConfigServer::getClientBodySize(std::string location)
+int                     ConfigServer::getClientBodySize(std::string location)
 {
     std::map<std::string, Location, Compare<std::string> >::iterator itBegin;
     std::map<std::string, Location, Compare<std::string> >::iterator itEnd;  
@@ -564,5 +564,5 @@ int                  ConfigServer::getClientBodySize(std::string location)
             return (itBegin->second._maxBody);
         itBegin++;
     }
-    return _defaultMaxBody;   
+    return _defaultMaxBody;
 }
