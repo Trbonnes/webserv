@@ -1,4 +1,4 @@
-DELETE /test/ HTTP/1.1
+OPTION /read.me HTTP/1.1
 Host: localhost:8000
 User-Agent: Mozilla/5.0 (Macintosh;...) ... Firefox/51.0
 Accept : text/html,aplication/xhtml+xml,...,*/*;q=0.8
@@ -9,5 +9,4 @@ Upgrade-Insecure-Requests: 1
 Content-Type: plain/text
 Content-Length: 345
 
-[...]
-this is a test
+fdsfsd

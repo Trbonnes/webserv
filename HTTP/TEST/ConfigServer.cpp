@@ -108,7 +108,7 @@ _defaultCgi_root("/sgoinfre/goinfre/Perso/pganglof/webserv/HTTP/bin-cgi/cgi_test
     Location loc3("/", "/sgoinfre/goinfre/Perso/pganglof/webserv/HTTP/www",
     _defaultAllow, _defaultIndex,
     _defaultType, _defaultCharset, _defaultLanguage, "off", "", true, "", exe2, cgi_methods, "",
-    100);
+    -1);
 
     _locationList["/"] = loc3;
 

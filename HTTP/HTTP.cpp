@@ -59,6 +59,9 @@ _body("")
     ft_bzero(_cgi_env, sizeof(_cgi_env));
     _uri = _socket.getRequestURI();
     setLocation();
+    std::cout << _config.getClientBodySize(_location) << std::endl;
+    std::cout << "BODY: " << _socket.getBody()  << std::endl;
+    std::cout << _socket.getBody().length()  << std::endl;
     if (_config.getClientBodySize(_location) != -1 && _socket.getBody().length() > _config.getClientBodySize(_location))
     {
         _statusCode = REQUEST_ENTITY_TOO_LARGE;
@@ -66,17 +69,25 @@ _body("")
     }
     replaceURI(); 
     setRoot();
-    extension = _route.find_last_of('.');
-    if (is_good_exe(str.assign(_route).erase(0, extension + 1)) && checkCGImethods(_socket.getMethod()))
+    if (_socket.getMethod().compare("OPTION"))
     {
-        cgi_metaVariables();
-        cgi_exe();
-        setDate();
+        _statusCode = NO_CONTENT;
+        return ;
     }
-    else if (checkAllowMethods(_socket.getMethod()))
-        callMethod(_socket.getMethod());
     else
-        _statusCode = METHOD_NOT_ALLOWED;
+    {
+        extension = _route.find_last_of('.');
+        if (is_good_exe(str.assign(_route).erase(0, extension + 1)) && checkCGImethods(_socket.getMethod()))
+        {
+            cgi_metaVariables();
+            cgi_exe();
+            setDate();
+        }
+        else if (checkAllowMethods(_socket.getMethod()))
+            callMethod(_socket.getMethod());
+        else
+            _statusCode = METHOD_NOT_ALLOWED;
+    }
 }
 
 HTTP::HTTP(HTTP &copy)
@@ -242,7 +253,7 @@ void         HTTP::setRoot()
         if ((file.st_mode & S_IFMT) == S_IFREG)
             return ;
 
-        // ** Else, add index if it is not a put request **
+        // ** Else, add index if it is not a put or delete request **
         if (_socket.getMethod().compare("PUT") && _socket.getMethod().compare("DELETE"))
         {
             itIndexBegin = _config.getIndex(_location).begin();
@@ -534,43 +545,58 @@ std::string         HTTP::getResponse()
         response.append(ft_itoa(_statusCode)).append(" ");
         response.append(_mapCodes.codes[_statusCode]).append("\n");
         response.append("Server: ").append(_config.getServerSoftware()).append("\n");
-        if (_contentType.length() > 0)
-            response.append("Content-Type: ").append(_contentType).append("\n");
-        if (_charset.length() > 0)
-            response.append("Charset: ").append(_charset).append("\n");
-        if (_contentLength > 0)
-        response.append("Content-Length: ").append(ft_itoa(_contentLength)).append("\n");
         if (ft_strlen(_date) > 0)
             response.append("Date: ").append(_date).append("\n");
-        if (_statusCode < 300)
+        if (_socket.getMethod().compare("OPTION") || _statusCode == METHOD_NOT_ALLOWED)
         {
-            if (ft_strlen(_lastModified) > 0)
-                response.append("Last-Modified: ").append(_lastModified).append("\n");
-            if (_contentLocation.length() > 0)
-                response.append("Content-Location: ").append(_contentLocation).append("\n");
-            if (_contentLanguage.length() > 0 && _socket.getMethod().compare("PUT") && _socket.getMethod().compare("DELETE"))
-                response.append("Content-Language: ").append(_contentLanguage).append("\n");
-        }
-        else if (_statusCode == METHOD_NOT_ALLOWED)
-        {
-            std::vector<std::string>::iterator itBegin;
-            std::vector<std::string>::iterator itEnd;
-
-            itBegin = _allow.begin();
-            itEnd = _allow.end();
             response.append("Allow: ");
-            while (itBegin != itEnd)
+            std::vector<std::string>::iterator it;
+            std::vector<std::string>::iterator itEnd;
+            std::size_t extension;
+            std::string str;
+
+            extension = _route.find_last_of('.');
+            if (is_good_exe(str.assign(_route).erase(0, extension + 1)))
             {
-                response.append(*itBegin).append(" ");
-                itBegin++;
+                it = _config.getCGImethods(_location).begin();
+                itEnd = _config.getCGImethods(_location).end();
+            }
+            else
+            {
+                it = _config.getAllow(_location).begin();
+                itEnd = _config.getAllow(_location).end();
+            }
+            while (it != itEnd)
+            {
+                response.append(*it).append(" ");
+                it++;
             }
             response.append("\n");
+
         }
-        else if (_statusCode == UNAUTHORIZED)
-            response.append("WWW-Authenticate: ").append("Basic ").append(_config.getAuth_basic(_location)).append("\n");
+        else
+        {
+            if (_contentType.length() > 0)
+                response.append("Content-Type: ").append(_contentType).append("\n");
+            if (_charset.length() > 0)
+                response.append("Charset: ").append(_charset).append("\n");
+            if (_contentLength > 0)
+            response.append("Content-Length: ").append(ft_itoa(_contentLength)).append("\n");
+            if (_statusCode < 300)
+            {
+                if (ft_strlen(_lastModified) > 0)
+                    response.append("Last-Modified: ").append(_lastModified).append("\n");
+                if (_contentLocation.length() > 0)
+                    response.append("Content-Location: ").append(_contentLocation).append("\n");
+                if (_contentLanguage.length() > 0 && _socket.getMethod().compare("PUT") && _socket.getMethod().compare("DELETE"))
+                    response.append("Content-Language: ").append(_contentLanguage).append("\n");
+            }
+            else if (_statusCode == UNAUTHORIZED)
+                response.append("WWW-Authenticate: ").append("Basic ").append(_config.getAuth_basic(_location)).append("\n");
+            response.append("\n\n");
+            if (_socket.getMethod().compare("HEAD"))
+                response.append(_body);
+        }
     }
-    response.append("\n\n");
-    if (_socket.getMethod().compare("HEAD"))
-        response.append(_body);
     return (response);
 }
