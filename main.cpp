@@ -6,11 +6,23 @@
 
 int     main(void)
 {
-    size_t i = 0;
-
 	int fd = open("/sgoinfre/goinfre/Perso/pganglof/webserv/Socket/httpRequestTest", O_RDWR);
     Socket *socket = httpRequestParser(fd);
+    ConfigServer    config;
+    HTTP method(socket, config);
+    std::string response;
 
+    response = method.getResponse();
+
+    std::cout << "RESPONSE: " << std::endl << std::endl << response << std::endl << std::endl;
+
+//    write(fd, response.c_str(), response.length());
+    
+    return 0;
+}
+
+
+    // size_t i = 0;
 
     // std::cout << "Fd: " << socket->getFd() << std::endl;
     // std::cout << "Method: " << socket->getMethod() << std::endl;
@@ -66,12 +78,3 @@ int     main(void)
     //     std::cout << socket->getBody()[i] << std::endl;
     //     i++;
     // }
-
-    // Socket          socket;
-    ConfigServer    config;
-
-    HTTP method(socket, config);
-
-    method.getResponse();
-    return 0;
-}

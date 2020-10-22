@@ -484,7 +484,7 @@ void        HTTP::configureErrorFile()
 }
 
 // ** Create the response socket **
-int         HTTP::getResponse()
+std::string         HTTP::getResponse()
 {
 
 
@@ -570,7 +570,6 @@ int         HTTP::getResponse()
     response.append(_body);
 
 
-    std::cout << "response: " << std::endl << std::endl << response << std::endl << std::endl;
 
-    return (1);
+    return (response);
 }

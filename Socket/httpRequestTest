@@ -12,4 +12,83 @@ Content-Length: 345
 
 [...]
 this is a test
-blablalalblaladsdafdsfsdfdfsd
+blablalalblaladsdafdsfsdfdfsdHTTP/1.1 201 Created
+Server: SuperServer/1.0
+Content-Location: /sgoinfre/goinfre/Perso/pganglof/webserv/put_files/hello.html
+
+
+HTTP/1.1 413 Request Entity Too Large
+Server: SuperServer/1.0
+Content-Type: text/html
+Charset: utf-8
+Content-Length: 86
+
+
+<!DOCTYPE html>
+<html>
+<body>
+
+<h1>413 Request Entity Too Large</h1>
+
+</body>
+</html>
+HTTP/1.1 413 Request Entity Too Large
+Server: SuperServer/1.0
+Content-Type: text/html
+Charset: utf-8
+Content-Length: 86
+
+
+<!DOCTYPE html>
+<html>
+<body>
+
+<h1>413 Request Entity Too Large</h1>
+
+</body>
+</html>
+HTTP/1.1 413 Request Entity Too Large
+Server: SuperServer/1.0
+Content-Type: text/html
+Charset: utf-8
+Content-Length: 86
+
+
+<!DOCTYPE html>
+<html>
+<body>
+
+<h1>413 Request Entity Too Large</h1>
+
+</body>
+</html>
+HTTP/1.1 413 Request Entity Too Large
+Server: SuperServer/1.0
+Content-Type: text/html
+Charset: utf-8
+Content-Length: 86
+
+
+<!DOCTYPE html>
+<html>
+<body>
+
+<h1>413 Request Entity Too Large</h1>
+
+</body>
+</html>
+HTTP/1.1 413 Request Entity Too Large
+Server: SuperServer/1.0
+Content-Type: text/html
+Charset: utf-8
+Content-Length: 86
+
+
+<!DOCTYPE html>
+<html>
+<body>
+
+<h1>413 Request Entity Too Large</h1>
+
+</body>
+</html>

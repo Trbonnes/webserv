@@ -140,7 +140,7 @@ class   HTTP
     ~HTTP();
 
     HTTP            &operator=(HTTP &rhs);
-    int             getResponse();
+    std::string     getResponse();
 };
 
 #endif
