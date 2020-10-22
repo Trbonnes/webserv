@@ -18,6 +18,17 @@ void HttpConnection::acceptOnSocket(int connection_sock) {
 
 	size = sizeof(_client_name);
 	_sock = accept(connection_sock, &_client_name, &size);
-	std::cout << "VALUE of RECEIPT" << _sock << std::endl;
 	// TO DO throw error if accept fails
+}
+
+
+#include <string.h>
+void HttpConnection::read() {
+    
+	char buff[1024]; // TO DO put buffer in class attribute	
+	
+	memset(buff, 0, 1024);
+	std::cout << "MESSAGE RECIEVED" << std::endl;
+	recv(_sock, buff, 1024, 0);
+	std::cout << buff << std::endl;
 }

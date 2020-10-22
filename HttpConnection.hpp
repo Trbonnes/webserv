@@ -23,6 +23,7 @@ private:
 public:
 	void	acceptOnSocket(int connection_sock);
 	void	write(char *data, size_t size);
+	void	read();
 	int		getSock();
 	
 };

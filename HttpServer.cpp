@@ -32,14 +32,14 @@ void HttpServer::initWorkers() {
 	int status;
 	HttpWorker worker(_listen_sockset);
 
-	_workers_pid = new pid_t[2]; // Change configuration
+	_workers_pid = new pid_t[1]; // Change configuration
 
     std::cout << "Initializing workers" << std::endl;
-	for (size_t i = 0; i < 2; i++)
+	for (size_t i = 0; i < 1; i++)
 	{
 		_workers_pid[i] = ProcessManager::launchProcess(worker);
 	}
-	for (size_t i = 0; i < 2; i++)
+	for (size_t i = 0; i < 1; i++)
 	{
 		wait(&status);
 	}

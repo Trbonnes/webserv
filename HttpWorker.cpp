@@ -65,8 +65,10 @@ void	HttpWorker::run()
 			else if (connections[i])
 			{
 				std::cout << "Event on connection" << std::endl;
+				FD_CLR(i, &read_fs);
 				// handle event with http Module
-				connections[i]->write((char*)"Event on connection\n", 20);
+				connections[i]->read();
+				connections[i]->write((char*)"You typed sum shiet\n", 20);
 			}
 			else
 			{
