@@ -58,7 +58,6 @@ _statusCode(OK)
     ft_bzero(_cgi_env, sizeof(_cgi_env));
     if (checkRequestErrors() != OK)
         return ;
-    std::cout << "Status Code: " << _statusCode << std::endl;
     _uri = _socket.getRequestURI();
     setLocation();
     if (_config.getClientBodySize(_location) != -1 && _socket.getBody().length() > _config.getClientBodySize(_location))
@@ -66,27 +65,23 @@ _statusCode(OK)
         _statusCode = REQUEST_ENTITY_TOO_LARGE;
         return ;
     }
-    replaceURI(); 
     setRoot();
     if (_socket.getMethod().compare("OPTIONS") == 0)
     {
         _statusCode = NO_CONTENT;
         return ;
     }
-    else
+    extension = _route.find_last_of('.');
+    if (is_good_exe(str.assign(_route).erase(0, extension + 1)) && checkCGImethods(_socket.getMethod()))
     {
-        extension = _route.find_last_of('.');
-        if (is_good_exe(str.assign(_route).erase(0, extension + 1)) && checkCGImethods(_socket.getMethod()))
-        {
-            cgi_metaVariables();
-            cgi_exe();
-            setDate();
-        }
-        else if (checkAllowMethods(_socket.getMethod()))
-            callMethod(_socket.getMethod());
-        else
-            _statusCode = METHOD_NOT_ALLOWED;
+        cgi_metaVariables();
+        cgi_exe();
+        setDate();
     }
+    else if (checkAllowMethods(_socket.getMethod()))
+        callMethod(_socket.getMethod());
+    else
+        _statusCode = METHOD_NOT_ALLOWED;
 }
 
 HTTP::HTTP(HTTP &copy)
@@ -141,7 +136,7 @@ HTTP     &HTTP::operator=(HTTP &rhs)
     return *this;
 }
 
-//** Call the non CGI methods, GET, HEAD and PUT **  // ADD OPTIONS? 
+//** Call the non CGI methods, GET, HEAD and PUT / OPTIONS is managed in a different way **  //
 void        HTTP::callMethod(std::string method)
 {
     if (method.compare("GET") == 0 || method.compare("HEAD") == 0)
@@ -239,13 +234,15 @@ void         HTTP::setRoot()
     }
     else
     {
+        replaceURI(); 
+
         //** Relative path **
 
         _route.assign(_config.getRoot(_location));
         _route.append(_socket.getRequestURI());
         stat(_route.c_str(), &file);
 
-        // ** If file exist return **
+        // ** If file exist or put request, return **
         if ((file.st_mode & S_IFMT) == S_IFREG || _socket.getMethod().compare("PUT") == 0
             || (((file.st_mode & S_IFMT) == S_IFDIR) && _socket.getMethod().compare("DELETE") == 0))
             return ;
@@ -255,28 +252,25 @@ void         HTTP::setRoot()
         _route.append(acceptLanguage());
         _route.append(str.assign(_socket.getRequestURI()).erase(0, _location.length()));
         
-        // ** If file exist return **
-        if ((file.st_mode & S_IFMT) == S_IFREG)
+        // ** If file exist or delete request, return **
+        if ((file.st_mode & S_IFMT) == S_IFREG || _socket.getMethod().compare("DELETE") == 0)
             return ;
 
         // ** Else, add index if it is not a put or delete request **
-        if (_socket.getMethod().compare("DELETE"))
+        itIndexBegin = _config.getIndex(_location).begin();
+        itIndexEnd = _config.getIndex(_location).end();
+        stat(_route.c_str(), &file);
+        str.assign(_route);
+        while (itIndexBegin != itIndexEnd && (file.st_mode & S_IFMT) != S_IFREG)
         {
-            itIndexBegin = _config.getIndex(_location).begin();
-            itIndexEnd = _config.getIndex(_location).end();
-            stat(_route.c_str(), &file);
             str.assign(_route);
-            while (itIndexBegin != itIndexEnd && (file.st_mode & S_IFMT) != S_IFREG)
-            {
-                str.assign(_route);
-                if (str.back() != '/')
-                    str.append("/");
-                str.append(*itIndexBegin);
-                stat(str.c_str(), &file);
-                itIndexBegin++;
-            }
-            _route.assign(str);
+            if (str.back() != '/')
+                str.append("/");
+            str.append(*itIndexBegin);
+            stat(str.c_str(), &file);
+            itIndexBegin++;
         }
+        _route.assign(str);
     }
     return ;
 }

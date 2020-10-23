@@ -323,7 +323,7 @@ std::string             ConfigServer::getRoot(std::string location)
     while (itBegin != itEnd)
     {
         if (location.compare(itBegin->first) == 0)
-            return (str.assign((itBegin->second._root)).append(itBegin->second._location));
+            return (str.assign((itBegin->second._root)).append(itBegin->second._location.substr(1)));
         itBegin++;
     }
     return _defaultRoot;
