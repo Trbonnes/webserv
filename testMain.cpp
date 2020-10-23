@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   testMain.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: trbonnes <trbonnes@student.42.fr>          +#+  +:+       +#+        */
+/*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/30 15:30:52 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/10/21 14:10:59 by trbonnes         ###   ########.fr       */
+/*   Updated: 2020/10/23 11:33:58 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,4 +48,6 @@ int main() {
     std::cout << "ContentLength: " << socket->getContentLength() << std::endl;
     i = 0;
     std::cout << "Body: " << std::endl << socket->getBody() << std::endl;
+
+	delete socket;
 }

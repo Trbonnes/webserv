@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   httpRequestParser.cpp                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: trbonnes <trbonnes@student.42.fr>          +#+  +:+       +#+        */
+/*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/30 15:45:46 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/10/21 14:10:38 by trbonnes         ###   ########.fr       */
+/*   Updated: 2020/10/23 11:37:36 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,6 +60,10 @@ int		httpRequestParseBody(std::string request, Socket *socket) {
 	}
 	else 
 		pos += 4;
+	if (pos >= request.npos) {
+		socket->setBody("");
+		return 0;
+	}
 	if (chunkedPos != std::string::npos)
 		return httpRequestParseChunckedBody(request, socket, pos);
 
