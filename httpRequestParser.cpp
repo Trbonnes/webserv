@@ -6,7 +6,7 @@
 /*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/30 15:45:46 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/10/23 11:37:36 by user42           ###   ########.fr       */
+/*   Updated: 2020/10/23 11:49:09 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -175,6 +175,7 @@ int		httpRequestParseRequestLine(std::string request, Socket *socket) {
 	"TRACE"};
 	std::vector<std::string> methodsVec(x, x + sizeof(x) / sizeof(*x));
 	std::string s2;
+	std::string s3;
 	size_t pos;
 
 	//GET METHOD FROM REQUEST
@@ -189,23 +190,23 @@ int		httpRequestParseRequestLine(std::string request, Socket *socket) {
 		s2.push_back(request[pos++]);
 	}
 	socket->setMethod(s2);
-	s2.clear();
 
 	//GET REQUEST-URI
-	while (request[pos] && request[pos] != '/') { pos++ ;}
+	//while (request[pos] && request[pos] != '/') { pos++ ;}
 	while (request[pos] && request[pos] != ' ') {
 		s2.push_back(request[pos++]);
 	}
-	socket->setRequestURI(s2);
-	s2.clear();
 
 	//GET HTTP VERSION
-	while (request[pos] && request[pos] != 'H') { pos++; }
-	while (request[pos] && request[pos] != '\n') {
+	while (request[pos] && request[pos] != 'H') {
 		s2.push_back(request[pos++]);
 	}
-	socket->setHttpVersion(s2);
-	s2.clear();
+	while (request[pos] && request[pos] != '\n') {
+		s3.push_back(request[pos++]);
+	}
+	socket->setHttpVersion(s3);
+	s2.append(s3);
+	socket->setRequestURI(s2);
 
 	return 0;
 }
