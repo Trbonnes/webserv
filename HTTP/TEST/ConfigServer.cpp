@@ -124,6 +124,19 @@ _defaultCgi_root("/sgoinfre/goinfre/Perso/pganglof/webserv/HTTP/bin-cgi/cgi_test
 
     _locationList["/cgi/"] = loc4;
 
+        //** fifth location **
+
+    std::vector<std::string> exe4;
+    std::vector<std::string> allow;
+    std::vector<std::string> cgi_methods2;
+
+    allow.push_back("POST");
+    Location loc5("/post_body", "/sgoinfre/goinfre/Perso/pganglof/webserv/www", allow, _defaultIndex, _defaultType, 
+    _defaultCharset, _defaultLanguage, "off", "", false, "", exe4, cgi_methods2, "",
+    100);
+
+    _locationList["/post_body/"] = loc5;
+
 }
 
 

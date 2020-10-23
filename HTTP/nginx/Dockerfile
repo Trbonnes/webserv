@@ -41,9 +41,7 @@ COPY 	srcs/koi-utf	/etc/nginx/
 COPY 	srcs/koi-win	/etc/nginx/
 COPY 	srcs/win-utf	/etc/nginx/
 
-COPY	srcs/index.html /www
-
-COPY 	srcs/code.css /www
+COPY	srcs/www/ /www
 
 COPY	srcs/.htpasswd /home/www/
 
