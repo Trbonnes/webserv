@@ -11,7 +11,6 @@ _config(),
 _mapCodes(),
 _cgi(),
 _stat(),
-_response(0),
 _allow(0),
 _wwwAuthenticate(""),
 _referer(""),
@@ -34,7 +33,6 @@ _config(config),
 _mapCodes(),
 _cgi(),
 _stat(),
-_response(0),
 _allow(0),
 _wwwAuthenticate(""),
 _referer(""),
@@ -49,7 +47,8 @@ _contentType(""),
 _date(""),
 _retryAfter(""),
 _transferEncoding(""),
-_body("")
+_body(""),
+_statusCode(OK)
 {
     int         i;
     size_t      extension;
@@ -57,6 +56,9 @@ _body("")
     int         fd; 
 
     ft_bzero(_cgi_env, sizeof(_cgi_env));
+    if (checkRequestErrors() != OK)
+        return ;
+    std::cout << "Status Code: " << _statusCode << std::endl;
     _uri = _socket.getRequestURI();
     setLocation();
     if (_config.getClientBodySize(_location) != -1 && _socket.getBody().length() > _config.getClientBodySize(_location))
@@ -66,7 +68,7 @@ _body("")
     }
     replaceURI(); 
     setRoot();
-    if (_socket.getMethod().compare("OPTION"))
+    if (_socket.getMethod().compare("OPTIONS") == 0)
     {
         _statusCode = NO_CONTENT;
         return ;
@@ -91,7 +93,6 @@ HTTP::HTTP(HTTP &copy)
 {
     _socket = copy._socket;
     _config = copy._config;
-    _response = copy._response;
     _stat = copy._stat;
     _allow = copy._allow;
     _wwwAuthenticate = copy._wwwAuthenticate;
@@ -122,7 +123,6 @@ HTTP     &HTTP::operator=(HTTP &rhs)
 {
     _socket = rhs._socket;
     _config = rhs._config;
-    _response = rhs._response;
     _stat = rhs._stat;
     _allow = rhs._allow;
     _wwwAuthenticate = rhs._wwwAuthenticate;
@@ -150,6 +150,14 @@ void        HTTP::callMethod(std::string method)
         put();
     else if (method.compare("DELETE") == 0)
         del();
+}
+
+//** Check request errors **
+int         HTTP::checkRequestErrors()
+{
+    if (_socket.getBody().length() > 0 && _socket.getContentLength().length() == 0)
+        _statusCode = LENGTH_REQUIRED;
+    return (_statusCode);
 }
 
 //** Check if the method is authorized for the non CGI locations **
@@ -238,7 +246,8 @@ void         HTTP::setRoot()
         stat(_route.c_str(), &file);
 
         // ** If file exist return **
-        if ((file.st_mode & S_IFMT) == S_IFREG || (((file.st_mode & S_IFMT) == S_IFDIR) && _socket.getMethod().compare("DELETE") == 0))
+        if ((file.st_mode & S_IFMT) == S_IFREG || _socket.getMethod().compare("PUT") == 0
+            || (((file.st_mode & S_IFMT) == S_IFDIR) && _socket.getMethod().compare("DELETE") == 0))
             return ;
 
         // ** Else, add the language **
@@ -251,7 +260,7 @@ void         HTTP::setRoot()
             return ;
 
         // ** Else, add index if it is not a put or delete request **
-        if (_socket.getMethod().compare("PUT") && _socket.getMethod().compare("DELETE"))
+        if (_socket.getMethod().compare("DELETE"))
         {
             itIndexBegin = _config.getIndex(_location).begin();
             itIndexEnd = _config.getIndex(_location).end();
@@ -544,7 +553,7 @@ std::string         HTTP::getResponse()
         response.append("Server: ").append(_config.getServerSoftware()).append("\n");
         if (ft_strlen(_date) > 0)
             response.append("Date: ").append(_date).append("\n");
-        if (_socket.getMethod().compare("OPTION") || _statusCode == METHOD_NOT_ALLOWED)
+        if (_socket.getMethod().compare("OPTIONS") == 0 || _statusCode == METHOD_NOT_ALLOWED)
         {
             response.append("Allow: ");
             std::vector<std::string>::iterator it;

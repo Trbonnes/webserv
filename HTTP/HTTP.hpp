@@ -63,7 +63,6 @@ class   HTTP
     std::string                 _route;
     std::string                 _location;
     struct stat                 _stat;
-    int                         _response;
     static const std::string    _base64_chars;
     char                        *_cgi_env[18];
 
@@ -136,6 +135,10 @@ class   HTTP
 
     // RESPONSE
     void            configureErrorFile(void);
+
+    // ERRORS
+
+    int             checkRequestErrors(void);
 
     public:
     HTTP(Socket *socket, ConfigServer &config);
