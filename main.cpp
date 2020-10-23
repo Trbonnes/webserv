@@ -14,7 +14,7 @@ int     main(void)
 
     response = method.getResponse();
 
-    std::cout << "RESPONSE: " << std::endl << std::endl << response << std::endl << std::endl;
+    std::cout << std::endl << response << std::endl << std::endl;
 
 //    write(fd, response.c_str(), response.length());
     
