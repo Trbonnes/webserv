@@ -6,7 +6,7 @@
 /*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/30 15:45:46 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/10/23 11:49:09 by user42           ###   ########.fr       */
+/*   Updated: 2020/10/23 12:26:13 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,8 +50,8 @@ int		httpRequestParseBody(std::string request, Socket *socket) {
 	std::string					body;
 	size_t						chunkedPos = socket->getTransferEncoding().find("chunked");
 	
-	if (!socket->getContentLength().size() && chunkedPos == std::string::npos)
-		return 0;
+	// if (!socket->getContentLength().size() && chunkedPos == std::string::npos)
+	//	return 0;
 	
 	size_t pos = request.find("\r\n\r\n");
 	if (pos == request.npos) {
