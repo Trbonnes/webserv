@@ -1,4 +1,4 @@
-GET /hello.html HTTP/1.1
+GET http://hello.html HTTP/1.1
 Host: localhost:8000
 User-Agent: Mozilla/5.0 (Macintosh;...) ... Firefox/51.0
 Accept : text/html,aplication/xhtml+xml,...,*/*;q=0.8
