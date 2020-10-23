@@ -265,6 +265,7 @@ ConfigServer::ConfigServer(ConfigServer &copy)
     _defaultCgi = copy._defaultCgi;
     _defaultCgi_methods = copy._defaultCgi_methods;
     _defaultCgi_root = copy._defaultCgi_root;
+    _defaultMaxBody = copy._defaultMaxBody;
 }
 
 ConfigServer::~ConfigServer() {}
@@ -291,6 +292,7 @@ ConfigServer                  &ConfigServer::operator=(ConfigServer const &rhs)
     _defaultCgi = rhs._defaultCgi;
     _defaultCgi_methods = rhs._defaultCgi_methods;
     _defaultCgi_root = rhs._defaultCgi_root;
+    _defaultMaxBody = rhs._defaultMaxBody;
     return *this;
 }
 

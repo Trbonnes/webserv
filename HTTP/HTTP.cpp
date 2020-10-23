@@ -60,7 +60,6 @@ _body("")
     _uri = _socket.getRequestURI();
     setLocation();
     std::cout << _config.getClientBodySize(_location) << std::endl;
-    std::cout << "BODY: " << _socket.getBody()  << std::endl;
     std::cout << _socket.getBody().length()  << std::endl;
     if (_config.getClientBodySize(_location) != -1 && _socket.getBody().length() > _config.getClientBodySize(_location))
     {
