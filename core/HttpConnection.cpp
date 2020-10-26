@@ -1,6 +1,5 @@
 #include "HttpConnection.hpp"
 
-
 void HttpConnection::write(char *data, size_t size) {
     send(_sock, data, size, 0);
 }
@@ -18,6 +17,7 @@ void HttpConnection::acceptOnSocket(int connection_sock) {
 
 	size = sizeof(_client_name);
 	_sock = accept(connection_sock, &_client_name, &size);
+	std::cout << "_sock : " << _sock << std::endl;
 	// TO DO throw error if accept fails
 }
 

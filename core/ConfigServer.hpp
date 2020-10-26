@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ConfigServer.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: trbonnes <trbonnes@student.42.fr>          +#+  +:+       +#+        */
+/*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/09 12:19:51 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/10/21 10:04:43 by trbonnes         ###   ########.fr       */
+/*   Updated: 2020/10/26 21:02:54 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,7 +74,7 @@ public:
     std::map<int, std::string>  getErrorPages();
     std::string                 getHTMLErrorPage(int error);
 
-    std::map<std::string, Location, Compare<std::string> > getLocationList();
+    std::map<std::string, Location, Compare<std::string> > getLocationList(); // TO DO shouldn t it return a reference ?
 
     void					setCGI(std::vector<std::string> cgi);
 	void					setCGI_allow(std::vector<std::string> cgi_allow);

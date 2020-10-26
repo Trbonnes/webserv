@@ -9,7 +9,7 @@
 class ListenSocket
 {
 public:
-	ListenSocket();
+	ListenSocket(int port);
 	ListenSocket(ListenSocket &&) = default;
 	ListenSocket(const ListenSocket &) = default;
 	ListenSocket &operator=(ListenSocket &&) = default;

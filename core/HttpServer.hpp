@@ -39,7 +39,7 @@ public:
 	~HttpServer();
 
 private:
-	Config						*conf;
+	Config						*_config;
 	std::vector<ListenSocket>	_listen_sockset;
 	pid_t*						_workers_pid; // might put into ProcessManager.hpp
 

@@ -17,8 +17,8 @@ void	HttpWorker::run()
 	fd_set active_fs;
 	fd_set read_fs;
 	int i;
-	HttpConnection *new_connection;
-	HttpConnection* connections[FD_SETSIZE];
+	HttpConnection *new_connection; // temp pointer 
+	HttpConnection* connections[FD_SETSIZE]; // array of connections
 	ListenSocket* listening[FD_SETSIZE];
 
 	std::cout << "Running a worker" << std::endl;
@@ -30,24 +30,28 @@ void	HttpWorker::run()
 		listening[_listen_socket[i].getSock()] = &_listen_socket[i];
 		FD_SET(_listen_socket[i].getSock(), &active_fs);
 	}
+	// Main loop of the worker
 	while (1)
 	{
+		//read fs is going to be modified by select call, so we must reattribute the set there
 		read_fs = active_fs;
+		// Waiting for an event on listen socket
 		if (select(FD_SETSIZE, &read_fs, NULL, NULL, NULL) == -1) // TO DO check if 0
 		{
 			std::cout << "Select error " << strerror(errno) << std::endl;
-			
 			continue; // TO DO throw something
 		}
 		std::cout << "Event occured" << std::endl;
 		i = 0;
 		for (i = 0; i < FD_SETSIZE; i++) // TO DO optimization ?
 		{
+			// if the fd is not set then there's no event on that fd, next
 			if (!FD_ISSET(i, &read_fs))
 				continue ;
+			// if it is on a listening socket, create a new connection
 			if (listening[i])
 			{
-				std::cout << "New connection" << std::endl;
+				std::cout << "New connection" << std::endl; // TO DO remove or change log
 				try
 				{
 					new_connection = new HttpConnection();
@@ -62,6 +66,7 @@ void	HttpWorker::run()
 				}
 				
 			}
+			// If it is a connection socket, do the job
 			else if (connections[i])
 			{
 				std::cout << "Event on connection" << std::endl;
@@ -75,8 +80,8 @@ void	HttpWorker::run()
 				// TO DO or not ?
 			}
 		}
+		// TO DO wero it just in case ?
 		FD_ZERO(&read_fs);
 	// TO DO timeout for http
 	}
-	std::cout << "Should not print" << std::endl;
 }
