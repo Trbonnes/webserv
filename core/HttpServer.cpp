@@ -10,9 +10,27 @@ HttpServer::~HttpServer() {
 }
 
 void HttpServer::initConf() {
-    std::cout << "Initializing configuration" << std::endl;
+	std::cout << "Initializing configuration" << std::endl;
 
-	// Read configuration and put it in a structure/class
+	int fd = open("/home/user42/Bureau/webserver/config/test.conf", O_RDWR); // for test purposes
+
+	try {
+		Config *config = configFileParser(fd);
+
+		std::cout << std::endl;
+
+		std::cout << "-> Workers: " << config->getWorker() << std::endl;
+		std::cout << "-> Worker connections: " << config->getWorkerConnections() << std::endl;
+
+		for (std::vector<ConfigServer>::iterator it = config->getServer().begin(); it != config->getServer().end(); it++) {
+			it->printServer();
+		}
+		
+	}
+	catch (std::exception &e) {
+		std::cout << "Exception: " << e.what() << std::endl;
+		//TO DO throw a custom error
+	}
 
 }
 

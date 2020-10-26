@@ -1,11 +1,15 @@
 #if !defined(HTTPSERVER)
 #define HTTPSERVER
 
+
+#include "Config.hpp"
 #include "HttpConf.hpp"
 #include "HttpWorker.hpp"
 #include "ProcessManager.hpp"
 #include "ListenSocket.hpp"
 
+#include <fstream>
+#include <fcntl.h>
 #include <sys/time.h>
 #include <sys/types.h>
 #include <sys/select.h>
