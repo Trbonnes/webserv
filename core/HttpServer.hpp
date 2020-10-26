@@ -3,7 +3,6 @@
 
 
 #include "Config.hpp"
-#include "HttpConf.hpp"
 #include "HttpWorker.hpp"
 #include "ProcessManager.hpp"
 #include "ListenSocket.hpp"
@@ -40,7 +39,7 @@ public:
 	~HttpServer();
 
 private:
-	HttpConf					conf;
+	Config						*conf;
 	std::vector<ListenSocket>	_listen_sockset;
 	pid_t*						_workers_pid; // might put into ProcessManager.hpp
 

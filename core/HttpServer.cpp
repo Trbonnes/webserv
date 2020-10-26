@@ -22,9 +22,9 @@ void HttpServer::initConf() {
 		std::cout << "-> Workers: " << config->getWorker() << std::endl;
 		std::cout << "-> Worker connections: " << config->getWorkerConnections() << std::endl;
 
-		for (std::vector<ConfigServer>::iterator it = config->getServer().begin(); it != config->getServer().end(); it++) {
-			it->printServer();
-		}
+		// for (std::vector<ConfigServer>::iterator it = config->getServer().begin(); it != config->getServer().end(); it++) {
+		// 	it->printServer();
+		// }
 		
 	}
 	catch (std::exception &e) {

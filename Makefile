@@ -14,11 +14,12 @@ CORESRC = 	core/ConfigServer.cpp \
 			core/Location.cpp \
 			core/Config.cpp \
 			core/HttpConnection.cpp \
-			core/HttpConf.cpp \
 			core/HttpServer.cpp
 
 SRCS = $(CORESRC)
 
+
+# TO DO ADD HEADERS
 
 # Headers files
 
@@ -27,20 +28,15 @@ INCLUDES = -I core/ -I http/
 # Object files
 
 OBJECTSDIR = objs
-OBJECTS = $(addprefix $(OBJECTDIR)/, $(subst .cpp,.o,$(SRCS)))
+OBJECTS = $(addprefix $(OBJECTSDIR)/, $(subst .cpp,.o,$(SRCS)))
+
+$(OBJECTSDIR)/%.o: ./%.cpp
+	mkdir -p $(OBJECTSDIR)/core $(OBJECTSDIR)/http
+	$(CXX) $(CXXFLAGS) -c $< -o $@ $(INCLUDES)
 
 # Executable
 
 NAME = webserv
-
-# Implicit rules
-
-$(OBJECTSDIR):
-	mkdir -p $(OBJECTSDIR)
-
-$(OBJECTSDIR)/%.o: ./%.c $(OBJECTSDIR)
-	$(CXX) $(CXXFLAGS) -c $< -o $@ $(INCLUDES)
-
 
 # Explicit rules
 
@@ -59,4 +55,4 @@ fclean: clean
 
 re: fclean all
 
-.PHONY: all clean fclean re
+.PHONY: all clean fclean re $(OBJECTSDIR) $(NAME)
