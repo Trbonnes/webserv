@@ -1,17 +1,17 @@
 #include "ConfigServer.hpp"
 
 ConfigServer::ConfigServer() :
-_defaultRoot("/sgoinfre/goinfre/Perso/pganglof/webserv/www"),
-_defaultServerName("localhost"),
-_defaultPort("80"),
 _httpVersion("HTTP/1.1"),
 _serverSoftware("SuperServer/1.0"),
+_configFilesRoot("/sgoinfre/goinfre/Perso/pganglof/webserv/HTTP/config"),
+_errorFilesRoot("/sgoinfre/goinfre/Perso/pganglof/webserv/HTTP/error"),
+_defaultPort("80"),
+_defaultServerName("localhost"),
+_defaultRoot("/sgoinfre/goinfre/Perso/pganglof/webserv/www"),
 _defaultIndex(0),
 _defaultType("text/plain"),
 _defaultCharset("utf-8"),
 _defaultLanguage(0),
-_configFilesRoot("/sgoinfre/goinfre/Perso/pganglof/webserv/HTTP/config"),
-_errorFilesRoot("/sgoinfre/goinfre/Perso/pganglof/webserv/HTTP/error"),
 _defaultAuth_basic("\"Authorization\""),
 _defaultAuth_basic_user_file("/sgoinfre/goinfre/Perso/pganglof/webserv/HTTP/config/.htpasswd"),
 _defaultAutoindex(false),

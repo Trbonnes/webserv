@@ -13,7 +13,6 @@
 #ifndef SOCKET_HPP
 # define SOCKET_HPP
 
-# include "../statusCodes.hpp"
 # include <iostream>
 # include <string>
 # include <list>
@@ -21,6 +20,8 @@
 # include <unistd.h>
 # include <sys/types.h>
 # include <sys/socket.h>
+
+# include "statusCodes.hpp"
 
 class   Socket
 {

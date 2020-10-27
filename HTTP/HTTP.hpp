@@ -14,7 +14,7 @@
 # include <algorithm>
 # include <stack>
 
-# include "socket.hpp"
+# include "Socket.hpp"
 # include "../core/ConfigServer.hpp"
 # include "utils/utils.hpp"
 # include "statusCodes.hpp"

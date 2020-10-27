@@ -5,8 +5,8 @@
 # include <vector>
 # include <list>
 
-// Les locations doivent être triées par ordre de longueur \
-    Du plus grand au plus petit
+// Les locations doivent être triées par ordre de longueur
+//    Du plus grand au plus petit
 
 class   Location
 {

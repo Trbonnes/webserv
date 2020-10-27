@@ -30,9 +30,10 @@ _auth_basic(auth_basic),
 _auth_basic_user_file(auth_basic_user_file),
 _autoindex(autoindex),
 _alias(alias),
+_maxBody(maxBody),
 _cgi(cgi),
 _cgi_methods(cgi_methods),
-_cgi_root(cgi_root),
-_maxBody(maxBody) {}
+_cgi_root(cgi_root)
+{}
 
 Location::~Location() {}
