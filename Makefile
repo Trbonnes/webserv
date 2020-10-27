@@ -51,7 +51,7 @@ $(NAME):	$(OBJECTS)
 
 clean:
 		rm -f $(OBJECTS)
-		rm -r objs
+		rm -r $(OBJECTSDIR)
 
 fclean: clean
 		rm -f $(NAME)
