@@ -23,7 +23,7 @@ void	HttpWorker::run()
 
 	std::cout << "Running a worker" << std::endl;
 	// Important zeroing of the values
-	bzero(connections, FD_SETSIZE * sizeof(ListenSocket*));
+	bzero(connections, FD_SETSIZE * sizeof(ListenSocket*)); // TO DO forbidden function
 	bzero(listening, FD_SETSIZE * sizeof(ListenSocket*));
 	// Transforming list in fdset and Listensocket hashmap (not sure about this name)
 	FD_ZERO(&active_fs);

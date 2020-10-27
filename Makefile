@@ -16,6 +16,9 @@ CORESRC = 	core/ConfigServer.cpp \
 			core/HttpConnection.cpp \
 			core/HttpServer.cpp
 
+HTTPSRC = 
+
+
 SRCS = $(CORESRC)
 
 
