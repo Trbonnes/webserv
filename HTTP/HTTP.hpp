@@ -17,7 +17,7 @@
 # include "socket.hpp"
 # include "../core/ConfigServer.hpp"
 # include "utils/utils.hpp"
-# include "../statusCodes.hpp"
+# include "statusCodes.hpp"
 # include "CGI.hpp"
 
 # define SIDE_OUT 0

@@ -1,6 +1,9 @@
 #ifndef STATUSCODES_HPP
 # define STATUSCODES_HPP
 
+# include <map>
+# include <iostream>
+
 // INFORMATIONAL
 
 # define CONTINUE                           100
@@ -56,5 +59,55 @@
 # define SERVICE_UNAVAILABLE                503
 # define GATEWAY_TIMEOUT                    504
 # define HTTP_VERSION_NOT_SUPPORTED         505 
+
+class  StatusCode
+{
+    public:
+    std::map<int, std::string> codes;
+
+    StatusCode() {
+        codes[CONTINUE] = "Continue";
+        codes[SWITCHING_PROTOCOLS] = "Switching Protocols";
+        codes[OK] = "Ok";
+        codes[CREATED] = "Created";
+        codes[ACCEPTED] = "Accepted";
+        codes[NON_AUTHORITATIVE_INFORMATION] = "Non Authoritative Information";
+        codes[NO_CONTENT] = "No Content";
+        codes[RESET_CONTENT] = "Reset Content";
+        codes[PARTIAL_CONTENT] = "Partial Content";
+        codes[MULTIPLE_CHOICES] = "Multiple Choices";
+        codes[MOVED_PERMANENTLY] = "Moved Permanently";
+        codes[FOUND] = "Found";
+        codes[SEE_OTHER] = "See Other";
+        codes[NOT_MODIFIED] = "Not Modified";
+        codes[USE_PROXY] = "Use Proxy";
+        codes[UNUSED] = "Unused";
+        codes[TEMPORARY_REDIRECT] = "Temporary Redirect";
+        codes[BAD_REQUEST] = "Bad Request";
+        codes[UNAUTHORIZED] = "Unauthorized";
+        codes[PAYMENT_REQUIRED] = "Payment Required";
+        codes[FORBIDDEN] = "Forbidden";
+        codes[NOT_FOUND] = "Not Found";
+        codes[METHOD_NOT_ALLOWED] = "Method Not Allowed";
+        codes[NOT_ACCEPTABLE] = "Not Acceptable";
+        codes[PROXY_AUTHENTICATION_REQUIRED] = "Proxy Authentication Required";
+        codes[REQUEST_TIMEOUT] = "Request Timeout";
+        codes[CONFLICT] = "Conflict";
+        codes[GONE] = "Gone";
+        codes[LENGTH_REQUIRED] = "Length Required";
+        codes[PRECONFITION_FAILED] = "Preconfition Failed";
+        codes[REQUEST_ENTITY_TOO_LARGE] = "Request Entity Too Large";
+        codes[REQUEST_URL_TOO_LONG] = "Request Url Too Long";
+        codes[REQUESTED_RANGE_NOT_SATISFIABLE] = "Requested Range Not Satisfiable";
+        codes[EXPECTATION_FAILED] = "Expectation Failed";
+        codes[INTERNAL_SERVER_ERROR] = "Internal Server Error";
+        codes[NOT_IMPLEMENTED] = "Not Implemented";
+        codes[BAD_GATEWAY] = "Bad Gateway";
+        codes[SERVICE_UNAVAILABLE] = "Service Unvailable";
+        codes[GATEWAY_TIMEOUT] = "Gateway Timeout";
+        codes[HTTP_VERSION_NOT_SUPPORTED] = "Http Version Not Supported";
+    }
+};
+
 
 #endif
