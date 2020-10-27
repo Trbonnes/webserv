@@ -76,7 +76,14 @@ void	HttpWorker::run()
 				FD_CLR(i, &read_fs);
 				// handle event with http Module
 				connections[i]->read();
-				connections[i]->write((char*)"You typed sum shiet\n", 20);
+
+				Socket *socket = httpRequestParser(fd); // TO DO why would it return a socket class and not an httpRequest object ? 
+				ConfigServer    config;
+				HTTP method(socket, config);
+				std::string response;
+				response = method.getResponse(); // TO DO make code more modulare and clean up names
+
+				connections[i]->write((char*)response.c_str(), response.length()); // TO DO ugly
 			}
 			else
 			{

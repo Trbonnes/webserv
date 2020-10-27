@@ -10,6 +10,9 @@
 #include "HttpConnection.hpp"
 #include "Runnable.hpp"
 
+#include "../HTTP/HTTP.hpp"
+#include "../Socket/Socket.hpp"
+
 class HttpWorker : public Runnable
 {
 public:
