@@ -16,10 +16,26 @@ CORESRC = 	core/ConfigServer.cpp \
 			core/HttpConnection.cpp \
 			core/HttpServer.cpp
 
-HTTPSRC = 
+HTTPSRC = 	HTTP/CGI.cpp \
+			HTTP/HTTP.cpp \
+			HTTP/httpRequestParser.cpp \
+			HTTP/parseHeaders.cpp \
+			HTTP/setHeaders.cpp \
+			HTTP/socket.cpp \
+			HTTP/bin-cgi/cgi.cpp \
+			HTTP/Methods/del.cpp \
+			HTTP/Methods/get.cpp \
+			HTTP/Methods/put.cpp \
+			HTTP/utils/ft_atoi.cpp \
+			HTTP/utils/ft_bzero.cpp \
+			HTTP/utils/ft_itoa.cpp \
+			HTTP/utils/ft_strcpy.cpp \
+			HTTP/utils/ft_strdup.cpp \
+			HTTP/utils/ft_strlen.cpp \
+			HTTP/utils/get_next_line.cpp \
 
 
-SRCS = $(CORESRC)
+SRCS = $(CORESRC) $(HTTPSRC)
 
 
 # TO DO ADD HEADERS
