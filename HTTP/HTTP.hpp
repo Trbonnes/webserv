@@ -13,8 +13,9 @@
 # include <fcntl.h>
 # include <algorithm>
 # include <stack>
-# include "../Socket/Socket.hpp"
-# include "TEST/ConfigServer.hpp"
+
+# include "socket.hpp"
+# include "../core/ConfigServer.hpp"
 # include "utils/utils.hpp"
 # include "../statusCodes.hpp"
 # include "CGI.hpp"

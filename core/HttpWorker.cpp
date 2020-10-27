@@ -75,9 +75,7 @@ void	HttpWorker::run()
 				std::cout << "Event on connection" << std::endl;
 				FD_CLR(i, &read_fs);
 				// handle event with http Module
-				connections[i]->read();
-
-				Socket *socket = httpRequestParser(fd); // TO DO why would it return a socket class and not an httpRequest object ? 
+				Socket *socket = httpRequestParser(connections[i]->getSock()); // TO DO why would it return a socket class and not an httpRequest object ? 
 				ConfigServer    config;
 				HTTP method(socket, config);
 				std::string response;
