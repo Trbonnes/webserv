@@ -50,10 +50,8 @@ _retryAfter(""),
 _transferEncoding(""),
 _body("")
 {
-    int         i;
     size_t      extension;
     std::string str;
-    int         fd; 
 
     ft_bzero(_cgi_env, sizeof(_cgi_env));
     if (checkRequestErrors() != OK)
