@@ -17,7 +17,7 @@ int     main(void)
     std::cout << std::endl << response << std::endl << std::endl;
 
 //    write(fd, response.c_str(), response.length());
-    
+    delete socket;
     return 0;
 }
 

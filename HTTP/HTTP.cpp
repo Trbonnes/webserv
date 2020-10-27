@@ -308,7 +308,7 @@ void            HTTP::setAutoindex(void)
             if (dirent->d_type == DT_DIR)
                 str.append("/");
             str.append("</a>\t\t\t\t");
-            timeinfo = localtime(&(directory.st_mtimespec.tv_sec)); // st_mtimespec.tv_sec = macos ; st_mtime = linux
+            timeinfo = localtime(&(directory.st_mtime)); // st_mtimespec.tv_sec = macos ; st_mtime = linux
             strftime(lastModifications, 100, "%d-%b-20%y %OH:%OM", timeinfo);
             str.append(lastModifications);
             str.append("\t\t");
@@ -468,12 +468,13 @@ void        HTTP::configureErrorFile()
     char    buf[1024 + 1];
     int     fd;
 
-    _route = _config.getErrorFilesRoot().append("/").append(ft_itoa(_statusCode));
+    char *code = ft_itoa(_statusCode);
+    _route = _config.getErrorFilesRoot().append("/").append(code);
     fd = open(_route.c_str(), O_RDONLY);
     if (fd == -1)
     {
         _body.assign("<!DOCTYPE html>\n<html>\n<body>\n\n<h1>");
-        _body.append(ft_itoa(_statusCode)).append(" ").append(_mapCodes.codes[_statusCode]);
+        _body.append(code).append(" ").append(_mapCodes.codes[_statusCode]);
         _body.append("</h1>\n\n</body>\n</html>\n");
         _contentType = "text/html";
         _charset = "utf-8";
@@ -496,6 +497,7 @@ void        HTTP::configureErrorFile()
         setContentLength();
         setDate();
     }
+    free(code);
 }
 
 // ** Create the response socket **
@@ -540,9 +542,10 @@ std::string         HTTP::getResponse()
     }
     else
     {
+        char *code = ft_itoa(_statusCode);
         response.append(_config.getHttpVersion());
         response.append(" ");
-        response.append(ft_itoa(_statusCode)).append(" ");
+        response.append(code).append(" ");
         response.append(_mapCodes.codes[_statusCode]).append("\n");
         response.append("Server: ").append(_config.getServerSoftware()).append("\n");
         if (ft_strlen(_date) > 0)
@@ -572,16 +575,17 @@ std::string         HTTP::getResponse()
                 it++;
             }
             response.append("\n");
-
+            free(code);
         }
         else
         {
+            char *contentLength = ft_itoa(_contentLength);
             if (_contentType.length() > 0)
                 response.append("Content-Type: ").append(_contentType).append("\n");
             if (_charset.length() > 0)
                 response.append("Charset: ").append(_charset).append("\n");
             if (_contentLength > 0)
-            response.append("Content-Length: ").append(ft_itoa(_contentLength)).append("\n");
+            response.append("Content-Length: ").append(contentLength).append("\n");
             if (_statusCode < 300)
             {
                 if (ft_strlen(_lastModified) > 0)
@@ -596,6 +600,7 @@ std::string         HTTP::getResponse()
             response.append("\n\n");
             if (_socket.getMethod().compare("HEAD"))
                 response.append(_body);
+            free(contentLength);
         }
     }
     return (response);
