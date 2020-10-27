@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   socket.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: trbonnes <trbonnes@student.42.fr>          +#+  +:+       +#+        */
+/*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/30 15:10:55 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/10/21 14:03:09 by trbonnes         ###   ########.fr       */
+/*   Updated: 2020/10/27 12:41:22 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "socket.hpp"
+#include "Socket.hpp"
 
 Socket::Socket() :
 _fd(0),
@@ -153,12 +153,12 @@ std::string     Socket::getTransferEncoding()
     return _transferEncoding;
 }
 
-std::vector<std::string>     Socket::getAcceptCharset()
+std::vector<std::string>     &Socket::getAcceptCharset()
 {
     return _acceptCharset;
 }
 
-std::vector<std::string>     Socket::getAcceptLanguage()
+std::vector<std::string>     &Socket::getAcceptLanguage()
 {
     return _acceptLanguage;
 }
@@ -262,4 +262,9 @@ void	Socket::setReferer(std::string Referer) {
 
 void	Socket::setBody(std::string Body) {
 	_body = Body;
+}
+
+std::string     Socket::getRemoteAddr()
+{
+    return _addr;
 }

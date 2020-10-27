@@ -58,7 +58,7 @@ _body("")
         return ;
     _uri = _socket.getRequestURI();
     setLocation();
-    if (_config.getClientBodySize(_location) != -1 && _socket.getBody().length() > _config.getClientBodySize(_location))
+    if (_config.getClientBodySize(_location) != -1 && (int)_socket.getBody().length() > _config.getClientBodySize(_location)) // TO DO quick fix
     {
         _statusCode = REQUEST_ENTITY_TOO_LARGE;
         return ;
@@ -214,7 +214,6 @@ int         HTTP::openFile()
 // ** Set the root with language and location directory if needed **
 void         HTTP::setRoot()
 {
-    int         fd;
     int         find;
     std::string str;
     struct stat file;

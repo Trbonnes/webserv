@@ -2,40 +2,40 @@
 # define LOCATION_HPP
 
 # include <iostream>
-# include <list>
-# include <unistd.h>
-# include <sys/types.h>
-# include <sys/stat.h>
-# include <fcntl.h>
 # include <vector>
-# include <map>
-class	Location {
-private:
-;
-public:
+# include <list>
+
+// Les locations doivent être triées par ordre de longueur \
+    Du plus grand au plus petit
+
+class   Location
+{
+    public:
+    
+    std::string                 _location;
+    std::string                 _root;
     std::vector<std::string>    _allow;
+    std::vector<std::string>    _index;
     std::string                 _type;
     std::string                 _charset;
     std::vector<std::string>    _language;
     std::string                 _auth_basic;
     std::string                 _auth_basic_user_file;
-
-	std::string					_location;
-	std::vector<std::string>	_cgi;
-	std::vector<std::string>	_cgi_allow;
-	std::string					_cgi_root;
-    std::string                 _root;
-    std::vector<std::string>    _index;
     bool                        _autoindex;
-    int                         _clientBodySize;
-	std::string					_alias;
+    std::string                 _alias;
+    int                         _maxBody;
 
-	Location();
-	Location(const Location &c);
-	/*virtual*/ ~Location();
-	Location &operator=(const Location &c);
+	std::vector<std::string>	_cgi;
+	std::vector<std::string>	_cgi_methods;
+	std::string					_cgi_root;
 
-    void                    printLocation();
+    Location(std::string location, std::string root, std::vector<std::string> allow, 
+    std::vector<std::string> index, std::string type, std::string charset, std::vector<std::string> language,
+    std::string auth_basic, std::string auth_basic_user_file, bool autoindex, std::string alias,
+    std::vector<std::string> cgi, std::vector<std::string> cgi_methods, std::string cgi_root, int maxBody);
+    ~Location();
+
+    Location();
 };
 
 #endif

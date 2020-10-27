@@ -1,51 +1,37 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   ConfigServer.cpp                                   :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/10/09 15:13:35 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/10/26 20:45:38 by user42           ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "ConfigServer.hpp"
 
 ConfigServer::ConfigServer() :
-_defaultRoot(""),
-// _defaultIndex(0),
-// _defaultType(""),
-// _defaultCharset(""),
-// _defaultLanguage(0),
-// _configFilesRoot(""),
-// _defaultAuth_basic(""),
-// _defaultAuth_basic_user_file(""),
-// _defaultServerName(0),
-// _defaultCgi(0),
-// _defaultCgi_allow(0),
-// _defaultCgi_root(""),
-// _defaultAutoindex(0),
-// _defaultAllow(0),
-_defaultClientBodySize(-1)
-// _port(0) 
+_defaultRoot("/sgoinfre/goinfre/Perso/pganglof/webserv/www"),
+_defaultServerName("localhost"),
+_defaultPort("80"),
+_httpVersion("HTTP/1.1"),
+_serverSoftware("SuperServer/1.0"),
+_defaultIndex(0),
+_defaultType("text/plain"),
+_defaultCharset("utf-8"),
+_defaultLanguage(0),
+_configFilesRoot("/sgoinfre/goinfre/Perso/pganglof/webserv/HTTP/config"),
+_errorFilesRoot("/sgoinfre/goinfre/Perso/pganglof/webserv/HTTP/error"),
+_defaultAuth_basic("\"Authorization\""),
+_defaultAuth_basic_user_file("/sgoinfre/goinfre/Perso/pganglof/webserv/HTTP/config/.htpasswd"),
+_defaultAutoindex(false),
+_defaultMaxBody(-1),
+_defaultCgi_root("/sgoinfre/goinfre/Perso/pganglof/webserv/HTTP/bin-cgi/cgi_tester")
 {
-    // _defaultAllow.push_back("GET");
-    // _defaultAllow.push_back("HEAD");
-    // _defaultAllow.push_back("POST");
-    // _defaultAllow.push_back("PUT");
-    // _defaultLanguage.push_back("fr");
-    // _defaultLanguage.push_back("en");
-    // _defaultIndex.push_back("index.html");
-    // _defaultIndex.push_back("index.html");
-    // _mimeTypes.push_back("plain/text");
-    // _defaultServerName.push_back("localhost");
+    _defaultAllow.push_back("GET");
+    _defaultAllow.push_back("HEAD");
+    _defaultAllow.push_back("PUT");
+    _defaultAllow.push_back("DELETE");
+    _defaultLanguage.push_back("en");
+    _defaultLanguage.push_back("fr");
+    // _defaultIndex.push_back("cgi.bla");
+    _defaultIndex.push_back("index.html");
+    _defaultIndex.push_back("index.php");
 
-/*
+    _defaultCgi.push_back("bla");
+    _defaultCgi_methods.push_back("POST");
 
-    -----mime.types test not for configfile parsing-----
-
-    // open mime.types **
+    //** open mime.types **
     int         ret;
     int         fd;
     char        *line;
@@ -58,12 +44,16 @@ _defaultClientBodySize(-1)
     file.append("/mime.types");
     if ((fd = open(file.c_str(), O_RDONLY)) >= 0)
     {
-        while ((ret = getDefault_next_line(fd, &line)) > 0)
+        while ((ret = get_next_line(fd, &line)) > 0)
         {
             string = line;
+            free(line);
+            line = NULL;
             _mimeTypes.push_back(string);
         }
         string = line;
+        free(line);
+        line = NULL;
         _mimeTypes.push_back(string);
         it = _mimeTypes.begin();
         while (it != _mimeTypes.end())
@@ -74,167 +64,221 @@ _defaultClientBodySize(-1)
             (*it).erase((*it).begin(), s_it);
             it++;
         }
-        free(line);
         close (fd);
     }
-*/
 
-/*
+    //** Locations **
 
-    -----Test Locations without config file parsing-----
+        //** first location **
 
-    // Locations **
+    std::vector<std::string> index;
+    std::vector<std::string> exe;
+    std::vector<std::string> cgi_methods;
 
-        // first location **
-
-    std::list<std::string> index;
-    
+    cgi_methods.push_back("GET");
+    cgi_methods.push_back("HEAD");
+    cgi_methods.push_back("PUT");
+    cgi_methods.push_back("POST");
+    cgi_methods.push_back("DELETE");
     index.push_back("index.php");
 
-    Location loc1("/data/", "/home/pauline/webserver/www",
+    Location loc1("/data/", "/sgoinfre/goinfre/Perso/pganglof/webserv/www",
     _defaultAllow, index,
-    "text/html", "utf-8", _defaultLanguage, _defaultAuth_basic, _defaultAuth_basic_user_file, _defaultAutoindex);
+    "text/html", "utf-8", _defaultLanguage, _defaultAuth_basic, _defaultAuth_basic_user_file, _defaultAutoindex, "/blabla/", exe, cgi_methods, "",
+    _defaultMaxBody);
 
     _locationList["/data/"] = loc1;
 
-        // second location **
-
-    std::list<std::string> index2;
+        //** second location **
+    std::vector<std::string> index2;
+    std::vector<std::string> exe1;
 
     index2.push_back("42.png");
 
-    Location loc2("/images/", "/home/pauline/webserver/www",
+    Location loc2("/images/", "/sgoinfre/goinfre/Perso/pganglof/webserv/www",
     _defaultAllow, index2,
-    "text/html", "", _defaultLanguage, "off", "", _defaultAutoindex);
+    "text/html", "", _defaultLanguage, "off", "", _defaultAutoindex, "", exe1, cgi_methods, "",
+    _defaultMaxBody);
 
     _locationList["/images/"] = loc2;
 
-    Location loc3("/", "/home/pauline/webserver/www",
+        //** third location **
+    std::vector<std::string> exe2;
+
+    Location loc3("/", "/sgoinfre/goinfre/Perso/pganglof/webserv/www",
     _defaultAllow, _defaultIndex,
-    _defaultType, _defaultCharset, _defaultLanguage, "off", "", "on");
+    _defaultType, _defaultCharset, _defaultLanguage, "off", "", true, "", _defaultCgi, cgi_methods, _defaultCgi_root,
+    -1);
 
     _locationList["/"] = loc3;
-*/
+
+        //** fourth location **
+    std::vector<std::string> exe3;
+
+    // exe3.push_back("bla");
+    exe3.push_back("php");
+
+    Location loc4("/cgi/", "/sgoinfre/goinfre/Perso/pganglof/webserv/www", _defaultAllow, _defaultIndex, _defaultType, 
+    _defaultCharset, _defaultLanguage, "off", "", false, "", exe3, cgi_methods, "/sgoinfre/goinfre/Perso/pganglof/webserv/HTTP/bin-cgi/cgi_tester",
+    _defaultMaxBody);
+
+    _locationList["/cgi/"] = loc4;
+
+        //** fifth location **
+
+    std::vector<std::string> exe4;
+    std::vector<std::string> allow;
+    std::vector<std::string> cgi_methods2;
+
+    allow.push_back("POST");
+    Location loc5("/post_body", "/sgoinfre/goinfre/Perso/pganglof/webserv/www", allow, _defaultIndex, _defaultType, 
+    _defaultCharset, _defaultLanguage, "off", "", false, "", exe4, cgi_methods2, "",
+    100);
+
+    _locationList["/post_body/"] = loc5;
 
 }
 
-void	Location::printLocation() {
-	std::cout << std::endl << "\033[0;33m///LOCATION///" << std::endl;
 
-	std::cout << "\033[0;34m--LOCATION--" << std::endl;
-	std::cout << _location << std::endl;
-	std::cout << "--ALIAS--" << std::endl;
-	std::cout << _alias << std::endl;
-	std::cout << "--ROOT--" << std::endl;
-	std::cout << _root << std::endl;
-	std::cout << "--INDEX--" << std::endl;
-	if (_index.size())
-		for (std::vector<std::string>::iterator it = _index.begin(); it != _index.end(); it++) {
-			std::cout << *it << std::endl;
-		}
-	std::cout << "--AUTO INDEX--" << std::endl;
-	std::cout << _autoindex << std::endl;
-	std::cout << "--CLIENT BODY--" << std::endl;
-	std::cout << _clientBodySize << std::endl;
-	std::cout << "--ALLOW--" << std::endl;
-	if (_allow.size())
-		for (std::vector<std::string>::iterator it = _allow.begin(); it != _allow.end(); it++) {
-			std::cout << *it << std::endl;
-		}
-	std::cout << "--CGI--" << std::endl;
-	if (_cgi.size())
-		for (std::vector<std::string>::iterator it = _cgi.begin(); it != _cgi.end(); it++) {
-			std::cout << *it << std::endl;
-		}
-	std::cout << "--CGI ALLOW--" << std::endl;
-	if (_cgi_allow.size())
-		for (std::vector<std::string>::iterator it = _cgi_allow.begin(); it != _cgi_allow.end(); it++) {
-			std::cout << *it << std::endl;
-		}
-	std::cout << "--CGI ROOT--" << std::endl;
-	std::cout << _cgi_root << std::endl;
+// ConfigServer::ConfigServer() :
+// _defaultRoot("/sgoinfre/goinfre/Perso/pganglof/webserv/www"),
+// _defaultServerName("localhost"),
+// _defaultPort("80"),
+// _httpVersion("HTTP/1.1"),
+// _serverSoftware("SuperServer/1.0"),
+// _defaultIndex(0),
+// _defaultType("text/plain"),
+// _defaultCharset("utf-8"),
+// _defaultLanguage(0),
+// _configFilesRoot("/sgoinfre/goinfre/Perso/pganglof/webserv/HTTP/config"),
+// _errorFilesRoot("/sgoinfre/goinfre/Perso/pganglof/webserv/HTTP/error"),
+// _defaultAuth_basic("\"Authorization\""),
+// _defaultAuth_basic_user_file("/sgoinfre/goinfre/Perso/pganglof/webserv/HTTP/config/.htpasswd"),
+// _defaultAutoindex(false),
+// _defaultMaxBody(-1),
+// _defaultCgi_root("/sgoinfre/goinfre/Perso/pganglof/webserv/HTTP/bin-cgi/cgi_tester")
+// {
+//     _defaultAllow.push_back("GET");
+//     _defaultAllow.push_back("HEAD");
+//     _defaultLanguage.push_back("en");
+//     _defaultLanguage.push_back("fr");
+//     // _defaultIndex.push_back("cgi.bla");
+//     _defaultIndex.push_back("index.html");
+//     _defaultIndex.push_back("index.php");
 
-}
+//     _defaultCgi.push_back("bla");
+//     _defaultCgi_methods.push_back("POST");
 
-void	ConfigServer::printServer() {
-	std::cout << std::endl << "\033[0;31m///SERVER///" << std::endl;
+//     //** open mime.types **
+//     int         ret;
+//     int         fd;
+//     char        *line;
+//     std::string string;
+//     std::string file;
+//     std::list<std::string>::iterator it;
+//     std::string::iterator   s_it;
 
-	std::cout << "\033[0;32m--PORT--" << std::endl;
-	std::cout << _port << std::endl;
-	std::cout << "--SERVER NAME--" << std::endl;
-	if (_defaultServerName.size())
-		for (std::vector<std::string>::iterator it = _defaultServerName.begin(); it != _defaultServerName.end(); it++) {
-			std::cout << *it << std::endl;
-		}
-	std::cout << "--ROOT--" << std::endl;
-	std::cout << _defaultRoot << std::endl;
-	std::cout << "--INDEX--" << std::endl;
-	if (_defaultIndex.size())
-		for (std::vector<std::string>::iterator it = _defaultIndex.begin(); it != _defaultIndex.end(); it++) {
-			std::cout << *it << std::endl;
-		}
-	std::cout << "--AUTO INDEX--" << std::endl;
-	std::cout << _defaultAutoindex << std::endl;
-	std::cout << "--CLIENT BODY--" << std::endl;
-	std::cout << _defaultClientBodySize << std::endl;
-	std::cout << "--ALLOW--" << std::endl;
-	if (_defaultAllow.size())
-		for (std::vector<std::string>::iterator it = _defaultAllow.begin(); it != _defaultAllow.end(); it++) {
-			std::cout << *it << std::endl;
-		}
-	std::cout << "--CGI--" << std::endl;
-	if (_defaultCgi.size())
-		for (std::vector<std::string>::iterator it = _defaultCgi.begin(); it != _defaultCgi.end(); it++) {
-			std::cout << *it << std::endl;
-		}
-	std::cout << "--CGI ALLOW--" << std::endl;
-	if (_defaultCgi_allow.size())
-		for (std::vector<std::string>::iterator it = _defaultCgi_allow.begin(); it != _defaultCgi_allow.end(); it++) {
-			std::cout << *it << std::endl;
-		}
-	std::cout << "--CGI ROOT--" << std::endl;
-	std::cout << _defaultCgi_root << std::endl;
+//     file.append(_configFilesRoot);
+//     file.append("/mime.types");
+//     if ((fd = open(file.c_str(), O_RDONLY)) >= 0)
+//     {
+//         while ((ret = get_next_line(fd, &line)) > 0)
+//         {
+//             string = line;
+//             free(line);
+//             line = NULL;
+//             _mimeTypes.push_back(string);
+//         }
+//         string = line;
+//         free(line);
+//         line = NULL;
+//         _mimeTypes.push_back(string);
+//         it = _mimeTypes.begin();
+//         while (it != _mimeTypes.end())
+//         {
+//             s_it = (*it).begin();
+//             while (*s_it == ' ')
+//                 s_it++;
+//             (*it).erase((*it).begin(), s_it);
+//             it++;
+//         }
+//         close (fd);
+//     }
 
-	std::cout << "--ERROR PAGES--" << std::endl;
-	for (auto& x: _errorPages)
-		std::cout << " [" << x.first << ':' << x.second << ']';
-	std::cout << '\n';
-	std::cout << "404 Error code: " << getHTMLErrorPage(404) << std::endl;
-	std::cout << "202 Error code: " << getHTMLErrorPage(202) << std::endl;
+//     //** Locations **
 
-	std::cout << "\033[0;35mLocation List: " << _locationList.size() << std::endl;
-	
-	std::cout << "Locations :";
-	for (auto& x: _locationList)
-		std::cout << " [" << x.first << ':' << x.second._location << ']';
-	std::cout << '\n';
+//         //** First location **
+//     std::vector<std::string> no_exe;
+//     std::vector<std::string> allow1;
 
-	for (std::map<std::string, Location, Compare<std::string> >::iterator it = _locationList.begin(); it != _locationList.end(); it++) {
-			it->second.printLocation();
-	}
-}
+//     allow1.push_back("GET");
 
-ConfigServer::ConfigServer(const ConfigServer &copy)
+//     Location loc1("/", "/sgoinfre/goinfre/Perso/pganglof/webserv/www",
+//     allow1, _defaultIndex,
+//     _defaultType, _defaultCharset, _defaultLanguage, "off", "", true, "", _defaultCgi, _defaultCgi_methods, _defaultCgi_root,
+//     _defaultMaxBody);
+
+//     _locationList["/"] = loc1;
+
+//         //** Second location **
+//     std::vector<std::string> allow2;
+
+//     allow2.push_back("PUT");
+
+//     Location loc2("/put_test/*", "/sgoinfre/goinfre/Perso/pganglof/webserv/www", allow2, _defaultIndex, _defaultType, 
+//     _defaultCharset, _defaultLanguage, "off", "", false, "", _defaultCgi, _defaultCgi_methods, _defaultCgi_root,
+//     _defaultMaxBody);
+
+//     _locationList["/put_test/"] = loc2;
+
+//     //** Third location **
+//     std::vector<std::string> allow3;
+
+//     allow3.push_back("POST");
+
+//     Location loc3("/post_body", "/sgoinfre/goinfre/Perso/pganglof/webserv/www", allow3, _defaultIndex, _defaultType, 
+//     _defaultCharset, _defaultLanguage, "off", "", false, "", _defaultCgi, _defaultCgi_methods, _defaultCgi_root, 100);
+
+//     _locationList["/post_body"] = loc3;
+
+//    //** Fourth location **
+//     std::vector<std::string> allow4;
+//     std::vector<std::string> index;
+    
+//     allow4.push_back("GET");
+//     index.push_back("youpi.bad_extension");
+
+//     Location loc4("/directory/", "/sgoinfre/goinfre/Perso/pganglof/webserv/www", allow4, index, _defaultType, 
+//     _defaultCharset, _defaultLanguage, "off", "", false, "", _defaultCgi, _defaultCgi_methods, _defaultCgi_root, 
+//     _defaultMaxBody);
+
+//     _locationList["/directory/"] = loc4;
+
+// }
+
+ConfigServer::ConfigServer(ConfigServer &copy)
 {
     _locationList = copy._locationList;
     _defaultRoot = copy._defaultRoot;
     _defaultAllow = copy._defaultAllow;
     _defaultServerName = copy._defaultServerName;
+    _defaultPort = copy._defaultPort;
+    _httpVersion = copy._httpVersion;
+    _serverSoftware = copy._serverSoftware;
     _defaultIndex = copy._defaultIndex;
     _defaultType = copy._defaultType;
     _defaultCharset = copy._defaultCharset;
     _defaultLanguage = copy._defaultLanguage;
     _mimeTypes = copy._mimeTypes;
     _configFilesRoot = copy._configFilesRoot;
+    _errorFilesRoot = copy._errorFilesRoot;
     _defaultAuth_basic = copy._defaultAuth_basic;
     _defaultAuth_basic_user_file = copy._defaultAuth_basic_user_file;
     _defaultAutoindex = copy._defaultAutoindex;
-	_defaultCgi = copy._defaultCgi;
-	_defaultCgi_allow = copy._defaultCgi_allow;
-	_defaultCgi_root = copy._defaultCgi_root;
-    _port = copy._port;
-    _defaultClientBodySize = copy._defaultClientBodySize;
-    _errorPages = copy._errorPages;
+    _defaultCgi = copy._defaultCgi;
+    _defaultCgi_methods = copy._defaultCgi_methods;
+    _defaultCgi_root = copy._defaultCgi_root;
+    _defaultMaxBody = copy._defaultMaxBody;
 }
 
 ConfigServer::~ConfigServer() {}
@@ -245,22 +289,23 @@ ConfigServer                  &ConfigServer::operator=(ConfigServer const &rhs)
     _defaultRoot = rhs._defaultRoot;
     _defaultAllow = rhs._defaultAllow;
     _defaultServerName = rhs._defaultServerName;
+    _defaultPort = rhs._defaultPort;
+    _httpVersion = rhs._httpVersion;
+    _serverSoftware = rhs._serverSoftware;
     _defaultIndex = rhs._defaultIndex;
     _defaultType = rhs._defaultType;
     _defaultCharset = rhs._defaultCharset;
     _defaultLanguage = rhs._defaultLanguage;
     _mimeTypes = rhs._mimeTypes;
     _configFilesRoot = rhs._configFilesRoot;
+    _errorFilesRoot = rhs._errorFilesRoot;
     _defaultAuth_basic = rhs._defaultAuth_basic;
     _defaultAuth_basic_user_file = rhs._defaultAuth_basic_user_file;
     _defaultAutoindex = rhs._defaultAutoindex;
-	_defaultCgi = rhs._defaultCgi;
-	_defaultCgi_allow = rhs._defaultCgi_allow;
-	_defaultCgi_root = rhs._defaultCgi_root;
-    _port = rhs._port;
-    _defaultClientBodySize = rhs._defaultClientBodySize;
-    _errorPages = rhs._errorPages;
-
+    _defaultCgi = rhs._defaultCgi;
+    _defaultCgi_methods = rhs._defaultCgi_methods;
+    _defaultCgi_root = rhs._defaultCgi_root;
+    _defaultMaxBody = rhs._defaultMaxBody;
     return *this;
 }
 
@@ -291,15 +336,35 @@ std::string             ConfigServer::getRoot(std::string location)
     while (itBegin != itEnd)
     {
         if (location.compare(itBegin->first) == 0)
-            return (str.assign((itBegin->second._root)).append(itBegin->second._location));
+            return (str.assign((itBegin->second._root)).append(itBegin->second._location.substr(1)));
         itBegin++;
     }
     return _defaultRoot;
 }
 
-std::vector<std::string>             ConfigServer::getServerName()
+std::string             ConfigServer::getServerName()
 {
     return _defaultServerName;
+}
+
+std::string             ConfigServer::getPort()
+{
+    return _defaultPort;
+}
+
+std::string             ConfigServer::getHttpVersion()
+{
+    return _httpVersion;
+}
+
+std::string             ConfigServer::getServerSoftware()
+{
+    return _serverSoftware;
+}
+
+std::string             ConfigServer::getErrorFilesRoot()
+{
+    return _errorFilesRoot;
 }
 
 std::vector<std::string>  &ConfigServer::getIndex(std::string location)
@@ -371,6 +436,23 @@ std::vector<std::string>    &ConfigServer::getAllow(std::string location)
     return _defaultAllow;
 }
 
+std::vector<std::string>    &ConfigServer::getCGImethods(std::string location)
+{
+    std::map<std::string, Location, Compare<std::string> >::iterator itBegin;
+    std::map<std::string, Location, Compare<std::string> >::iterator itEnd;  
+
+    itBegin = _locationList.begin();
+    itEnd = _locationList.end();
+    while (itBegin != itEnd)
+    {
+        if (location.compare(itBegin->first) == 0)
+            return (itBegin->second._cgi_methods);
+        itBegin++;
+    }
+    return _defaultCgi_methods;
+}
+
+
 std::string                 ConfigServer::getCharset(std::string location)
 {
     std::map<std::string, Location, Compare<std::string> >::iterator itBegin;
@@ -419,7 +501,7 @@ std::string                 ConfigServer::getAuth_basic_user_file(std::string lo
     return _defaultAuth_basic_user_file;   
 }
 
-bool                 ConfigServer::getAutoindex(std::string location)
+bool                        ConfigServer::getAutoindex(std::string location)
 {
     std::map<std::string, Location, Compare<std::string> >::iterator itBegin;
     std::map<std::string, Location, Compare<std::string> >::iterator itEnd;  
@@ -451,10 +533,11 @@ std::string             ConfigServer::getAlias(std::string location)
     return "";   
 }
 
-std::vector<std::string>             ConfigServer::getCGI(std::string location)
+std::vector<std::string>             &ConfigServer::getCGI(std::string location)
 {
     std::map<std::string, Location, Compare<std::string> >::iterator itBegin;
     std::map<std::string, Location, Compare<std::string> >::iterator itEnd;  
+    std::vector<std::string> ret;
 
     itBegin = _locationList.begin();
     itEnd = _locationList.end();
@@ -480,10 +563,11 @@ std::string             ConfigServer::getCGI_root(std::string location)
             return (itBegin->second._cgi_root);
         itBegin++;
     }
-    return _defaultCgi_root;   
+    return _defaultCgi_root;
 }
 
-std::vector<std::string>	&ConfigServer::getCGI_allow(std::string location) {
+int                     ConfigServer::getClientBodySize(std::string location)
+{
     std::map<std::string, Location, Compare<std::string> >::iterator itBegin;
     std::map<std::string, Location, Compare<std::string> >::iterator itEnd;  
 
@@ -492,93 +576,8 @@ std::vector<std::string>	&ConfigServer::getCGI_allow(std::string location) {
     while (itBegin != itEnd)
     {
         if (location.compare(itBegin->first) == 0)
-            return (itBegin->second._cgi_allow);
+            return (itBegin->second._maxBody);
         itBegin++;
     }
-    return _defaultCgi_allow;  
-}
-
-int                         ConfigServer::getClientBodySize(std::string location) {
-    std::map<std::string, Location, Compare<std::string> >::iterator itBegin;
-    std::map<std::string, Location, Compare<std::string> >::iterator itEnd;  
-
-    itBegin = _locationList.begin();
-    itEnd = _locationList.end();
-    while (itBegin != itEnd)
-    {
-        if (location.compare(itBegin->first) == 0)
-            return (itBegin->second._clientBodySize);
-        itBegin++;
-    }
-    return _defaultClientBodySize;  
-
-}
-
-int                         ConfigServer::getPort() {
-    return _port;
-}
-
-std::map<int, std::string>  ConfigServer::getErrorPages() {
-    return _errorPages;
-}
-
-std::string                 ConfigServer::getHTMLErrorPage(int error) {
-    std::map<int, std::string>::iterator it;
-
-    it = _errorPages.find(error);
-	if (it == _errorPages.end())
-		return ("");
-    return it->second;
-}
-
-std::map<std::string, Location, Compare<std::string> > ConfigServer::getLocationList() {
-    return _locationList;
-}
-
-void					ConfigServer::setCGI(std::vector<std::string> cgi) {
-    _defaultCgi = cgi;
-}
-
-void					ConfigServer::setCGI_allow(std::vector<std::string> cgi_allow) {
-    _defaultCgi_allow = cgi_allow;
-}
-
-void					ConfigServer::setCGI_root(std::string cgi_root) {
-    _defaultCgi_root = cgi_root;
-}
-
-void                    ConfigServer::setPort(int port) {
-    _port = port;
-}
-
-void                    ConfigServer::setServer_name(std::vector<std::string> server_name) {
-    _defaultServerName = server_name;
-}
-
-void                    ConfigServer::setRoot(std::string root) {
-    _defaultRoot = root;
-}
-
-void                    ConfigServer::setIndex(std::vector<std::string> index) {
-    _defaultIndex = index;
-}
-
-void                    ConfigServer::setAutoIndex(bool autoIndex) {
-    _defaultAutoindex = autoIndex;
-}
-
-void                    ConfigServer::setClientBodySize(int clientBodySize) {
-    _defaultClientBodySize = clientBodySize;
-}
-
-void                    ConfigServer::setAllow(std::vector<std::string> allow) {
-    _defaultAllow = allow;
-}
-
-void                    ConfigServer::setErrorPages(int error, std::string page) {
-    _errorPages.emplace(error, page);
-}
-
-void                    ConfigServer::insertLocation(std::string s, Location location) {
-    _locationList.emplace(s, location);
+    return _defaultMaxBody;
 }

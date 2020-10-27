@@ -3,15 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   parseHeaders.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: trbonnes <trbonnes@student.42.fr>          +#+  +:+       +#+        */
+/*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/30 18:55:18 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/10/21 14:01:43 by trbonnes         ###   ########.fr       */
+/*   Updated: 2020/10/27 12:42:58 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "socket.hpp"
-
+#include "Socket.hpp"
 
 std::string ParseStdHeaders(std::string request, size_t pos) {
 	std::string s;
