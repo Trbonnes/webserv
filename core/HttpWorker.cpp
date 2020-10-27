@@ -19,10 +19,12 @@ void	HttpWorker::run()
 	int i;
 	HttpConnection *new_connection; // temp pointer 
 	HttpConnection* connections[FD_SETSIZE]; // array of connections
-	ListenSocket* listening[FD_SETSIZE];
+	ListenSocket* listening[FD_SETSIZE]; // array of pointers
 
 	std::cout << "Running a worker" << std::endl;
-
+	// Important zeroing of the values
+	bzero(connections, FD_SETSIZE * sizeof(ListenSocket*));
+	bzero(listening, FD_SETSIZE * sizeof(ListenSocket*));
 	// Transforming list in fdset and Listensocket hashmap (not sure about this name)
 	FD_ZERO(&active_fs);
 	for (unsigned int i = 0; i < _listen_socket.size(); i++)
@@ -39,7 +41,7 @@ void	HttpWorker::run()
 		if (select(FD_SETSIZE, &read_fs, NULL, NULL, NULL) == -1) // TO DO check if 0
 		{
 			std::cout << "Select error " << strerror(errno) << std::endl;
-			continue; // TO DO throw something
+			continue; // TO DO throw something ?
 		}
 		std::cout << "Event occured" << std::endl;
 		i = 0;
@@ -56,6 +58,7 @@ void	HttpWorker::run()
 				{
 					new_connection = new HttpConnection();
 					new_connection->acceptOnSocket(i);
+					std::cout << "/* message */" << new_connection->getSock() << std::endl;
 					connections[new_connection->getSock()] = new_connection;
 					FD_SET(new_connection->getSock(), &active_fs);
 				}
@@ -79,9 +82,10 @@ void	HttpWorker::run()
 			{
 				// TO DO or not ?
 			}
+			// TO DO wero it just in case ?
+			FD_ZERO(&read_fs);
 		}
-		// TO DO wero it just in case ?
-		FD_ZERO(&read_fs);
 	// TO DO timeout for http
 	}
+	// TO DO delete connections
 }

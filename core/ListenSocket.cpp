@@ -22,9 +22,13 @@ ListenSocket::ListenSocket(int port) {
                                  sizeof(address)))
 	{
 		std::cout << strerror(errno) << std::endl;
-		exit(0);
+		// TO DO error throw
 	}
-	listen(_sock, 3);
+
+	if (listen(_sock, 3))
+	{
+		std::cout << "Listen error " << strerror(errno) << std::endl;
+	}
 
 	// TO DO error management
 }

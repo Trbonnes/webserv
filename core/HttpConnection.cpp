@@ -10,6 +10,7 @@ int HttpConnection::getSock() {
 }
 
 #include <iostream>
+#include <string.h>
 
 void HttpConnection::acceptOnSocket(int connection_sock) {
 
@@ -17,7 +18,6 @@ void HttpConnection::acceptOnSocket(int connection_sock) {
 
 	size = sizeof(_client_name);
 	_sock = accept(connection_sock, &_client_name, &size);
-	std::cout << "_sock : " << _sock << std::endl;
 	// TO DO throw error if accept fails
 }
 
