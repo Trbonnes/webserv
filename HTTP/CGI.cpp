@@ -34,12 +34,12 @@ void        HTTP::cgi_metaVariables()
     _cgi._content_type = _socket.getContentType();
     _cgi._gateway_interface = "CGI/1.1";
     query = str.assign(_route).find('?', 0);
-    if (query != -1)
+    if (query == str.npos) // TO DO check if behavior stays the same
         _cgi._path_info = str.erase(query, str.length());
     else
         _cgi._path_info = _route;
     _cgi._path_translated = _cgi._path_info;
-    if (query != -1)
+    if (query == str.npos)
        _cgi._query_string = str.assign(_route).erase(0, query);
     _cgi._remote_addr = _socket.getRemoteAddr(); // Default 
     _cgi._remote_ident = "user"; // Default
@@ -119,13 +119,13 @@ void        HTTP::cgi_exe()
     int         ret;
     int         fd[2];
     int         status;
-    char        *line;
+    // char        *line;
     char        *args[2];
     char        buf[1024];
-    size_t      space;
+    // size_t      space;
     size_t      find;
     std::string str;
-    struct stat stat;
+    // struct stat stat;
     std::string::iterator it;
 
     pipe(fd);
@@ -145,7 +145,7 @@ void        HTTP::cgi_exe()
     else
     {
         waitpid(-1, &status, 0);
-        if (WIFEXITED(status))
+        // if (WIFEXITED(status))
             ret = WEXITSTATUS(status);
         close(fd[SIDE_IN]);
         if (ret == EXIT_SUCCESS)

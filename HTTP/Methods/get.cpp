@@ -3,7 +3,6 @@
 void        HTTP::get()
 {
     std::string root;
-    int         find;
     int         fd;
 
     // setRoot();

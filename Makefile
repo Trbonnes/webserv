@@ -20,7 +20,7 @@ HTTPSRC = 	HTTP/HTTP.cpp \
 			HTTP/httpRequestParser.cpp \
 			HTTP/parseHeaders.cpp \
 			HTTP/setHeaders.cpp \
-			HTTP/socket.cpp \
+			HTTP/Socket.cpp \
 			HTTP/bin-cgi/cgi.cpp \
 			HTTP/Methods/del.cpp \
 			HTTP/Methods/get.cpp \
@@ -42,7 +42,7 @@ SRCS = $(CORESRC) $(HTTPSRC)
 
 # Headers files
 
-INCLUDES = -I core/ -I HTTP/ 
+INCLUDES = -I core/ -I HTTP/
 
 # Object files
 
@@ -50,7 +50,7 @@ OBJECTSDIR = objs
 OBJECTS = $(addprefix $(OBJECTSDIR)/, $(subst .cpp,.o,$(SRCS)))
 
 $(OBJECTSDIR)/%.o: ./%.cpp
-	mkdir -p $(OBJECTSDIR)/core $(OBJECTSDIR)/HTTP
+	mkdir -p $(OBJECTSDIR)/core $(OBJECTSDIR)/HTTP/bin-cgi $(OBJECTSDIR)/HTTP/Methods $(OBJECTSDIR)/HTTP/utils
 	$(CXX) $(CXXFLAGS) -c $< -o $@ $(INCLUDES)
 
 # Executable

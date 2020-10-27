@@ -25,7 +25,9 @@ class   Location
     std::string                 _alias;
     int                         _maxBody;
 
+
 	std::vector<std::string>	_cgi;
+	std::vector<std::string>	_cgi_allow;
 	std::vector<std::string>	_cgi_methods;
 	std::string					_cgi_root;
 

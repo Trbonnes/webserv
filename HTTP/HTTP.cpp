@@ -306,9 +306,9 @@ void            HTTP::setAutoindex(void)
                 str.append("/");
             str.append("</a>\t\t\t\t");
 			#if defined(TARGET_OS_MAC)
-            	timeinfo = localtime(&(directory.st_mtimespec.tv_sec)); // st_mtimespec.tv_sec = macos ; st_mtime = linux
+            	timeinfo = localtime(&(directory.st_mtimespec.tv_sec)); // st_mtimespec.tv_sec = macos ; st_mtim = linux
 			#else
-            	timeinfo = localtime(&(directory.st_mtime.tv_sec));
+            	timeinfo = localtime(&(directory.st_mtim.tv_sec));
 			#endif // TARGET_OS_MAC
 			
             strftime(lastModifications, 100, "%d-%b-20%y %OH:%OM", timeinfo);
