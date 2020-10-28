@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ConfigServer.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: trbonnes <trbonnes@student.42.fr>          +#+  +:+       +#+        */
+/*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/09 15:13:35 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/10/21 16:37:32 by trbonnes         ###   ########.fr       */
+/*   Updated: 2020/10/28 11:26:56 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -418,7 +418,7 @@ int                         ConfigServer::getClientBodySize(std::string location
 
 }
 
-int                         ConfigServer::getPort() {
+std::vector<int>                         ConfigServer::getPort() {
     return _port;
 }
 
@@ -452,7 +452,7 @@ void					ConfigServer::setCGI_root(std::string cgi_root) {
 }
 
 void                    ConfigServer::setPort(int port) {
-    _port = port;
+    _port.push_back(port);
 }
 
 void                    ConfigServer::setServer_name(std::vector<std::string> server_name) {

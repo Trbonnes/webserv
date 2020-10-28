@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ConfigServer.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: trbonnes <trbonnes@student.42.fr>          +#+  +:+       +#+        */
+/*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/09 12:19:51 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/10/21 10:04:43 by trbonnes         ###   ########.fr       */
+/*   Updated: 2020/10/28 11:25:59 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ private:
 	std::vector<std::string>	_defaultCgi;
 	std::vector<std::string>	_defaultCgi_allow;
 	std::string					_defaultCgi_root;
-    int                         _port;
+    std::vector<int>            _port;
     int                         _defaultClientBodySize;
     std::map<int, std::string>  _errorPages;
 
@@ -70,7 +70,7 @@ public:
     std::string                 getCGI_root(std::string location);
 	std::vector<std::string>	&getCGI_allow(std::string location);
     int                         getClientBodySize(std::string location);
-    int                         getPort();
+    std::vector<int>            getPort();
     std::map<int, std::string>  getErrorPages();
     std::string                 getHTMLErrorPage(int error);
 

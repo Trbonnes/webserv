@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   testMain.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: trbonnes <trbonnes@student.42.fr>          +#+  +:+       +#+        */
+/*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/14 09:20:21 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/10/21 16:40:21 by trbonnes         ###   ########.fr       */
+/*   Updated: 2020/10/28 11:32:49 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,9 @@ void	ConfigServer::printServer() {
 	std::cout << std::endl << "\033[0;31m///SERVER///" << std::endl;
 
 	std::cout << "\033[0;32m--PORT--" << std::endl;
-	std::cout << _port << std::endl;
+	for (std::vector<int>::iterator it = _port.begin(); it != _port.end(); it++) {
+		std::cout << *it << std::endl;
+	}
 	std::cout << "--SERVER NAME--" << std::endl;
 	if (_defaultServerName.size())
 		for (std::vector<std::string>::iterator it = _defaultServerName.begin(); it != _defaultServerName.end(); it++) {
@@ -111,7 +113,7 @@ void	ConfigServer::printServer() {
 }
 
 int main() {
-	int fd = open("./config/webserv.conf", O_RDWR);
+	int fd = open("./config/test.conf", O_RDWR);
 
 	try {
 		Config *config = configFileParser(fd);
@@ -124,6 +126,8 @@ int main() {
 		for (std::vector<ConfigServer>::iterator it = config->getServer().begin(); it != config->getServer().end(); it++) {
 			it->printServer();
 		}
+
+		delete config;
 		
 	}
 	catch (std::exception &e) {
