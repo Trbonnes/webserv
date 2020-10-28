@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   configFileParser.cpp                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: trbonnes <trbonnes@student.42.fr>          +#+  +:+       +#+        */
+/*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/14 08:46:39 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/10/21 12:38:44 by trbonnes         ###   ########.fr       */
+/*   Updated: 2020/10/28 11:27:53 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -215,11 +215,14 @@ int		configFileParseServerUnit(std::string configFile, std::vector<ConfigServer>
 
 	//PORT
 	if ((pos = parseServer.find("listen")) != parseServer.npos) {
-		pos += 6;
-		checkEndLine(pos, parseServer);
-		while (parseServer[pos] == ' ') { pos++; }
-		i = parseServer.find(";", pos);
-		v->back().setPort(std::stoi(parseServer.substr(pos, i - pos)));
+		while (pos != parseServer.npos) {
+			pos += 6;
+			checkEndLine(pos, parseServer);
+			while (parseServer[pos] == ' ') { pos++; }
+			i = parseServer.find(";", pos);
+			v->back().setPort(std::stoi(parseServer.substr(pos, i - pos)));
+			pos = parseServer.find("listen", i);
+		}
 	}
 	else
 		throw Config::InvalidConfigException();
