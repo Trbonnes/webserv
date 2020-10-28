@@ -11,7 +11,7 @@
 #include "Runnable.hpp"
 
 #include "../HTTP/HTTP.hpp"
-#include "../HTTP/socket.hpp"
+#include "../HTTP/Socket.hpp"
 
 class HttpWorker : public Runnable
 {

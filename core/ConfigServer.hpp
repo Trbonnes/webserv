@@ -15,40 +15,39 @@
 
 class	ConfigServer {
 private:
+
+	// Server Software 
+    std::string                 _httpVersion;
+    std::string                 _serverSoftware;
+    std::list<std::string>      _mimeTypes;
+    std::string                 _configFilesRoot;
+    std::string                 _errorFilesRoot;
+    // Default Server
+    std::string                 _defaultPort;
+    std::vector<std::string>    _defaultServerName; // TO DO gere l'implementatio ndans le constructeur CONFLIT
+	
+	// Config Server
 	std::map<std::string, Location, Compare<std::string> > _locationList;
     std::string                 _defaultRoot;
     std::vector<std::string>    _defaultAllow; // == Accepted Methods
-    std::vector<std::string>    _defaultServerName;
     std::vector<std::string>    _defaultIndex;
     std::string                 _defaultType;
     std::string                 _defaultCharset;
     std::vector<std::string>    _defaultLanguage;
-    std::list<std::string>      _mimeTypes;
-    std::string                 _configFilesRoot;
     std::string                 _defaultAuth_basic;
     std::string                 _defaultAuth_basic_user_file;
     bool                        _defaultAutoindex;
+	int                         _defaultMaxBody;
+
+	// CGI
 	std::vector<std::string>	_defaultCgi;
-    int                         _port;
-    int                         _defaultClientBodySize;
-    std::map<int, std::string>  _errorPages;
-
-
-    // Server Software 
-    std::string                 _httpVersion;
-    std::string                 _serverSoftware;
-    std::string                 _errorFilesRoot;
-
-    // Default Server
-    std::string                 _defaultPort;
-
-    // Config Server
-    int                         _defaultMaxBody;
-
-    // CGI
 	std::vector<std::string>	_defaultCgi_allow;
-	std::string					_defaultCgi_root;
 	std::vector<std::string>	_defaultCgi_methods;
+	std::string					_defaultCgi_root;
+
+    int                         _port; // CONFLIT
+    int                         _defaultClientBodySize; // CONFLIT
+    std::map<int, std::string>  _errorPages; // CONFLIT
 
 public:
 	ConfigServer();
@@ -57,13 +56,16 @@ public:
 	ConfigServer &operator=(const ConfigServer &c);
 
     std::string                 getRoot(std::string _uri);
-    std::vector<std::string>    getServerName(void);
+    std::string                 getHttpVersion(void); // NEW
+    std::string                 getServerSoftware(void); // NEW
+    std::vector<std::string>    getServerName(void); //CONFLIT
     std::vector<std::string>    &getIndex(std::string location);
     std::string                 getType(std::string location);
     std::string                 getCharset(std::string location);
     std::vector<std::string>    &getLanguage(std::string location);
     std::vector<std::string>    &getAllow(std::string location);
     std::list<std::string>      &getMimeTypes();
+	std::string                 getErrorFilesRoot(void); // CONFLIT ?
     std::string                 getLocation(std::string location);
     std::string                 getAuth_basic(std::string location);
     std::string                 getAuth_basic_user_file(std::string location);
@@ -72,7 +74,8 @@ public:
     std::vector<std::string>    getCGI(std::string location);
     std::string                 getCGI_root(std::string location);
 	std::vector<std::string>	&getCGI_allow(std::string location);
-    int                         getClientBodySize(std::string location);
+	std::vector<std::string>    &getCGImethods(std::string location); // CONFLIT
+    int                         getClientBodySize(std::string location); // CONFLIT
     int                         getPort();
     std::map<int, std::string>  getErrorPages();
     std::string                 getHTMLErrorPage(int error);
