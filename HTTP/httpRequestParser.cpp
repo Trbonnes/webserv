@@ -68,7 +68,6 @@ int		httpRequestParseBody(std::string request, Socket *socket) { // TO DO
 		return httpRequestParseChunckedBody(request, socket, pos);
 
 	try {
-		std::cout << ">>>>>>>>>>>>>>> " << pos << "AND"  << request.length() << std::endl;
 		body = request.substr(pos, request.npos);
 		socket->setBody(body);
 	}
