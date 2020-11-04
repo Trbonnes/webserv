@@ -3,7 +3,7 @@
 //** absolute location route for the user agent **
 void        HTTP::setContentLocation()
 {
-    _contentLocation.assign("http://").append(_config.getServerName()).append(_route);
+    _contentLocation.assign("http://").append(_config.getServerName()[0]).append(_route); // TO DO quick fix
     if (_config.getAlias(_location).length() > 0)
         _contentLocation.replace(_contentLocation.find(_location), _location.length(), _config.getAlias(_location));
 }
@@ -32,7 +32,7 @@ void        HTTP::setCharset(void)
 
 void        HTTP::setServerName()
 {
-    _server = _config.getServerName();
+    _server = _config.getServerName()[0]; // TO DO quick fix
 }
 
 void        HTTP::setContentLength()

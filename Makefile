@@ -21,7 +21,6 @@ HTTPSRC = 	HTTP/HTTP.cpp \
 			HTTP/parseHeaders.cpp \
 			HTTP/setHeaders.cpp \
 			HTTP/Socket.cpp \
-			HTTP/bin-cgi/cgi.cpp \
 			HTTP/Methods/del.cpp \
 			HTTP/Methods/get.cpp \
 			HTTP/Methods/put.cpp \
@@ -32,7 +31,8 @@ HTTPSRC = 	HTTP/HTTP.cpp \
 			HTTP/utils/ft_strdup.cpp \
 			HTTP/utils/ft_strlen.cpp \
 			HTTP/utils/get_next_line.cpp \
-			HTTP/CGI.cpp
+			HTTP/CGI.cpp \
+			# HTTP/bin-cgi/cgi.cpp
 
 
 SRCS = $(CORESRC) $(HTTPSRC)

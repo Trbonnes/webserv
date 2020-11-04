@@ -407,6 +407,37 @@ std::string                 ConfigServer::getHTMLErrorPage(int error) {
     return it->second;
 }
 
+std::string             ConfigServer::getHttpVersion()
+{
+    return _httpVersion;
+}
+
+std::string             ConfigServer::getServerSoftware()
+{
+    return _serverSoftware;
+}
+
+std::string             ConfigServer::getErrorFilesRoot()
+{
+    return _errorFilesRoot;
+}
+
+std::vector<std::string>    &ConfigServer::getCGImethods(std::string location)
+{
+    std::map<std::string, Location, Compare<std::string> >::iterator itBegin;
+    std::map<std::string, Location, Compare<std::string> >::iterator itEnd;  
+
+    itBegin = _locationList.begin();
+    itEnd = _locationList.end();
+    while (itBegin != itEnd)
+    {
+        if (location.compare(itBegin->first) == 0)
+            return (itBegin->second._cgi_methods);
+        itBegin++;
+    }
+    return _defaultCgi_methods;
+}
+
 std::map<std::string, Location, Compare<std::string> > ConfigServer::getLocationList() {
     return _locationList;
 }

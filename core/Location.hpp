@@ -24,6 +24,7 @@ public:
 	std::vector<std::string>	_cgi;
 	std::vector<std::string>	_cgi_allow;
 	std::string					_cgi_root;
+	std::vector<std::string>	_cgi_methods;
     std::string                 _root;
     std::vector<std::string>    _index;
     bool                        _autoindex;

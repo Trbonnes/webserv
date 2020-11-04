@@ -223,9 +223,8 @@ void         HTTP::setRoot()
     if (_uri.compare(0, 4, "http") == 0)
     {
         //** Absolute path **
-
-        find = _route.append(_socket.getRequestURI()).find(_config.getServerName());
-        _route.erase(0, find + _config.getServerName().length());
+        find = _route.append(_socket.getRequestURI()).find(_config.getServerName()[0]); // TO DO temp fix for compilation
+        _route.erase(0, find + _config.getServerName()[0].length());
         _route.insert(0, _config.getRoot(_location));
         _route.insert(_config.getRoot(_location).length(), acceptLanguage());
     }

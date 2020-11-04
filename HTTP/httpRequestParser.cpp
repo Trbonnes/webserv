@@ -39,13 +39,13 @@ int		httpRequestParseChunckedBody(std::string request, Socket *socket, size_t po
 		socket->setBody(body);
 	}
 	catch (std::exception &e) {
-		std::cout << "Exception: " << e.what() << std::endl;
+		std::cout << "Exception1: " << e.what() << std::endl;
 	}
 	
 	return 0;
 }
 
-int		httpRequestParseBody(std::string request, Socket *socket) {
+int		httpRequestParseBody(std::string request, Socket *socket) { // TO DO 
 	std::string					content;
 	std::string					body;
 	size_t						chunkedPos = socket->getTransferEncoding().find("chunked");
@@ -68,11 +68,12 @@ int		httpRequestParseBody(std::string request, Socket *socket) {
 		return httpRequestParseChunckedBody(request, socket, pos);
 
 	try {
+		std::cout << ">>>>>>>>>>>>>>> " << pos << "AND"  << request.length() << std::endl;
 		body = request.substr(pos, request.npos);
 		socket->setBody(body);
 	}
 	catch (std::exception &e) {
-		std::cout << "Exception: " << e.what() << std::endl;
+		std::cout << "Exception2: " << e.what() << std::endl;
 	}
 
 	//FOR MULPART BODY : NOT USEFUL IN OUR IMPLEMENTATION

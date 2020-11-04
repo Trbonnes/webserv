@@ -12,7 +12,7 @@ HttpServer::~HttpServer() {
 void HttpServer::initConf() {
 	std::cout << "Initializing configuration" << std::endl;
 
-	int fd = open("/home/user42/Bureau/webserver/config/test.conf", O_RDWR); // for test purposes
+	int fd = open("/home/user42/Bureau/webserver/test/test.conf", O_RDWR); // for test purposes
 
 	try {
 		_config = configFileParser(fd);
@@ -29,6 +29,7 @@ void HttpServer::initConf() {
 	}
 	catch (std::exception &e) {
 		std::cout << "Exception: " << e.what() << std::endl;
+		exit (0);
 		//TO DO throw a custom error
 	}
 
@@ -40,6 +41,7 @@ void HttpServer::initListenSocket() // TO DO optimization
 	std::vector<ConfigServer> servers;
 	std::map<std::string, Location, Compare<std::string>> locations;
 	std::map<std::string, Location, Compare<std::string>>::iterator itl;
+	 
 	servers = _config->getServer();
 	// Initialize listening sockets that will be shared between workers
 	for (size_t i = 0; i < servers.size(); i++)
