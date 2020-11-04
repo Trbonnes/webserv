@@ -215,7 +215,7 @@ Socket	*httpRequestParser(int fd) {
 	char c[4096];
 	std::string request;
 
-	for (int i = 0; i < 4096; i++)
+	for (int i = 0; i < 4096; i++) // TO DO we should reimplement bzero
 		c[i] = '\0';
 	while (int ret = read(fd, c, 4096) > 0) {
 		if (ret == -1) { return NULL; }
@@ -223,7 +223,6 @@ Socket	*httpRequestParser(int fd) {
 		for (int i = 0; i < 4096; i++)
 			c[i] = '\0';
 	}
-	
 	httpRequestParseRequestLine(request, socket);
 	httpRequestParseHeaders(request, socket);
 	httpRequestParseBody(request, socket);
