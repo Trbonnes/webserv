@@ -80,7 +80,7 @@ void	HttpWorker::run()
 				// {
 				// 	std::cout << buff << std::endl;
 				// }
-				
+				std::cout << "ABOUT TO PARSE" << std::endl;
 				Socket *socket = httpRequestParser(connections[i]->getSock()); // TO DO why would it return a socket class and not an httpRequest object ? 
 				std::cout << "PASSED THIS POINT" << std::endl;
 				ConfigServer    config;
