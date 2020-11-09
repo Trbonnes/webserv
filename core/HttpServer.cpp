@@ -12,7 +12,7 @@ HttpServer::~HttpServer() {
 void HttpServer::initConf() {
 	std::cout << "Initializing configuration" << std::endl;
 
-	int fd = open("/home/user42/Bureau/webserver/test/test.conf", O_RDWR); // for test purposes
+	int fd = open("/home/user42/Documents/42Jobs/webserv/test/test.conf", O_RDWR); // for test purposes
 
 	try {
 		_config = configFileParser(fd);

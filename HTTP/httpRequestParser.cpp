@@ -6,7 +6,7 @@
 /*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/30 15:45:46 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/10/27 12:43:03 by user42           ###   ########.fr       */
+/*   Updated: 2020/11/09 18:39:03 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,16 @@ int		httpRequestParseChunckedBody(std::string request, Socket *socket, size_t po
 	std::vector<std::string>	bodyV;
 	std::string body;
 
+	std::cout << s << std::endl;
+	pos = s.find("0\r\n");
+	if (pos == s.npos) {
+		char	c[4096];
+
+		while ((pos = s.find("0\r\n")) == s.npos) {
+			read(socket->getFd(), c, 4096);
+			s.append(c);
+		}
+	}
 	try {
 		pos = s.find("\r\n") - 1;
 		convert = s.substr(pos, 1);
@@ -50,8 +60,10 @@ int		httpRequestParseBody(std::string request, Socket *socket) { // TO DO
 	std::string					body;
 	size_t						chunkedPos = socket->getTransferEncoding().find("chunked");
 	
-	// if (!socket->getContentLength().size() && chunkedPos == std::string::npos)
-	//	return 0;
+	if (!socket->getContentLength().size() && chunkedPos == std::string::npos){
+		socket->setBody("");
+		return 0;
+	}
 	
 	size_t pos = request.find("\r\n\r\n");
 	if (pos == request.npos) {
@@ -69,7 +81,21 @@ int		httpRequestParseBody(std::string request, Socket *socket) { // TO DO
 
 	try {
 		body = request.substr(pos, request.npos);
-		socket->setBody(body);
+		size_t	contentLength = std::stol(socket->getContentLength());
+		std::cout << body.size() << std::endl;
+		if (body.size() >= contentLength)
+			socket->setBody(body);
+		else {
+			char	c[4096];
+			
+			while (body.size() <= contentLength) {
+				read(socket->getFd(), c, 4096);
+				body.append(c);
+			}
+			if (body.size() > contentLength)
+				body.erase(contentLength, body.npos);
+			socket->setBody(body);
+		}
 	}
 	catch (std::exception &e) {
 		std::cout << "Exception2: " << e.what() << std::endl;
@@ -212,20 +238,27 @@ int		httpRequestParseRequestLine(std::string request, Socket *socket) {
 Socket	*httpRequestParser(int fd) {
 
 	Socket *socket = new Socket(fd);
-	char c[4096];
+	char	c[4096];
+	int		ret;
 	std::string request;
 
+	std::cout << "BEGINING PARSING" << std::endl;
 	for (int i = 0; i < 4096; i++) // TO DO we should reimplement bzero
 		c[i] = '\0';
-	while (int ret = read(fd, c, 4096) > 0) {
+	while (request.find("\r\n") >= request.npos && request.find("\n\n") >= request.npos) {
+		ret = read(fd, c, 4096);
 		if (ret == -1) { return NULL; }
 		request.append(c);
 		for (int i = 0; i < 4096; i++)
 			c[i] = '\0';
 	}
+	std::cout << "GOING THROUGH PARSING" << std::endl;
 	httpRequestParseRequestLine(request, socket);
+	std::cout << "REQUEST LINE PARSED" << std::endl;
 	httpRequestParseHeaders(request, socket);
+	std::cout << "HEADERS PARSED" << std::endl;
 	httpRequestParseBody(request, socket);
+	std::cout << "BODY PARSED" << std::endl;
 
 	return socket;
 }
