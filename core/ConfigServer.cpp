@@ -6,14 +6,14 @@
 /*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/09 15:13:35 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/11/11 15:53:20 by user42           ###   ########.fr       */
+/*   Updated: 2020/11/11 16:07:31 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ConfigServer.hpp"
 
 ConfigServer::ConfigServer() :
-_defaultRoot(""),
+//_defaultRoot(""),
 // _defaultIndex(0),
 // _defaultType(""),
 // _defaultCharset(""),
