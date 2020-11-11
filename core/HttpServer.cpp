@@ -12,7 +12,7 @@ HttpServer::~HttpServer() {
 void HttpServer::initConf() {
 	std::cout << "Initializing configuration" << std::endl;
 
-	int fd = open("/home/user42/Documents/42Jobs/webserv/test/test.conf", O_RDWR); // for test purposes
+	int fd = open("/home/user42/Documents/42Jobs/webserver/test/test.conf", O_RDWR); // for test purposes
 
 	try {
 		_config = configFileParser(fd);
@@ -42,11 +42,11 @@ void HttpServer::initListenSocket() // TO DO optimization
 	std::map<std::string, Location, Compare<std::string>> locations;
 	std::map<std::string, Location, Compare<std::string>>::iterator itl;
 	 
-	servers = _config->getServer();
+	servers = _config->getServerList();
 	// Initialize listening sockets that will be shared between workers
 	for (size_t i = 0; i < servers.size(); i++)
 	{
-		_listen_sockset.push_back(ListenSocket(servers[i].getPort())); // TO DO Check port already in use
+		_listen_sockset.push_back(ListenSocket(servers[i].getPort()[0])); // TO DO Check port already in use / Fix getPort()
 	}
 }
 

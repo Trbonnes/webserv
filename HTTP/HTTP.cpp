@@ -559,8 +559,8 @@ std::string         HTTP::getResponse()
             extension = _route.find_last_of('.');
             if (is_good_exe(str.assign(_route).erase(0, extension + 1)))
             {
-                it = _config.getCGImethods(_location).begin();
-                itEnd = _config.getCGImethods(_location).end();
+                it = _config.getCGI_allow(_location).begin();
+                itEnd = _config.getCGI_allow(_location).end();
             }
             else
             {

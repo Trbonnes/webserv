@@ -9,8 +9,8 @@ int         HTTP::checkCGImethods(std::string method)
     int ret;
 
     ret = 0;
-    itBegin = _config.getCGImethods(_location).begin();
-    itEnd = _config.getCGImethods(_location).end();
+    itBegin = _config.getCGI_allow(_location).begin();
+    itEnd = _config.getCGI_allow(_location).end();
     while (itBegin != itEnd)
     {
         _allow.push_back(*itBegin);
@@ -48,7 +48,7 @@ void        HTTP::cgi_metaVariables()
     _cgi._request_uri = _socket.getRequestURI();
     _cgi._script_name = _config.getCGI_root(_location);
     _cgi._server_name = _config.getServerName()[0]; // TO DO quick fix
-    _cgi._server_port = _config.getPort();
+    _cgi._server_port = _config.getPort()[0]; // TO DO fix getPort()
     _cgi._server_protocol = _config.getHttpVersion();
     _cgi._server_software = _config.getServerSoftware();
     setEnv();
