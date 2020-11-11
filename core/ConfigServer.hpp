@@ -1,18 +1,3 @@
-<<<<<<< HEAD:core/ConfigServer.hpp
-=======
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   ConfigServer.hpp                                   :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/10/09 12:19:51 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/10/28 11:25:59 by user42           ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
->>>>>>> multiple port in one server unit allowed:ConfigServer.hpp
 #ifndef CONFIGSERVER_HPP
 # define CONFIGSERVER_HPP
 
@@ -59,16 +44,10 @@ private:
 	std::vector<std::string>	_defaultCgi_allow;
 	std::vector<std::string>	_defaultCgi_methods;
 	std::string					_defaultCgi_root;
-<<<<<<< HEAD:core/ConfigServer.hpp
 
     int                         _port; // CONFLIT
     int                         _defaultClientBodySize; // CONFLIT
     std::map<int, std::string>  _errorPages; // CONFLIT
-=======
-    std::vector<int>            _port;
-    int                         _defaultClientBodySize;
-    std::map<int, std::string>  _errorPages;
->>>>>>> multiple port in one server unit allowed:ConfigServer.hpp
 
 public:
 	ConfigServer();
@@ -95,14 +74,9 @@ public:
     std::vector<std::string>    getCGI(std::string location);
     std::string                 getCGI_root(std::string location);
 	std::vector<std::string>	&getCGI_allow(std::string location);
-<<<<<<< HEAD:core/ConfigServer.hpp
 	std::vector<std::string>    &getCGImethods(std::string location); // CONFLIT
     int                         getClientBodySize(std::string location); // CONFLIT
     int                         getPort();
-=======
-    int                         getClientBodySize(std::string location);
-    std::vector<int>            getPort();
->>>>>>> multiple port in one server unit allowed:ConfigServer.hpp
     std::map<int, std::string>  getErrorPages();
     std::string                 getHTMLErrorPage(int error);
 

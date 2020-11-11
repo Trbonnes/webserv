@@ -1,18 +1,3 @@
-<<<<<<< HEAD:core/ConfigServer.cpp
-=======
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   ConfigServer.cpp                                   :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/10/09 15:13:35 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/10/28 11:26:56 by user42           ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
->>>>>>> multiple port in one server unit allowed:ConfigServer.cpp
 #include "ConfigServer.hpp"
 
 ConfigServer::ConfigServer() :
@@ -405,7 +390,7 @@ int                         ConfigServer::getClientBodySize(std::string location
 
 }
 
-std::vector<int>                         ConfigServer::getPort() {
+int                         ConfigServer::getPort() {
     return _port;
 }
 
@@ -470,7 +455,7 @@ void					ConfigServer::setCGI_root(std::string cgi_root) {
 }
 
 void                    ConfigServer::setPort(int port) {
-    _port.push_back(port);
+    _port = port;
 }
 
 void                    ConfigServer::setServer_name(std::vector<std::string> server_name) {
