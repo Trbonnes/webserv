@@ -6,7 +6,7 @@
 /*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/09 10:32:53 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/10/26 20:43:17 by user42           ###   ########.fr       */
+/*   Updated: 2020/11/11 16:57:46 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,8 @@ public:
 	/*virtual*/ ~Config();
 	Config &operator=(const Config &c);
 
-	std::vector<ConfigServer>	&getServer();
+	std::vector<ConfigServer>	&getServerList();
+	ConfigServer				*getServerUnit(int port, std::string name);
 	int							getWorker();
 	int							getWorkerConnections();
 

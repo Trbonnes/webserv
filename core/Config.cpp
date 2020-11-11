@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Config.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: trbonnes <trbonnes@student.42.fr>          +#+  +:+       +#+        */
+/*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/09 10:32:47 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/10/19 15:49:03 by trbonnes         ###   ########.fr       */
+/*   Updated: 2020/11/11 16:58:24 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,8 +31,24 @@ Config &Config::operator=(const Config &c) {
 	return *this;
 }
 
-std::vector<ConfigServer>	&Config::getServer() {
+std::vector<ConfigServer>	&Config::getServerList() {
 	return _server;
+}
+
+ConfigServer				*Config::getServerUnit(int port, std::string name) {
+	for (size_t i = 0; i < _server.size(); i++) {
+		std::vector<int> _port = _server[i].getPort();
+		std::vector<std::string> _serverName = _server[i].getServerName();
+		for (size_t j = 0; j < _port.size(); j++) {
+			if (_port[j] == port) {
+				for (size_t k = 0; k < _serverName.size(); k++) {
+					if (_serverName[k] == name)
+						return &(_server[i]);
+				}
+			}
+		}
+	}
+	return NULL;
 }
 
 int							Config::getWorker() {
