@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ConfigServer.cpp                                   :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2020/10/09 15:13:35 by trbonnes          #+#    #+#             */
+/*   Updated: 2020/11/11 15:53:20 by user42           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "ConfigServer.hpp"
 
 ConfigServer::ConfigServer() :
@@ -30,7 +42,9 @@ _defaultClientBodySize(-1)
     // _defaultServerName.push_back("localhost");
 
 /*
+
     -----mime.types test not for configfile parsing-----
+
     // open mime.types **
     int         ret;
     int         fd;
@@ -39,6 +53,7 @@ _defaultClientBodySize(-1)
     std::string file;
     std::list<std::string>::iterator it;
     std::string::iterator s_it;
+
     file.append(_configFilesRoot);
     file.append("/mime.types");
     if ((fd = open(file.c_str(), O_RDONLY)) >= 0)
@@ -65,26 +80,39 @@ _defaultClientBodySize(-1)
 */
 
 /*
+
     -----Test Locations without config file parsing-----
+
     // Locations **
+
         // first location **
+
     std::list<std::string> index;
     
     index.push_back("index.php");
+
     Location loc1("/data/", "/home/pauline/webserver/www",
     _defaultAllow, index,
     "text/html", "utf-8", _defaultLanguage, _defaultAuth_basic, _defaultAuth_basic_user_file, _defaultAutoindex);
+
     _locationList["/data/"] = loc1;
+
         // second location **
+
     std::list<std::string> index2;
+
     index2.push_back("42.png");
+
     Location loc2("/images/", "/home/pauline/webserver/www",
     _defaultAllow, index2,
     "text/html", "", _defaultLanguage, "off", "", _defaultAutoindex);
+
     _locationList["/images/"] = loc2;
+
     Location loc3("/", "/home/pauline/webserver/www",
     _defaultAllow, _defaultIndex,
     _defaultType, _defaultCharset, _defaultLanguage, "off", "", "on");
+
     _locationList["/"] = loc3;
 */
 
@@ -92,7 +120,15 @@ _defaultClientBodySize(-1)
 
 ConfigServer::ConfigServer(const ConfigServer &copy)
 {
-    _locationList = copy._locationList;
+    _httpVersion = copy._httpVersion;
+    _serverSoftware = copy._serverSoftware;
+    _mimeTypes = copy._mimeTypes;
+    _configFilesRoot = copy._configFilesRoot;
+    _errorFilesRoot = copy._errorFilesRoot;
+    _port = copy._port;
+    _defaultClientBodySize = copy._defaultClientBodySize;
+    _errorPages = copy._errorPages;
+	_locationList = copy._locationList;
     _defaultRoot = copy._defaultRoot;
     _defaultAllow = copy._defaultAllow;
     _defaultServerName = copy._defaultServerName;
@@ -100,24 +136,27 @@ ConfigServer::ConfigServer(const ConfigServer &copy)
     _defaultType = copy._defaultType;
     _defaultCharset = copy._defaultCharset;
     _defaultLanguage = copy._defaultLanguage;
-    _mimeTypes = copy._mimeTypes;
-    _configFilesRoot = copy._configFilesRoot;
     _defaultAuth_basic = copy._defaultAuth_basic;
     _defaultAuth_basic_user_file = copy._defaultAuth_basic_user_file;
     _defaultAutoindex = copy._defaultAutoindex;
 	_defaultCgi = copy._defaultCgi;
 	_defaultCgi_allow = copy._defaultCgi_allow;
 	_defaultCgi_root = copy._defaultCgi_root;
-    _port = copy._port;
-    _defaultClientBodySize = copy._defaultClientBodySize;
-    _errorPages = copy._errorPages;
 }
 
 ConfigServer::~ConfigServer() {}
 
 ConfigServer                  &ConfigServer::operator=(ConfigServer const &rhs)
 {
-    _locationList = rhs._locationList;
+    _httpVersion = rhs._httpVersion;
+    _serverSoftware = rhs._serverSoftware;
+    _mimeTypes = rhs._mimeTypes;
+    _configFilesRoot = rhs._configFilesRoot;
+    _errorFilesRoot = rhs._errorFilesRoot;
+    _port = rhs._port;
+    _defaultClientBodySize = rhs._defaultClientBodySize;
+    _errorPages = rhs._errorPages;
+	_locationList = rhs._locationList;
     _defaultRoot = rhs._defaultRoot;
     _defaultAllow = rhs._defaultAllow;
     _defaultServerName = rhs._defaultServerName;
@@ -125,17 +164,12 @@ ConfigServer                  &ConfigServer::operator=(ConfigServer const &rhs)
     _defaultType = rhs._defaultType;
     _defaultCharset = rhs._defaultCharset;
     _defaultLanguage = rhs._defaultLanguage;
-    _mimeTypes = rhs._mimeTypes;
-    _configFilesRoot = rhs._configFilesRoot;
     _defaultAuth_basic = rhs._defaultAuth_basic;
     _defaultAuth_basic_user_file = rhs._defaultAuth_basic_user_file;
     _defaultAutoindex = rhs._defaultAutoindex;
 	_defaultCgi = rhs._defaultCgi;
 	_defaultCgi_allow = rhs._defaultCgi_allow;
 	_defaultCgi_root = rhs._defaultCgi_root;
-    _port = rhs._port;
-    _defaultClientBodySize = rhs._defaultClientBodySize;
-    _errorPages = rhs._errorPages;
 
     return *this;
 }
@@ -390,7 +424,7 @@ int                         ConfigServer::getClientBodySize(std::string location
 
 }
 
-int                         ConfigServer::getPort() {
+std::vector<int>                         ConfigServer::getPort() {
     return _port;
 }
 
@@ -422,22 +456,6 @@ std::string             ConfigServer::getErrorFilesRoot()
     return _errorFilesRoot;
 }
 
-std::vector<std::string>    &ConfigServer::getCGImethods(std::string location)
-{
-    std::map<std::string, Location, Compare<std::string> >::iterator itBegin;
-    std::map<std::string, Location, Compare<std::string> >::iterator itEnd;  
-
-    itBegin = _locationList.begin();
-    itEnd = _locationList.end();
-    while (itBegin != itEnd)
-    {
-        if (location.compare(itBegin->first) == 0)
-            return (itBegin->second._cgi_methods);
-        itBegin++;
-    }
-    return _defaultCgi_methods;
-}
-
 std::map<std::string, Location, Compare<std::string> > ConfigServer::getLocationList() {
     return _locationList;
 }
@@ -455,7 +473,7 @@ void					ConfigServer::setCGI_root(std::string cgi_root) {
 }
 
 void                    ConfigServer::setPort(int port) {
-    _port = port;
+    _port.push_back(port);
 }
 
 void                    ConfigServer::setServer_name(std::vector<std::string> server_name) {
