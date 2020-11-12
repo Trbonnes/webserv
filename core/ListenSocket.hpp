@@ -18,9 +18,11 @@ public:
 
 private:
 	int	_sock;
+	int _port;
 	// add configuration
 public:
 	int	getSock();
+	int	getPort();
 
 };
 

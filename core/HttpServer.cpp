@@ -12,7 +12,7 @@ HttpServer::~HttpServer() {
 void HttpServer::initConf() {
 	std::cout << "Initializing configuration" << std::endl;
 
-	int fd = open("/home/user42/Documents/42Jobs/webserver/test/test.conf", O_RDWR); // for test purposes
+	int fd = open("test/test.conf", O_RDWR); // for test purposes
 
 	try {
 		_config = configFileParser(fd);
@@ -38,15 +38,20 @@ void HttpServer::initConf() {
 void HttpServer::initListenSocket() // TO DO optimization
 {
 	std::cout << "Initializing listening sockets" << std::endl;
-	std::vector<ConfigServer> servers;
-	std::map<std::string, Location, Compare<std::string>> locations;
 	std::map<std::string, Location, Compare<std::string>>::iterator itl;
+	std::map<std::string, Location, Compare<std::string>> locations;
+	std::vector<ConfigServer> servers;
+	std::vector<int> ports;
 	 
 	servers = _config->getServerList();
 	// Initialize listening sockets that will be shared between workers
 	for (size_t i = 0; i < servers.size(); i++)
 	{
-		_listen_sockset.push_back(ListenSocket(servers[i].getPort()[0])); // TO DO Check port already in use / Fix getPort()
+		ports = servers[i].getPort();
+		for (size_t j = 0; j < ports.size(); j++)
+		{
+			_listen_sockset.push_back(ListenSocket(ports[j])); // TO DO Check port already in use / Fix getPort()
+		}
 	}
 }
 
@@ -58,7 +63,7 @@ void HttpServer::initWorkers() {
 
 	int status;
 	int nbworkers;
-	HttpWorker worker(_listen_sockset);
+	HttpWorker worker(_listen_sockset, _config);
 	
 	nbworkers = _config->getWorker();
 	_workers_pid = new pid_t[nbworkers];

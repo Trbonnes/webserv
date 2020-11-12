@@ -2,8 +2,10 @@
 
 
 //TO DO The runnable arguments might depend from the configuration file
-HttpWorker::HttpWorker(std::vector<ListenSocket> &listen) : Runnable(1, 1){
+HttpWorker::HttpWorker(std::vector<ListenSocket> &listen, Config* config) : Runnable(1, 1)
+{
 	std::cout << "Worker Initializing" << std::endl;
+	_config = config;
     _listen_socket = listen;
 }
 
@@ -56,9 +58,8 @@ void	HttpWorker::run()
 				std::cout << "New connection" << std::endl; // TO DO remove or change log
 				try
 				{
-					new_connection = new HttpConnection();
-					new_connection->acceptOnSocket(i);
-					std::cout << "/* message */" << new_connection->getSock() << std::endl;
+					new_connection = new HttpConnection(*listening[i]);
+					new_connection->accept();
 					connections[new_connection->getSock()] = new_connection;
 					FD_SET(new_connection->getSock(), &active_fs);
 				}
@@ -82,13 +83,17 @@ void	HttpWorker::run()
 				// }
 				std::cout << "ABOUT TO PARSE" << std::endl;
 				Socket *socket = httpRequestParser(connections[i]->getSock()); // TO DO why would it return a socket class and not an httpRequest object ? 
-				std::cout << "PASSED THIS POINT" << std::endl;
-				ConfigServer    config;
-				HTTP method(socket, config);
+				ConfigServer *ptr = _config->getServerUnit(connections[i]->getSock(), socket->getHost()); // TO DO check if null ?
+				std::cout << "PASSED THIS POINT, value of ptr : " << ptr << socket->getHost() << std::endl;
+				HTTP method(socket, *ptr);
+				std::cout << "METHOD HAS BEEN CONSTRUCTED" << std::endl;		
 				std::string response;
+				std::cout << "ABOUT TO CREATE RESPONSE" << std::endl;
 				response = method.getResponse(); // TO DO make code more modulare and clean up names
+				std::cout << "RESPONSE CREATED" << std::endl;
 
 				connections[i]->write((char*)response.c_str(), response.length()); // TO DO ugly
+				std::cout << "ENDING REQUEST" << std::endl;
 			}
 			else
 			{

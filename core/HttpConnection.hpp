@@ -6,10 +6,12 @@
 #include <netinet/in.h>
 #include <unistd.h>
 
+#include "ListenSocket.hpp"
+
 class HttpConnection
 {
 public:
-	HttpConnection() = default;
+	HttpConnection(ListenSocket& listen_sock);
 	HttpConnection(HttpConnection &&) = default;
 	HttpConnection(const HttpConnection &) = default;
 	HttpConnection &operator=(HttpConnection &&) = default;
@@ -18,13 +20,16 @@ public:
 
 private:
 	int				_sock;
+	ListenSocket&	_listen_sock;
 	struct sockaddr	_client_name;
 
 public:
-	void	acceptOnSocket(int connection_sock);
+	void	accept();
 	void	write(char *data, size_t size);
 	void	read();
 	int		getSock();
+	int		getPort();
+
 	
 };
 

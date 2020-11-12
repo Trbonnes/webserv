@@ -3,6 +3,7 @@
 
 		#include <string.h>
 ListenSocket::ListenSocket(int port) {
+	_port = port;
     _sock = socket(AF_INET, SOCK_STREAM, 0);
 	if (_sock < 0)
 	{
@@ -39,4 +40,8 @@ ListenSocket::~ListenSocket() {
 
 int ListenSocket::getSock() {
     return _sock;
+}
+
+int ListenSocket::getPort() {
+    return _port;
 }

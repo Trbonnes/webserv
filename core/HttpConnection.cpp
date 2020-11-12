@@ -12,12 +12,17 @@ int HttpConnection::getSock() {
 #include <iostream>
 #include <string.h>
 
-void HttpConnection::acceptOnSocket(int connection_sock) {
+HttpConnection::HttpConnection(ListenSocket& listen_sock) : _listen_sock(listen_sock)
+{
+}
+
+
+void HttpConnection::accept() {
 
 	socklen_t size;
 
 	size = sizeof(_client_name);
-	_sock = accept(connection_sock, &_client_name, &size);
+	_sock = ::accept( _listen_sock.getSock(), &_client_name, &size);
 	// TO DO throw error if accept fails
 }
 
@@ -31,4 +36,8 @@ void HttpConnection::read() {
 	std::cout << "MESSAGE RECIEVED" << std::endl;
 	recv(_sock, buff, 1024, 0);
 	std::cout << buff << std::endl;
+}
+
+int HttpConnection::getPort() {
+	return _listen_sock.getPort();
 }
