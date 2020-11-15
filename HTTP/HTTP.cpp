@@ -200,6 +200,7 @@ int         HTTP::openFile()
     struct stat file;
 
     fd = -1;
+    std::cout << "_route: " << _route << std::endl;
     stat(_route.c_str(), &file);
     if ((file.st_mode & S_IFMT) == S_IFREG)
     {
@@ -219,12 +220,12 @@ void         HTTP::setRoot()
     struct stat file;
     std::vector<std::string>::iterator itIndexBegin;
     std::vector<std::string>::iterator itIndexEnd;
-    
+
     if (_uri.compare(0, 4, "http") == 0)
     {
         //** Absolute path **
         find = _route.append(_socket.getRequestURI()).find(_config.getServerName()[0]); // TO DO temp fix for compilation
-        _route.erase(0, find + _config.getServerName()[0].length());
+        _route.erase(0, find + _config.getServerName()[0].length()); // TO DO quick fix
         _route.insert(0, _config.getRoot(_location));
         _route.insert(_config.getRoot(_location).length(), acceptLanguage());
     }
@@ -237,6 +238,8 @@ void         HTTP::setRoot()
         _route.assign(_config.getRoot(_location));
         _route.append(_socket.getRequestURI());
         stat(_route.c_str(), &file);
+        std::cout << "Root: " << _route << std::endl;
+        std::cout << "Location: " << _location << std::endl;
 
         // ** If file exist or put request, return **
         if ((file.st_mode & S_IFMT) == S_IFREG || _socket.getMethod().compare("PUT") == 0
@@ -339,7 +342,7 @@ void            HTTP::authorization()
 
     if (_config.getAuth_basic(_location).compare("off") != 0)
     {
-        if (_socket.getAuthorization().compare("") == 0)
+        if (_socket.getAuthorization().compare(""))
         {
             _statusCode = UNAUTHORIZED;
             _wwwAuthenticate.assign("Basic realm=").append(_config.getAuth_basic(_location));
@@ -545,7 +548,8 @@ std::string         HTTP::getResponse()
         response.append(" ");
         response.append(ft_itoa(_statusCode)).append(" ");
         response.append(_mapCodes.codes[_statusCode]).append("\n");
-        response.append("Server: ").append(_config.getServerSoftware()).append("\n");
+        //response.append("Server: ").append(_config.getServerSoftware()).append("\n"); TO DO
+        response.append("Server: ").append("Server/2.0").append("\n");// TO DO
         if (ft_strlen(_date) > 0)
             response.append("Date: ").append(_date).append("\n");
         if (_socket.getMethod().compare("OPTIONS") == 0 || _statusCode == METHOD_NOT_ALLOWED)
@@ -579,6 +583,7 @@ std::string         HTTP::getResponse()
         {
             if (_contentType.length() > 0)
                 response.append("Content-Type: ").append(_contentType).append("\n");
+                response.append("Content-Type: ").append("text/html").append("\n"); // QUICK FIX
             if (_charset.length() > 0)
                 response.append("Charset: ").append(_charset).append("\n");
             if (_contentLength > 0)
@@ -593,10 +598,11 @@ std::string         HTTP::getResponse()
                     response.append("Content-Language: ").append(_contentLanguage).append("\n");
             }
             else if (_statusCode == UNAUTHORIZED)
-                response.append("WWW-Authenticate: ").append("Basic ").append(_config.getAuth_basic(_location)).append("\n");
-            response.append("\n\n");
+                response.append("WWW-Authenticate: ").append("Basic ").append(_config.getAuth_basic(_location));
+            response.append("\r\n\r\n");
             if (_socket.getMethod().compare("HEAD"))
                 response.append(_body);
+            response.append("\r\n");
         }
     }
     return (response);

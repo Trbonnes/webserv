@@ -41,10 +41,11 @@ _defaultClientBodySize(-1)
     // _mimeTypes.push_back("plain/text");
     // _defaultServerName.push_back("localhost");
 
+
+
+//    -----mime.types test not for configfile parsing-----
+
 /*
-
-    -----mime.types test not for configfile parsing-----
-
     // open mime.types **
     int         ret;
     int         fd;
@@ -54,11 +55,10 @@ _defaultClientBodySize(-1)
     std::list<std::string>::iterator it;
     std::string::iterator s_it;
 
-    file.append(_configFilesRoot);
-    file.append("/mime.types");
+    file.append("../HTTP/config/mime.types");
     if ((fd = open(file.c_str(), O_RDONLY)) >= 0)
     {
-        while ((ret = getDefault_next_line(fd, &line)) > 0)
+        while ((ret = get_next_line(fd, &line)) > 0)
         {
             string = line;
             _mimeTypes.push_back(string);
@@ -77,9 +77,9 @@ _defaultClientBodySize(-1)
         free(line);
         close (fd);
     }
-*/
 
-/*
+
+
 
     -----Test Locations without config file parsing-----
 
@@ -200,11 +200,13 @@ std::string             ConfigServer::getRoot(std::string location)
     itEnd = _locationList.end();
     while (itBegin != itEnd)
     {
-        if (location.compare(itBegin->first) == 0)
+        if (location.compare(itBegin->first) == 0 && (itBegin->second._root).compare(""))
             return (str.assign((itBegin->second._root)).append(itBegin->second._location));
+        else if (location.compare(itBegin->first) == 0)
+            break;
         itBegin++;
     }
-    return _defaultRoot;
+    return _defaultRoot.append(itBegin->second._location);
 }
 
 std::vector<std::string>             ConfigServer::getServerName()

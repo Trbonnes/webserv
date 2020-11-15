@@ -22,6 +22,7 @@
 # include <vector>
 # include <map>
 
+# include "../HTTP/utils/utils.hpp"
 # include "Compare.hpp"
 # include "Location.hpp"
 
