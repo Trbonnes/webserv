@@ -80,6 +80,7 @@ void        HTTP::setContentType()
     it = _config.getMimeTypes().begin();
     while (it != _config.getMimeTypes().end())
     {
+        std::cout << *it << std::endl;
         if ((find = (*it).find(_contentType)) >= 0)
             break ;
         it++;

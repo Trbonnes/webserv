@@ -2,4 +2,4 @@
 *
 !.gitignore
 !core/
-!http/
+!http/nginx
