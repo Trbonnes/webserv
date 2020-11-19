@@ -237,28 +237,27 @@ int		httpRequestParseRequestLine(std::string request, Socket *socket) {
 
 Socket	*httpRequestParser(int fd) {
 
-	Socket *socket = new Socket(fd);
+	Socket *socket;
 	char	c[4096];
 	int		ret;
 	std::string request;
 
-	std::cout << "BEGINING PARSING" << std::endl;
 	for (int i = 0; i < 4096; i++) // TO DO we should reimplement bzero
 		c[i] = '\0';
 	while (request.find("\r\n") >= request.npos && request.find("\n\n") >= request.npos) {
 		ret = read(fd, c, 4096);
+		if (ret == 0)
+			throw HttpConnection::ConnectionClose();
+		std::cout << ret << std::endl;
 		if (ret == -1) { return NULL; }
 		request.append(c);
 		for (int i = 0; i < 4096; i++)
 			c[i] = '\0';
 	}
-	std::cout << "GOING THROUGH PARSING" << std::endl;
+	socket = new Socket(fd);
 	httpRequestParseRequestLine(request, socket);
-	std::cout << "REQUEST LINE PARSED" << std::endl;
 	httpRequestParseHeaders(request, socket);
-	std::cout << "HEADERS PARSED" << std::endl;
 	httpRequestParseBody(request, socket);
-	std::cout << "BODY PARSED" << std::endl;
 
 	return socket;
 }

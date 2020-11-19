@@ -22,6 +22,7 @@
 # include <sys/socket.h>
 
 # include "statusCodes.hpp"
+# include "../core/HttpConnection.hpp"
 
 class   Socket
 {

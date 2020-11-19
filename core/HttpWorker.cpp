@@ -45,7 +45,6 @@ void	HttpWorker::run()
 			std::cout << "Select error " << strerror(errno) << std::endl;
 			continue; // TO DO throw something ?
 		}
-		std::cout << "Event occured" << std::endl;
 		i = 0;
 		for (i = 0; i < FD_SETSIZE; i++) // TO DO optimization ?
 		{
@@ -75,34 +74,34 @@ void	HttpWorker::run()
 			{
 				std::cout << "Event on connection" << std::endl;
 				FD_CLR(i, &read_fs);
-				// handle event with http Module
-				// char buff[408];
-				// while (read(connections[i]->getSock(), buff, 408))
-				// {
-				// 	std::cout << buff << std::endl;
-				// }
-				std::cout << "ABOUT TO PARSE" << std::endl;
-				Socket *socket = httpRequestParser(connections[i]->getSock()); // TO DO why would it return a socket class and not an httpRequest object ? 
+				Socket *socket;
+				try
+				{
+					socket = httpRequestParser(connections[i]->getSock()); // TO DO why would it return a socket class and not an httpRequest object ? 
+				}
+				catch(const HttpConnection::ConnectionClose& e)
+				{
+					std::cerr << e.what() << '\n';
+					delete connections[i];
+					connections[i] = 0;
+					FD_CLR(i, &active_fs);
+					continue ;
+				}
+				
 				// ConfigServer *ptr = _config->getServerUnit(connections[i]->getSock(), socket->getHost()); // TO DO check if null ?
 				// std::cout << "PASSED THIS POINT, value of ptr : " << ptr << socket->getHost() << std::endl;
 				
 				ConfigServer &ptr2 = _config->getServerList()[0];
 				HTTP method(socket, ptr2);
-				std::cout << "METHOD HAS BEEN CONSTRUCTED" << std::endl;		
 				std::string response;
-				std::cout << "ABOUT TO CREATE RESPONSE" << std::endl;
 				response = method.getResponse(); // TO DO make code more modulare and clean up names
-				std::cout << "RESPONSE CREATED" << std::endl;
 
 				connections[i]->write((char*)response.c_str(), response.length()); // TO DO ugly
-				std::cout << "ENDING REQUEST" << std::endl;
 			}
 			else
 			{
 				// TO DO or not ?
 			}
-			// TO DO wero it just in case ?
-			FD_ZERO(&read_fs);
 		}
 	// TO DO timeout for http
 	}

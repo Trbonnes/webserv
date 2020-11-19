@@ -29,8 +29,15 @@ public:
 	void	read();
 	int		getSock();
 	int		getPort();
-
 	
+	class ConnectionClose : public std::exception
+	{
+		public:
+			const char * what () const throw ()
+			{
+				return "Connection closed"; // Maybe add Port or something
+			}
+	};
 };
 
 #endif // HTTPCONNECTION
