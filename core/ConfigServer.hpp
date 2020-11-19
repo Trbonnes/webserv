@@ -78,12 +78,12 @@ public:
     std::string                 getAuth_basic_user_file(std::string location);
     bool                        getAutoindex(std::string location);
     std::string                 getAlias(std::string location);
-    std::vector<std::string>    getCGI(std::string location);
+    std::vector<std::string>    &getCGI(std::string location);
     std::string                 getCGI_root(std::string location);
 	std::vector<std::string>	&getCGI_allow(std::string location);
     int                         getClientBodySize(std::string location);
     std::vector<int>            getPort();
-    std::map<int, std::string>  getErrorPages();
+    std::map<int, std::string>  &getErrorPages();
     std::string                 getHTMLErrorPage(int error);
 
     std::map<std::string, Location, Compare<std::string> > getLocationList();

@@ -200,7 +200,6 @@ int         HTTP::openFile()
     struct stat file;
 
     fd = -1;
-    std::cout << "_route: " << _route << std::endl;
     stat(_route.c_str(), &file);
     if ((file.st_mode & S_IFMT) == S_IFREG)
     {
@@ -238,8 +237,6 @@ void         HTTP::setRoot()
         _route.assign(_config.getRoot(_location));
         _route.append(_socket.getRequestURI());
         stat(_route.c_str(), &file);
-        std::cout << "Root: " << _route << std::endl;
-        std::cout << "Location: " << _location << std::endl;
 
         // ** If file exist or put request, return **
         if ((file.st_mode & S_IFMT) == S_IFREG || _socket.getMethod().compare("PUT") == 0
@@ -505,36 +502,7 @@ void        HTTP::configureErrorFile()
 // ** Create the response socket **
 std::string         HTTP::getResponse()
 {
-    // std::vector<std::string>::iterator it;
-    // std::cout << std::endl;
-
-    // std::cout << "ORIGINALE URI: " << _socket.getRequestURI() << std::endl << std::endl;
-    // std::cout << "LOCATION: " << _location << std::endl << std::endl;
-    // std::cout << "URI: " << _uri << std::endl << std::endl;
-    // std::cout << "ROUTE: " << _route << std::endl << std::endl;
-    // std::cout << "CONTENT-LOCATION: " << _contentLocation << std::endl << std::endl;
-    // std::cout << "SERVER NAME: " << _server << std::endl << std::endl;
-    // std::cout << "STATUS CODE: " << _statusCode << std::endl << std::endl;
-
-    // it = _allow.begin();
-    // std::cout << "ALLOW: ";
-    // while (it != _allow.end())
-    // {
-    //     std::cout << *it << " ";
-    //     it++;
-    // }
-    // std::cout << std::endl << std::endl;
-    // std::cout << "CONTENT TYPE: " << _contentType << std::endl << std::endl;
-    // std::cout << "CHARSET: " << _charset << std::endl << std::endl;
-    // std::cout << "CONTENT LENGTH: " << _contentLength << std::endl << std::endl;
-    // std::cout << "CONTENT LANGUAGE: " << _contentLanguage << std::endl << std::endl;
-    // std::cout << "WWW AUTHENTICATE: " << _wwwAuthenticate << std::endl << std::endl;
-    // std::cout << "LAST MODIFIED: " << _lastModified << std::endl << std::endl;
-    // std::cout << "DATE: " << _date << std::endl << std::endl;
-    // std::cout << "BODY: " << std::endl << _body << std::endl << std::endl;
-
     std::string response;
-    response.append("HTTP/1.1 ");
     if (_statusCode >= 300)
         configureErrorFile();
     if (_statusCode == 200 && _socket.getMethod().compare("PUT") == 0)
@@ -605,5 +573,6 @@ std::string         HTTP::getResponse()
             response.append("\r\n");
         }
     }
+    std::cerr << response << std::endl;
     return (response);
 }
