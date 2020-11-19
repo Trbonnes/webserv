@@ -534,7 +534,7 @@ std::string         HTTP::getResponse()
     // std::cout << "BODY: " << std::endl << _body << std::endl << std::endl;
 
     std::string response;
-
+    response.append("HTTP/1.1 ");
     if (_statusCode >= 300)
         configureErrorFile();
     if (_statusCode == 200 && _socket.getMethod().compare("PUT") == 0)
