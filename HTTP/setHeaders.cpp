@@ -21,13 +21,13 @@ void        HTTP::setBody(int fd)
     }
     if (ret == -1)
         _statusCode = INTERNAL_SERVER_ERROR;
-    else
-        close(fd);
+    close(fd);
 }
 
 void        HTTP::setCharset(void)
 {
-    _charset = _config.getCharset(_location);
+    if (_contentType.compare("text/html") == 0)
+        _charset = _config.getCharset(_location);
 }
 
 void        HTTP::setServerName()
@@ -37,7 +37,7 @@ void        HTTP::setServerName()
 
 void        HTTP::setContentLength()
 {
-    _contentLength = _stat.st_size;
+   _contentLength = _stat.st_size + 2;
 }
 
 void        HTTP::setLastModified()

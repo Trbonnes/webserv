@@ -19,7 +19,10 @@ int         HTTP::checkCGImethods(std::string method)
         itBegin++;
     }
     if (!ret)
-      _statusCode = METHOD_NOT_ALLOWED;
+    {
+        std::cerr << "CGI ALLOW NOT METHOD" << std::endl;
+        _statusCode = METHOD_NOT_ALLOWED;
+    }
     return (ret);
 }
 

@@ -19,6 +19,13 @@ _defaultClientBodySize(-1),
 _defaultType("text/plain"),
 _defaultCharset("utf-8")
 {
+    // default language
+
+    // A ajouter dans le fichier de config
+
+//    _defaultLanguage.push_back("en");  
+//    _defaultLanguage.push_back("fr");
+
     // open mime.types **
     int         ret;
     int         fd;
@@ -134,12 +141,14 @@ std::string             ConfigServer::getRoot(std::string location)
     while (itBegin != itEnd)
     {
         if (location.compare(itBegin->first) == 0 && (itBegin->second._root).compare(""))
-            return (str.assign((itBegin->second._root)).append(itBegin->second._location));
+            return (str.assign((itBegin->second._root)).append(itBegin->second._location, itBegin->second._location.size() - 1));
         else if (location.compare(itBegin->first) == 0)
             break;
         itBegin++;
     }
-    return _defaultRoot.append(itBegin->second._location);
+    if (itBegin != itEnd)
+        return (str.assign(_defaultRoot).append(itBegin->second._location));
+    return _defaultRoot; 
 }
 
 std::vector<std::string>             ConfigServer::getServerName()

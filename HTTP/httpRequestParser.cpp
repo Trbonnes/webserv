@@ -19,7 +19,7 @@ int		httpRequestParseChunckedBody(std::string request, Socket *socket, size_t po
 	std::vector<std::string>	bodyV;
 	std::string body;
 
-	std::cout << s << std::endl;
+	//std::cout << s << std::endl;
 	pos = s.find("0\r\n");
 	if (pos == s.npos) {
 		char	c[4096];
@@ -49,7 +49,7 @@ int		httpRequestParseChunckedBody(std::string request, Socket *socket, size_t po
 		socket->setBody(body);
 	}
 	catch (std::exception &e) {
-		std::cout << "Exception1: " << e.what() << std::endl;
+		std::cerr << "Exception1: " << e.what() << std::endl;
 	}
 	
 	return 0;
@@ -98,7 +98,7 @@ int		httpRequestParseBody(std::string request, Socket *socket) { // TO DO
 		}
 	}
 	catch (std::exception &e) {
-		std::cout << "Exception2: " << e.what() << std::endl;
+		std::cerr << "Exception2: " << e.what() << std::endl;
 	}
 
 	//FOR MULPART BODY : NOT USEFUL IN OUR IMPLEMENTATION
@@ -249,6 +249,10 @@ Socket	*httpRequestParser(int fd) {
 		if (ret == 0)
 			throw HttpConnection::ConnectionClose();
 		std::cout << ret << std::endl;
+		std::string str = c; // SOCKET TEST
+		std::cerr << "SOCKET:" << std::endl; // SOCKET TEST
+		std::cerr << str << std::endl; // SOCKET TEST
+		std::cerr << "END SOCKET" << std::endl; // SOCKET TEST
 		if (ret == -1) { return NULL; }
 		request.append(c);
 		for (int i = 0; i < 4096; i++)
