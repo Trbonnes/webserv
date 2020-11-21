@@ -1,6 +1,7 @@
 #include "HttpConnection.hpp"
 
 void HttpConnection::write(char *data, size_t size) {
+	printf("data : %s", data);
     send(_sock, data, size, 0);
 }
 

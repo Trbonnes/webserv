@@ -17,7 +17,7 @@ void        HTTP::setBody(int fd)
     while ((ret = read(fd, buf, 1024)) > 0)
     {
         buf[ret] = '\0';
-        _body.append(buf);
+        _body.append(buf, ret);
     }
     if (ret == -1)
         _statusCode = INTERNAL_SERVER_ERROR;

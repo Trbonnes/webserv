@@ -598,8 +598,8 @@ std::string         HTTP::getResponse()
             {
                 if (ft_strlen(_lastModified) > 0)
                     response.append("Last-Modified: ").append(_lastModified).append("\r\n");
-                if (_contentLocation.length() > 0)
-                    response.append("Content-Location: ").append(_contentLocation).append("\r\n");
+        //        if (_contentLocation.length() > 0)
+       //             response.append("Content-Location: ").append(_contentLocation).append("\r\n");
                 if (_contentLanguage.length() > 0 && _socket.getMethod().compare("PUT") && _socket.getMethod().compare("DELETE"))
                     response.append("Content-Language: ").append(_contentLanguage).append("\r\n");
             }
@@ -608,7 +608,6 @@ std::string         HTTP::getResponse()
             response.append("\r\n\r\n");
             if (_socket.getMethod().compare("HEAD"))
                 response.append(_body);
-            //response.append("\r\n");
         }
     }
     std::cerr << response << std::endl;
