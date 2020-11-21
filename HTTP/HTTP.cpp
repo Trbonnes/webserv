@@ -285,7 +285,7 @@ void            HTTP::setAutoindex(void)
     // Verifier que DIR marche bien sur linux, car bug sur MACOS
 
     _body.assign("<html>\n<head><title>Index of /</title></head>\n<body>\n<h1>Index of /</h1><hr><pre>\n");
-    dir = opendir(_uri.c_str());
+    dir = opendir(_route.c_str());
     if (dir == NULL)
         _statusCode = INTERNAL_SERVER_ERROR;
     else
@@ -305,7 +305,7 @@ void            HTTP::setAutoindex(void)
                 str.append("/");
             str.append("</a>\t\t\t\t");
 			#if defined(TARGET_OS_MAC)
-            	timeinfo = localtime(&(directory.st_mtimespec.tv_sec)); // st_mtimespec.tv_sec = macos ; st_mtim = linux
+            	timeinfo = localtime(&(directory.st_mtimespec.tv_sec));
 			#else
             	timeinfo = localtime(&(directory.st_mtim.tv_sec));
 			#endif // TARGET_OS_MAC
@@ -328,6 +328,7 @@ void            HTTP::setAutoindex(void)
     }
     _body.append("</pre><hr></body>\n</html>\n");
     _contentLength = _body.length();
+    _contentType = "text/html";
 }
 
 // ** Check if the autorization mode is on and if the user is authorized to make the request **
@@ -516,8 +517,7 @@ std::string         HTTP::getResponse()
         response.append(" ");
         response.append(ft_itoa(_statusCode)).append(" ");
         response.append(_mapCodes.codes[_statusCode]).append("\n");
-        //response.append("Server: ").append(_config.getServerSoftware()).append("\n"); TO DO
-        response.append("Server: ").append("Server/2.0").append("\n");// TO DO
+        response.append("Server: ").append(_config.getServerSoftware()).append("\n"); //TO DO
         if (ft_strlen(_date) > 0)
             response.append("Date: ").append(_date).append("\n");
         if (_socket.getMethod().compare("OPTIONS") == 0 || _statusCode == METHOD_NOT_ALLOWED)
@@ -551,7 +551,6 @@ std::string         HTTP::getResponse()
         {
             if (_contentType.length() > 0)
                 response.append("Content-Type: ").append(_contentType).append("\n");
-                response.append("Content-Type: ").append("text/html").append("\n"); // QUICK FIX
             if (_charset.length() > 0)
                 response.append("Charset: ").append(_charset).append("\n");
             if (_contentLength > 0)

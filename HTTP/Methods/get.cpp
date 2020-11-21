@@ -26,11 +26,11 @@ void        HTTP::get()
     else if (_config.getAutoindex(_location) == true)
     {
         setAutoindex();
-        setContentType();
+        //setContentType();
         setCharset();
         setDate();
         _contentLanguage = "";
-        _charset = "";
+        //_charset = "";
         // TransferEncoding();
         _statusCode = OK;
     }

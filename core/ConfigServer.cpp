@@ -15,7 +15,9 @@
 ConfigServer::ConfigServer() :
 _httpVersion("HTTP/1.1"),
 _serverSoftware("Server/2.0"),
-_defaultClientBodySize(-1)
+_defaultClientBodySize(-1),
+_defaultType("text/plain"),
+_defaultCharset("utf-8")
 {
     // open mime.types **
     int         ret;
@@ -26,7 +28,7 @@ _defaultClientBodySize(-1)
     std::list<std::string>::iterator it;
     std::string::iterator s_it;
 
-    file.append("../HTTP/config/mime.types");
+    file.append("HTTP/config/mime.types");
     if ((fd = open(file.c_str(), O_RDONLY)) >= 0)
     {
         while ((ret = get_next_line(fd, &line)) > 0)
