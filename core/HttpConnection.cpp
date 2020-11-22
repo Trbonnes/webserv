@@ -1,8 +1,15 @@
 #include "HttpConnection.hpp"
+#include <unistd.h>
+
+// void	ft_write(char *data, int size)
+// {
+// 	write(2, data, size);
+// }
 
 void HttpConnection::write(char *data, size_t size) {
-	printf("data : %s", data);
+	// ft_write(data, size); // TEST
     send(_sock, data, size, 0);
+	free(data);
 }
 
 

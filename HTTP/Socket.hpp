@@ -21,6 +21,7 @@
 # include <sys/types.h>
 # include <sys/socket.h>
 
+# include "utils/utils.hpp"
 # include "statusCodes.hpp"
 # include "../core/HttpConnection.hpp"
 

@@ -242,9 +242,8 @@ Socket	*httpRequestParser(int fd) {
 	int		ret;
 	std::string request;
 
-	for (int i = 0; i < 4096; i++) // TO DO we should reimplement bzero
-		c[i] = '\0';
 	while (request.find("\r\n") >= request.npos && request.find("\n\n") >= request.npos) {
+		ft_bzero(c, 4096);
 		ret = read(fd, c, 4096);
 		if (ret == 0)
 			throw HttpConnection::ConnectionClose();
@@ -255,8 +254,6 @@ Socket	*httpRequestParser(int fd) {
 		std::cerr << "END SOCKET" << std::endl; // SOCKET TEST
 		if (ret == -1) { return NULL; }
 		request.append(c);
-		for (int i = 0; i < 4096; i++)
-			c[i] = '\0';
 	}
 	socket = new Socket(fd);
 	httpRequestParseRequestLine(request, socket);

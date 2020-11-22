@@ -16,12 +16,14 @@ HttpWorker::~HttpWorker() {
 // TO DO Check config var regarding max connections and max port/server block
 void	HttpWorker::run()
 {
-	fd_set active_fs;
-	fd_set read_fs;
-	int i;
-	HttpConnection *new_connection; // temp pointer 
-	HttpConnection* connections[FD_SETSIZE]; // array of connections
-	ListenSocket* listening[FD_SETSIZE]; // array of pointers
+	fd_set 	active_fs;
+	fd_set 	read_fs;
+	int 	i;
+	char* 	response;
+	int		responseSize;
+	HttpConnection*	new_connection; // temp pointer 
+	HttpConnection*	connections[FD_SETSIZE]; // array of connections
+	ListenSocket* 	listening[FD_SETSIZE]; // array of pointers
 
 	std::cout << "Running a worker" << std::endl;
 	// Important zeroing of the values
@@ -89,13 +91,13 @@ void	HttpWorker::run()
 				ConfigServer &ptr2 = _config->getServerList()[0];
 				HTTP method(socket, ptr2);
 				std::cout << "METHOD HAS BEEN CONSTRUCTED" << std::endl;		
-				std::string response;
+
 				std::cout << "ABOUT TO CREATE RESPONSE" << std::endl;
 				response = method.getResponse(); // TO DO make code more modulare and clean up names
+				responseSize = method.getResponseSize();
 				std::cout << "RESPONSE CREATED" << std::endl;
-
-				connections[i]->write((char*)response.c_str(), response.length()); // TO DO ugly
-				std::cout << "ENDING REQUEST" << std::endl;
+				connections[i]->write(response, responseSize); // TO DO ugly
+				std::cout << std::endl << "ENDING REQUEST" << std::endl;
 			}
 			else
 			{

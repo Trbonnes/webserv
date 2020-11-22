@@ -12,13 +12,9 @@ void        HTTP::setContentLocation()
 void        HTTP::setBody(int fd)
 {
     int     ret;
-    char    buf[1024 + 1];
 
-    while ((ret = read(fd, buf, 1024)) > 0)
-    {
-        buf[ret] = '\0';
-        _body.append(buf, ret);
-    }
+    _body = (char*)ft_calloc(_stat.st_size, sizeof(char));
+    ret = read(fd, _body, _stat.st_size);
     if (ret == -1)
         _statusCode = INTERNAL_SERVER_ERROR;
     close(fd);
@@ -37,7 +33,7 @@ void        HTTP::setServerName()
 
 void        HTTP::setContentLength()
 {
-   _contentLength = _stat.st_size + 2;
+   _contentLength = _stat.st_size;
 }
 
 void        HTTP::setLastModified()

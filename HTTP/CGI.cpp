@@ -156,16 +156,16 @@ void        HTTP::cgi_exe()
             while ((ret = read(fd[SIDE_OUT], buf, sizeof(buf))) != 0)
             {
                 buf[ret] = '\0';
-                _body.append(buf);
+                _OLDbody.append(buf);
             }
             close(fd[SIDE_OUT]);
-            std::cout << std::endl << std::endl << "CGI BODY: " << std::endl << _body << std::endl;
-            find = _body.find("Status: ");
-            _statusCode = ft_atoi(_body.substr(find + 8, 3).c_str());
-            find = _body.find("Content-Type: ");
-            _contentType = _body.substr(find + 14, _body.find('\n', find + 14) - find - 14);
-            it = std::adjacent_find(_body.begin(), _body.end(), mypred);
-            _body.erase(_body.begin(), it + 3);
+            std::cout << std::endl << std::endl << "CGI BODY: " << std::endl << _OLDbody << std::endl;
+            find = _OLDbody.find("Status: ");
+            _statusCode = ft_atoi(_OLDbody.substr(find + 8, 3).c_str());
+            find = _OLDbody.find("Content-Type: ");
+            _contentType = _OLDbody.substr(find + 14, _OLDbody.find('\n', find + 14) - find - 14);
+            it = std::adjacent_find(_OLDbody.begin(), _OLDbody.end(), mypred);
+            _OLDbody.erase(_OLDbody.begin(), it + 3);
         }
         else
             _statusCode = BAD_GATEWAY;

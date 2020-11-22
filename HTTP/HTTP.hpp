@@ -86,8 +86,11 @@ class   HTTP
     
     // body
 
-    std::string                 _body;
-    
+    std::string                 _OLDbody; // A MODIFIER LE CGI
+    char*                       _body;
+    char*                       _response;
+    int                         _responseSize;
+
     HTTP();
 
     void            callMethod(std::string method);
@@ -147,7 +150,8 @@ class   HTTP
     ~HTTP();
 
     HTTP            &operator=(HTTP &rhs);
-    std::string     getResponse();
+    char*           getResponse();
+    int             getResponseSize();
 };
 
 #endif

@@ -13,7 +13,6 @@ void        HTTP::get()
         if (_statusCode == OK)
         {
             setBody(fd);
-            setStat();
             setLastModified();
             setContentType();
             setCharset();
@@ -26,11 +25,8 @@ void        HTTP::get()
     else if (_config.getAutoindex(_location) == true)
     {
         setAutoindex();
-        //setContentType();
-        setCharset();
         setDate();
         _contentLanguage = "";
-        //_charset = "";
         // TransferEncoding();
         _statusCode = OK;
     }
