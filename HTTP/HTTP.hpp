@@ -45,6 +45,7 @@ enum cgi_variables
     REQUEST_METHOD,
     REQUEST_URI,
     SCRIPT_NAME,
+    SCRIPT_FILENAME,
     SERVER_NAME,
     SERVER_PORT,
     SERVER_PROTOCOL,
@@ -65,7 +66,7 @@ class   HTTP
     std::string                 _location;
     struct stat                 _stat;
     static const std::string    _base64_chars;
-    char                        *_cgi_env[18];
+    char                        *_cgi_env[19];
 
     // headers
 

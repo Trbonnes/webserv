@@ -33,7 +33,7 @@ void        HTTP::setServerName()
 
 void        HTTP::setContentLength()
 {
-   _contentLength = _stat.st_size;
+   _contentLength = _stat.st_size + 2;
 }
 
 void        HTTP::setLastModified()

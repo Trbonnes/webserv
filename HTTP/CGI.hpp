@@ -23,6 +23,7 @@ struct              CGI
     std::string     _server_protocol;
     std::string     _server_software;
 
+    std::string     _script_filename;
 };
 
 #endif
