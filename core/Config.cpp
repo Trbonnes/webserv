@@ -67,8 +67,8 @@ void						Config::setWorker(int worker) {
 	_worker = worker;
 }
 
-void						Config::setWorkerConnections(int worckerConections) {
-	_workerConnections = worckerConections;
+void						Config::setWorkerConnections(int workerConections) {
+	_workerConnections = workerConections;
 }
 
 const char	*Config::InvalidConfigException::what() const throw() {

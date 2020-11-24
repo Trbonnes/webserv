@@ -104,6 +104,7 @@ int         HTTP::is_good_exe(std::string exe)
             }
         }
     }
+    std::cerr << "is good exe return 0" << std::endl;
     return (0);
 }
 

@@ -27,8 +27,8 @@ void	HttpWorker::run()
 
 	std::cout << "Running a worker" << std::endl;
 	// Important zeroing of the values
-	bzero(connections, FD_SETSIZE * sizeof(ListenSocket*)); // TO DO forbidden function
-	bzero(listening, FD_SETSIZE * sizeof(ListenSocket*));
+	ft_bzero(connections, FD_SETSIZE * sizeof(ListenSocket*));
+	ft_bzero(listening, FD_SETSIZE * sizeof(ListenSocket*));
 	// Transforming list in fdset and Listensocket hashmap (not sure about this name)
 	FD_ZERO(&active_fs);
 	for (unsigned int i = 0; i < _listen_socket.size(); i++)
@@ -98,6 +98,7 @@ void	HttpWorker::run()
 				std::cout << "RESPONSE CREATED" << std::endl;
 				connections[i]->write(response, responseSize); // TO DO ugly
 				std::cout << std::endl << "ENDING REQUEST" << std::endl;
+				delete socket;
 			}
 			else
 			{

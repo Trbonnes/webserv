@@ -471,16 +471,14 @@ Config *configFileParser(int fd) {
 	char c[4096];
 	std::string configFile;
 
-	for (int i = 0; i < 4096; i++)
-		c[i] = '\0';
+	ft_bzero(c, 4096);
 	while (int ret = read(fd, c, 4096) > 0) {
 		if (ret == -1) {
 			throw Config::InvalidConfigException();
 			return NULL;
 	}
-		configFile.append(c);
-		for (int i = 0; i < 4096; i++)
-			c[i] = '\0';
+	configFile.append(c);
+	ft_bzero(c, 4096);
 	}
 	
 	//std::cout << configFile << std::endl << std::endl;

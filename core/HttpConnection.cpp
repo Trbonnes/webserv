@@ -1,7 +1,7 @@
 #include "HttpConnection.hpp"
 #include <unistd.h>
 
-// void	ft_write(char *data, int size)
+// void	ft_write(char *data, int size) // TEST
 // {
 // 	write(2, data, size);
 // }

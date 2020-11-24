@@ -255,10 +255,15 @@ Socket	*httpRequestParser(int fd) {
 		if (ret == -1) { return NULL; }
 		request.append(c);
 	}
+		// std::cerr << "SORTIE" << std::endl;
 	socket = new Socket(fd);
+		// std::cerr << "BLABLA" << std::endl;
 	httpRequestParseRequestLine(request, socket);
+		// std::cerr << "BLABLA2" << std::endl;
 	httpRequestParseHeaders(request, socket);
+		// std::cerr << "BLABLA3" << std::endl;
 	httpRequestParseBody(request, socket);
 
+	std::cerr << "HTTP REQUEST PARSER" << std::endl;
 	return socket;
 }

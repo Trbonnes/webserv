@@ -55,6 +55,15 @@ _response()
     size_t      extension;
     std::string str;
 
+    std::cerr << "METHOD: " << _socket.getMethod() << std::endl;
+    std::cerr << "URI: " << _socket.getRequestURI() << std::endl;
+    std::cerr << "HTTP: " << _socket.getHttpVersion() << std::endl;
+    std::cerr << "HOST: " << _socket.getHost() << std::endl;
+    std::cerr << "USER-AGENT: " << _socket.getUserAgent() << std::endl;
+    std::cerr << "TRANSFER-ENCODING: " << _socket.getTransferEncoding() << std::endl;
+    std::cerr << "CONTENT-TYPE: " << _socket.getContentType() << std::endl;
+    std::cerr << "BODY: " << _socket.getBody() << std::endl;
+
     ft_bzero(_cgi_env, sizeof(_cgi_env));
     if (checkRequestErrors() != OK)
         return ;
@@ -75,14 +84,21 @@ _response()
     extension = _route.find_last_of('.');
     if (is_good_exe(str.assign(_route).erase(0, extension + 1)) && checkCGImethods(_socket.getMethod()))
     {
+        std::cerr << "9- POST" << std::endl;
         cgi_metaVariables();
         cgi_exe();
         setDate();
     }
     else if (checkAllowMethods(_socket.getMethod()))
+    {
+        std::cerr << "10- POST" << std::endl;
         callMethod(_socket.getMethod());
+    }
     else
+    {
+        std::cerr << "METHOD NOT ALLOWED" << std::endl;
         _statusCode = METHOD_NOT_ALLOWED;
+    }
 }
 
 HTTP::HTTP(HTTP &copy)
@@ -152,7 +168,8 @@ void        HTTP::callMethod(std::string method)
 //** Check request errors **
 int         HTTP::checkRequestErrors()
 {
-    if (_socket.getBody().length() > 0 && _socket.getContentLength().length() == 0 && _socket.getTransferEncoding().length() == 0)
+    if ((_socket.getBody().length() > 0 || _socket.getMethod().compare("POST") == 0)
+    && _socket.getContentLength().length() == 0 && _socket.getTransferEncoding().length() == 0)
         _statusCode = LENGTH_REQUIRED;
     return (_statusCode);
 }
@@ -169,9 +186,15 @@ int         HTTP::checkAllowMethods(std::string method)
     itEnd = _config.getAllow(_location).end();
     while (itBegin != itEnd)
     {
+        std::cerr << "allow: " << *itBegin << std::endl;
+        std::cerr << "method: " << method << std::endl;
         _allow.push_back(*itBegin);
         if ((*itBegin).compare(method) == 0)
+        {
+            std::cerr << "allow: " << *itBegin << std::endl;
+            std::cerr << "method: " << method << std::endl;
             ret = 1;
+        }
         itBegin++;
     }
     if (!ret)
@@ -587,10 +610,11 @@ char*         HTTP::getResponse()
     }
     response.append("\r\n");
     _responseSize = response.length() + _contentLength;
-    _response = (char*)ft_calloc(_responseSize, sizeof(char));
+    _response = (char*)ft_calloc(_responseSize + 1, sizeof(char));
     ft_strcpy(_response, response.c_str());
     if (_socket.getMethod().compare("HEAD"))
         ft_memcat(_response, _body, _contentLength);
+    free(_body);
     return (_response);
 }
 
