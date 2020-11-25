@@ -528,7 +528,7 @@ char*         HTTP::getResponse()
     if (_statusCode == 200 && _socket.getMethod().compare("PUT") == 0)
     {
         if (ft_strlen(_date) > 0)
-            response.append("Date: ").append(_date).append("\n");
+            response.append("Date: ").append(_date).append("\r\n");
     }
     else
     {
