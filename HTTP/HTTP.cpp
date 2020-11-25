@@ -339,11 +339,11 @@ void            HTTP::setAutoindex(void)
             files.pop();
         }
     }
-    body.append("</pre><hr></body>\n</html>\n");
-    _contentLength = body.length() + 2 + 1; // + 2 sinon test fail
+    body.append("</pre><hr></body>\n</html>");
+    _contentLength = body.length(); // + 2 sinon test fail
     _contentType = "text/html";
     _charset = "utf-8";
-    _body = (char*)ft_calloc(_contentLength, sizeof(char));
+    _body = (char*)ft_calloc(_contentLength + 1, sizeof(char));
     ft_strcpy(_body, body.c_str());
 }
 
@@ -496,7 +496,7 @@ void        HTTP::configureErrorFile()
         body.append("</h1>\n\n</body>\n</html>\n");
         _contentType = "text/html";
         _charset = "utf-8";
-        _contentLength = body.length() + 2;
+        _contentLength = body.length();
     }
     else
     {
@@ -539,6 +539,12 @@ char*         HTTP::getResponse()
         response.append("Server: ").append(_config.getServerSoftware()).append("\r\n"); //TO DO
         if (ft_strlen(_date) > 0)
             response.append("Date: ").append(_date).append("\r\n");
+
+        if (_contentType.length() > 0)
+            response.append("Content-Type: ").append(_contentType).append("\r\n");
+
+        if (_contentLength > 0)
+            response.append("Content-Length: ").append(ft_itoa(_contentLength)).append("\r\n");
         if (_socket.getMethod().compare("OPTIONS") == 0 || _statusCode == METHOD_NOT_ALLOWED)
         {
             response.append("Allow: ");
@@ -563,15 +569,12 @@ char*         HTTP::getResponse()
                 response.append(*it).append(" ");
                 it++;
             }
+            response.append("\r\n");
         }
         else
         {
-            if (_contentType.length() > 0)
-                response.append("Content-Type: ").append(_contentType).append("\r\n");
             if (_charset.length() > 0)
                 response.append("Charset: ").append(_charset).append("\r\n");
-            if (_contentLength > 0)
-            response.append("Content-Length: ").append(ft_itoa(_contentLength)).append("\r\n");
             if (_statusCode < 300)
             {
                 if (ft_strlen(_lastModified) > 0)
@@ -582,15 +585,15 @@ char*         HTTP::getResponse()
                     response.append("Content-Language: ").append(_contentLanguage).append("\r\n");
             }
             else if (_statusCode == UNAUTHORIZED)
-                response.append("WWW-Authenticate: ").append("Basic ").append(_config.getAuth_basic(_location));
+                response.append("WWW-Authenticate: ").append("Basic ").append(_config.getAuth_basic(_location)).append("\r\n");
         }
     }
     response.append("\r\n");
     _responseSize = response.length() + _contentLength;
-    _response = (char*)ft_calloc(_responseSize, sizeof(char));
+    _response = (char*)ft_calloc(_responseSize + 1, sizeof(char));
     ft_strcpy(_response, response.c_str());
     if (_socket.getMethod().compare("HEAD"))
-        ft_memcat(_response, _body, _contentLength);
+        ft_memcat(_response, _body, _contentLength + 1);
     return (_response);
 }
 
