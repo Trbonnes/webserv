@@ -55,14 +55,14 @@ _response(nullptr)
     size_t      extension;
     std::string str;
 
-    std::cerr << "METHOD: " << _socket.getMethod() << std::endl;
-    std::cerr << "URI: " << _socket.getRequestURI() << std::endl;
-    std::cerr << "HTTP: " << _socket.getHttpVersion() << std::endl;
-    std::cerr << "HOST: " << _socket.getHost() << std::endl;
-    std::cerr << "USER-AGENT: " << _socket.getUserAgent() << std::endl;
-    std::cerr << "TRANSFER-ENCODING: " << _socket.getTransferEncoding() << std::endl;
-    std::cerr << "CONTENT-TYPE: " << _socket.getContentType() << std::endl;
-    std::cerr << "BODY: " << _socket.getBody() << std::endl;
+    // std::cerr << "METHOD: " << _socket.getMethod() << std::endl;
+    // std::cerr << "URI: " << _socket.getRequestURI() << std::endl;
+    // std::cerr << "HTTP: " << _socket.getHttpVersion() << std::endl;
+    // std::cerr << "HOST: " << _socket.getHost() << std::endl;
+    // std::cerr << "USER-AGENT: " << _socket.getUserAgent() << std::endl;
+    // std::cerr << "TRANSFER-ENCODING: " << _socket.getTransferEncoding() << std::endl;
+    // std::cerr << "CONTENT-TYPE: " << _socket.getContentType() << std::endl;
+    // std::cerr << "BODY: " << _socket.getBody() << std::endl;
 
     ft_bzero(_cgi_env, sizeof(_cgi_env));
     if (checkRequestErrors() != OK)
@@ -558,6 +558,8 @@ char*         HTTP::getResponse()
             response.append("Server: ").append(_config.getServerSoftware()).append("\r\n"); //TO DO
             if (_contentLength > 0)
                 response.append("Content-Length: ").append(ft_itoa(_contentLength)).append("\r\n");
+            if (_contentType.length() > 0)
+                response.append("Content-Type: ").append(_contentType).append("\r\n");
             if (ft_strlen(_date) > 0)
                 response.append("Date: ").append(_date).append("\r\n");
             if (_socket.getMethod().compare("OPTIONS") == 0 || _statusCode == METHOD_NOT_ALLOWED)
@@ -587,8 +589,8 @@ char*         HTTP::getResponse()
             }
             else
             {
-                if (_contentType.length() > 0)
-                    response.append("Content-Type: ").append(_contentType).append("\r\n");
+                // if (_contentType.length() > 0)
+                    // response.append("Content-Type: ").append(_contentType).append("\r\n");
                 if (_charset.length() > 0)
                     response.append("Charset: ").append(_charset).append("\r\n");
                 if (_contentLength > 0)
