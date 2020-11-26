@@ -55,6 +55,8 @@ _response()
     size_t      extension;
     std::string str;
 
+    std::cerr << "METHOD: " << _socket.getMethod() << std::endl;
+
     ft_bzero(_cgi_env, sizeof(_cgi_env));
     if (checkRequestErrors() != OK)
         return ;
@@ -170,7 +172,7 @@ int         HTTP::checkAllowMethods(std::string method)
     while (itBegin != itEnd)
     {
         _allow.push_back(*itBegin);
-        if ((*itBegin).compare(method) == 0)
+        if ((*itBegin).compare(method) == 0 || method.compare("HEAD") == 0)
             ret = 1;
         itBegin++;
     }

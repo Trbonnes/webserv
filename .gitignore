@@ -1,5 +1,2 @@
-
-*
 !.gitignore
-!core/
 !http/nginx

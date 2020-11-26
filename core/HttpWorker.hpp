@@ -13,6 +13,7 @@
 
 #include "../HTTP/HTTP.hpp"
 #include "../HTTP/Socket.hpp"
+#include "../HTTP/utils/utils.hpp"
 
 class HttpWorker : public Runnable
 {
