@@ -6,7 +6,7 @@
 /*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/14 08:46:39 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/11/26 10:48:22 by user42           ###   ########.fr       */
+/*   Updated: 2020/11/26 12:26:47 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -374,6 +374,14 @@ int		configFileParseServerUnit(std::string configFile, std::vector<ConfigServer>
 	}
 
 	//ERROR PAGES
+	if ((pos = parseServer.find("error_root", i)) != parseServer.npos) {
+		pos += 10;
+		checkEndLine(pos, parseServer);
+		while (parseServer[pos] == ' ') { pos++; }
+		i = parseServer.find(";", pos);
+		v->back().setErrorRoot(parseServer.substr(pos, i - pos));
+	}
+
 	i = 0;
 	if ((pos = parseServer.find("error_page", i)) != parseServer.npos) {
 		while ((pos = parseServer.find("error_page", i)) != parseServer.npos) {

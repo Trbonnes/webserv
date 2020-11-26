@@ -6,7 +6,7 @@
 /*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/09 15:13:35 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/11/26 10:50:39 by user42           ###   ########.fr       */
+/*   Updated: 2020/11/26 12:26:16 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -379,11 +379,15 @@ std::map<int, std::string>  &ConfigServer::getErrorPages() {
 
 std::string                 ConfigServer::getHTMLErrorPage(int error) {
     std::map<int, std::string>::iterator it;
+	std::string page;
 
     it = _errorPages.find(error);
 	if (it == _errorPages.end())
 		return ("");
-    return it->second;
+	
+	page.append(_errorFilesRoot);
+	page.append(it->second);
+    return page;
 }
 
 std::string             ConfigServer::getHttpVersion()
@@ -443,6 +447,10 @@ void                    ConfigServer::setClientBodySize(int clientBodySize) {
 
 void                    ConfigServer::setAllow(std::vector<std::string> allow) {
     _defaultAllow = allow;
+}
+
+void					ConfigServer::setErrorRoot(std::string root) {
+	_errorFilesRoot = root;
 }
 
 void                    ConfigServer::setErrorPages(int error, std::string page) {

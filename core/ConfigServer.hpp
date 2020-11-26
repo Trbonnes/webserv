@@ -6,7 +6,7 @@
 /*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/09 12:19:51 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/11/26 10:44:22 by user42           ###   ########.fr       */
+/*   Updated: 2020/11/26 12:25:29 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,6 +98,7 @@ public:
     void                    setAutoIndex(int autoIndex);
     void                    setClientBodySize(int clientBodySize);
     void                    setAllow(std::vector<std::string> allow);
+	void					setErrorRoot(std::string root);
     void                    setErrorPages(int error, std::string page);
 
     void                    insertLocation(std::string s, Location location);
