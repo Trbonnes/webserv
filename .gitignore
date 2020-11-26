@@ -1,2 +1,4 @@
 !.gitignore
 !http/nginx
+configtest
+requesttest
