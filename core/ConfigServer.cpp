@@ -6,7 +6,7 @@
 /*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/09 15:13:35 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/11/26 12:26:16 by user42           ###   ########.fr       */
+/*   Updated: 2020/11/26 15:05:49 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,12 +20,6 @@ _defaultType("text/plain"),
 _defaultCharset("utf-8"),
 _defaultAutoindex(0)
 {
-    // default language
-
-    // A ajouter dans le fichier de config
-
-//    _defaultLanguage.push_back("en");  
-//    _defaultLanguage.push_back("fr");
 
     // open mime.types **
     int         ret;
@@ -436,6 +430,19 @@ void                    ConfigServer::setRoot(std::string root) {
 void                    ConfigServer::setIndex(std::vector<std::string> index) {
     _defaultIndex = index;
 }
+
+void					ConfigServer::setType(std::string type) {
+	_defaultType = type;
+}
+
+void					ConfigServer::setCharset(std::string charset) {
+	_defaultCharset = charset;
+}
+
+void					ConfigServer::setLanguage(std::vector<std::string> language) {
+	_defaultLanguage = language;
+}
+
 
 void                    ConfigServer::setAutoIndex(int autoIndex) {
     _defaultAutoindex = autoIndex;

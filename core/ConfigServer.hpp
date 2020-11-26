@@ -6,7 +6,7 @@
 /*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/09 12:19:51 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/11/26 12:25:29 by user42           ###   ########.fr       */
+/*   Updated: 2020/11/26 15:07:44 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,6 +95,9 @@ public:
     void                    setServer_name(std::vector<std::string> server_name);
     void                    setRoot(std::string root);
     void                    setIndex(std::vector<std::string> index);
+    void					setType(std::string type);
+    void					setCharset(std::string charset);
+    void					setLanguage(std::vector<std::string> language);
     void                    setAutoIndex(int autoIndex);
     void                    setClientBodySize(int clientBodySize);
     void                    setAllow(std::vector<std::string> allow);
@@ -103,7 +106,7 @@ public:
 
     void                    insertLocation(std::string s, Location location);
 
-    //void                    printServer(); -> used for local tests
+    //void                    printServer();
 };
 
 #endif
