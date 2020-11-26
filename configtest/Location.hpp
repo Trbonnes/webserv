@@ -35,7 +35,7 @@ public:
 	/*virtual*/ ~Location();
 	Location &operator=(const Location &c);
 
-    //void                    printLocation(); ->used for local tests
+    void                    printLocation();
 };
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/09 12:19:51 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/11/26 10:44:22 by user42           ###   ########.fr       */
+/*   Updated: 2020/11/26 09:59:57 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,6 @@
 # include <vector>
 # include <map>
 
-# include "../HTTP/utils/utils.hpp"
 # include "Compare.hpp"
 # include "Location.hpp"
 
@@ -78,12 +77,12 @@ public:
     std::string                 getAuth_basic_user_file(std::string location);
     int	                        getAutoindex(std::string location);
     std::string                 getAlias(std::string location);
-    std::vector<std::string>    &getCGI(std::string location);
+    std::vector<std::string>    getCGI(std::string location);
     std::string                 getCGI_root(std::string location);
 	std::vector<std::string>	&getCGI_allow(std::string location);
     int                         getClientBodySize(std::string location);
     std::vector<int>            getPort();
-    std::map<int, std::string>  &getErrorPages();
+    std::map<int, std::string>  getErrorPages();
     std::string                 getHTMLErrorPage(int error);
 
     std::map<std::string, Location, Compare<std::string> > getLocationList();
@@ -102,7 +101,7 @@ public:
 
     void                    insertLocation(std::string s, Location location);
 
-    //void                    printServer(); -> used for local tests
+    void                    printServer();
 };
 
 #endif

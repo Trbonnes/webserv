@@ -6,26 +6,44 @@
 /*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/09 15:13:35 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/11/26 10:50:39 by user42           ###   ########.fr       */
+/*   Updated: 2020/11/26 10:01:15 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ConfigServer.hpp"
 
 ConfigServer::ConfigServer() :
-_httpVersion("HTTP/1.1"),
-_serverSoftware("Server/2.0"),
+// _defaultRoot(""),
+// _defaultIndex(0),
+// _defaultType(""),
+// _defaultCharset(""),
+// _defaultLanguage(0),
+// _configFilesRoot(""),
+// _defaultAuth_basic(""),
+// _defaultAuth_basic_user_file(""),
+// _defaultServerName(0),
+// _defaultCgi(0),
+// _defaultCgi_allow(0),
+// _defaultCgi_root(""),
 _defaultClientBodySize(-1),
-_defaultType("text/plain"),
-_defaultCharset("utf-8"),
 _defaultAutoindex(0)
+// _defaultAllow(0),
+// _port(0) 
 {
-    // default language
+    // _defaultAllow.push_back("GET");
+    // _defaultAllow.push_back("HEAD");
+    // _defaultAllow.push_back("POST");
+    // _defaultAllow.push_back("PUT");
+    // _defaultLanguage.push_back("fr");
+    // _defaultLanguage.push_back("en");
+    // _defaultIndex.push_back("index.html");
+    // _defaultIndex.push_back("index.html");
+    // _mimeTypes.push_back("plain/text");
+    // _defaultServerName.push_back("localhost");
 
-    // A ajouter dans le fichier de config
+/*
 
-//    _defaultLanguage.push_back("en");  
-//    _defaultLanguage.push_back("fr");
+    -----mime.types test not for configfile parsing-----
 
     // open mime.types **
     int         ret;
@@ -36,10 +54,11 @@ _defaultAutoindex(0)
     std::list<std::string>::iterator it;
     std::string::iterator s_it;
 
-    file.append("HTTP/config/mime.types");
+    file.append(_configFilesRoot);
+    file.append("/mime.types");
     if ((fd = open(file.c_str(), O_RDONLY)) >= 0)
     {
-        while ((ret = get_next_line(fd, &line)) > 0)
+        while ((ret = getDefault_next_line(fd, &line)) > 0)
         {
             string = line;
             _mimeTypes.push_back(string);
@@ -58,6 +77,45 @@ _defaultAutoindex(0)
         free(line);
         close (fd);
     }
+*/
+
+/*
+
+    -----Test Locations without config file parsing-----
+
+    // Locations **
+
+        // first location **
+
+    std::list<std::string> index;
+    
+    index.push_back("index.php");
+
+    Location loc1("/data/", "/home/pauline/webserver/www",
+    _defaultAllow, index,
+    "text/html", "utf-8", _defaultLanguage, _defaultAuth_basic, _defaultAuth_basic_user_file, _defaultAutoindex);
+
+    _locationList["/data/"] = loc1;
+
+        // second location **
+
+    std::list<std::string> index2;
+
+    index2.push_back("42.png");
+
+    Location loc2("/images/", "/home/pauline/webserver/www",
+    _defaultAllow, index2,
+    "text/html", "", _defaultLanguage, "off", "", _defaultAutoindex);
+
+    _locationList["/images/"] = loc2;
+
+    Location loc3("/", "/home/pauline/webserver/www",
+    _defaultAllow, _defaultIndex,
+    _defaultType, _defaultCharset, _defaultLanguage, "off", "", "on");
+
+    _locationList["/"] = loc3;
+*/
+
 }
 
 ConfigServer::ConfigServer(const ConfigServer &copy)
@@ -112,6 +170,7 @@ ConfigServer                  &ConfigServer::operator=(ConfigServer const &rhs)
 	_defaultCgi = rhs._defaultCgi;
 	_defaultCgi_allow = rhs._defaultCgi_allow;
 	_defaultCgi_root = rhs._defaultCgi_root;
+
     return *this;
 }
 
@@ -141,15 +200,11 @@ std::string             ConfigServer::getRoot(std::string location)
     itEnd = _locationList.end();
     while (itBegin != itEnd)
     {
-        if (location.compare(itBegin->first) == 0 && (itBegin->second._root).compare(""))
-            return (str.assign((itBegin->second._root)).append(itBegin->second._location, itBegin->second._location.size() - 1));
-        else if (location.compare(itBegin->first) == 0)
-            break;
+        if (location.compare(itBegin->first) == 0)
+            return (str.assign((itBegin->second._root)).append(itBegin->second._location));
         itBegin++;
     }
-    if (itBegin != itEnd)
-        return (str.assign(_defaultRoot).append(itBegin->second._location));
-    return _defaultRoot; 
+    return _defaultRoot;
 }
 
 std::vector<std::string>             ConfigServer::getServerName()
@@ -166,7 +221,7 @@ std::vector<std::string>  &ConfigServer::getIndex(std::string location)
     itEnd = _locationList.end();
     while (itBegin != itEnd)
     {
-        if (location.compare(itBegin->first) == 0 && itBegin->second._index.size() > 0)
+        if (location.compare(itBegin->first) == 0)
             return (itBegin->second._index);
         itBegin++;
     }
@@ -182,7 +237,7 @@ std::string                 ConfigServer::getType(std::string location)
     itEnd = _locationList.end();
     while (itBegin != itEnd)
     {
-        if (location.compare(itBegin->first) == 0 && itBegin->second._type.compare(""))
+        if (location.compare(itBegin->first) == 0)
             return (itBegin->second._type);
         itBegin++;
     }
@@ -203,7 +258,7 @@ std::vector<std::string>    &ConfigServer::getLanguage(std::string location)
     itEnd = _locationList.end();
     while (itBegin != itEnd)
     {
-        if (location.compare(itBegin->first) == 0 && itBegin->second._language.size() > 0)
+        if (location.compare(itBegin->first) == 0)
             return (itBegin->second._language);
         itBegin++;
     }
@@ -219,7 +274,7 @@ std::vector<std::string>    &ConfigServer::getAllow(std::string location)
     itEnd = _locationList.end();
     while (itBegin != itEnd)
     {
-        if (location.compare(itBegin->first) == 0 && itBegin->second._allow.size() > 0)
+        if (location.compare(itBegin->first) == 0)
             return (itBegin->second._allow);
         itBegin++;
     }
@@ -235,7 +290,7 @@ std::string                 ConfigServer::getCharset(std::string location)
     itEnd = _locationList.end();
     while (itBegin != itEnd)
     {
-        if (location.compare(itBegin->first) == 0 && itBegin->second._charset.compare(""))
+        if (location.compare(itBegin->first) == 0)
             return (itBegin->second._charset);
         itBegin++;
     }
@@ -251,7 +306,7 @@ std::string                 ConfigServer::getAuth_basic(std::string location)
     itEnd = _locationList.end();
     while (itBegin != itEnd)
     {
-        if (location.compare(itBegin->first) == 0 && itBegin->second._auth_basic.compare(""))
+        if (location.compare(itBegin->first) == 0)
             return (itBegin->second._auth_basic);
         itBegin++;
     }
@@ -267,7 +322,7 @@ std::string                 ConfigServer::getAuth_basic_user_file(std::string lo
     itEnd = _locationList.end();
     while (itBegin != itEnd)
     {
-        if (location.compare(itBegin->first) == 0 && itBegin->second._auth_basic_user_file.compare(""))
+        if (location.compare(itBegin->first) == 0)
             return (itBegin->second._auth_basic_user_file);
         itBegin++;
     }
@@ -299,14 +354,14 @@ std::string             ConfigServer::getAlias(std::string location)
     itEnd = _locationList.end();
     while (itBegin != itEnd)
     {
-        if (location.compare(itBegin->first) == 0 && itBegin->second._alias.compare(""))
+        if (location.compare(itBegin->first) == 0)
             return (itBegin->second._alias);
         itBegin++;
     }
     return "";   
 }
 
-std::vector<std::string>             &ConfigServer::getCGI(std::string location)
+std::vector<std::string>             ConfigServer::getCGI(std::string location)
 {
     std::map<std::string, Location, Compare<std::string> >::iterator itBegin;
     std::map<std::string, Location, Compare<std::string> >::iterator itEnd;  
@@ -315,7 +370,7 @@ std::vector<std::string>             &ConfigServer::getCGI(std::string location)
     itEnd = _locationList.end();
     while (itBegin != itEnd)
     {
-        if (location.compare(itBegin->first) == 0 && itBegin->second._cgi.size() > 0)
+        if (location.compare(itBegin->first) == 0)
             return (itBegin->second._cgi);
         itBegin++;
     }
@@ -346,7 +401,7 @@ std::vector<std::string>	&ConfigServer::getCGI_allow(std::string location) {
     itEnd = _locationList.end();
     while (itBegin != itEnd)
     {
-        if (location.compare(itBegin->first) == 0 && itBegin->second._cgi_allow.size() > 0)
+        if (location.compare(itBegin->first) == 0)
             return (itBegin->second._cgi_allow);
         itBegin++;
     }
@@ -361,7 +416,7 @@ int                         ConfigServer::getClientBodySize(std::string location
     itEnd = _locationList.end();
     while (itBegin != itEnd)
     {
-        if (location.compare(itBegin->first) == 0 && itBegin->second._clientBodySize != -1)
+        if (location.compare(itBegin->first) == 0)
             return (itBegin->second._clientBodySize);
         itBegin++;
     }
@@ -373,7 +428,7 @@ std::vector<int>                         ConfigServer::getPort() {
     return _port;
 }
 
-std::map<int, std::string>  &ConfigServer::getErrorPages() {
+std::map<int, std::string>  ConfigServer::getErrorPages() {
     return _errorPages;
 }
 
