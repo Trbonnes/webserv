@@ -6,7 +6,7 @@
 /*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/14 08:46:39 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/11/26 12:26:47 by user42           ###   ########.fr       */
+/*   Updated: 2020/11/26 14:59:26 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,6 +103,44 @@ std::string		configFileParseServerLocation(std::string parseServer, ConfigServer
 			location._index.push_back(s.substr(pos, i - pos));
 			pos = i;
 		}
+	}
+
+	//TYPE
+	if ((pos = s.find("type", i)) != s.npos) {
+		pos += 4;
+		checkEndLine(pos, s);
+		while (s[pos] == ' ') { pos++; }
+		i = s.find(";", pos);
+		location._type = s.substr(pos, i - pos);
+	}
+
+	//CHARSET
+	if ((pos = s.find("charset", i)) != s.npos) {
+		pos += 7;
+		checkEndLine(pos, s);
+		while (s[pos] == ' ') { pos++; }
+		i = s.find(";", pos);
+		location._charset = s.substr(pos, i - pos);
+	}
+
+	//LANGUAGE
+	if ((pos = s.find("language")) != s.npos) {
+		std::string tmp;
+		size_t j;
+		std::vector<std::string> vs;
+		pos += 8;
+		checkEndLine(pos, s);
+		i = s.find(";", pos);
+		while (pos != i) {
+			while (s[pos] == ' ') { pos++; }
+			j = pos;
+			while (s[j] &&s[j] != ' ' && s[j] != ';' && s[j] != '\n') { j++; }
+			if (!s[j] || s[j] == '\n')
+				throw Config::InvalidConfigException();
+			vs.push_back(s.substr(pos, j - pos));
+			pos = j;
+		}
+		location._language = vs;
 	}
 
 	//AUTOINDEX
@@ -308,6 +346,45 @@ int		configFileParseServerUnit(std::string configFile, std::vector<ConfigServer>
 		else
 			throw Config::InvalidConfigException();
 	}
+
+	//TYPE
+	if ((pos = parseServer.find("type", i)) != parseServer.npos) {
+		pos += 4;
+		checkEndLine(pos, parseServer);
+		while (parseServer[pos] == ' ') { pos++; }
+		i = parseServer.find(";", pos);
+		v->back().setType(parseServer.substr(pos, i - pos));
+	}
+
+	//CHARSET
+	if ((pos = parseServer.find("charset", i)) != parseServer.npos) {
+		pos += 7;
+		checkEndLine(pos, parseServer);
+		while (parseServer[pos] == ' ') { pos++; }
+		i = parseServer.find(";", pos);
+		v->back().setCharset(parseServer.substr(pos, i - pos));
+	}
+
+	//LANGUAGE
+	if ((pos = parseServer.find("language")) != parseServer.npos) {
+		std::string tmp;
+		size_t j;
+		std::vector<std::string> vs;
+		pos += 8;
+		checkEndLine(pos, parseServer);
+		i = parseServer.find(";", pos);
+		while (pos != i) {
+			while (parseServer[pos] == ' ') { pos++; }
+			j = pos;
+			while (parseServer[j] &&parseServer[j] != ' ' && parseServer[j] != ';' && parseServer[j] != '\n') { j++; }
+			if (!parseServer[j] || parseServer[j] == '\n')
+				throw Config::InvalidConfigException();
+			vs.push_back(parseServer.substr(pos, j - pos));
+			pos = j;
+		}
+		v->back().setLanguage(vs);
+	}
+
 
 	//CLIENTBODYSIZE
 	if ((pos = parseServer.find("client_max_body_size")) != parseServer.npos) {
