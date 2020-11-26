@@ -283,11 +283,11 @@ int                 ConfigServer::getAutoindex(std::string location)
     itEnd = _locationList.end();
     while (itBegin != itEnd)
     {
-        if (location.compare(itBegin->first) == 0)
+        if (location.compare(itBegin->first) == 0 && itBegin->second._autoindex != -1)
             return (itBegin->second._autoindex);
         itBegin++;
     }
-    return _defaultAutoindex;   
+    return _defaultAutoindex;
 }
 
 std::string             ConfigServer::getAlias(std::string location)
