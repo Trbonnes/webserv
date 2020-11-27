@@ -24,7 +24,7 @@ class WorkersInitException: public std::exception
 	public:
 		const char * what () const throw ()
     	{
-    		return "Workers failed to initialize";
+    		return "Workers failed to initialize"; // TO DO reimplement into the cpp file
     	}
 };
 
@@ -43,13 +43,14 @@ private:
 	Config						*_config;
 	std::vector<ListenSocket>	_listen_sockset;
 	pid_t*						_workers_pid; // might put into ProcessManager.hpp
-
-
-public:
 	void			initConf();
 	void			initListenSocket();
 	void			initWorkers();
-	static	void	launchProcess();
+	static	void	launchProcess(); // TO DO is it clean ?
+
+public:
+	void			run();
+
 };
 #endif // HTTPSERVER
 

@@ -7,12 +7,9 @@ int main(int argc, const char** argv) {
 	(void) argc;
 	(void) argv;
 	server = HttpServer();
-
 	try
 	{
-		server.initConf();
-		server.initListenSocket();
-		server.initWorkers();
+		server.run();
 	}
 	catch(const std::exception& e)
 	{

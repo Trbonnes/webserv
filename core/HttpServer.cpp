@@ -13,22 +13,52 @@ HttpServer::~HttpServer() {
 		delete _workers_pid;
 }
 
+
+void HttpServer::run()
+{
+	try
+	{
+		initConf();
+	}
+	catch(const std::exception& e)
+	{
+		std::cerr << "Error while initializing configuration : " << e.what() << '\n';
+		throw e;
+	}
+	try
+	{
+		initListenSocket();
+	}
+	catch(const std::exception& e)
+	{
+		std::cerr << "Error while initializing listen socket : " << e.what() << '\n';
+		throw e;
+	}
+	try
+	{
+		// initWorkers();
+	}
+	catch(const std::exception& e)
+	{
+		std::cerr << "Error while initializing workers : " << e.what() << '\n';
+		std::cerr << e.what() << '\n';
+		throw e;
+	}
+}
+
 void HttpServer::initConf() {
 	std::cout << "Initializing configuration" << std::endl;
 
 	int fd = open("test/test.conf", O_RDWR); // for test purposes
 
+	_config = 0;
 	try {
 		_config = configFileParser(fd);
-
-		std::cout << std::endl;
-
 		std::cout << "Workers: " << _config->getWorker() << std::endl;
 		std::cout << "Worker connections: " << _config->getWorkerConnections() << std::endl;
 
 	}
 	catch (std::exception const &e) {
-		
 		std::cout << "Exception: " << e.what() << std::endl;
 		if (_config)
 			delete _config;

@@ -1,7 +1,5 @@
 #include "ListenSocket.hpp"
 
-
-		#include <string.h>
 ListenSocket::ListenSocket(int port) {
 	_port = port;
     _sock = socket(AF_INET, SOCK_STREAM, 0);
@@ -21,17 +19,9 @@ ListenSocket::ListenSocket(int port) {
 
 	if (bind(_sock, (struct sockaddr *)&address,
                                  sizeof(address)))
-	{
-		std::cout << strerror(errno) << std::endl;
-		// TO DO error throw
-	}
-
+		throw BindingException(errno);
 	if (listen(_sock, 3))
-	{
-		std::cout << "Listen error " << strerror(errno) << std::endl;
-	}
-
-	// TO DO error management
+		throw ListenException(errno);
 }
 
 ListenSocket::~ListenSocket() {
@@ -44,4 +34,22 @@ int ListenSocket::getSock() {
 
 int ListenSocket::getPort() {
     return _port;
+}
+
+ListenSocket::ListenSocketException::ListenSocketException(std::string msg, int errcode)
+{
+	_msg = msg + " : " + strerror(errcode);
+}
+
+const char * ListenSocket::ListenSocketException::what () const throw ()
+{
+	return _msg.c_str();
+}
+
+ListenSocket::BindingException::BindingException(int errcode) : ListenSocketException("Socket binding error", errcode)
+{
+}
+
+ListenSocket::ListenException::ListenException(int errcode) : ListenSocketException("Listen init error", errcode)
+{
 }
