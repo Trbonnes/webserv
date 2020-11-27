@@ -11,27 +11,13 @@ int main(int argc, const char** argv) {
 	try
 	{
 		server.initConf();
-	}
-	catch(const std::exception& e)
-	{
-		std::cerr << e.what() << '\n';
-	}
-	try
-	{
 		server.initListenSocket();
-	}
-	catch(const std::exception& e)
-	{
-		std::cerr << e.what() << '\n';
-	}
-	try
-	{
 		server.initWorkers();
 	}
 	catch(const std::exception& e)
 	{
 		std::cerr << e.what() << '\n';
+		return 1;
 	}
-
 	return 0;
 }

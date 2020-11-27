@@ -560,18 +560,27 @@ Config *configFileParser(int fd) {
 		c[i] = '\0';
 	while (int ret = read(fd, c, 4096) > 0) {
 		if (ret == -1) {
+			delete config;
 			throw Config::InvalidConfigException();
 			return NULL;
-	}
+		}
 		configFile.append(c);
 		for (int i = 0; i < 4096; i++)
 			c[i] = '\0';
+	}	
+	try
+	{
+		configFileParseWorkers(configFile, config);
+		configFileParseServers(configFile, config);
+	}
+	catch(const std::exception& e)
+	{
+		std::cerr << e.what() << '\n';
+		delete config;
+		throw Config::InvalidConfigException();
 	}
 	
-	//std::cout << configFile << std::endl << std::endl;
 
-	configFileParseWorkers(configFile, config);
-	configFileParseServers(configFile, config);
 
 	return config;
 }

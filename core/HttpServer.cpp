@@ -2,11 +2,15 @@
 
 
 HttpServer::HttpServer() {
-    
+    _config = NULL;
+    _workers_pid = NULL;
 }
 
 HttpServer::~HttpServer() {
-    
+	if (_config)
+		delete _config;
+	if (_workers_pid)
+		delete _workers_pid;
 }
 
 void HttpServer::initConf() {
@@ -19,20 +23,17 @@ void HttpServer::initConf() {
 
 		std::cout << std::endl;
 
-		std::cout << "-> Workers: " << _config->getWorker() << std::endl;
-		std::cout << "-> Worker connections: " << _config->getWorkerConnections() << std::endl;
+		std::cout << "Workers: " << _config->getWorker() << std::endl;
+		std::cout << "Worker connections: " << _config->getWorkerConnections() << std::endl;
 
-		// for (std::vector<ConfigServer>::iterator it = config->getServer().begin(); it != config->getServer().end(); it++) {
-		// 	it->printServer();
-		// }
+	}
+	catch (std::exception const &e) {
 		
-	}
-	catch (std::exception &e) {
 		std::cout << "Exception: " << e.what() << std::endl;
-		exit (0);
-		//TO DO throw a custom error
+		if (_config)
+			delete _config;
+		throw e;
 	}
-
 }
 
 void HttpServer::initListenSocket() // TO DO optimization
@@ -42,7 +43,7 @@ void HttpServer::initListenSocket() // TO DO optimization
 	std::map<std::string, Location, Compare<std::string>> locations;
 	std::vector<ConfigServer> servers;
 	std::vector<int> ports;
-	 
+
 	servers = _config->getServerList();
 	// Initialize listening sockets that will be shared between workers
 	for (size_t i = 0; i < servers.size(); i++)
