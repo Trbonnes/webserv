@@ -1,2 +1,6 @@
 !.gitignore
 !http/nginx
+*.o
+webserv
+test/
+.vscode
