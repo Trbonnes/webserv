@@ -99,7 +99,6 @@ void	HttpWorker::run()
 				std::cerr << response << std::endl;
 				std::cout << "RESPONSE CREATED" << std::endl;
 				connections[i]->write(response, responseSize); // TO DO ugly
-				delete response;
 				std::cout << std::endl << "ENDING REQUEST" << std::endl;
 			}
 			else

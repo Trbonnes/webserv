@@ -1,4 +1,5 @@
 #include "utils.hpp"
+#include <iostream>
 
 char			*ft_memcat(char *dest, const char *src, size_t nb)
 {
@@ -9,9 +10,10 @@ char			*ft_memcat(char *dest, const char *src, size_t nb)
 	len_dest = (int)ft_strlen((const char*)dest);
 	while (i < nb)
 	{
+		std::cerr << len_dest + i << " ";
 		dest[len_dest + i] = src[i];
 		i++;
 	}
-	dest[len_dest + i] = src[i];
+	//dest[len_dest + i] = src[i];
 	return (dest);
 }
