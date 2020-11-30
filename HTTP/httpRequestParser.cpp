@@ -6,7 +6,7 @@
 /*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/30 15:45:46 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/11/09 18:39:03 by user42           ###   ########.fr       */
+/*   Updated: 2020/11/30 15:52:42 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -242,6 +242,7 @@ Socket	*httpRequestParser(int fd) {
 	int		ret;
 	std::string request;
 
+	std::cout << "\033[0;32m --TEST--" << std::endl;
 	while (request.find("\r\n") >= request.npos && request.find("\n\n") >= request.npos) {
 		ft_bzero(c, 4096);
 		ret = read(fd, c, 4096);
@@ -249,9 +250,9 @@ Socket	*httpRequestParser(int fd) {
 			throw HttpConnection::ConnectionClose();
 		std::cout << ret << std::endl;
 		std::string str = c; // SOCKET TEST
-		std::cerr << "SOCKET:" << std::endl; // SOCKET TEST
-		std::cerr << str << std::endl; // SOCKET TEST
-		std::cerr << "END SOCKET" << std::endl; // SOCKET TEST
+		std::cout << "SOCKET:" << std::endl; // SOCKET TEST
+		std::cout << str << std::endl; // SOCKET TEST
+		std::cout << "END SOCKET" << std::endl; // SOCKET TEST
 		if (ret == -1) { return NULL; }
 		request.append(c);
 	}
