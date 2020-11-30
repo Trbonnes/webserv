@@ -21,6 +21,7 @@ pid_t ProcessManager::launchProcess(Runnable &proc)
 		{
 		case 0:
 			proc.run();
+			std::exit(0);
 			break;
 		case -1:
 			// ERROR TO THROW

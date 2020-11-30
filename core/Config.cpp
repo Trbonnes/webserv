@@ -21,7 +21,8 @@ Config::Config(const Config &c) {
 	_workerConnections = c._workerConnections;
 }
 
-Config::~Config() {
+Config::~Config()
+{
 }
 
 Config &Config::operator=(const Config &c) {

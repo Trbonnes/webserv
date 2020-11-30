@@ -11,6 +11,7 @@ CORESRC = 	core/Runnable.cpp \
 			core/ListenSocket.cpp \
 			core/HttpConnection.cpp \
 			core/HttpServer.cpp \
+			core/Log.cpp \
 			core/ConfigServer.cpp \
 			core/configFileParser.cpp \
 			core/Location.cpp \
