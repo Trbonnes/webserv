@@ -57,11 +57,7 @@ void HttpServer::run()
 void HttpServer::initConf() {
 	std::cout << "Initializing configuration" << std::endl;
 
-<<<<<<< HEAD
 	int fd = open("config/test.conf", O_RDWR); // for test purposes
-=======
-	int fd = open("config/webserv.conf", O_RDWR); // for test purposes
->>>>>>> coreModule
 
 	_config = 0;
 	try {
@@ -124,5 +120,4 @@ void HttpServer::initWorkers() {
 	{
 		_workers_pid[i] = ProcessManager::launchProcess(worker); //TO DO rework the process manager to hold the process pid in the class
 	}
-	std::cout << "Workers Init" << std::endl;
 }

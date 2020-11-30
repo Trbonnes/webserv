@@ -1,6 +1,6 @@
 # Implicit variable definition
 CXX = clang++
-CXXFLAGS = -Wall -Wextra -Werror -g -std=c++11
+CXXFLAGS = -Wall -Wextra -Werror -g -std=c++98
 
 # Sources files
 
