@@ -463,9 +463,9 @@ void					ConfigServer::setErrorRoot(std::string root) {
 }
 
 void                    ConfigServer::setErrorPages(int error, std::string page) {
-    _errorPages.emplace(error, page);
+    _errorPages.insert(std::pair<int, std::string>(error, page)); // TO DO previous in C++11 were emplace, is it still daijobu ?
 }
 
 void                    ConfigServer::insertLocation(std::string s, Location location) {
-    _locationList.emplace(s, location);
+    _locationList.insert(std::pair<std::string, Location>(s, location)); // TO DO previous in C++11 were emplace, is it still daijobu ?
 }

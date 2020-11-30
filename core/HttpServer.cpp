@@ -6,6 +6,14 @@ HttpServer::HttpServer() {
     _workers_pid = NULL;
 }
 
+HttpServer &HttpServer::operator=(const HttpServer &s)
+{
+	_config = s._config;
+	_workers_pid = s._workers_pid;
+	_listen_sockset = s._listen_sockset;
+	return *this;
+}
+
 HttpServer::~HttpServer() {
 	if (_config)
 		delete _config;
