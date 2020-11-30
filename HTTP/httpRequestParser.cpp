@@ -6,11 +6,7 @@
 /*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/30 15:45:46 by trbonnes          #+#    #+#             */
-<<<<<<< HEAD
-/*   Updated: 2020/11/30 16:33:48 by user42           ###   ########.fr       */
-=======
-/*   Updated: 2020/11/30 15:52:42 by user42           ###   ########.fr       */
->>>>>>> fa44a4da1405ae0fcedfe6539fd2116ab11dbbe6
+/*   Updated: 2020/11/30 16:37:05 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -246,29 +242,17 @@ Socket	*httpRequestParser(int fd) {
 	int		ret;
 	std::string request;
 
-<<<<<<< HEAD
 	while (request.find("\r\n") >= request.npos && request.find("\n\n") >= request.npos)
 	{
-=======
-	std::cout << "\033[0;32m --TEST--" << std::endl;
-	while (request.find("\r\n") >= request.npos && request.find("\n\n") >= request.npos) {
->>>>>>> fa44a4da1405ae0fcedfe6539fd2116ab11dbbe6
 		ft_bzero(c, 4096);
 		ret = read(fd, c, 4096);
 		if (ret == 0)
 			throw HttpConnection::ConnectionClose();
 		std::cout << ret << std::endl;
-<<<<<<< HEAD
 		// std::string str = c; // SOCKET TEST
 		//std::cerr << "SOCKET:" << std::endl; // SOCKET TEST
 		//std::cerr << str << std::endl; // SOCKET TEST
 		//std::cerr << "END SOCKET" << std::endl; // SOCKET TEST
-=======
-		std::string str = c; // SOCKET TEST
-		std::cout << "SOCKET:" << std::endl; // SOCKET TEST
-		std::cout << str << std::endl; // SOCKET TEST
-		std::cout << "END SOCKET" << std::endl; // SOCKET TEST
->>>>>>> fa44a4da1405ae0fcedfe6539fd2116ab11dbbe6
 		if (ret == -1) { return NULL; }
 		request.append(c, ret);
 	}
