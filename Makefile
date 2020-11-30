@@ -1,20 +1,20 @@
 # Implicit variable definition
 CXX = clang++
-CXXFLAGS = -Wall -Wextra -Werror -g -std=c++11
+CXXFLAGS = -Wall -Wextra -Werror -g -std=c++98
 
 # Sources files
 
-CORESRC = 	core/ConfigServer.cpp \
-			core/Runnable.cpp \
-			core/configFileParser.cpp \
+CORESRC = 	core/Runnable.cpp \
 			core/webserver.cpp \
-			core/ProcessManager.cpp \
 			core/HttpWorker.cpp \
+			core/ProcessManager.cpp \
 			core/ListenSocket.cpp \
-			core/Location.cpp \
-			core/Config.cpp \
 			core/HttpConnection.cpp \
-			core/HttpServer.cpp
+			core/HttpServer.cpp \
+			core/ConfigServer.cpp \
+			core/configFileParser.cpp \
+			core/Location.cpp \
+			core/Config.cpp
 
 HTTPSRC = 	HTTP/HTTP.cpp \
 			HTTP/httpRequestParser.cpp \

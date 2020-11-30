@@ -7,31 +7,14 @@ int main(int argc, const char** argv) {
 	(void) argc;
 	(void) argv;
 	server = HttpServer();
-
 	try
 	{
-		server.initConf();
+		server.run();
 	}
 	catch(const std::exception& e)
 	{
 		std::cerr << e.what() << '\n';
+		return 1;
 	}
-	try
-	{
-		server.initListenSocket();
-	}
-	catch(const std::exception& e)
-	{
-		std::cerr << e.what() << '\n';
-	}
-	try
-	{
-		server.initWorkers();
-	}
-	catch(const std::exception& e)
-	{
-		std::cerr << e.what() << '\n';
-	}
-
 	return 0;
 }

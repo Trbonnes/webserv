@@ -21,6 +21,7 @@
 # include <fcntl.h>
 # include <vector>
 # include <map>
+# include <stdlib.h>
 
 # include "../HTTP/utils/utils.hpp"
 # include "Compare.hpp"

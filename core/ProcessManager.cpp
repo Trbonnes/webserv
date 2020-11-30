@@ -1,5 +1,15 @@
 #include "ProcessManager.hpp"
 
+ProcessManager::ProcessManager(const ProcessManager &) {
+}
+
+ProcessManager &ProcessManager::operator=(const ProcessManager &) {
+	return *this;
+}
+
+ProcessManager::~ProcessManager() {   
+}
+
 pid_t ProcessManager::launchProcess(Runnable &proc) 
 {
 	pid_t pid;

@@ -19,18 +19,16 @@ class HttpWorker : public Runnable
 {
 public:
 	HttpWorker(std::vector<ListenSocket> &listen, Config* config);
-	HttpWorker(HttpWorker &&) = default;
-	HttpWorker(const HttpWorker &) = default;
-	HttpWorker &operator=(HttpWorker &&) = default;
-	HttpWorker &operator=(const HttpWorker &) = default;
 	~HttpWorker();
 
 private:
+	HttpWorker(const HttpWorker &);
+	HttpWorker &operator=(const HttpWorker &);
 	std::vector<ListenSocket>	_listen_socket;
 	Config						*_config;
 
 public:
-	void run() override;
+	void run();
 
 
 };

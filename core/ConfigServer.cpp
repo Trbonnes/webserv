@@ -35,8 +35,9 @@ _defaultAutoindex(0)
     {
         while ((ret = get_next_line(fd, &line)) > 0)
         {
-            string = line;
+            string = line; // TO DO is implicit cast (call to string(char*)) ok ? 
             _mimeTypes.push_back(string);
+            free(line);
         }
         string = line;
         _mimeTypes.push_back(string);
@@ -80,7 +81,8 @@ ConfigServer::ConfigServer(const ConfigServer &copy)
 	_defaultCgi_root = copy._defaultCgi_root;
 }
 
-ConfigServer::~ConfigServer() {}
+ConfigServer::~ConfigServer() {
+}
 
 ConfigServer                  &ConfigServer::operator=(ConfigServer const &rhs)
 {
@@ -461,9 +463,9 @@ void					ConfigServer::setErrorRoot(std::string root) {
 }
 
 void                    ConfigServer::setErrorPages(int error, std::string page) {
-    _errorPages.emplace(error, page);
+    _errorPages.insert(std::pair<int, std::string>(error, page)); // TO DO previous in C++11 were emplace, is it still daijobu ?
 }
 
 void                    ConfigServer::insertLocation(std::string s, Location location) {
-    _locationList.emplace(s, location);
+    _locationList.insert(std::pair<std::string, Location>(s, location)); // TO DO previous in C++11 were emplace, is it still daijobu ?
 }

@@ -6,7 +6,7 @@
 /*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/14 08:46:39 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/11/26 14:59:26 by user42           ###   ########.fr       */
+/*   Updated: 2020/11/30 11:17:48 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,6 +44,7 @@ std::string		configFileParseServerLocation(std::string parseServer, ConfigServer
 	size_t pos;
 	size_t i;
 	std::string s;
+	std::string tmp;
 	Location location;
 
 	if ((pos = parseServer.find("location")) == parseServer.npos)
@@ -125,7 +126,6 @@ std::string		configFileParseServerLocation(std::string parseServer, ConfigServer
 
 	//LANGUAGE
 	if ((pos = s.find("language")) != s.npos) {
-		std::string tmp;
 		size_t j;
 		std::vector<std::string> vs;
 		pos += 8;
@@ -160,7 +160,8 @@ std::string		configFileParseServerLocation(std::string parseServer, ConfigServer
 		checkEndLine(pos, s);
 		while (s[pos] == ' ') { pos++; }
 		i = s.find(";", pos);
-		location._clientBodySize = std::stoi(s.substr(pos, i - pos));
+		tmp = s.substr(pos, i - pos);
+		location._clientBodySize = ft_atoi(tmp.c_str());
 	}
 
 	//ALIAS
@@ -176,7 +177,6 @@ std::string		configFileParseServerLocation(std::string parseServer, ConfigServer
 	if ((pos = s.find("cgi ")) != s.npos) {
 		pos += 3;
 		checkEndLine(pos, s);
-		std::string tmp;
 		size_t j;
 		i = s.find(";", pos);
 		while (pos != i) {
@@ -240,6 +240,7 @@ int		configFileParseServerUnit(std::string configFile, std::vector<ConfigServer>
 	size_t pos;
 	size_t i;
 	std::string parseServer;
+	std::string tmp;
 
 	pos = configFile.find("server {");
 	if ((i = findClosingBracket(configFile.find("{", pos), configFile)) == configFile.npos) {
@@ -258,7 +259,8 @@ int		configFileParseServerUnit(std::string configFile, std::vector<ConfigServer>
 			checkEndLine(pos, parseServer);
 			while (parseServer[pos] == ' ') { pos++; }
 			i = parseServer.find(";", pos);
-			v->back().setPort(std::stoi(parseServer.substr(pos, i - pos)));
+			tmp = parseServer.substr(pos, i - pos);
+			v->back().setPort(ft_atoi(tmp.c_str()));
 			pos = parseServer.find("listen", i);
 		}
 	}
@@ -267,7 +269,6 @@ int		configFileParseServerUnit(std::string configFile, std::vector<ConfigServer>
 
 	//SERVER NAME
 	if ((pos = parseServer.find("server_name")) != parseServer.npos) {
-		std::string tmp;
 		size_t j;
 		std::vector<std::string> vs;
 		pos += 11;
@@ -367,7 +368,6 @@ int		configFileParseServerUnit(std::string configFile, std::vector<ConfigServer>
 
 	//LANGUAGE
 	if ((pos = parseServer.find("language")) != parseServer.npos) {
-		std::string tmp;
 		size_t j;
 		std::vector<std::string> vs;
 		pos += 8;
@@ -392,7 +392,8 @@ int		configFileParseServerUnit(std::string configFile, std::vector<ConfigServer>
 		checkEndLine(pos, parseServer);
 		while (parseServer[pos] == ' ') { pos++; }
 		i = parseServer.find(";", pos);
-		v->back().setClientBodySize(std::stoi(parseServer.substr(pos, i - pos)));
+		tmp = parseServer.substr(pos, i - pos);
+		v->back().setClientBodySize(ft_atoi(tmp.c_str()));
 	}
 
 	//CGI
@@ -484,7 +485,7 @@ int		configFileParseServerUnit(std::string configFile, std::vector<ConfigServer>
 				if (isX) {
 					page[tmp - 1] = errorCode[errorCode.size() - 1];
 				}
-				v->back().setErrorPages(std::stoi(errorCode), page);
+				v->back().setErrorPages(ft_atoi(errorCode.c_str()), page);
 				pos = j;
 				while (parseServer[pos] == ' ') { pos++; }
 			}
@@ -530,6 +531,7 @@ int		configFileParseServers(std::string configFile, Config *config) {
 int		configFileParseWorkers(std::string configFile, Config *config) {
 	size_t pos;
 	size_t i;
+	std::string tmp;
 
 	if ((pos = configFile.find("worker_processes")) == configFile.npos)
 		throw Config::InvalidConfigException();
@@ -537,7 +539,8 @@ int		configFileParseWorkers(std::string configFile, Config *config) {
 	while (!isdigit(configFile[pos]) && configFile[pos] != ';') { pos++; }
 	i = pos;
 	while (configFile[i] != ';') { i++; }
-	config->setWorker(std::stoi(configFile.substr(pos, i)));
+	tmp = configFile.substr(pos, i);
+	config->setWorker(ft_atoi(tmp.c_str()));
 	
 	if (configFile.find("events") != configFile.npos) {
 		pos = configFile.find("worker_connections");
@@ -545,7 +548,8 @@ int		configFileParseWorkers(std::string configFile, Config *config) {
 		while (!isdigit(configFile[pos]) && configFile[pos] != ';') { pos++; }
 		i = pos;
 		while (configFile[i] != ';') { i++; }
-		config->setWorkerConnections(std::stoi(configFile.substr(pos, i)));
+		tmp = configFile.substr(pos, i);
+		config->setWorkerConnections(ft_atoi(tmp.c_str()));
 	}
 
 	return 0;
@@ -560,18 +564,27 @@ Config *configFileParser(int fd) {
 		c[i] = '\0';
 	while (int ret = read(fd, c, 4096) > 0) {
 		if (ret == -1) {
+			delete config;
 			throw Config::InvalidConfigException();
 			return NULL;
-	}
+		}
 		configFile.append(c);
 		for (int i = 0; i < 4096; i++)
 			c[i] = '\0';
+	}	
+	try
+	{
+		configFileParseWorkers(configFile, config);
+		configFileParseServers(configFile, config);
+	}
+	catch(const std::exception& e)
+	{
+		std::cerr << e.what() << '\n';
+		delete config;
+		throw Config::InvalidConfigException();
 	}
 	
-	//std::cout << configFile << std::endl << std::endl;
 
-	configFileParseWorkers(configFile, config);
-	configFileParseServers(configFile, config);
 
 	return config;
 }

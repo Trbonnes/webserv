@@ -17,6 +17,7 @@
 #include <unistd.h>
 #include <cstring>
 #include <vector>
+#include <signal.h>
 
 
 class WorkersInitException: public std::exception
@@ -24,7 +25,7 @@ class WorkersInitException: public std::exception
 	public:
 		const char * what () const throw ()
     	{
-    		return "Workers failed to initialize";
+    		return "Workers failed to initialize"; // TO DO reimplement into the cpp file
     	}
 };
 
@@ -33,23 +34,23 @@ class HttpServer
 {
 public:
 	HttpServer();
-	HttpServer(HttpServer &&) = default;
-	HttpServer(const HttpServer &) = default;
-	HttpServer &operator=(HttpServer &&) = default;
-	HttpServer &operator=(const HttpServer &) = default;
 	~HttpServer();
+	HttpServer &operator=(const HttpServer &);
 
 private:
 	Config						*_config;
 	std::vector<ListenSocket>	_listen_sockset;
 	pid_t*						_workers_pid; // might put into ProcessManager.hpp
-
-
-public:
+	HttpServer(const HttpServer &);
 	void			initConf();
 	void			initListenSocket();
 	void			initWorkers();
-	static	void	launchProcess();
+	void			masterLifecycle();
+	static	void	launchProcess(); // TO DO is it clean ?
+
+public:
+	void			run();
+
 };
 #endif // HTTPSERVER
 

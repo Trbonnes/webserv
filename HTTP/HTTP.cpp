@@ -274,7 +274,7 @@ void         HTTP::setRoot()
         while (itIndexBegin != itIndexEnd && (file.st_mode & S_IFMT) != S_IFREG)
         {
             str.assign(_route);
-            if (str.back() != '/')
+            if (str.at(str.length() - 1) != '/')
                 str.append("/");
             str.append(*itIndexBegin);
             stat(str.c_str(), &file);
@@ -331,7 +331,7 @@ void            HTTP::setAutoindex(void)
             if (dirent->d_type == DT_DIR)
                 str.append("-");
             else
-                str.append(std::to_string(directory.st_size));
+                str.append(ft_itoa(directory.st_size));
             str.append("\n");
             files.push(str);
         }
