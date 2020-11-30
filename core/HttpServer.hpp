@@ -34,16 +34,14 @@ class HttpServer
 {
 public:
 	HttpServer();
-	HttpServer(HttpServer &&) = default;
-	HttpServer(const HttpServer &) = default;
-	HttpServer &operator=(HttpServer &&) = default;
-	HttpServer &operator=(const HttpServer &) = default;
 	~HttpServer();
 
 private:
 	Config						*_config;
 	std::vector<ListenSocket>	_listen_sockset;
 	pid_t*						_workers_pid; // might put into ProcessManager.hpp
+	HttpServer(const HttpServer &);
+	HttpServer &operator=(const HttpServer &);
 	void			initConf();
 	void			initListenSocket();
 	void			initWorkers();

@@ -13,7 +13,6 @@ HttpServer::~HttpServer() {
 		delete _workers_pid;
 }
 
-
 void HttpServer::run()
 {
 	try
@@ -70,8 +69,8 @@ void HttpServer::initConf() {
 void HttpServer::initListenSocket() // TO DO optimization
 {
 	std::cout << "Initializing listening sockets" << std::endl;
-	std::map<std::string, Location, Compare<std::string>>::iterator itl;
-	std::map<std::string, Location, Compare<std::string>> locations;
+	std::map<std::string, Location, Compare<std::string> >::iterator itl;
+	std::map<std::string, Location, Compare<std::string> > locations;
 	std::vector<ConfigServer> servers;
 	std::vector<int> ports;
 
@@ -99,7 +98,6 @@ void			HttpServer::masterLifecycle()
 	}
 	// TO DO add process management / reload mechanics
 }
-
 
 
 void HttpServer::initWorkers() {

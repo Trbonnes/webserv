@@ -14,16 +14,17 @@ class ListenSocket
 private:
 	int	_sock;
 	int _port;
-	ListenSocket(const ListenSocket &);
-	ListenSocket &operator=(const ListenSocket &);
 
 public:
 	ListenSocket(int port);
+	ListenSocket(const ListenSocket &);
+	ListenSocket &operator=(const ListenSocket &);
 	~ListenSocket();
 	int	getSock();
 	int	getPort();
 
-	class ListenSocketException : public std::exception
+	// TO DO not sure about those extension's names
+	class ListenSocketException : public std::exception 
 	{
 		protected:
 			std::string _msg;
@@ -37,11 +38,13 @@ public:
 	{
 		public:
 			BindingException(int errcode);
+    		virtual ~BindingException() _GLIBCXX_TXN_SAFE_DYN _GLIBCXX_USE_NOEXCEPT;
 	};
 	class ListenException : public ListenSocketException
 	{
 		public:
 			ListenException(int errcode);
+    		virtual ~ListenException() _GLIBCXX_TXN_SAFE_DYN _GLIBCXX_USE_NOEXCEPT;
 	};
 
 };

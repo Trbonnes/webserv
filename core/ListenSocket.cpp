@@ -24,12 +24,16 @@ ListenSocket::ListenSocket(int port) {
 		throw ListenException(errno);
 }
 
-ListenSocket::ListenSocket(const ListenSocket &)
+ListenSocket::ListenSocket(const ListenSocket &s)
 {
+	_sock = s._sock;
+	_port = s._port;
 }
 
-ListenSocket &ListenSocket::operator=(const ListenSocket &)
+ListenSocket &ListenSocket::operator=(const ListenSocket &s)
 {
+	_sock = s._sock;
+	_port = s._port;
 	return *this;
 }
 
@@ -59,5 +63,17 @@ ListenSocket::BindingException::BindingException(int errcode) : ListenSocketExce
 }
 
 ListenSocket::ListenException::ListenException(int errcode) : ListenSocketException("Listen init error", errcode)
+{
+}
+
+ListenSocket::ListenSocketException::~ListenSocketException() _GLIBCXX_TXN_SAFE_DYN _GLIBCXX_USE_NOEXCEPT
+{
+}
+
+ListenSocket::ListenException::~ListenException() _GLIBCXX_TXN_SAFE_DYN _GLIBCXX_USE_NOEXCEPT
+{
+}
+
+ListenSocket::BindingException::~BindingException() _GLIBCXX_TXN_SAFE_DYN _GLIBCXX_USE_NOEXCEPT
 {
 }
