@@ -6,7 +6,7 @@
 /*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/30 15:45:46 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/11/09 18:39:03 by user42           ###   ########.fr       */
+/*   Updated: 2020/11/30 16:22:42 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,14 +32,14 @@ int		httpRequestParseChunckedBody(std::string request, Socket *socket, size_t po
 	try {
 		pos = s.find("\r\n") - 1;
 		convert = s.substr(pos, 1);
-		chunkSize = std::stol(convert);
+		chunkSize = atol(convert.c_str());
 		while (chunkSize > 0) {
 			bodyV.push_back(s.substr(pos + 3, chunkSize));
 			s.erase(pos, 2 + chunkSize + 2);
 			convert.clear();
 			pos = s.find("\r\n") - 1;
 			convert = s.substr(pos, 1);
-			chunkSize = std::stol(convert);
+			chunkSize = atol(convert.c_str());
 		}
 		for (size_t i = 0; i < bodyV.size(); i++) {
 			body.append(bodyV[i]);
@@ -81,7 +81,7 @@ int		httpRequestParseBody(std::string request, Socket *socket) { // TO DO
 
 	try {
 		body = request.substr(pos, request.npos);
-		size_t	contentLength = std::stol(socket->getContentLength());
+		size_t	contentLength = atol(socket->getContentLength().c_str());
 		std::cout << body.size() << std::endl;
 		if (body.size() >= contentLength)
 			socket->setBody(body);
