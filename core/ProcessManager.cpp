@@ -20,7 +20,14 @@ pid_t ProcessManager::launchProcess(Runnable &proc)
 		switch (pid)
 		{
 		case 0:
-			proc.run();
+			try
+			{
+				proc.run();
+			}
+			catch(const std::exception& e)
+			{
+				std::cerr << "Process error :" << e.what() << '\n';
+			}
 			std::exit(0);
 			break;
 		case -1:
