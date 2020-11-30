@@ -44,6 +44,7 @@ void HttpServer::run()
 		std::cerr << e.what() << '\n';
 		throw e;
 	}
+	masterLifecycle();
 }
 
 void HttpServer::initConf() {
@@ -80,19 +81,29 @@ void HttpServer::initListenSocket() // TO DO optimization
 	{
 		ports = servers[i].getPort();
 		for (size_t j = 0; j < ports.size(); j++)
-		{
 			_listen_sockset.push_back(ListenSocket(ports[j])); // TO DO Check port already in use / Fix getPort()
-		}
 	}
 }
 
 //Define numver of workers
 
-#include <signal.h>
+void			HttpServer::masterLifecycle()
+{
+	int status;
+	int nbworkers = _config->getWorker();
+
+	std::cout << "Master is entering is main lifecycle" << std::endl;
+	for (int i = 0; i < nbworkers; i++)
+	{
+		wait(&status);
+	}
+	// TO DO add process management / reload mechanics
+}
+
+
 
 void HttpServer::initWorkers() {
 
-	int status;
 	int nbworkers;
 	HttpWorker worker(_listen_sockset, _config);
 	
@@ -102,9 +113,5 @@ void HttpServer::initWorkers() {
 	for (int i = 0; i < nbworkers; i++)
 	{
 		_workers_pid[i] = ProcessManager::launchProcess(worker); //TO DO rework the process manager to hold the process pid in the class
-	}
-	for (int i = 0; i < nbworkers; i++)
-	{
-		wait(&status);
 	}
 }

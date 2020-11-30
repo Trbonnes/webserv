@@ -17,6 +17,7 @@
 #include <unistd.h>
 #include <cstring>
 #include <vector>
+#include <signal.h>
 
 
 class WorkersInitException: public std::exception
@@ -46,6 +47,7 @@ private:
 	void			initConf();
 	void			initListenSocket();
 	void			initWorkers();
+	void			masterLifecycle();
 	static	void	launchProcess(); // TO DO is it clean ?
 
 public:

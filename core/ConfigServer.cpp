@@ -35,8 +35,9 @@ _defaultAutoindex(0)
     {
         while ((ret = get_next_line(fd, &line)) > 0)
         {
-            string = line;
+            string = line; // TO DO is implicit cast (call to string(char*)) ok ? 
             _mimeTypes.push_back(string);
+            free(line);
         }
         string = line;
         _mimeTypes.push_back(string);
@@ -80,7 +81,8 @@ ConfigServer::ConfigServer(const ConfigServer &copy)
 	_defaultCgi_root = copy._defaultCgi_root;
 }
 
-ConfigServer::~ConfigServer() {}
+ConfigServer::~ConfigServer() {
+}
 
 ConfigServer                  &ConfigServer::operator=(ConfigServer const &rhs)
 {
