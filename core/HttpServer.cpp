@@ -36,7 +36,7 @@ void HttpServer::run()
 	}
 	try
 	{
-		// initWorkers();
+		initWorkers();
 	}
 	catch(const std::exception& e)
 	{

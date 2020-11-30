@@ -24,8 +24,16 @@ ListenSocket::ListenSocket(int port) {
 		throw ListenException(errno);
 }
 
+ListenSocket::ListenSocket(const ListenSocket &)
+{
+}
+
+ListenSocket &ListenSocket::operator=(const ListenSocket &)
+{
+	return *this;
+}
+
 ListenSocket::~ListenSocket() {
-    
 }
 
 int ListenSocket::getSock() {

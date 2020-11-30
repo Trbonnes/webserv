@@ -7,19 +7,18 @@
 #include <sys/types.h>
 #include <string>
 #include <string.h>
+#include <errno.h>
 
 class ListenSocket
 {
 private:
 	int	_sock;
 	int _port;
+	ListenSocket(const ListenSocket &);
+	ListenSocket &operator=(const ListenSocket &);
 
 public:
 	ListenSocket(int port);
-	ListenSocket(ListenSocket &&) = default;
-	ListenSocket(const ListenSocket &) = default;
-	ListenSocket &operator=(ListenSocket &&) = default;
-	ListenSocket &operator=(const ListenSocket &) = default;
 	~ListenSocket();
 	int	getSock();
 	int	getPort();
@@ -31,7 +30,7 @@ public:
 		public:
 			ListenSocketException(std::string msg, int errcode);
 			virtual const char * what () const throw ();
-			virtual ~ListenSocketException();
+    		virtual ~ListenSocketException() _GLIBCXX_TXN_SAFE_DYN _GLIBCXX_USE_NOEXCEPT;
 
 	};
 	class BindingException : public ListenSocketException

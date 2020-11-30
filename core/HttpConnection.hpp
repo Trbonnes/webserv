@@ -12,13 +12,11 @@ class HttpConnection
 {
 public:
 	HttpConnection(ListenSocket& listen_sock);
-	HttpConnection(HttpConnection &&) = default;
-	HttpConnection(const HttpConnection &) = default;
-	HttpConnection &operator=(HttpConnection &&) = default;
-	HttpConnection &operator=(const HttpConnection &) = default;
-	~HttpConnection() = default;
+	~HttpConnection();
 
 private:
+	HttpConnection &operator=(const HttpConnection &);
+	HttpConnection(const HttpConnection &);
 	int				_sock;
 	ListenSocket&	_listen_sock;
 	struct sockaddr	_client_name;
