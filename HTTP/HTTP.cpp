@@ -592,10 +592,11 @@ char*         HTTP::getResponse()
     }
     response.append("\r\n");
     _responseSize = response.length() + _contentLength;
-    _response = (char*)ft_calloc(_responseSize + 1, sizeof(char));
+    _response = (char*)ft_calloc(_responseSize + 5, sizeof(char));
     ft_strcpy(_response, response.c_str());
     if (_socket.getMethod().compare("HEAD"))
         ft_memcat(_response, _body, _contentLength + 1);
+    response.append("\r\n\r\n");
     return (_response);
 }
 

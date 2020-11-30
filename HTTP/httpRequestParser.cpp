@@ -242,19 +242,21 @@ Socket	*httpRequestParser(int fd) {
 	int		ret;
 	std::string request;
 
-	while (request.find("\r\n") >= request.npos && request.find("\n\n") >= request.npos) {
+	while (request.find("\r\n") >= request.npos && request.find("\n\n") >= request.npos)
+	{
 		ft_bzero(c, 4096);
 		ret = read(fd, c, 4096);
 		if (ret == 0)
 			throw HttpConnection::ConnectionClose();
 		std::cout << ret << std::endl;
-		std::string str = c; // SOCKET TEST
-		std::cerr << "SOCKET:" << std::endl; // SOCKET TEST
-		std::cerr << str << std::endl; // SOCKET TEST
-		std::cerr << "END SOCKET" << std::endl; // SOCKET TEST
+		// std::string str = c; // SOCKET TEST
+		//std::cerr << "SOCKET:" << std::endl; // SOCKET TEST
+		//std::cerr << str << std::endl; // SOCKET TEST
+		//std::cerr << "END SOCKET" << std::endl; // SOCKET TEST
 		if (ret == -1) { return NULL; }
-		request.append(c);
+		request.append(c, ret);
 	}
+	std::cerr << request << std::endl;
 	socket = new Socket(fd);
 	httpRequestParseRequestLine(request, socket);
 	httpRequestParseHeaders(request, socket);
