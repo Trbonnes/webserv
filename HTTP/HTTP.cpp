@@ -274,7 +274,7 @@ void         HTTP::setRoot()
         while (itIndexBegin != itIndexEnd && (file.st_mode & S_IFMT) != S_IFREG)
         {
             str.assign(_route);
-            if (str.back() != '/')
+            if (str.at(str.length() - 1) != '/')
                 str.append("/");
             str.append(*itIndexBegin);
             stat(str.c_str(), &file);
@@ -331,7 +331,7 @@ void            HTTP::setAutoindex(void)
             if (dirent->d_type == DT_DIR)
                 str.append("-");
             else
-                str.append(std::to_string(directory.st_size));
+                str.append(ft_itoa(directory.st_size));
             str.append("\n");
             files.push(str);
         }
@@ -592,10 +592,11 @@ char*         HTTP::getResponse()
     }
     response.append("\r\n");
     _responseSize = response.length() + _contentLength;
-    _response = (char*)ft_calloc(_responseSize + 1, sizeof(char));
+    _response = (char*)ft_calloc(_responseSize + 5, sizeof(char));
     ft_strcpy(_response, response.c_str());
     if (_socket.getMethod().compare("HEAD"))
         ft_memcat(_response, _body, _contentLength + 1);
+    response.append("\r\n\r\n");
     return (_response);
 }
 

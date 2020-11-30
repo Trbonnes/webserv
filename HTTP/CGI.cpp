@@ -79,9 +79,9 @@ void        HTTP::setEnv()
     _cgi_env[SERVER_PROTOCOL] = ft_strdup(_cgi._server_protocol.insert(0, "SERVER_PROTOCOL=").c_str());
     _cgi_env[SERVER_SOFTWARE] = ft_strdup(_cgi._server_software.insert(0, "SERVER_SOFTWARE=").c_str());
     _cgi_env[NB_METAVARIABLES] = NULL;
-    int i = 0;
-    while (i < NB_METAVARIABLES)
-        printf("%s\n", _cgi_env[i++]);
+    // int i = 0;
+    // while (i < NB_METAVARIABLES)
+    //     printf("%s\n", _cgi_env[i++]);
 }
 
 // ** Verify if the extensions correspond to the config file (CGI) ** 
