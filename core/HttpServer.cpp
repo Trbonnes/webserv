@@ -124,4 +124,5 @@ void HttpServer::initWorkers() {
 	{
 		_workers_pid[i] = ProcessManager::launchProcess(worker); //TO DO rework the process manager to hold the process pid in the class
 	}
+	std::cout << "Workers Init" << std::endl;
 }
