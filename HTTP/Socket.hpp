@@ -25,6 +25,7 @@
 # include "utils/utils.hpp"
 # include "statusCodes.hpp"
 # include "../core/HttpConnection.hpp"
+# include "../core/Log.hpp"
 
 class   Socket
 {
@@ -110,6 +111,13 @@ class   Socket
     void	setUserAgent(std::string UserAgent);
 	void	setReferer(std::string Referer);
     void	setBody(std::string sBody);
+
+	class	BadReadException: public std::exception {
+		public:
+			virtual const char* what() const throw() {
+				return strerror(errno);
+			}
+	};
 };
 
 Socket	*httpRequestParser(int fd);

@@ -114,6 +114,7 @@ void	HttpWorker::run()
 				}
 				catch(const std::exception& e)
 				{
+					std::cerr << "errno: ";
 					std::cerr << e.what() << '\n';
 				}
 			}
