@@ -55,8 +55,6 @@ _response()
     size_t      extension;
     std::string str;
 
-    std::cerr << "METHOD: " << _socket.getMethod() << std::endl;
-
     ft_bzero(_cgi_env, sizeof(_cgi_env));
     if (checkRequestErrors() != OK)
         return ;
@@ -116,6 +114,7 @@ HTTP::~HTTP()
     while (i < NB_METAVARIABLES)
         free(_cgi_env[i++]);
     free(_body);
+    free(_response);
 }
 
 HTTP     &HTTP::operator=(HTTP &rhs)
@@ -342,7 +341,7 @@ void            HTTP::setAutoindex(void)
         }
     }
     body.append("</pre><hr></body>\n</html>");
-    _contentLength = body.length(); // + 2 sinon test fail
+    _contentLength = body.length();
     _contentType = "text/html";
     _charset = "utf-8";
     _body = (char*)ft_calloc(_contentLength + 1, sizeof(char));
@@ -592,11 +591,10 @@ char*         HTTP::getResponse()
     }
     response.append("\r\n");
     _responseSize = response.length() + _contentLength;
-    _response = (char*)ft_calloc(_responseSize + 5, sizeof(char));
+    _response = (char*)ft_calloc(_responseSize + 1, sizeof(char));
     ft_strcpy(_response, response.c_str());
     if (_socket.getMethod().compare("HEAD"))
-        ft_memcat(_response, _body, _contentLength + 1);
-    response.append("\r\n\r\n");
+        ft_memcat(_response, _body, _contentLength);
     return (_response);
 }
 

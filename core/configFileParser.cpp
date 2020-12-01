@@ -583,8 +583,6 @@ Config *configFileParser(int fd) {
 		delete config;
 		throw Config::InvalidConfigException();
 	}
-	
-
 
 	return config;
 }

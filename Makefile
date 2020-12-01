@@ -1,6 +1,6 @@
 # Implicit variable definition
 CXX = clang++
-CXXFLAGS = -Wall -Wextra -Werror -g -std=c++98
+CXXFLAGS = -Wall -Wextra -Werror -g -std=c++98 -fsanitize=address # TO DO remove fsanitize of produciton
 
 # Sources files
 
@@ -11,6 +11,7 @@ CORESRC = 	core/Runnable.cpp \
 			core/ListenSocket.cpp \
 			core/HttpConnection.cpp \
 			core/HttpServer.cpp \
+			core/Log.cpp \
 			core/ConfigServer.cpp \
 			core/configFileParser.cpp \
 			core/Location.cpp \

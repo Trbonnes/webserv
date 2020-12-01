@@ -7,6 +7,7 @@
 #include "HttpWorker.hpp"
 #include "ProcessManager.hpp"
 #include "ListenSocket.hpp"
+#include "Log.hpp"
 
 #include <fstream>
 #include <fcntl.h>
@@ -17,8 +18,6 @@
 #include <unistd.h>
 #include <cstring>
 #include <vector>
-#include <signal.h>
-
 
 class WorkersInitException: public std::exception
 {

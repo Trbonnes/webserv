@@ -1,4 +1,5 @@
 #include "utils.hpp"
+#include <iostream>
 
 char			*ft_memcat(char *dest, const char *src, size_t nb)
 {
@@ -12,6 +13,5 @@ char			*ft_memcat(char *dest, const char *src, size_t nb)
 		dest[len_dest + i] = src[i];
 		i++;
 	}
-	dest[len_dest + i] = src[i];
 	return (dest);
 }

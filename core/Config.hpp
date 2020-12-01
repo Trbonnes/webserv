@@ -23,6 +23,7 @@
 # include <map>
 
 # include "ConfigServer.hpp"
+# include "Log.hpp"
 
 class	Config {
 private:

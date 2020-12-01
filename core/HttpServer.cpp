@@ -18,7 +18,7 @@ HttpServer::~HttpServer() {
 	if (_config)
 		delete _config;
 	if (_workers_pid)
-		delete _workers_pid;
+		delete[] _workers_pid;
 }
 
 void HttpServer::run()
@@ -43,10 +43,13 @@ void HttpServer::run()
 	}
 	try
 	{
+		Log::debug("About to create workers");
 		initWorkers();
+		Log::debug("Workers have beent initated");
 	}
 	catch(const std::exception& e)
 	{
+		Log::debug("Is this real life ?");
 		std::cerr << "Error while initializing workers : " << e.what() << '\n';
 		std::cerr << e.what() << '\n';
 		throw e;
@@ -58,6 +61,8 @@ void HttpServer::initConf() {
 	std::cout << "Initializing configuration" << std::endl;
 
 	int fd = open("config/test.conf", O_RDWR); // for test purposes
+
+
 
 	_config = 0;
 	try {
@@ -120,4 +125,5 @@ void HttpServer::initWorkers() {
 	{
 		_workers_pid[i] = ProcessManager::launchProcess(worker); //TO DO rework the process manager to hold the process pid in the class
 	}
+	Log::debug("I AM HERE");
 }

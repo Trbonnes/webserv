@@ -12,6 +12,7 @@
 #include <unistd.h>
 #include <cstring>
 #include <sys/wait.h>
+#include <stdlib.h>
 
 class ProcessManager
 {
