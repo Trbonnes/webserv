@@ -114,10 +114,7 @@ void	HttpWorker::run()
 				}
 				catch(const std::exception& e)
 				{
-<<<<<<< HEAD
-=======
 					std::cerr << "errno: ";
->>>>>>> httpRequestParser
 					std::cerr << e.what() << '\n';
 				}
 			}
