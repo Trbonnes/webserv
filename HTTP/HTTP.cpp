@@ -598,6 +598,8 @@ char*         HTTP::getResponse()
     ft_strcpy(_response, response.c_str());
     if (_socket.getMethod().compare("HEAD"))
         ft_memcat(_response, _body, _contentLength);
+    std::cout << "Responsize: " << _responseSize << std::endl;
+    std::cout << "Contentlength: " << _contentLength << std::endl;
     return (_response);
 }
 

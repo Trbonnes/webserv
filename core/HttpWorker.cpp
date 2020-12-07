@@ -84,14 +84,18 @@ void	HttpWorker::run()
 				// 	std::cout << buff << std::endl;
 				// }
 				std::cout << "ABOUT TO PARSE" << std::endl;
-				Socket *socket = httpRequestParser(connections[i]->getSock()); // TO DO why would it return a socket class and not an httpRequest object ? 
-				// ConfigServer *ptr = _config->getServerUnit(connections[i]->getSock(), socket->getHost()); // TO DO check if null ?
-				// std::cout << "PASSED THIS POINT, value of ptr : " << ptr << socket->getHost() << std::endl;
 				
-				ConfigServer &ptr2 = _config->getServerList()[0];
-				HTTP method(socket, ptr2);
-				std::cout << "METHOD HAS BEEN CONSTRUCTED" << std::endl;		
+				try
+				{
+					Socket *socket = httpRequestParser(connections[i]->getSock()); // TO DO why would it return a socket class and not an httpRequest object ? 
+					// ConfigServer *ptr = _config->getServerUnit(connections[i]->getSock(), socket->getHost()); // TO DO check if null ?
+					// std::cout << "PASSED THIS POINT, value of ptr : " << ptr << socket->getHost() << std::endl;
+					
+					ConfigServer &ptr2 = _config->getServerList()[0];
+					HTTP method(socket, ptr2);
+					std::cout << "METHOD HAS BEEN CONSTRUCTED" << std::endl;		
 
+<<<<<<< HEAD
 				std::cout << "ABOUT TO CREATE RESPONSE" << std::endl;
 				response = method.getResponse(); // TO DO make code more modulare and clean up names
 				responseSize = method.getResponseSize();
@@ -100,6 +104,30 @@ void	HttpWorker::run()
 				std::cout << "RESPONSE CREATED" << std::endl;
 				connections[i]->write(response, responseSize); // TO DO ugly
 				std::cout << std::endl << "ENDING REQUEST" << std::endl;
+=======
+					std::cout << "ABOUT TO CREATE RESPONSE" << std::endl;
+					response = method.getResponse(); // TO DO make code more modulare and clean up names
+					responseSize = method.getResponseSize();
+					std::cerr << "Response size: " << responseSize << std::endl;
+					std::cerr << response << std::endl;
+					std::cout << "RESPONSE CREATED" << std::endl;
+					connections[i]->write(response, responseSize); // TO DO ugly
+					std::cout << std::endl << "ENDING REQUEST" << std::endl;
+				}
+				catch(const HttpConnection::ConnectionClose& e)
+				{
+					int index = connections[i]->getSock();
+					std::cerr << "Connection has been closed: " << e.what() << '\n';
+					FD_CLR(index, &active_fs);
+					delete connections[index];
+					connections[index] = 0;
+				}
+				catch(const std::exception& e)
+				{
+					std::cerr << "errno: ";
+					std::cerr << e.what() << '\n';
+				}
+>>>>>>> develop
 			}
 			else
 			{
