@@ -95,16 +95,6 @@ void	HttpWorker::run()
 					HTTP method(socket, ptr2);
 					std::cout << "METHOD HAS BEEN CONSTRUCTED" << std::endl;		
 
-<<<<<<< HEAD
-				std::cout << "ABOUT TO CREATE RESPONSE" << std::endl;
-				response = method.getResponse(); // TO DO make code more modulare and clean up names
-				responseSize = method.getResponseSize();
-				// std::cerr << responseSize << std::endl;
-				// std::cerr << response << std::endl;
-				std::cout << "RESPONSE CREATED" << std::endl;
-				connections[i]->write(response, responseSize); // TO DO ugly
-				std::cout << std::endl << "ENDING REQUEST" << std::endl;
-=======
 					std::cout << "ABOUT TO CREATE RESPONSE" << std::endl;
 					response = method.getResponse(); // TO DO make code more modulare and clean up names
 					responseSize = method.getResponseSize();
@@ -127,7 +117,6 @@ void	HttpWorker::run()
 					std::cerr << "errno: ";
 					std::cerr << e.what() << '\n';
 				}
->>>>>>> develop
 			}
 			else
 			{
