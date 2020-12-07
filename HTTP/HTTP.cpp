@@ -590,11 +590,16 @@ char*         HTTP::getResponse()
         }
     }
     response.append("\r\n");
-    _responseSize = response.length() + _contentLength;
+    if (_socket.getMethod().compare("HEAD"))
+        _responseSize = response.length() + _contentLength;
+    else
+        _responseSize = response.length();
     _response = (char*)ft_calloc(_responseSize + 1, sizeof(char));
     ft_strcpy(_response, response.c_str());
     if (_socket.getMethod().compare("HEAD"))
         ft_memcat(_response, _body, _contentLength);
+    std::cout << "Responsize: " << _responseSize << std::endl;
+    std::cout << "Contentlength: " << _contentLength << std::endl;
     return (_response);
 }
 

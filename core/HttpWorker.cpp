@@ -98,7 +98,7 @@ void	HttpWorker::run()
 					std::cout << "ABOUT TO CREATE RESPONSE" << std::endl;
 					response = method.getResponse(); // TO DO make code more modulare and clean up names
 					responseSize = method.getResponseSize();
-					std::cerr << responseSize << std::endl;
+					std::cerr << "Response size: " << responseSize << std::endl;
 					std::cerr << response << std::endl;
 					std::cout << "RESPONSE CREATED" << std::endl;
 					connections[i]->write(response, responseSize); // TO DO ugly
