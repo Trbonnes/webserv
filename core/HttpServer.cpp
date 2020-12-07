@@ -60,7 +60,7 @@ void HttpServer::run()
 void HttpServer::initConf() {
 	std::cout << "Initializing configuration" << std::endl;
 
-	int fd = open("config/test.conf", O_RDWR); // for test purposes
+	int fd = open("config/webserv.conf", O_RDWR); // for test purposes
 
 
 
