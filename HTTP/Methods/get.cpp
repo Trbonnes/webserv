@@ -24,6 +24,7 @@ void        HTTP::get()
     }
     else if (_config.getAutoindex(_location) == true)
     {
+        std::cerr << "AUTO INDEX" << std::endl;
         setAutoindex();
         setDate();
         _contentLanguage = "";

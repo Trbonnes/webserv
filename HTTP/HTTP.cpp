@@ -171,7 +171,7 @@ int         HTTP::checkAllowMethods(std::string method)
     while (itBegin != itEnd)
     {
         _allow.push_back(*itBegin);
-        if ((*itBegin).compare(method) == 0 || method.compare("HEAD") == 0)
+        if ((*itBegin).compare(method) == 0)
             ret = 1;
         itBegin++;
     }
@@ -206,14 +206,13 @@ int         HTTP::openFile()
 
     fd = -1;
     stat(_route.c_str(), &file);
-    //if ((file.st_mode & S_IFMT) == S_IFREG)
     if (S_ISREG(file.st_mode))
     {
         fd = open(_route.c_str(), O_RDONLY);
         _statusCode = OK;
     }
     else
-        _statusCode = FORBIDDEN;
+        _statusCode = NOT_FOUND;
     return fd;
 }
 
@@ -239,10 +238,14 @@ void         HTTP::setRoot()
     {
         replaceURI(); 
 
+
         //** Relative path **
         _route.assign(_config.getRoot(_location));
         _route.append(_socket.getRequestURI());
         stat(_route.c_str(), &file);
+
+        if (_config.getAlias(_location).length() > 0)
+            _route.assign(_config.getAlias(_location)).append("/");
 
         // ** If file exist or put request, return **
         if (((S_ISREG(file.st_mode) && (fd = open(_route.c_str(), O_RDONLY)) != -1)) || _socket.getMethod().compare("PUT") == 0
@@ -254,12 +257,15 @@ void         HTTP::setRoot()
 
         // ** Else, add the language **
         _route.assign(_config.getRoot(_location));
+        if (_config.getAlias(_location).length() > 0)
+            _route.assign(_config.getAlias(_location)).append("/");
         _route.append(acceptLanguage());
         _route.append(str.assign(_socket.getRequestURI()).erase(0, _location.length()));
         stat(_route.c_str(), &file);
         
         // ** If file exist or delete request, return **
-        if ((((file.st_mode & S_IFMT) == S_IFREG  && (fd = open(_route.c_str(), O_RDONLY)) != -1)) || _socket.getMethod().compare("DELETE") == 0)
+        if ((((file.st_mode & S_IFMT) == S_IFREG && (fd = open(_route.c_str(), O_RDONLY)) != -1))
+        || _socket.getMethod().compare("DELETE") == 0)
         {
             close(fd);
             return ;
@@ -281,6 +287,7 @@ void         HTTP::setRoot()
         }
         _route.assign(str);
     }
+
     return ;
 }
 
@@ -524,6 +531,7 @@ char*         HTTP::getResponse()
 {
     std::string response;
 
+    std::cerr << _route << std::endl;
     if (_statusCode >= 300)
         configureErrorFile();
     if (_statusCode == 200 && _socket.getMethod().compare("PUT") == 0)
@@ -598,8 +606,6 @@ char*         HTTP::getResponse()
     ft_strcpy(_response, response.c_str());
     if (_socket.getMethod().compare("HEAD"))
         ft_memcat(_response, _body, _contentLength);
-    std::cout << "Responsize: " << _responseSize << std::endl;
-    std::cout << "Contentlength: " << _contentLength << std::endl;
     return (_response);
 }
 
