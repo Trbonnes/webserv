@@ -19,7 +19,7 @@ _lastModified(""),
 _date(""),
 _server(""),
 _contentLanguage(""),
-_contentLength(0),
+_contentLength(-1),
 _contentLocation(""),
 _contentType(""),
 _charset(""),
@@ -43,7 +43,7 @@ _lastModified(""),
 _date(""),
 _server(""),
 _contentLanguage(""),
-_contentLength(0),
+_contentLength(-1),
 _contentLocation(""),
 _contentType(""),
 _charset(""),
@@ -552,7 +552,7 @@ char*         HTTP::getResponse()
         if (_contentType.length() > 0)
             response.append("Content-Type: ").append(_contentType).append("\r\n");
 
-        if (_contentLength > 0)
+        if (_contentLength >= 0)
             response.append("Content-Length: ").append(ft_itoa(_contentLength)).append("\r\n");
         if (_socket.getMethod().compare("OPTIONS") == 0 || _statusCode == METHOD_NOT_ALLOWED)
         {
