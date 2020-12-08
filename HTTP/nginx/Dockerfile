@@ -47,6 +47,7 @@ COPY	srcs/.htpasswd /home/www/
 
 COPY	srcs/start.sh .
 
+COPY 	srcs/ubuntu_tester .
 
 RUN 	chmod +x start.sh
 

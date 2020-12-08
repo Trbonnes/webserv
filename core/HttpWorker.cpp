@@ -42,6 +42,7 @@ void	HttpWorker::run()
 		//read fs is going to be modified by select call, so we must reattribute the set there
 		read_fs = active_fs;
 		// Waiting for an event on listen socket
+		std::cerr << "test" << std::endl;
 		if (select(FD_SETSIZE, &read_fs, NULL, NULL, NULL) == -1) // TO DO check if 0
 		{
 			std::cout << "Select error " << strerror(errno) << std::endl;
