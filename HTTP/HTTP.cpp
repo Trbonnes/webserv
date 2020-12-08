@@ -589,9 +589,9 @@ char*         HTTP::getResponse()
                 response.append("WWW-Authenticate: ").append("Basic ").append(_config.getAuth_basic(_location)).append("\r\n");
         }
     }
+    response.append("\r\n");
     if (_socket.getMethod().compare("HEAD"))
     {
-        response.append("\r\n");
         _responseSize = response.length() + _contentLength;
     }
     else
