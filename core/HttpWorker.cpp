@@ -42,7 +42,6 @@ void	HttpWorker::run()
 		//read fs is going to be modified by select call, so we must reattribute the set there
 		read_fs = active_fs;
 		// Waiting for an event on listen socket
-		std::cerr << "test" << std::endl;
 		if (select(FD_SETSIZE, &read_fs, NULL, NULL, NULL) == -1) // TO DO check if 0
 		{
 			std::cout << "Select error " << strerror(errno) << std::endl;
@@ -99,9 +98,8 @@ void	HttpWorker::run()
 					std::cout << "ABOUT TO CREATE RESPONSE" << std::endl;
 					response = method.getResponse(); // TO DO make code more modulare and clean up names
 					responseSize = method.getResponseSize();
-					std::cerr << "Response size: " << responseSize << std::endl;
+					std::cout << "RESPONSE CREATED" << std::endl << std::endl;
 					std::cerr << response << std::endl;
-					std::cout << "RESPONSE CREATED" << std::endl;
 					connections[i]->write(response, responseSize); // TO DO ugly
 					std::cout << std::endl << "ENDING REQUEST" << std::endl;
 				}

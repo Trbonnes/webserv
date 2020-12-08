@@ -15,6 +15,7 @@
 ConfigServer::ConfigServer() :
 _httpVersion("HTTP/1.1"),
 _serverSoftware("Server/2.0"),
+_putRoot("/home/pauline/webserver/"),
 _defaultClientBodySize(-1),
 _defaultType("text/plain"),
 _defaultCharset("utf-8"),
@@ -62,6 +63,7 @@ ConfigServer::ConfigServer(const ConfigServer &copy)
     _mimeTypes = copy._mimeTypes;
     _configFilesRoot = copy._configFilesRoot;
     _errorFilesRoot = copy._errorFilesRoot;
+    _putRoot = copy._putRoot;
     _port = copy._port;
     _defaultClientBodySize = copy._defaultClientBodySize;
     _errorPages = copy._errorPages;
@@ -91,6 +93,7 @@ ConfigServer                  &ConfigServer::operator=(ConfigServer const &rhs)
     _mimeTypes = rhs._mimeTypes;
     _configFilesRoot = rhs._configFilesRoot;
     _errorFilesRoot = rhs._errorFilesRoot;
+    _putRoot = rhs._putRoot;
     _port = rhs._port;
     _defaultClientBodySize = rhs._defaultClientBodySize;
     _errorPages = rhs._errorPages;
@@ -401,6 +404,11 @@ std::string             ConfigServer::getServerSoftware()
 std::string             ConfigServer::getErrorFilesRoot()
 {
     return _errorFilesRoot;
+}
+
+std::string             ConfigServer::getPutRoot()
+{
+    return _putRoot;
 }
 
 std::map<std::string, Location, Compare<std::string> > ConfigServer::getLocationList() {
