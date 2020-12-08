@@ -35,6 +35,7 @@ private:
     std::list<std::string>      _mimeTypes;
     std::string                 _configFilesRoot;
     std::string                 _errorFilesRoot;
+    std::string                 _putRoot;
 
 	// Default server
     std::vector<int>            _port;
@@ -86,6 +87,7 @@ public:
     std::vector<int>            getPort();
     std::map<int, std::string>  &getErrorPages();
     std::string                 getHTMLErrorPage(int error);
+    std::string                 getPutRoot();
 
     std::map<std::string, Location, Compare<std::string> > getLocationList();
 

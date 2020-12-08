@@ -30,8 +30,8 @@ int		httpRequestParseChunckedBody(std::string request, Socket *socket, size_t po
 		while ((pos = s.find("0\r\n")) == s.npos) {
 			ft_bzero(c, 4096);
 			ret = read(socket->getFd(), c, 4096);
-			Log::debug("\033[0;32mret: ");
-			std::cout << ret << std::endl;
+			// Log::debug("\033[0;32mret: ");
+			// std::cout << ret << std::endl;
 			s.append(c);
 		}
 		Log::debug("s");
@@ -259,7 +259,7 @@ Socket	*httpRequestParser(int fd) {
 		ret = read(fd, c, 4096);
 		if (ret == 0)
 			throw HttpConnection::ConnectionClose();
-		std::cout << "ret: " << ret << std::endl;
+		// std::cout << "ret: " << ret << std::endl;
 		// std::string str = c; // SOCKET TEST
 		//std::cerr << "SOCKET:" << std::endl; // SOCKET TEST
 		//std::cerr << str << std::endl; // SOCKET TEST
