@@ -6,7 +6,7 @@
 /*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/09 15:13:35 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/11/26 15:05:49 by user42           ###   ########.fr       */
+/*   Updated: 2020/12/09 16:10:38 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ _putRoot("/home/pauline/webserver/"),
 _defaultClientBodySize(-1),
 _defaultType("text/plain"),
 _defaultCharset("utf-8"),
-_defaultAutoindex(0)
+_defaultAutoindex(-1)
 {
 
     // open mime.types **

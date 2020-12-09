@@ -133,5 +133,6 @@ void	ParseHost(Socket *socket, std::string request, size_t pos);
 void	ParseReferer(Socket *socket, std::string request, size_t pos);
 void	ParseTransferEncoding(Socket *socket, std::string request, size_t pos);
 void	ParseUserAgent(Socket *socket, std::string request, size_t pos);
+std::string ParseStdHeaders(std::string request, size_t pos);
 
 #endif

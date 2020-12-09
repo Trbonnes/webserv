@@ -24,6 +24,7 @@ public:
     static void debug(std::string &str);
     static void debug(const char *str);
     static void debug(char *str);
+	static void debug(int i);
 };
 
 #endif // LOG_HPP
