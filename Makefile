@@ -35,6 +35,7 @@ HTTPSRC = 	HTTP/HTTP.cpp \
 			HTTP/utils/ft_strcat.cpp \
 			HTTP/utils/ft_calloc.cpp \
 			HTTP/utils/ft_memcat.cpp \
+			HTTP/utils/ft_realloc.cpp \
 			HTTP/CGI.cpp
 			# HTTP/bin-cgi/cgi.cpp
 

@@ -19,10 +19,7 @@ int         HTTP::checkCGImethods(std::string method)
         itBegin++;
     }
     if (!ret)
-    {
-        std::cerr << "CGI ALLOW NOT METHOD" << std::endl;
         _statusCode = METHOD_NOT_ALLOWED;
-    }
     return (ret);
 }
 
@@ -32,31 +29,34 @@ void        HTTP::cgi_metaVariables()
     std::string str;
     size_t      query;
 
+    std::cerr << "ROUTE: " << _route << std::endl;
     _cgi._auth_type = _socket.getAuthorization();
     _cgi._content_length = _socket.getContentLength();
     _cgi._content_type = _socket.getContentType();
     _cgi._gateway_interface = "CGI/1.1";
     query = str.assign(_route).find('?', 0);
-    if (query == str.npos) // TO DO check if behavior stays the same
-        _cgi._path_info = str.erase(query, str.length());
-    else
-        _cgi._path_info = _route;
-    _cgi._path_translated = _cgi._path_info;
+    //_cgi._path_info = _config.getCGI_root(_location);
+    _cgi._path_info = "/directory/youpi.bla";
+    //_cgi._path_translated = _cgi._path_info;
+    _cgi._path_translated = "/YoupiBanane/youpi.bla";
     if (query == str.npos)
        _cgi._query_string = str.assign(_route).erase(0, query);
-    _cgi._remote_addr = _socket.getRemoteAddr(); // Default 
+    _cgi._remote_addr = _socket.getRemoteAddr(); // EN DUR! TO DO
     _cgi._remote_ident = "user"; // Default
     _cgi._remote_user = "user"; // Default 
     _cgi._request_method = _socket.getMethod();
     _cgi._request_uri = _socket.getRequestURI();
-    _cgi._script_name = _config.getCGI_root(_location);
+    _cgi._script_name = "/directory/youpi.bla";
+    //_cgi._script_name = _config.getCGI_root(_location);
     _cgi._server_name = _config.getServerName()[0]; // TO DO quick fix
-    _cgi._server_port = _config.getPort()[0]; // TO DO fix getPort()
+    _cgi._server_port = ft_itoa(_config.getPort()[0]); // TO DO fix getPort()
     _cgi._server_protocol = _config.getHttpVersion();
     _cgi._server_software = _config.getServerSoftware();
     setEnv();
     return ;
 }
+
+# include <stdio.h> // TEST
 
 // ** Set the environnement variables in a char** table **
 void        HTTP::setEnv()
@@ -79,9 +79,9 @@ void        HTTP::setEnv()
     _cgi_env[SERVER_PROTOCOL] = ft_strdup(_cgi._server_protocol.insert(0, "SERVER_PROTOCOL=").c_str());
     _cgi_env[SERVER_SOFTWARE] = ft_strdup(_cgi._server_software.insert(0, "SERVER_SOFTWARE=").c_str());
     _cgi_env[NB_METAVARIABLES] = NULL;
-    // int i = 0;
-    // while (i < NB_METAVARIABLES)
-    //     printf("%s\n", _cgi_env[i++]);
+    int i = 0;
+    while (i < NB_METAVARIABLES)
+        printf("%s\n", _cgi_env[i++]);
 }
 
 // ** Verify if the extensions correspond to the config file (CGI) ** 
@@ -122,15 +122,13 @@ void        HTTP::cgi_exe()
     int         ret;
     int         fd[2];
     int         status;
-    // char        *line;
     char        *args[2];
-    char        buf[1024];
-    // size_t      space;
-    size_t      find;
+    char        buf[2048];
     std::string str;
-    // struct stat stat;
     std::string::iterator it;
+    int         mem;
 
+    ret = 0;
     pipe(fd);
     pid = fork();
     if (pid < 0)
@@ -139,35 +137,41 @@ void        HTTP::cgi_exe()
     {
         dup2(fd[SIDE_IN], STDOUT_FILENO);
         dup2(fd[SIDE_OUT], STDIN_FILENO);
-        write(STDIN_FILENO, _socket.getBody().c_str(), _socket.getBody().length());
+        write(STDIN_FILENO, _socket.getBody().c_str(), ft_atoi(_socket.getContentLength().c_str()));
         args[0] = ft_strdup(_config.getCGI_root(_location).c_str());
         args[1] = NULL;
+        printf("args[0]: %s\n", args[0]); // WORK WHEN I PRINT ARGS[0] ?! WTF
         if ((ret = execve(args[0], args, _cgi_env)) == -1)
             exit(EXIT_FAILURE);
     }
     else
     {
         waitpid(-1, &status, 0);
-        // if (WIFEXITED(status))
+        if (WIFEXITED(status))
             ret = WEXITSTATUS(status);
         close(fd[SIDE_IN]);
         if (ret == EXIT_SUCCESS)
         {
+            mem = 0;
             while ((ret = read(fd[SIDE_OUT], buf, sizeof(buf))) != 0)
             {
-                buf[ret] = '\0';
-                _OLDbody.append(buf);
+                _responseSize += ret;
+                if (mem == 0)
+                {
+                    mem = _responseSize;
+                    _cgiResponse = (char*)ft_calloc(mem, sizeof(char));
+                }
+                else if (mem < _responseSize)
+                {
+                    mem *= 2;
+                    _cgiResponse = (char*)ft_realloc(_cgiResponse, sizeof(char) * mem);
+                }
+                _cgiResponse = ft_memcat(_cgiResponse, buf, ret);
             }
             close(fd[SIDE_OUT]);
-            std::cout << std::endl << std::endl << "CGI BODY: " << std::endl << _OLDbody << std::endl;
-            find = _OLDbody.find("Status: ");
-            _statusCode = ft_atoi(_OLDbody.substr(find + 8, 3).c_str());
-            find = _OLDbody.find("Content-Type: ");
-            _contentType = _OLDbody.substr(find + 14, _OLDbody.find('\n', find + 14) - find - 14);
-            it = std::adjacent_find(_OLDbody.begin(), _OLDbody.end(), mypred);
-            _OLDbody.erase(_OLDbody.begin(), it + 3);
         }
         else
             _statusCode = BAD_GATEWAY;
     }
+    printf("%s\n", _cgiResponse);
 }

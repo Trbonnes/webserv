@@ -26,7 +26,9 @@ _charset(""),
 _retryAfter(""),
 _transferEncoding(""),
 _body(),
-_response() {}
+_cgiResponse(NULL),
+_response(),
+_responseSize(0) {}
 
 HTTP::HTTP(Socket *socket, ConfigServer &config) :
 _socket(*socket),
@@ -50,7 +52,9 @@ _charset(""),
 _retryAfter(""),
 _transferEncoding(""),
 _body(),
-_response()
+_cgiResponse(NULL),
+_response(),
+_responseSize(0)
 {
     size_t      extension;
     std::string str;
@@ -107,6 +111,9 @@ HTTP::HTTP(HTTP &copy)
     _retryAfter = copy._retryAfter;
     _transferEncoding = copy._transferEncoding;
     _body = ft_strdup(copy._body);
+    _cgiResponse = ft_strdup(copy._cgiResponse);
+    _response = ft_strdup(copy._response);
+    _responseSize = copy._responseSize;
 }
 
 HTTP::~HTTP()
@@ -118,6 +125,7 @@ HTTP::~HTTP()
         free(_cgi_env[i++]);
     free(_body);
     free(_response);
+    free(_cgiResponse);
 }
 
 HTTP     &HTTP::operator=(HTTP &rhs)
@@ -139,6 +147,9 @@ HTTP     &HTTP::operator=(HTTP &rhs)
     _retryAfter = rhs._retryAfter;
     _transferEncoding = rhs._transferEncoding;
     _body = ft_strdup(rhs._body);
+    _cgiResponse = ft_strdup(rhs._cgiResponse);
+    _response = ft_strdup(rhs._response);
+    _responseSize = rhs._responseSize;
     return *this;
 }
 
@@ -241,13 +252,10 @@ void         HTTP::setRoot()
     {
         replaceURI(); 
 
-
         //** Relative path **
         _route.assign(_config.getRoot(_location));
         _route.append(_socket.getRequestURI());
         stat(_route.c_str(), &file);
-
-        // std::cerr << "1/ route: " << _route << std::endl;
 
         if (_config.getAlias(_location).length() > 0)
             _route.assign(_config.getAlias(_location)).append("/");
@@ -535,6 +543,8 @@ char*         HTTP::getResponse()
 {
     std::string response;
 
+    if (_cgiResponse != NULL)
+        return (_cgiResponse);
     if (_statusCode >= 300)
         configureErrorFile();
     response.append(_config.getHttpVersion());

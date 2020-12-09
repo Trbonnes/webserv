@@ -332,7 +332,7 @@ std::string             ConfigServer::getCGI_root(std::string location)
     itEnd = _locationList.end();
     while (itBegin != itEnd)
     {
-        if (location.compare(itBegin->first) == 0)
+        if (location.compare(itBegin->first) == 0 && itBegin->second._cgi_root.compare(""))
             return (itBegin->second._cgi_root);
         itBegin++;
     }

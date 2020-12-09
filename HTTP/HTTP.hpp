@@ -13,6 +13,7 @@
 # include <fcntl.h>
 # include <algorithm>
 # include <stack>
+# include <stdio.h> // REMOVE
 
 # include "Socket.hpp"
 # include "../core/ConfigServer.hpp"
@@ -86,8 +87,8 @@ class   HTTP
     
     // body
 
-    std::string                 _OLDbody; // A MODIFIER LE CGI
     char*                       _body;
+    char*                       _cgiResponse;
     char*                       _response;
     int                         _responseSize;
 

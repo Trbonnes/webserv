@@ -251,7 +251,7 @@ Socket	*httpRequestParser(int fd) {
 	char	c[4096];
 	int		ret;
 	std::string request;
-
+	int i = 0;
 	Log::debug("\033[0;32mRequestParsing Reading");
 	while (request.find("\r\n\r\n") >= request.npos && request.find("\n\n") >= request.npos)
 	{
@@ -259,6 +259,8 @@ Socket	*httpRequestParser(int fd) {
 		ret = read(fd, c, 4096);
 		if (ret == 0)
 			throw HttpConnection::ConnectionClose();
+		i += ret;
+		std::cerr << i << std::endl;
 		// std::cout << "ret: " << ret << std::endl;
 		// std::string str = c; // SOCKET TEST
 		//std::cerr << "SOCKET:" << std::endl; // SOCKET TEST
@@ -269,7 +271,7 @@ Socket	*httpRequestParser(int fd) {
 		request.append(c, ret);
 	}
 	Log::debug("\033[0;32mRequestParsing Reading End");
-	Log::debug(request.c_str());
+	//Log::debug(request.c_str());
 	socket = new Socket(fd);
 	Log::debug("\033[0;32mRequestParsing Creation");
 	httpRequestParseRequestLine(request, socket);
