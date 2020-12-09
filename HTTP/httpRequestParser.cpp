@@ -6,7 +6,7 @@
 /*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/30 15:45:46 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/12/01 12:33:38 by user42           ###   ########.fr       */
+/*   Updated: 2020/12/09 16:06:29 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,23 +23,24 @@ int		httpRequestParseChunckedBody(std::string request, Socket *socket, size_t po
 	Log::debug(s.c_str());
 	pos = s.find("0\r\n");
 	if (pos == s.npos) {
-		char	c[4096];
+		char	c[8192];
 		int		ret;
 
 		Log::debug("\033[0;32mRead in chuncked body");
 		while ((pos = s.find("0\r\n")) == s.npos) {
-			ft_bzero(c, 4096);
-			ret = read(socket->getFd(), c, 4096);
-			// Log::debug("\033[0;32mret: ");
-			// std::cout << ret << std::endl;
-			s.append(c);
+			ft_bzero(c, 8192);
+			ret = read(socket->getFd(), c, 8192);
+			Log::debug("\033[0;32mret: ");
+			Log::debug(ret);
+			s.append(c, ret);
 		}
-		Log::debug("s");
+		Log::debug(s);
 	}
 	try {
 		pos = s.find("\r\n") - 1;
 		convert = s.substr(pos, 1);
 		chunkSize = atol(convert.c_str());
+		socket->setContentLength(ft_itoa(atol(socket->getContentLength().c_str()) + chunkSize));
 		while (chunkSize > 0) {
 			bodyV.push_back(s.substr(pos + 3, chunkSize));
 			s.erase(pos, 2 + chunkSize + 2);
@@ -47,6 +48,7 @@ int		httpRequestParseChunckedBody(std::string request, Socket *socket, size_t po
 			pos = s.find("\r\n") - 1;
 			convert = s.substr(pos, 1);
 			chunkSize = atol(convert.c_str());
+			socket->setContentLength(ft_itoa(atol(socket->getContentLength().c_str()) + chunkSize));
 		}
 		for (size_t i = 0; i < bodyV.size(); i++) {
 			body.append(bodyV[i]);
@@ -54,6 +56,8 @@ int		httpRequestParseChunckedBody(std::string request, Socket *socket, size_t po
 		}
 		bodyV.clear();
 		socket->setBody(body);
+		Log::debug("\033[0;32mchuncked content length: ");
+		Log::debug(socket->getContentLength().c_str());
 	}
 	catch (std::exception &e) {
 		std::cerr << "Exception1: " << e.what() << std::endl;
@@ -62,10 +66,11 @@ int		httpRequestParseChunckedBody(std::string request, Socket *socket, size_t po
 	return 0;
 }
 
-int		httpRequestParseBody(std::string request, Socket *socket) { // TO DO 
+int		httpRequestParseBody(std::string request, Socket *socket) {
 	std::string					content;
 	std::string					body;
 	size_t						chunkedPos = socket->getTransferEncoding().find("chunked");
+	size_t						ret;
 	
 	if (!socket->getContentLength().size() && chunkedPos == std::string::npos){
 		socket->setBody("");
@@ -93,13 +98,13 @@ int		httpRequestParseBody(std::string request, Socket *socket) { // TO DO
 		if (body.size() >= contentLength)
 			socket->setBody(body);
 		else {
-			char	c[4096];
+			char	c[8192];
 			
 			Log::debug("\033[0;32mRead if body missing");
 			while (body.size() <= contentLength) {
-				ft_bzero(c, 4096);
-				read(socket->getFd(), c, 4096);
-				body.append(c);
+				ft_bzero(c, 8192);
+				ret = read(socket->getFd(), c, 8192);
+				body.append(c, ret);
 			}
 			if (body.size() > contentLength)
 				body.erase(contentLength, body.npos);
@@ -248,26 +253,60 @@ int		httpRequestParseRequestLine(std::string request, Socket *socket) {
 Socket	*httpRequestParser(int fd) {
 
 	Socket *socket;
-	char	c[4096];
+	char	c[8192];
 	int		ret;
-	std::string request;
+	static std::string request;
 
 	Log::debug("\033[0;32mRequestParsing Reading");
+	// ft_bzero(c, 8192);
+	// ret = read(fd, c, 8192);
+	// Log::debug("\033[0;32mret: ");
+	// Log::debug(ret);
+	// if (ret == -1)
+	// 	throw Socket::BadReadException();
+	// request.append(c, ret);
+	// ft_bzero(c, 8192);
+	// Log::debug("\"");
+	// Log::debug(request.c_str());
+	// Log::debug("\"");
+	// Log::debug("\033[0;32mret: ");
+	// Log::debug(ret);
+	// if (request.find("chunked") !=  request.npos) {
+	// 	Log::debug("chuncked");
+	// 	if (request.find("0\r\n") == request.npos)
+	// 		return NULL;
+	// }
+	// else if (request.find("Content-Length") != request.npos) {
+	// 	Log::debug("with body");
+	// 	if (request.find("\r\n\r\n") == request.npos)
+	// 		return NULL;
+	// 	else if (request.find("HEAD") == request.npos){
+	// 		Log::debug("not HEAD");
+	// 		size_t pos = request.find("\r\n\r\n");
+	// 		size_t pos2 = request.find("Content-Length");
+
+	// 		int length = atoi(ParseStdHeaders(request, pos2).c_str());
+	// 		if ((request.length() - pos + 3) < (size_t)length)
+	// 			return NULL;
+	// 	}
+	// }
+	// else if (request.find("\r\n\r\n") == request.npos && ret != 0) {
+	// 	return NULL;
+	// }
+
 	while (request.find("\r\n\r\n") >= request.npos && request.find("\n\n") >= request.npos)
 	{
-		ft_bzero(c, 4096);
-		ret = read(fd, c, 4096);
+		ft_bzero(c, 8192);
+		ret = read(fd, c, 8192);
 		if (ret == 0)
 			throw HttpConnection::ConnectionClose();
-		// std::cout << "ret: " << ret << std::endl;
-		// std::string str = c; // SOCKET TEST
-		//std::cerr << "SOCKET:" << std::endl; // SOCKET TEST
-		//std::cerr << str << std::endl; // SOCKET TEST
-		//std::cerr << "END SOCKET" << std::endl; // SOCKET TEST
+		Log::debug("\033[0;32mret: ");
+		Log::debug(ret);
 		if (ret == -1)
 			throw Socket::BadReadException();
 		request.append(c, ret);
 	}
+
 	Log::debug("\033[0;32mRequestParsing Reading End");
 	Log::debug(request.c_str());
 	socket = new Socket(fd);
@@ -275,6 +314,7 @@ Socket	*httpRequestParser(int fd) {
 	httpRequestParseRequestLine(request, socket);
 	httpRequestParseHeaders(request, socket);
 	httpRequestParseBody(request, socket);
+	request.clear();
 
 	return socket;
 }
