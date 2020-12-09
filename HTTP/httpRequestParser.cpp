@@ -6,7 +6,7 @@
 /*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/30 15:45:46 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/12/09 15:40:48 by user42           ###   ########.fr       */
+/*   Updated: 2020/12/09 16:06:29 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,6 +56,8 @@ int		httpRequestParseChunckedBody(std::string request, Socket *socket, size_t po
 		}
 		bodyV.clear();
 		socket->setBody(body);
+		Log::debug("\033[0;32mchuncked content length: ");
+		Log::debug(socket->getContentLength().c_str());
 	}
 	catch (std::exception &e) {
 		std::cerr << "Exception1: " << e.what() << std::endl;
