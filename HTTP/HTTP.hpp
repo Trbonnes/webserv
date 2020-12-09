@@ -88,7 +88,8 @@ class   HTTP
     // body
 
     char*                       _body;
-    char*                       _cgiResponse;
+    std::string                 _cgiResponse;
+    // char*                       _cgiResponse;
     char*                       _response;
     int                         _responseSize;
 

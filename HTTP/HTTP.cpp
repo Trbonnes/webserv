@@ -25,8 +25,8 @@ _contentType(""),
 _charset(""),
 _retryAfter(""),
 _transferEncoding(""),
-_body(),
-_cgiResponse(NULL),
+_body(NULL),
+_cgiResponse(),
 _response(),
 _responseSize(0) {}
 
@@ -51,8 +51,8 @@ _contentType(""),
 _charset(""),
 _retryAfter(""),
 _transferEncoding(""),
-_body(),
-_cgiResponse(NULL),
+_body(NULL),
+_cgiResponse(),
 _response(),
 _responseSize(0)
 {
@@ -111,7 +111,7 @@ HTTP::HTTP(HTTP &copy)
     _retryAfter = copy._retryAfter;
     _transferEncoding = copy._transferEncoding;
     _body = ft_strdup(copy._body);
-    _cgiResponse = ft_strdup(copy._cgiResponse);
+    _cgiResponse = copy._cgiResponse;
     _response = ft_strdup(copy._response);
     _responseSize = copy._responseSize;
 }
@@ -125,7 +125,6 @@ HTTP::~HTTP()
         free(_cgi_env[i++]);
     free(_body);
     free(_response);
-    free(_cgiResponse);
 }
 
 HTTP     &HTTP::operator=(HTTP &rhs)
@@ -147,7 +146,7 @@ HTTP     &HTTP::operator=(HTTP &rhs)
     _retryAfter = rhs._retryAfter;
     _transferEncoding = rhs._transferEncoding;
     _body = ft_strdup(rhs._body);
-    _cgiResponse = ft_strdup(rhs._cgiResponse);
+    _cgiResponse = rhs._cgiResponse;
     _response = ft_strdup(rhs._response);
     _responseSize = rhs._responseSize;
     return *this;
@@ -543,8 +542,6 @@ char*         HTTP::getResponse()
 {
     std::string response;
 
-    if (_cgiResponse != NULL)
-        return (_cgiResponse);
     if (_statusCode >= 300)
         configureErrorFile();
     response.append(_config.getHttpVersion());
@@ -552,6 +549,7 @@ char*         HTTP::getResponse()
     response.append(ft_itoa(_statusCode)).append(" ");
     response.append(_mapCodes.codes[_statusCode]).append("\r\n");
     response.append("Server: ").append(_config.getServerSoftware()).append("\r\n"); //TO DO
+
     if (ft_strlen(_date) > 0)
         response.append("Date: ").append(_date).append("\r\n");
 
@@ -560,6 +558,7 @@ char*         HTTP::getResponse()
 
     if (_contentLength >= 0)
         response.append("Content-Length: ").append(ft_itoa(_contentLength)).append("\r\n");
+
     if (_socket.getMethod().compare("OPTIONS") == 0 || _statusCode == METHOD_NOT_ALLOWED)
     {
         response.append("Allow: ");

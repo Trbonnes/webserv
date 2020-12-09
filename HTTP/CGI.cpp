@@ -29,9 +29,9 @@ void        HTTP::cgi_metaVariables()
     std::string str;
     size_t      query;
 
-    std::cerr << "ROUTE: " << _route << std::endl;
     _cgi._auth_type = _socket.getAuthorization();
     _cgi._content_length = _socket.getContentLength();
+    _cgi._content_length = "100000000";
     _cgi._content_type = _socket.getContentType();
     _cgi._gateway_interface = "CGI/1.1";
     query = str.assign(_route).find('?', 0);
@@ -125,7 +125,7 @@ void        HTTP::cgi_exe()
     char*       args[2];
     char        buf[2048];
     int         mem;
-    std::string str;
+    size_t      find;
 
     ret = 0;
     ft_bzero(args, sizeof(args));
@@ -154,26 +154,42 @@ void        HTTP::cgi_exe()
         if (ret == EXIT_SUCCESS)
         {
             mem = 0;
+            find = _cgiResponse.npos;
             while ((ret = read(fd[SIDE_OUT], buf, sizeof(buf))) != 0)
             {
                 _responseSize += ret;
-                if (mem == 0)
+                if (find == _cgiResponse.npos)
                 {
-                    mem = _responseSize;
-                    _cgiResponse = (char*)ft_calloc(mem, sizeof(char));
+                    _cgiResponse.append(buf);
+                    find = _cgiResponse.find("\r\n\r\n");
                 }
-                else if (mem < _responseSize)
+                if (find != _cgiResponse.npos)
                 {
-                    mem *= 2;
-                    _cgiResponse = (char*)ft_realloc(_cgiResponse, sizeof(char) * mem);
+                    if (mem == 0)
+                    {                   
+                        mem = _responseSize;
+                        _body = (char*)ft_calloc(mem, sizeof(char));
+                        _contentLength = 0;
+                        _contentLength += _cgiResponse.length() - find - 4;
+                        _body = ft_memcat(_body, _cgiResponse.substr(find + 4, _cgiResponse.length()).c_str(), _cgiResponse.length() - find - 4);
+                    }
+                    else if (mem < _responseSize)
+                    {
+                       mem *= 2;
+                        _body = (char*)ft_realloc(_body, sizeof(char) * mem);
+                        _contentLength += ret;
+                        _body = ft_memcat(_body, buf, ret);
+                    }
+                    _cgiResponse.erase(find + 2, _cgiResponse.length());
                 }
-                _cgiResponse = ft_memcat(_cgiResponse, buf, ret);
             }
             close(fd[SIDE_OUT]);
         }
         else
             _statusCode = BAD_GATEWAY;
     }
-    write(2, _cgiResponse, _responseSize); // TEST
-    write(2, "\n", 1);
+    find = _cgiResponse.find("Status: ");
+    _statusCode = ft_atoi(_cgiResponse.substr(find + ft_strlen("Status: "), find + ft_strlen("Status: ") + 3).c_str());
+    find = _cgiResponse.find("Content-Type: ");
+    _contentType = _cgiResponse.substr(find + ft_strlen("Content-Type: "), _cgiResponse.find("\r\n", find) - find - ft_strlen("Content-Type: "));
 }
