@@ -280,8 +280,8 @@ int                 ConfigServer::getAutoindex(std::string location)
 
     itBegin = _locationList.begin();
     itEnd = _locationList.end();
-    if (location.compare("/directory/") == 0) // QUICK FIX!
-        return 0;
+    // if (location.compare("/directory/") == 0) // QUICK FIX!
+        // return 0;
     while (itBegin != itEnd)
     {
         if (location.compare(itBegin->first) == 0 && itBegin->second._autoindex != -1)

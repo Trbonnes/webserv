@@ -31,6 +31,7 @@ void        HTTP::cgi_metaVariables()
 
     _cgi._auth_type = _socket.getAuthorization();
     _cgi._content_length = _socket.getContentLength();
+    std::cerr << "SOCKET CONTENT LENGTH: " << _socket.getContentLength() << std::endl;
     _cgi._content_length = "100000000";
     _cgi._content_type = _socket.getContentType();
     _cgi._gateway_interface = "CGI/1.1";
