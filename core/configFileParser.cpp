@@ -6,7 +6,7 @@
 /*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/14 08:46:39 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/11/30 11:17:48 by user42           ###   ########.fr       */
+/*   Updated: 2020/12/09 16:14:14 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -149,7 +149,7 @@ std::string		configFileParseServerLocation(std::string parseServer, ConfigServer
 		if ((i = s.find("auto_index on", pos)) != s.npos)
 			location._autoindex = 1;
 		else if ((i = s.find("auto_index off", pos)) != s.npos)
-			location._autoindex = -1;
+			location._autoindex = 0;
 		else
 			throw Config::InvalidConfigException();
 	}
@@ -343,7 +343,7 @@ int		configFileParseServerUnit(std::string configFile, std::vector<ConfigServer>
 		if ((i = parseServer.find("auto_index on", pos)) != parseServer.npos)
 			v->back().setAutoIndex(1);
 		else if ((i = parseServer.find("auto_index off", pos)) != parseServer.npos)
-			v->back().setAutoIndex(-1);
+			v->back().setAutoIndex(0);
 		else
 			throw Config::InvalidConfigException();
 	}
