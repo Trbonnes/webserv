@@ -122,25 +122,26 @@ void        HTTP::cgi_exe()
     int         ret;
     int         fd[2];
     int         status;
-    char        *args[2];
+    char*       args[2];
     char        buf[2048];
-    std::string str;
-    std::string::iterator it;
     int         mem;
+    std::string str;
 
     ret = 0;
+    ft_bzero(args, sizeof(args));
+    ft_bzero(buf, sizeof(args));
+    ft_bzero(fd, sizeof(fd));
     pipe(fd);
     pid = fork();
     if (pid < 0)
         _statusCode = INTERNAL_SERVER_ERROR;
     else if (pid == 0)
     {
-        dup2(fd[SIDE_IN], STDOUT_FILENO);
-        dup2(fd[SIDE_OUT], STDIN_FILENO);
-        write(STDIN_FILENO, _socket.getBody().c_str(), ft_atoi(_socket.getContentLength().c_str()));
         args[0] = ft_strdup(_config.getCGI_root(_location).c_str());
         args[1] = NULL;
-        printf("args[0]: %s\n", args[0]); // WORK WHEN I PRINT ARGS[0] ?! WTF
+        dup2(fd[SIDE_IN], STDOUT_FILENO);
+        dup2(fd[SIDE_OUT], STDIN_FILENO);
+        write(STDOUT_FILENO, _socket.getBody().c_str(), ft_atoi(_socket.getContentLength().c_str()));
         if ((ret = execve(args[0], args, _cgi_env)) == -1)
             exit(EXIT_FAILURE);
     }
@@ -173,5 +174,6 @@ void        HTTP::cgi_exe()
         else
             _statusCode = BAD_GATEWAY;
     }
-    printf("%s\n", _cgiResponse);
+    write(2, _cgiResponse, _responseSize); // TEST
+    write(2, "\n", 1);
 }
