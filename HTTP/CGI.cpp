@@ -42,7 +42,8 @@ void        HTTP::cgi_metaVariables()
     _cgi._path_translated = "/YoupiBanane/youpi.bla";
     if (query == str.npos)
        _cgi._query_string = str.assign(_route).erase(0, query);
-    _cgi._remote_addr = _socket.getRemoteAddr(); // EN DUR! TO DO
+    _cgi._remote_addr = "127.0.0.1"; // EN DUR! TO DO
+    // _cgi._remote_addr = _socket.getRemoteAddr();
     _cgi._remote_ident = "user"; // Default
     _cgi._remote_user = "user"; // Default 
     _cgi._request_method = _socket.getMethod();

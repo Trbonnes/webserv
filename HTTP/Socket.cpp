@@ -266,6 +266,5 @@ void	Socket::setBody(std::string Body) {
 
 std::string     Socket::getRemoteAddr()
 {
-    return "127.0.0.1";
-    // return _addr;
+    return _addr;
 }
