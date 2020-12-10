@@ -6,7 +6,7 @@
 /*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/30 15:45:46 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/12/10 17:07:22 by user42           ###   ########.fr       */
+/*   Updated: 2020/12/10 17:42:12 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -282,7 +282,7 @@ Socket	*httpRequestParser(int fd) {
 	Socket *socket;
 	char	c[8192];
 	int		ret;
-	static std::string request;
+	std::string request;
 
 	Log::debug("\033[0;32mRequestParsing Reading");
 	// ft_bzero(c, 8192);
@@ -327,8 +327,8 @@ Socket	*httpRequestParser(int fd) {
 		ret = read(fd, c, 8192);
 		if (ret == 0)
 			throw HttpConnection::ConnectionClose();
-		Log::debug("\033[0;32mret: ");
-		Log::debug(ret);
+		// Log::debug("\033[0;32mret: ");
+		// Log::debug(ret);
 		if (ret == -1)
 			throw Socket::BadReadException();
 		request.append(c, ret);
