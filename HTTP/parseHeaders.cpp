@@ -6,7 +6,7 @@
 /*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/30 18:55:18 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/10/27 12:42:58 by user42           ###   ########.fr       */
+/*   Updated: 2020/11/30 16:23:40 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,7 @@ std::vector<std::string> ParseAcceptHeaders(std::string request, size_t pos) {
 		else {
 			pos = s.find("=");
 			std::string tmpS = s.substr(pos + 1, s.npos);
-			q = std::stoi(tmpS);
+			q = ft_atoi(tmpS.c_str());
 		}
 		for (tmpIt++; tmpIt != tmpV.end(); tmpIt++) {
 			int q2 = 0;
@@ -72,7 +72,7 @@ std::vector<std::string> ParseAcceptHeaders(std::string request, size_t pos) {
 			else {
 				pos = s2.find("=");
 				std::string tmpS = s2.substr(pos + 1, s2.npos);
-				q2 = std::stoi(tmpS);
+				q2 = ft_atoi(tmpS.c_str());
 			}
 			if (q2 > q) {
 				q = q2;

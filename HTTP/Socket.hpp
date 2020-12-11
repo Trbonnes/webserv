@@ -18,12 +18,14 @@
 # include <list>
 # include <vector>
 # include <unistd.h>
+# include <stdlib.h>
 # include <sys/types.h>
 # include <sys/socket.h>
 
 # include "utils/utils.hpp"
 # include "statusCodes.hpp"
 # include "../core/HttpConnection.hpp"
+# include "../core/Log.hpp"
 
 class   Socket
 {
@@ -109,6 +111,13 @@ class   Socket
     void	setUserAgent(std::string UserAgent);
 	void	setReferer(std::string Referer);
     void	setBody(std::string sBody);
+
+	class	BadReadException: public std::exception {
+		public:
+			virtual const char* what() const throw() {
+				return strerror(errno);
+			}
+	};
 };
 
 Socket	*httpRequestParser(int fd);
@@ -124,5 +133,6 @@ void	ParseHost(Socket *socket, std::string request, size_t pos);
 void	ParseReferer(Socket *socket, std::string request, size_t pos);
 void	ParseTransferEncoding(Socket *socket, std::string request, size_t pos);
 void	ParseUserAgent(Socket *socket, std::string request, size_t pos);
+std::string ParseStdHeaders(std::string request, size_t pos);
 
 #endif

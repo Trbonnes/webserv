@@ -26,7 +26,7 @@ public:
 	std::string					_cgi_root;
     std::string                 _root;
     std::vector<std::string>    _index;
-    bool                        _autoindex;
+    int	                        _autoindex;
     int                         _clientBodySize;
 	std::string					_alias;
 
@@ -35,7 +35,7 @@ public:
 	/*virtual*/ ~Location();
 	Location &operator=(const Location &c);
 
-    //void                    printLocation(); ->used for local tests
+    //void                    printLocation();
 };
 
 #endif

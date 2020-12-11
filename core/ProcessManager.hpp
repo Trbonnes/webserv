@@ -12,16 +12,15 @@
 #include <unistd.h>
 #include <cstring>
 #include <sys/wait.h>
+#include <stdlib.h>
 
 class ProcessManager
 {
 public:
-	ProcessManager() = default;
-	ProcessManager(ProcessManager &&) = default;
-	ProcessManager(const ProcessManager &) = default;
-	ProcessManager &operator=(ProcessManager &&) = default;
-	ProcessManager &operator=(const ProcessManager &) = default;
-	~ProcessManager() = default;
+	ProcessManager();
+	ProcessManager(const ProcessManager &);
+	ProcessManager &operator=(const ProcessManager &);
+	~ProcessManager();
 	static	pid_t launchProcess(Runnable &proc);
 };
 

@@ -6,7 +6,7 @@
 /*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/09 12:19:51 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/11/11 16:02:20 by user42           ###   ########.fr       */
+/*   Updated: 2020/11/26 15:07:44 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@
 # include <fcntl.h>
 # include <vector>
 # include <map>
+# include <stdlib.h>
 
 # include "../HTTP/utils/utils.hpp"
 # include "Compare.hpp"
@@ -34,6 +35,7 @@ private:
     std::list<std::string>      _mimeTypes;
     std::string                 _configFilesRoot;
     std::string                 _errorFilesRoot;
+    std::string                 _putRoot;
 
 	// Default server
     std::vector<int>            _port;
@@ -49,7 +51,7 @@ private:
     std::vector<std::string>    _defaultLanguage;
     std::string                 _defaultAuth_basic;
     std::string                 _defaultAuth_basic_user_file;
-    bool                        _defaultAutoindex;
+    int	                        _defaultAutoindex;
 
 	// CGI
 	std::vector<std::string>	_defaultCgi;
@@ -76,7 +78,7 @@ public:
     std::string                 getLocation(std::string location);
     std::string                 getAuth_basic(std::string location);
     std::string                 getAuth_basic_user_file(std::string location);
-    bool                        getAutoindex(std::string location);
+    int	                        getAutoindex(std::string location);
     std::string                 getAlias(std::string location);
     std::vector<std::string>    &getCGI(std::string location);
     std::string                 getCGI_root(std::string location);
@@ -85,6 +87,7 @@ public:
     std::vector<int>            getPort();
     std::map<int, std::string>  &getErrorPages();
     std::string                 getHTMLErrorPage(int error);
+    std::string                 getPutRoot();
 
     std::map<std::string, Location, Compare<std::string> > getLocationList();
 
@@ -95,14 +98,18 @@ public:
     void                    setServer_name(std::vector<std::string> server_name);
     void                    setRoot(std::string root);
     void                    setIndex(std::vector<std::string> index);
-    void                    setAutoIndex(bool autoIndex);
+    void					setType(std::string type);
+    void					setCharset(std::string charset);
+    void					setLanguage(std::vector<std::string> language);
+    void                    setAutoIndex(int autoIndex);
     void                    setClientBodySize(int clientBodySize);
     void                    setAllow(std::vector<std::string> allow);
+	void					setErrorRoot(std::string root);
     void                    setErrorPages(int error, std::string page);
 
     void                    insertLocation(std::string s, Location location);
 
-    //void                    printServer(); -> used for local tests
+    //void                    printServer();
 };
 
 #endif

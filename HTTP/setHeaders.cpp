@@ -4,8 +4,6 @@
 void        HTTP::setContentLocation()
 {
     _contentLocation.assign("http://").append(_config.getServerName()[0]).append(_route); // TO DO quick fix
-    if (_config.getAlias(_location).length() > 0)
-        _contentLocation.replace(_contentLocation.find(_location), _location.length(), _config.getAlias(_location));
 }
 
 //** Copy file into body string **

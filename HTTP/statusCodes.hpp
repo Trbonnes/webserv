@@ -68,7 +68,7 @@ class  StatusCode
     StatusCode() {
         codes[CONTINUE] = "Continue";
         codes[SWITCHING_PROTOCOLS] = "Switching Protocols";
-        codes[OK] = "Ok";
+        codes[OK] = "OK";
         codes[CREATED] = "Created";
         codes[ACCEPTED] = "Accepted";
         codes[NON_AUTHORITATIVE_INFORMATION] = "Non Authoritative Information";

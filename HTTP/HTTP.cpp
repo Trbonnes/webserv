@@ -19,14 +19,16 @@ _lastModified(""),
 _date(""),
 _server(""),
 _contentLanguage(""),
-_contentLength(0),
+_contentLength(-1),
 _contentLocation(""),
 _contentType(""),
 _charset(""),
 _retryAfter(""),
 _transferEncoding(""),
-_body(),
-_response(nullptr) {}
+_body(NULL),
+_cgiResponse(),
+_response(),
+_responseSize(0) {}
 
 HTTP::HTTP(Socket *socket, ConfigServer &config) :
 _socket(*socket),
@@ -43,14 +45,16 @@ _lastModified(""),
 _date(""),
 _server(""),
 _contentLanguage(""),
-_contentLength(0),
+_contentLength(-1),
 _contentLocation(""),
 _contentType(""),
 _charset(""),
 _retryAfter(""),
 _transferEncoding(""),
-_body(),
-_response(nullptr)
+_body(NULL),
+_cgiResponse(),
+_response(),
+_responseSize(0)
 {
     size_t      extension;
     std::string str;
@@ -74,8 +78,12 @@ _response(nullptr)
         _statusCode = REQUEST_ENTITY_TOO_LARGE;
         return ;
     }
-    setRoot();
-    setStat();
+    if (_socket.getMethod().compare("PUT"))
+    {
+        setRoot();
+        std::cerr << "ROUTE: " << _route << std::endl;
+        setStat();
+    }
     if (_socket.getMethod().compare("OPTIONS") == 0)
     {
         _statusCode = NO_CONTENT;
@@ -120,6 +128,9 @@ HTTP::HTTP(HTTP &copy)
     _retryAfter = copy._retryAfter;
     _transferEncoding = copy._transferEncoding;
     _body = ft_strdup(copy._body);
+    _cgiResponse = copy._cgiResponse;
+    _response = ft_strdup(copy._response);
+    _responseSize = copy._responseSize;
 }
 
 HTTP::~HTTP()
@@ -130,6 +141,7 @@ HTTP::~HTTP()
     while (i < NB_METAVARIABLES)
         free(_cgi_env[i++]);
     free(_body);
+    free(_response);
 }
 
 HTTP     &HTTP::operator=(HTTP &rhs)
@@ -151,6 +163,9 @@ HTTP     &HTTP::operator=(HTTP &rhs)
     _retryAfter = rhs._retryAfter;
     _transferEncoding = rhs._transferEncoding;
     _body = ft_strdup(rhs._body);
+    _cgiResponse = rhs._cgiResponse;
+    _response = ft_strdup(rhs._response);
+    _responseSize = rhs._responseSize;
     return *this;
 }
 
@@ -222,14 +237,13 @@ int         HTTP::openFile()
 
     fd = -1;
     stat(_route.c_str(), &file);
-    //if ((file.st_mode & S_IFMT) == S_IFREG)
     if (S_ISREG(file.st_mode))
     {
         fd = open(_route.c_str(), O_RDONLY);
         _statusCode = OK;
     }
     else
-        _statusCode = FORBIDDEN;
+        _statusCode = NOT_FOUND;
     return fd;
 }
 
@@ -256,8 +270,15 @@ void         HTTP::setRoot()
         replaceURI(); 
 
         //** Relative path **
-        _route.assign(_config.getRoot(_location));
-        _route.append(_socket.getRequestURI());
+
+        if (_config.getAlias(_location).length() > 0)
+            _route.assign(_config.getAlias(_location)).append("/");
+        else
+        {
+            _route.assign(_config.getRoot(_location));
+            _route.append(_socket.getRequestURI());
+        }
+        
         stat(_route.c_str(), &file);
 
         // ** If file exist or put request, return **
@@ -270,12 +291,15 @@ void         HTTP::setRoot()
 
         // ** Else, add the language **
         _route.assign(_config.getRoot(_location));
+        if (_config.getAlias(_location).length() > 0)
+            _route.assign(_config.getAlias(_location)).append("/");
         _route.append(acceptLanguage());
         _route.append(str.assign(_socket.getRequestURI()).erase(0, _location.length()));
         stat(_route.c_str(), &file);
-        
+
         // ** If file exist or delete request, return **
-        if ((((file.st_mode & S_IFMT) == S_IFREG  && (fd = open(_route.c_str(), O_RDONLY)) != -1)) || _socket.getMethod().compare("DELETE") == 0)
+        if ((((file.st_mode & S_IFMT) == S_IFREG && (fd = open(_route.c_str(), O_RDONLY)) != -1))
+        || _socket.getMethod().compare("DELETE") == 0)
         {
             close(fd);
             return ;
@@ -289,7 +313,7 @@ void         HTTP::setRoot()
         while (itIndexBegin != itIndexEnd && (file.st_mode & S_IFMT) != S_IFREG)
         {
             str.assign(_route);
-            if (str.back() != '/')
+            if (str.at(str.length() - 1) != '/')
                 str.append("/");
             str.append(*itIndexBegin);
             stat(str.c_str(), &file);
@@ -346,7 +370,7 @@ void            HTTP::setAutoindex(void)
             if (dirent->d_type == DT_DIR)
                 str.append("-");
             else
-                str.append(std::to_string(directory.st_size));
+                str.append(ft_itoa(directory.st_size));
             str.append("\n");
             files.push(str);
         }
@@ -356,11 +380,11 @@ void            HTTP::setAutoindex(void)
             files.pop();
         }
     }
-    body.append("</pre><hr></body>\n</html>\n");
-    _contentLength = body.length() + 2 + 1; // + 2 sinon test fail
+    body.append("</pre><hr></body>\n</html>");
+    _contentLength = body.length();
     _contentType = "text/html";
     _charset = "utf-8";
-    _body = (char*)ft_calloc(_contentLength, sizeof(char));
+    _body = (char*)ft_calloc(_contentLength + 1, sizeof(char));
     ft_strcpy(_body, body.c_str());
 }
 
@@ -513,7 +537,7 @@ void        HTTP::configureErrorFile()
         body.append("</h1>\n\n</body>\n</html>\n");
         _contentType = "text/html";
         _charset = "utf-8";
-        _contentLength = body.length() + 2;
+        _contentLength = body.length();
     }
     else
     {
@@ -540,84 +564,74 @@ char*         HTTP::getResponse()
 {
     std::string response;
 
-    if (_response == nullptr)
+    if (_statusCode >= 300)
+        configureErrorFile();
+    response.append(_config.getHttpVersion());
+    response.append(" ");
+    response.append(ft_itoa(_statusCode)).append(" ");
+    response.append(_mapCodes.codes[_statusCode]).append("\r\n");
+    response.append("Server: ").append(_config.getServerSoftware()).append("\r\n"); //TO DO
+
+    if (ft_strlen(_date) > 0)
+        response.append("Date: ").append(_date).append("\r\n");
+
+    if (_contentType.length() > 0)
+        response.append("Content-Type: ").append(_contentType).append("\r\n");
+
+    if (_contentLength >= 0)
+        response.append("Content-Length: ").append(ft_itoa(_contentLength)).append("\r\n");
+
+    if (_socket.getMethod().compare("OPTIONS") == 0 || _statusCode == METHOD_NOT_ALLOWED)
     {
-        if (_statusCode >= 300)
-            configureErrorFile();
-        if (_statusCode == 200 && _socket.getMethod().compare("PUT") == 0)
+        response.append("Allow: ");
+        std::vector<std::string>::iterator it;
+        std::vector<std::string>::iterator itEnd;
+        std::size_t extension;
+        std::string str;
+
+        extension = _route.find_last_of('.');
+        if (is_good_exe(str.assign(_route).erase(0, extension + 1)))
         {
-            if (ft_strlen(_date) > 0)
-                response.append("Date: ").append(_date).append("\n");
+            it = _config.getCGI_allow(_location).begin();
+            itEnd = _config.getCGI_allow(_location).end();
         }
         else
         {
-            response.append(_config.getHttpVersion());
-            response.append(" ");
-            response.append(ft_itoa(_statusCode)).append(" ");
-            response.append(_mapCodes.codes[_statusCode]).append("\r\n");
-            response.append("Server: ").append(_config.getServerSoftware()).append("\r\n"); //TO DO
-            if (_contentLength > 0)
-                response.append("Content-Length: ").append(ft_itoa(_contentLength)).append("\r\n");
-            if (_contentType.length() > 0)
-                response.append("Content-Type: ").append(_contentType).append("\r\n");
-            if (ft_strlen(_date) > 0)
-                response.append("Date: ").append(_date).append("\r\n");
-            if (_socket.getMethod().compare("OPTIONS") == 0 || _statusCode == METHOD_NOT_ALLOWED)
-            {
-                response.append("Allow: ");
-                std::vector<std::string>::iterator it;
-                std::vector<std::string>::iterator itEnd;
-                std::size_t extension;
-                std::string str;
-
-                extension = _route.find_last_of('.');
-                if (extension != _route.npos && is_good_exe(str.assign(_route).erase(0, extension + 1)))
-                {
-                    it = _config.getCGI_allow(_location).begin();
-                    itEnd = _config.getCGI_allow(_location).end();
-                }
-                else
-                {
-                    it = _config.getAllow(_location).begin();
-                    itEnd = _config.getAllow(_location).end();
-                }
-                while (it != itEnd)
-                {
-                    response.append(*it).append(" ");
-                    it++;
-                }
-            }
-            else
-            {
-                // if (_contentType.length() > 0)
-                    // response.append("Content-Type: ").append(_contentType).append("\r\n");
-                if (_charset.length() > 0)
-                    response.append("Charset: ").append(_charset).append("\r\n");
-                if (_contentLength > 0)
-                    response.append("Content-Length: ").append(ft_itoa(_contentLength)).append("\r\n");
-                if (_statusCode < 300)
-                {
-                    if (ft_strlen(_lastModified) > 0)
-                        response.append("Last-Modified: ").append(_lastModified).append("\r\n");
-                if (_contentLocation.length() > 0)
-                    response.append("Content-Location: ").append(_contentLocation).append("\r\n");
-                    if (_contentLanguage.length() > 0 && _socket.getMethod().compare("PUT") && _socket.getMethod().compare("DELETE"))
-                        response.append("Content-Language: ").append(_contentLanguage).append("\r\n");
-                }
-                else if (_statusCode == UNAUTHORIZED)
-                    response.append("WWW-Authenticate: ").append("Basic ").append(_config.getAuth_basic(_location));
-            }
+            it = _config.getAllow(_location).begin();
+            itEnd = _config.getAllow(_location).end();
         }
-        response.append("\r\n\r\n");
-        _responseSize = response.length() + _contentLength;
-        _response = (char*)ft_calloc(_responseSize + 1, sizeof(char));
-        ft_strcpy(_response, response.c_str());
-        if (_socket.getMethod().compare("HEAD"))
-            ft_memcat(_response, _body, _contentLength);
-        free(_body);
+        while (it != itEnd)
+        {
+            response.append(*it).append(" ");
+            it++;
+        }
+        response.append("\r\n");
     }
-    std::cerr << "RESPONSE RESPONSE: " << std::endl << _response << std::endl;
-
+    else
+    {
+        if (_charset.length() > 0)
+            response.append("Charset: ").append(_charset).append("\r\n");
+        if (_statusCode < 300)
+        {
+            if (ft_strlen(_lastModified) > 0)
+                response.append("Last-Modified: ").append(_lastModified).append("\r\n");
+            if (_contentLocation.length() > 0)
+                response.append("Content-Location: ").append(_contentLocation).append("\r\n");
+            if (_contentLanguage.length() > 0 && _socket.getMethod().compare("PUT") && _socket.getMethod().compare("DELETE"))
+                response.append("Content-Language: ").append(_contentLanguage).append("\r\n");
+        }
+        else if (_statusCode == UNAUTHORIZED)
+            response.append("WWW-Authenticate: ").append("Basic ").append(_config.getAuth_basic(_location)).append("\r\n");
+    }
+    response.append("\r\n");
+    if (_socket.getMethod().compare("HEAD") && _contentLength > 0)
+        _responseSize = response.length() + _contentLength;
+    else
+        _responseSize = response.length();
+    _response = (char*)ft_calloc(_responseSize + 1, sizeof(char));
+    ft_strcpy(_response, response.c_str());
+    if (_socket.getMethod().compare("HEAD") && _contentLength > 0)
+        ft_memcat(_response, _body, _contentLength);
     return (_response);
 }
 

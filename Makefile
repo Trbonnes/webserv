@@ -1,20 +1,21 @@
 # Implicit variable definition
 CXX = clang++
-CXXFLAGS = -Wall -Wextra -Werror -g -std=c++11
+CXXFLAGS = -Wall -Wextra -Werror -g -std=c++98 #-fsanitize=address # TO DO remove fsanitize of produciton
 
 # Sources files
 
-CORESRC = 	core/ConfigServer.cpp \
-			core/Runnable.cpp \
-			core/configFileParser.cpp \
+CORESRC = 	core/Runnable.cpp \
 			core/webserver.cpp \
-			core/ProcessManager.cpp \
 			core/HttpWorker.cpp \
+			core/ProcessManager.cpp \
 			core/ListenSocket.cpp \
-			core/Location.cpp \
-			core/Config.cpp \
 			core/HttpConnection.cpp \
-			core/HttpServer.cpp
+			core/HttpServer.cpp \
+			core/Log.cpp \
+			core/ConfigServer.cpp \
+			core/configFileParser.cpp \
+			core/Location.cpp \
+			core/Config.cpp
 
 HTTPSRC = 	HTTP/HTTP.cpp \
 			HTTP/httpRequestParser.cpp \
@@ -34,6 +35,7 @@ HTTPSRC = 	HTTP/HTTP.cpp \
 			HTTP/utils/ft_strcat.cpp \
 			HTTP/utils/ft_calloc.cpp \
 			HTTP/utils/ft_memcat.cpp \
+			HTTP/utils/ft_realloc.cpp \
 			HTTP/CGI.cpp
 			# HTTP/bin-cgi/cgi.cpp
 

@@ -6,7 +6,7 @@
 /*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/09 10:32:53 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/11/11 16:57:46 by user42           ###   ########.fr       */
+/*   Updated: 2020/11/30 11:09:17 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@
 # include <map>
 
 # include "ConfigServer.hpp"
+# include "Log.hpp"
 
 class	Config {
 private:

@@ -14,7 +14,7 @@ Location::Location() :
 	_cgi_root(""),
     _root(""),
 	_index(0),
-    _autoindex(false),
+    _autoindex(-1),
     _clientBodySize(-1),
 	_alias("") {	
 }

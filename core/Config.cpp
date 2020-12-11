@@ -6,7 +6,7 @@
 /*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/09 10:32:47 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/11/11 16:58:24 by user42           ###   ########.fr       */
+/*   Updated: 2020/11/26 11:52:12 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,8 @@ Config::Config(const Config &c) {
 	_workerConnections = c._workerConnections;
 }
 
-Config::~Config() {
+Config::~Config()
+{
 }
 
 Config &Config::operator=(const Config &c) {
@@ -41,6 +42,8 @@ ConfigServer				*Config::getServerUnit(int port, std::string name) {
 		std::vector<std::string> _serverName = _server[i].getServerName();
 		for (size_t j = 0; j < _port.size(); j++) {
 			if (_port[j] == port) {
+				if (!name.size())
+					return &(_server[i]);
 				for (size_t k = 0; k < _serverName.size(); k++) {
 					if (_serverName[k] == name)
 						return &(_server[i]);

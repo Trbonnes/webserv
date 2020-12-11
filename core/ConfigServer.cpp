@@ -6,7 +6,7 @@
 /*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/09 15:13:35 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/11/11 16:28:02 by user42           ###   ########.fr       */
+/*   Updated: 2020/12/09 16:10:38 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,16 +15,12 @@
 ConfigServer::ConfigServer() :
 _httpVersion("HTTP/1.1"),
 _serverSoftware("Server/2.0"),
+_putRoot("/home/pauline/webserver/"),
 _defaultClientBodySize(-1),
 _defaultType("text/plain"),
-_defaultCharset("utf-8")
+_defaultCharset("utf-8"),
+_defaultAutoindex(-1)
 {
-    // default language
-
-    // A ajouter dans le fichier de config
-
-//    _defaultLanguage.push_back("en");  
-//    _defaultLanguage.push_back("fr");
 
     // open mime.types **
     int         ret;
@@ -40,8 +36,9 @@ _defaultCharset("utf-8")
     {
         while ((ret = get_next_line(fd, &line)) > 0)
         {
-            string = line;
+            string = line; // TO DO is implicit cast (call to string(char*)) ok ? 
             _mimeTypes.push_back(string);
+            free(line);
         }
         string = line;
         _mimeTypes.push_back(string);
@@ -66,6 +63,7 @@ ConfigServer::ConfigServer(const ConfigServer &copy)
     _mimeTypes = copy._mimeTypes;
     _configFilesRoot = copy._configFilesRoot;
     _errorFilesRoot = copy._errorFilesRoot;
+    _putRoot = copy._putRoot;
     _port = copy._port;
     _defaultClientBodySize = copy._defaultClientBodySize;
     _errorPages = copy._errorPages;
@@ -85,7 +83,8 @@ ConfigServer::ConfigServer(const ConfigServer &copy)
 	_defaultCgi_root = copy._defaultCgi_root;
 }
 
-ConfigServer::~ConfigServer() {}
+ConfigServer::~ConfigServer() {
+}
 
 ConfigServer                  &ConfigServer::operator=(ConfigServer const &rhs)
 {
@@ -94,6 +93,7 @@ ConfigServer                  &ConfigServer::operator=(ConfigServer const &rhs)
     _mimeTypes = rhs._mimeTypes;
     _configFilesRoot = rhs._configFilesRoot;
     _errorFilesRoot = rhs._errorFilesRoot;
+    _putRoot = rhs._putRoot;
     _port = rhs._port;
     _defaultClientBodySize = rhs._defaultClientBodySize;
     _errorPages = rhs._errorPages;
@@ -273,20 +273,22 @@ std::string                 ConfigServer::getAuth_basic_user_file(std::string lo
     return _defaultAuth_basic_user_file;   
 }
 
-bool                 ConfigServer::getAutoindex(std::string location)
+int                 ConfigServer::getAutoindex(std::string location)
 {
     std::map<std::string, Location, Compare<std::string> >::iterator itBegin;
     std::map<std::string, Location, Compare<std::string> >::iterator itEnd;  
 
     itBegin = _locationList.begin();
     itEnd = _locationList.end();
+    // if (location.compare("/directory/") == 0) // QUICK FIX!
+        // return 0;
     while (itBegin != itEnd)
     {
-        if (location.compare(itBegin->first) == 0)
+        if (location.compare(itBegin->first) == 0 && itBegin->second._autoindex != -1)
             return (itBegin->second._autoindex);
         itBegin++;
     }
-    return _defaultAutoindex;   
+    return _defaultAutoindex;
 }
 
 std::string             ConfigServer::getAlias(std::string location)
@@ -332,7 +334,7 @@ std::string             ConfigServer::getCGI_root(std::string location)
     // return _defaultCgi_root;
     while (itBegin != itEnd) 
     {
-        if (location.compare(itBegin->first) == 0 )
+        if (location.compare(itBegin->first) == 0 && itBegin->second._cgi_root.compare(""))
             return (itBegin->second._cgi_root);
         itBegin++;
     }
@@ -380,11 +382,15 @@ std::map<int, std::string>  &ConfigServer::getErrorPages() {
 
 std::string                 ConfigServer::getHTMLErrorPage(int error) {
     std::map<int, std::string>::iterator it;
+	std::string page;
 
     it = _errorPages.find(error);
 	if (it == _errorPages.end())
 		return ("");
-    return it->second;
+	
+	page.append(_errorFilesRoot);
+	page.append(it->second);
+    return page;
 }
 
 std::string             ConfigServer::getHttpVersion()
@@ -400,6 +406,11 @@ std::string             ConfigServer::getServerSoftware()
 std::string             ConfigServer::getErrorFilesRoot()
 {
     return _errorFilesRoot;
+}
+
+std::string             ConfigServer::getPutRoot()
+{
+    return _putRoot;
 }
 
 std::map<std::string, Location, Compare<std::string> > ConfigServer::getLocationList() {
@@ -434,7 +445,20 @@ void                    ConfigServer::setIndex(std::vector<std::string> index) {
     _defaultIndex = index;
 }
 
-void                    ConfigServer::setAutoIndex(bool autoIndex) {
+void					ConfigServer::setType(std::string type) {
+	_defaultType = type;
+}
+
+void					ConfigServer::setCharset(std::string charset) {
+	_defaultCharset = charset;
+}
+
+void					ConfigServer::setLanguage(std::vector<std::string> language) {
+	_defaultLanguage = language;
+}
+
+
+void                    ConfigServer::setAutoIndex(int autoIndex) {
     _defaultAutoindex = autoIndex;
 }
 
@@ -446,10 +470,14 @@ void                    ConfigServer::setAllow(std::vector<std::string> allow) {
     _defaultAllow = allow;
 }
 
+void					ConfigServer::setErrorRoot(std::string root) {
+	_errorFilesRoot = root;
+}
+
 void                    ConfigServer::setErrorPages(int error, std::string page) {
-    _errorPages.emplace(error, page);
+    _errorPages.insert(std::pair<int, std::string>(error, page)); // TO DO previous in C++11 were emplace, is it still daijobu ?
 }
 
 void                    ConfigServer::insertLocation(std::string s, Location location) {
-    _locationList.emplace(s, location);
+    _locationList.insert(std::pair<std::string, Location>(s, location)); // TO DO previous in C++11 were emplace, is it still daijobu ?
 }
