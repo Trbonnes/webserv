@@ -15,8 +15,9 @@ public:
 	Runnable(int respawn, int detached);
 	Runnable &operator=(const Runnable &);
 	virtual ~Runnable();
-	virtual void	run();
+	virtual void run();
 	bool isRespawn();
 	bool isDetached();
+	virtual Runnable* clone() const = 0;
 };
 #endif // RUNNABLE

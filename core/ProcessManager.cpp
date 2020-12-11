@@ -17,9 +17,13 @@ void ProcessManager::run(Runnable &proc, unsigned int n = 1)
 {
 	pid_t pid;
 
+	if (n  == 0)
+		return;
+
+	Runnable *cpy = proc.clone();
 	while (n-- > 0)
 	{	
-		if (proc.isDetached())
+		if (cpy->isDetached())
 		{
 			pid = fork();
 			std::cout << pid << std::endl;
@@ -27,24 +31,26 @@ void ProcessManager::run(Runnable &proc, unsigned int n = 1)
 			{
 				try
 				{
-					proc.run();
+					cpy->run();
 			Log::debug("ok");
 				}
 				catch(const std::exception& e)
 				{
 					std::cerr << "Process error :" << e.what() << '\n';
 				}
+				delete cpy;
 				std::exit(0);
 			}
 			if (pid == -1)
 			{
 				// TO DO throw error
 			}
-			_process[pid] = proc;
+			_process[pid] = cpy;
 		}
 		else
 		{
-			proc.run();
+			cpy->run();
+			delete cpy;
 			// manage errors
 		}
 		
@@ -62,12 +68,13 @@ void ProcessManager::manage()
 		std::cout << "Process with pid " << pid << " was killed" << std::endl;
 		(void) status;
 		// TO DO check error codes
-		Runnable& proc = _process[pid];
-		if (proc.isRespawn())
+		Runnable* proc = _process[pid];
+		if (proc->isRespawn())
 		{
 			std::cout << "Respawning the process" << std::endl;
-			this->run(proc);
+			this->run(*proc);
 			_process.erase(pid);
+			delete proc;
 		}
 	}
 }

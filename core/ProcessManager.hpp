@@ -20,7 +20,7 @@
 class ProcessManager
 {
 private:
-	std::map<pid_t, Runnable> _process;
+	std::map<pid_t, Runnable*> _process;
 public:
 	ProcessManager();
 	ProcessManager(const ProcessManager &);

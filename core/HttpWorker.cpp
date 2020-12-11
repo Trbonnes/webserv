@@ -9,6 +9,13 @@ HttpWorker::HttpWorker(std::vector<ListenSocket> &listen, Config* config) : Runn
     _listen_socket = listen;
 }
 
+HttpWorker::HttpWorker(const HttpWorker &w) : Runnable(w)
+{
+	std::cout << "Worker Initializing" << std::endl;
+	_config = w._config;
+    _listen_socket = w._listen_socket;
+}
+
 HttpWorker::~HttpWorker() {
 }
 
@@ -124,4 +131,9 @@ void	HttpWorker::run()
 	// TO DO timeout for http
 	}
 	// TO DO delete connections
+}
+
+Runnable* HttpWorker::clone() const
+{
+	return new HttpWorker(*this);
 }

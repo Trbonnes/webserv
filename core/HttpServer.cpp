@@ -105,7 +105,7 @@ void HttpServer::initWorkers() {
 	HttpWorker worker(_listen_sockset, _config);
 	int nbworkers = _config->getWorker();
 
-	if (!(nbworkers >= WORKER_MIN && nbworkers <= WORKER_MAX))
+	if (nbworkers < WORKER_MIN || nbworkers > WORKER_MAX)
 		nbworkers = WORKER_MIN;
     std::cout << "Initializing " << nbworkers << " workers" << std::endl;
 	try
