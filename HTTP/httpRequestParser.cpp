@@ -6,7 +6,7 @@
 /*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/30 15:45:46 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/12/10 17:42:12 by user42           ###   ########.fr       */
+/*   Updated: 2020/12/11 11:11:26 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ int		httpRequestParseChunckedBody(std::string request, Socket *socket, size_t po
 	std::string body;
 
 	Log::debug("\033[0;32mCHUNCKED");
-	Log::debug(s);
+	// Log::debug(s);
 	pos = s.find("0\r\n");
 	if (pos == s.npos) {
 		char	c[8192];
@@ -33,15 +33,15 @@ int		httpRequestParseChunckedBody(std::string request, Socket *socket, size_t po
 			Log::debug("\033[0;32mread in chuncked ret: ");
 			Log::debug(ret);
 			s.append(c, ret);
-			Log::debug("s:");
-			Log::debug(s);
+			// Log::debug("s:");
+			// Log::debug(s);
 		}
 	}
 	try {
 		chunkSize = 0;
 		pos = 0;
-		Log::debug("s:");
-		Log::debug(s);
+		// Log::debug("s:");
+		// Log::debug(s);
 		// pos = s.find("\r\n") - 1;
 		// while (pos > 0) {
 		// 	pos--;
@@ -335,7 +335,7 @@ Socket	*httpRequestParser(int fd) {
 	}
 
 	Log::debug("\033[0;32mRequestParsing Reading End");
-	Log::debug(request.c_str());
+	// Log::debug(request.c_str());
 	socket = new Socket(fd);
 	Log::debug("\033[0;32mRequestParsing Creation");
 	httpRequestParseRequestLine(request, socket);
