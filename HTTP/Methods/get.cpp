@@ -7,9 +7,9 @@ void        HTTP::get()
 
     // setRoot();
     fd = openFile();
+    authorization();
     if (_statusCode == OK)
     {
-        authorization();
         if (_statusCode == OK)
         {
             setBody(fd);
@@ -22,14 +22,13 @@ void        HTTP::get()
             setDate();
         }
     }
-    else if (_config.getAutoindex(_location) == true)
+    else if (_statusCode != UNAUTHORIZED && _config.getAutoindex(_location) == true)
     {
-        std::cerr << "AUTO INDEX" << std::endl;
         setAutoindex();
         setDate();
         _contentLanguage = "";
-        // TransferEncoding();
         _statusCode = OK;
+        // TransferEncoding();
     }
     return ;
 }

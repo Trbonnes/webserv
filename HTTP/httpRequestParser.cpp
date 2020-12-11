@@ -340,7 +340,7 @@ Socket	*httpRequestParser(int fd) {
 	}
 
 	Log::debug("\033[0;32mRequestParsing Reading End");
-	// Log::debug(request.c_str());
+	Log::debug(request.c_str());
 	socket = new Socket(fd);
 	Log::debug("\033[0;32mRequestParsing Creation");
 	httpRequestParseRequestLine(request, socket);

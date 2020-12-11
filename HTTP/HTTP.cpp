@@ -376,21 +376,21 @@ void            HTTP::authorization()
     int     fd;
     int     ret;
     char    *line;
+    size_t  length;
 
-    if (_config.getAuth_basic(_location).compare("off") != 0)
+    if (_config.getAuth_basic(_location).compare("") != 0)
     {
-        if (_socket.getAuthorization().compare(""))
-        {
+        if (_socket.getAuthorization().compare("") == 0)
             _statusCode = UNAUTHORIZED;
-            _wwwAuthenticate.assign("Basic realm=").append(_config.getAuth_basic(_location));
-        }
         else
         {
             if ((fd = open(_config.getAuth_basic_user_file(_location).c_str(), O_RDONLY)) >= 0)
             {
                 while ((ret = get_next_line(fd, &line)) > 0)
                 {
-                    if (base64_decode(_socket.getAuthorization()).compare(line) == 0)
+                    // if (base64_decode("cGF1bGluZTpwYXVsaW5l").compare(line) == 0)
+                    length = _socket.getAuthorization().length();
+                    if (base64_decode(_socket.getAuthorization().substr(6, length)).compare(line) == 0)
                     {
                         _wwwAuthenticate.assign("OK");
                         break ;
@@ -398,13 +398,11 @@ void            HTTP::authorization()
                     free(line);
                     line = NULL;
                 }
-                if (base64_decode(_socket.getAuthorization()).compare(line) == 0)
+                // if (base64_decode("cGF1bGluZTpwYXVsaW5l").compare(line) == 0)
+                if (base64_decode(_socket.getAuthorization().substr(6, length)).compare(line) == 0)
                     _wwwAuthenticate.assign("OK");
                 if (_wwwAuthenticate.compare("OK") != 0)
-                {
                     _statusCode = UNAUTHORIZED;
-                    _wwwAuthenticate.assign("Basic realm=").append(_config.getAuth_basic(_location));
-                }
                 free(line);
                 line = NULL;
             }
@@ -463,44 +461,44 @@ std::string   HTTP::base64_encode(unsigned char const* bytes_to_encode, unsigned
 
 //** Decode password in base64 **
 std::string   HTTP::base64_decode(std::string const& encoded_string) {
-  int           in_len;
-  int           i;
-  int           j;
-  int           in_;
-  unsigned char char_array_4[4];
-  unsigned char char_array_3[3];
-  std::string   ret;
+    int           in_len;
+    int           i;
+    int           j;
+    int           in_;
+    unsigned char char_array_4[4];
+    unsigned char char_array_3[3];
+    std::string   ret;
 
-  in_len = encoded_string.size();
-  i = 0;
-  j = 0;
-  in_ = 0;
-  while (in_len-- && ( encoded_string[in_] != '=') && is_base64(encoded_string[in_]))
-  {
-    char_array_4[i++] = encoded_string[in_]; in_++;
-    if (i ==4) {
-      for (i = 0; i <4; i++)
-        char_array_4[i] = _base64_chars.find(char_array_4[i]);
-      char_array_3[0] = (char_array_4[0] << 2) + ((char_array_4[1] & 0x30) >> 4);
-      char_array_3[1] = ((char_array_4[1] & 0xf) << 4) + ((char_array_4[2] & 0x3c) >> 2);
-      char_array_3[2] = ((char_array_4[2] & 0x3) << 6) + char_array_4[3];
-      for (i = 0; (i < 3); i++)
-        ret += char_array_3[i];
-      i = 0;
+    in_len = encoded_string.size();
+    i = 0;
+    j = 0;
+    in_ = 0;
+    while (in_len-- && ( encoded_string[in_] != '=') && is_base64(encoded_string[in_]))
+    {
+        char_array_4[i++] = encoded_string[in_]; in_++;
+        if (i ==4) {
+        for (i = 0; i <4; i++)
+            char_array_4[i] = _base64_chars.find(char_array_4[i]);
+        char_array_3[0] = (char_array_4[0] << 2) + ((char_array_4[1] & 0x30) >> 4);
+        char_array_3[1] = ((char_array_4[1] & 0xf) << 4) + ((char_array_4[2] & 0x3c) >> 2);
+        char_array_3[2] = ((char_array_4[2] & 0x3) << 6) + char_array_4[3];
+        for (i = 0; (i < 3); i++)
+            ret += char_array_3[i];
+        i = 0;
+        }
     }
-  }
-  if (i) {
-    for (j = i; j <4; j++)
-      char_array_4[j] = 0;
-    for (j = 0; j <4; j++)
-      char_array_4[j] = _base64_chars.find(char_array_4[j]);
-    char_array_3[0] = (char_array_4[0] << 2) + ((char_array_4[1] & 0x30) >> 4);
-    char_array_3[1] = ((char_array_4[1] & 0xf) << 4) + ((char_array_4[2] & 0x3c) >> 2);
-    char_array_3[2] = ((char_array_4[2] & 0x3) << 6) + char_array_4[3];
-    for (j = 0; (j < i - 1); j++)
-      ret += char_array_3[j];
-  }
-  return ret;
+    if (i) {
+        for (j = i; j <4; j++)
+        char_array_4[j] = 0;
+        for (j = 0; j <4; j++)
+        char_array_4[j] = _base64_chars.find(char_array_4[j]);
+        char_array_3[0] = (char_array_4[0] << 2) + ((char_array_4[1] & 0x30) >> 4);
+        char_array_3[1] = ((char_array_4[1] & 0xf) << 4) + ((char_array_4[2] & 0x3c) >> 2);
+        char_array_3[2] = ((char_array_4[2] & 0x3) << 6) + char_array_4[3];
+        for (j = 0; (j < i - 1); j++)
+        ret += char_array_3[j];
+    }
+    return ret;
 }
 
 void        HTTP::configureErrorFile()
@@ -603,7 +601,7 @@ char*         HTTP::getResponse()
                 response.append("Content-Language: ").append(_contentLanguage).append("\r\n");
         }
         else if (_statusCode == UNAUTHORIZED)
-            response.append("WWW-Authenticate: ").append("Basic ").append(_config.getAuth_basic(_location)).append("\r\n");
+            response.append("WWW-Authenticate: ").append("Basic realm=").append(_config.getAuth_basic(_location)).append("\r\n");
     }
     response.append("\r\n");
     if (_socket.getMethod().compare("HEAD") && _contentLength > 0)

@@ -19,6 +19,8 @@ _putRoot("/home/pauline/webserver/put_test/"),
 _defaultClientBodySize(-1),
 _defaultType("text/plain"),
 _defaultCharset("utf-8"),
+_defaultAuth_basic("AUTHENTIFICATION"),
+_defaultAuth_basic_user_file("/home/pauline/webserver/HTTP/config/.htpasswd"),
 _defaultAutoindex(-1)
 {
 
@@ -261,7 +263,8 @@ std::string                 ConfigServer::getAuth_basic(std::string location)
             return (itBegin->second._auth_basic);
         itBegin++;
     }
-    return _defaultAuth_basic;   
+    std::cerr << "_defaultAuth_basic: " << _defaultAuth_basic << std::endl;
+    return _defaultAuth_basic;
 }
 
 std::string                 ConfigServer::getAuth_basic_user_file(std::string location)
