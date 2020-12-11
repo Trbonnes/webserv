@@ -72,6 +72,7 @@ _responseSize(0)
     if (_socket.getMethod().compare("PUT"))
     {
         setRoot();
+        std::cerr << "ROUTE: " << _route << std::endl;
         setStat();
     }
     if (_socket.getMethod().compare("OPTIONS") == 0)
@@ -252,12 +253,16 @@ void         HTTP::setRoot()
         replaceURI(); 
 
         //** Relative path **
-        _route.assign(_config.getRoot(_location));
-        _route.append(_socket.getRequestURI());
-        stat(_route.c_str(), &file);
 
         if (_config.getAlias(_location).length() > 0)
             _route.assign(_config.getAlias(_location)).append("/");
+        else
+        {
+            _route.assign(_config.getRoot(_location));
+            _route.append(_socket.getRequestURI());
+        }
+        
+        stat(_route.c_str(), &file);
 
         // ** If file exist or put request, return **
         if (((S_ISREG(file.st_mode) && (fd = open(_route.c_str(), O_RDONLY)) != -1)) || _socket.getMethod().compare("PUT") == 0
