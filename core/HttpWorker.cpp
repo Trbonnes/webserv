@@ -88,12 +88,9 @@ void	HttpWorker::run()
 				try
 				{
 					Socket *socket = httpRequestParser(connections[i]->getSock()); // TO DO why would it return a socket class and not an httpRequest object ? 
-					// ConfigServer *ptr = _config->getServerUnit(connections[i]->getSock(), socket->getHost()); // TO DO check if null ?
-					// std::cout << "PASSED THIS POINT, value of ptr : " << ptr << socket->getHost() << std::endl;
-					
 					ConfigServer &ptr2 = _config->getServerList()[0];
 					HTTP method(socket, ptr2);
-					std::cout << "METHOD HAS BEEN CONSTRUCTED" << std::endl;		
+					std::cout << "METHOD HAS BEEN CONSTRUCTED" << std::endl;
 
 					std::cout << "ABOUT TO CREATE RESPONSE" << std::endl;
 					response = method.getResponse(); // TO DO make code more modulare and clean up names

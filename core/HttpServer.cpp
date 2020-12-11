@@ -3,13 +3,13 @@
 
 HttpServer::HttpServer() {
     _config = NULL;
-    _workers_pid = NULL;
+    _manager = NULL;
 }
 
 HttpServer &HttpServer::operator=(const HttpServer &s)
 {
 	_config = s._config;
-	_workers_pid = s._workers_pid;
+	_manager = s._manager;
 	_listen_sockset = s._listen_sockset;
 	return *this;
 }
@@ -17,8 +17,8 @@ HttpServer &HttpServer::operator=(const HttpServer &s)
 HttpServer::~HttpServer() {
 	if (_config)
 		delete _config;
-	if (_workers_pid)
-		delete[] _workers_pid;
+	if (_manager)
+		delete _manager;
 }
 
 void HttpServer::run()
@@ -59,17 +59,11 @@ void HttpServer::run()
 
 void HttpServer::initConf() {
 	std::cout << "Initializing configuration" << std::endl;
-
-	int fd = open("config/webserv.conf", O_RDWR); // for test purposes
-
-
-
-	_config = 0;
+	_config = NULL;
 	try {
+		int fd = open("config/test.conf", O_RDWR); // for test purposes
 		_config = configFileParser(fd);
-		std::cout << "Workers: " << _config->getWorker() << std::endl;
-		std::cout << "Worker connections: " << _config->getWorkerConnections() << std::endl;
-
+		_manager = new ProcessManager();
 	}
 	catch (std::exception const &e) {
 		std::cout << "Exception: " << e.what() << std::endl;
@@ -101,29 +95,26 @@ void HttpServer::initListenSocket() // TO DO optimization
 
 void			HttpServer::masterLifecycle()
 {
-	int status;
-	int nbworkers = _config->getWorker();
-
 	std::cout << "Master is entering is main lifecycle" << std::endl;
-	for (int i = 0; i < nbworkers; i++)
-	{
-		wait(&status);
-	}
+	_manager->manage();
 	// TO DO add process management / reload mechanics
 }
 
-
 void HttpServer::initWorkers() {
 
-	int nbworkers;
 	HttpWorker worker(_listen_sockset, _config);
-	
-	nbworkers = _config->getWorker();
-	_workers_pid = new pid_t[nbworkers];
-    std::cout << "Initializing workers" << std::endl;
-	for (int i = 0; i < nbworkers; i++)
+	int nbworkers = _config->getWorker();
+
+	if (!(nbworkers >= WORKER_MIN && nbworkers <= WORKER_MAX))
+		nbworkers = WORKER_MIN;
+    std::cout << "Initializing " << nbworkers << " workers" << std::endl;
+	try
 	{
-		_workers_pid[i] = ProcessManager::launchProcess(worker); //TO DO rework the process manager to hold the process pid in the class
+		_manager->run(worker, nbworkers);
 	}
-	Log::debug("I AM HERE");
+	catch(const std::exception& e)
+	{
+		std::cerr << "Cannot instantiate workers: " << e.what() << '\n';
+		// TO DO delete process ?
+	}
 }

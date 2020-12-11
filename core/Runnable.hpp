@@ -5,15 +5,18 @@
 class Runnable
 {
 private:
-	Runnable(const Runnable &);
-	Runnable &operator=(const Runnable &);
-
-public:
-	Runnable(int respawn, int detached);
-	virtual ~Runnable();
-	virtual void	run();
 	bool	_respawn;
 	bool	_detached;
-	int		_status;
+	// int		_status;
+
+public:
+	Runnable();
+	Runnable(const Runnable &);
+	Runnable(int respawn, int detached);
+	Runnable &operator=(const Runnable &);
+	virtual ~Runnable();
+	virtual void	run();
+	bool isRespawn();
+	bool isDetached();
 };
 #endif // RUNNABLE

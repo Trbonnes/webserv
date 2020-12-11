@@ -19,6 +19,10 @@
 #include <cstring>
 #include <vector>
 
+
+#define WORKER_MAX 30
+#define WORKER_MIN 1
+
 class WorkersInitException: public std::exception
 {
 	public:
@@ -39,7 +43,7 @@ public:
 private:
 	Config						*_config;
 	std::vector<ListenSocket>	_listen_sockset;
-	pid_t*						_workers_pid; // might put into ProcessManager.hpp
+	ProcessManager*				_manager;
 	HttpServer(const HttpServer &);
 	void			initConf();
 	void			initListenSocket();

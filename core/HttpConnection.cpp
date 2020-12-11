@@ -28,10 +28,10 @@ void HttpConnection::accept() {
 
 void HttpConnection::read() {
     
-	char buff[1024]; // TO DO put buffer in class attribute	
-	
-	memset(buff, 0, 1024);
-	recv(_sock, buff, 1024, 0);
+	char buff[8192]; // TO DO put buffer in class attribute	
+
+	memset(buff, 0, 8192); // TO DO is it allowed ?
+	recv(_sock, buff, 8192, 0);
 	std::cout << buff << std::endl;
 }
 
