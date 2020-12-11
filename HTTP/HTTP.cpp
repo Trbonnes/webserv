@@ -72,7 +72,6 @@ _responseSize(0)
     if (_socket.getMethod().compare("PUT"))
     {
         setRoot();
-        std::cerr << "ROUTE: " << _route << std::endl;
         setStat();
     }
     if (_socket.getMethod().compare("OPTIONS") == 0)
@@ -197,7 +196,7 @@ int         HTTP::checkAllowMethods(std::string method)
 //** Absolute location route for the server **
 void        HTTP::setLocation()
 {
-  _location = _config.getLocation(_uri);
+    _location = _config.getLocation(_uri);
 }
 
 //** Replace URI by the location **

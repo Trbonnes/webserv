@@ -15,7 +15,7 @@
 ConfigServer::ConfigServer() :
 _httpVersion("HTTP/1.1"),
 _serverSoftware("Server/2.0"),
-_putRoot("/home/pauline/webserver/"),
+_putRoot("/home/pauline/webserver/put_test/"),
 _defaultClientBodySize(-1),
 _defaultType("text/plain"),
 _defaultCharset("utf-8"),
@@ -118,12 +118,19 @@ std::string             ConfigServer::getLocation(std::string uri)
 {
     std::map<std::string, Location, Compare<std::string> >::iterator itBegin;
     std::map<std::string, Location, Compare<std::string> >::iterator itEnd;
+    std::string location;
+    size_t      length;
 
     itBegin = _locationList.begin();
     itEnd = _locationList.end();
     while (itBegin != itEnd)
     {
-        if (uri.find(itBegin->first) != std::string::npos)
+        length = itBegin->first.length();
+        if (itBegin->first[length - 1] == '*')
+            location = itBegin->first.substr(0, length - 1);
+        else
+            location = itBegin->first;        
+        if (uri.find(location) != std::string::npos)
             return (itBegin->first);
         itBegin++;
     }
