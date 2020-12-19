@@ -18,12 +18,13 @@
 #include <unistd.h>
 #include <cstring>
 #include <vector>
+#include <string>
 
 
 #define WORKER_MAX 30
 #define WORKER_MIN 1
 
-class WorkersInitException: public std::exception
+class WorkersInitException: public std::exception // TO DO to put in the HttpServer class
 {
 	public:
 		const char * what () const throw ()
@@ -39,6 +40,10 @@ public:
 	HttpServer();
 	~HttpServer();
 	HttpServer &operator=(const HttpServer &);
+	void			run();
+
+	// Default configuration variables setters
+	void setDefaultConfigPath(std::string &);
 
 private:
 	Config						*_config;
@@ -49,10 +54,10 @@ private:
 	void			initListenSocket();
 	void			initWorkers();
 	void			masterLifecycle();
-	static	void	launchProcess(); // TO DO is it clean ?
 
-public:
-	void			run();
+	// Default configuration variables
+	std::string					_defaultconfigpath;
+	
 
 };
 #endif // HTTPSERVER

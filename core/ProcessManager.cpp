@@ -43,7 +43,7 @@ void ProcessManager::run(Runnable &proc, unsigned int n = 1)
 			}
 			if (pid == -1)
 			{
-				// TO DO throw error
+				throw Runnable::RunnableLaunchException();
 			}
 			_process[pid] = cpy;
 		}

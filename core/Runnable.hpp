@@ -1,6 +1,7 @@
 #if !defined(RUNNABLE)
 #define RUNNABLE
 
+#include <exception>
 
 class Runnable
 {
@@ -10,6 +11,14 @@ private:
 	// int		_status;
 
 public:
+	class RunnableLaunchException: public std::exception
+	{
+		public:
+			const char * what () const throw ()
+			{
+				return "Runnable failed to launch"; // TO DO think to use log function
+			}
+	};
 	Runnable();
 	Runnable(const Runnable &);
 	Runnable(int respawn, int detached);

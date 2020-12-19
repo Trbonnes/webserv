@@ -33,10 +33,10 @@ void	HttpWorker::run()
 	ListenSocket* 	listening[FD_SETSIZE]; // array of pointers
 
 	std::cout << "Running a worker" << std::endl;
-	// Important zeroing of the values
+	// Important zeroing-out of the arrays
 	ft_bzero(connections, FD_SETSIZE * sizeof(ListenSocket*)); 
 	ft_bzero(listening, FD_SETSIZE * sizeof(ListenSocket*));
-	// Transforming list in fdset and Listensocket hashmap (not sure about this name)
+	// Transforming list in fdset and ListenSocket in an array we can access with i directly without looping through the fdset
 	FD_ZERO(&active_fs);
 	for (unsigned int i = 0; i < _listen_socket.size(); i++)
 	{
@@ -56,7 +56,7 @@ void	HttpWorker::run()
 		}
 		std::cout << "Event occured" << std::endl;
 		i = 0;
-		for (i = 0; i < FD_SETSIZE; i++) // TO DO optimization ?
+		for (i = 0; i < FD_SETSIZE; i++)
 		{
 			// if the fd is not set then there's no event on that fd, next
 			if (!FD_ISSET(i, &read_fs))
@@ -84,21 +84,11 @@ void	HttpWorker::run()
 			{
 				std::cout << "Event on connection" << std::endl;
 				FD_CLR(i, &read_fs);
-				// handle event with http Module
-				// char buff[408];
-				// while (read(connections[i]->getSock(), buff, 408))
-				// {
-				// 	std::cout << buff << std::endl;
-				// }
-				std::cout << "ABOUT TO PARSE" << std::endl;
-				
 				try
 				{
 					Socket *socket = httpRequestParser(connections[i]->getSock()); // TO DO why would it return a socket class and not an httpRequest object ? 
 					ConfigServer &ptr2 = _config->getServerList()[0];
 					HTTP method(socket, ptr2);
-					std::cout << "METHOD HAS BEEN CONSTRUCTED" << std::endl;
-
 					std::cout << "ABOUT TO CREATE RESPONSE" << std::endl;
 					response = method.getResponse(); // TO DO make code more modulare and clean up names
 					responseSize = method.getResponseSize();
@@ -121,12 +111,6 @@ void	HttpWorker::run()
 					std::cerr << e.what() << '\n';
 				}
 			}
-			else
-			{
-				// TO DO or not ?
-			}
-			// TO DO wero it just in case ?
-			FD_ZERO(&read_fs);
 		}
 	// TO DO timeout for http
 	}

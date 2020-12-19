@@ -1,12 +1,64 @@
 #include "HttpServer.hpp"
+#include <string>
 
-int main(int argc, const char** argv) {
+
+static void printUsage()
+{
+	std::cout << "Usage: ./webserv [option argument]" << std::endl;
+	std::cout << std::endl;
+	std::cout << "Available options:" << std::endl;
+	std::cout << "\r-c : set the path to configuration file to the next argument" << std::endl;
+}
+
+static int parseArguments(HttpServer &server, const char **av)
+{
+	size_t i;
+	std::string opt;
+	std::string arg;
+
+
+	i = 1;
+	while (av[i])
+	{
+		if (av[i][0] == '-')
+		{
+			if (av[i + 1])
+			{
+				opt = std::string(av[i]);
+				arg = std::string(av[i+1]);
+				if (opt == "-c")
+					server.setDefaultConfigPath(arg);
+				else
+					return -1;
+				i++;
+			}
+			else
+				return -1;
+		}
+		else
+			return -1;
+		i++;
+	}
+	return (0);
+}
+
+
+int main(int ac, const char** av, const char** env) {
 
 	HttpServer server;
 
-	(void) argc;
-	(void) argv;
-	server = HttpServer();
+	(void) ac;
+	(void) av;
+	(void) env;
+
+	if (ac > 1)
+	{
+		if (parseArguments(server, av))
+		{
+			printUsage();
+			return 1;
+		}
+	}
 	try
 	{
 		server.run();

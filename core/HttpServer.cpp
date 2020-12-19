@@ -4,6 +4,7 @@
 HttpServer::HttpServer() {
     _config = NULL;
     _manager = NULL;
+	// TO DO set a default conifguration file
 }
 
 HttpServer &HttpServer::operator=(const HttpServer &s)
@@ -60,7 +61,8 @@ void HttpServer::run()
 void HttpServer::initConf() {
 	std::cout << "Initializing configuration" << std::endl;
 	_config = NULL;
-	try {
+	try
+	{
 		int fd = open("config/test.conf", O_RDWR); // for test purposes
 		_config = configFileParser(fd);
 		_manager = new ProcessManager();
@@ -115,6 +117,11 @@ void HttpServer::initWorkers() {
 	catch(const std::exception& e)
 	{
 		std::cerr << "Cannot instantiate workers: " << e.what() << '\n';
-		// TO DO delete process ?
 	}
+}
+
+
+void			HttpServer::setDefaultConfigPath(std::string &path)
+{
+	_defaultconfigpath = path;
 }
