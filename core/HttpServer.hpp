@@ -21,18 +21,8 @@
 #include <string>
 
 
-#define WORKER_MAX 30
+#define WORKER_MAX 30 // TO DO is it un peu bourrin ?
 #define WORKER_MIN 1
-
-class WorkersInitException: public std::exception // TO DO to put in the HttpServer class
-{
-	public:
-		const char * what () const throw ()
-    	{
-    		return "Workers failed to initialize"; // TO DO reimplement into the cpp file
-    	}
-};
-
 
 class HttpServer
 {
@@ -44,6 +34,11 @@ public:
 
 	// Default configuration variables setters
 	void setDefaultConfigPath(std::string &);
+	class WorkersInitException: public std::exception
+	{
+	public:
+		const char * what () const throw ();
+	};
 
 private:
 	Config						*_config;

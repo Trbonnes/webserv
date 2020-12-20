@@ -117,9 +117,14 @@ void HttpServer::initWorkers() {
 	catch(const std::exception& e)
 	{
 		std::cerr << "Cannot instantiate workers: " << e.what() << '\n';
+		throw HttpServer::WorkersInitException();
 	}
 }
 
+const char * HttpServer::WorkersInitException::what () const throw ()
+{
+    		return "Workers failed to initialize"; // TO DO reimplement into the cpp file
+}
 
 void			HttpServer::setDefaultConfigPath(std::string &path)
 {
