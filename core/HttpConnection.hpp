@@ -5,8 +5,13 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <unistd.h>
+#include <string.h>
+#include <errno.h>
 
 #include "ListenSocket.hpp"
+
+
+#define CONNECTION_BUFF_SIZE 8192
 
 class HttpConnection
 {
@@ -20,6 +25,7 @@ private:
 	int				_sock;
 	ListenSocket&	_listen_sock;
 	struct sockaddr	_client_name;
+	char			_buff[CONNECTION_BUFF_SIZE];
 
 public:
 	void	accept();
@@ -31,10 +37,12 @@ public:
 	class ConnectionClose : public std::exception
 	{
 		public:
-			const char * what () const throw ()
-			{
-				return "Connection closed"; // Maybe add Port or something
-			}
+			const char * what () const throw ();
+	};
+	class AcceptFailed : public std::exception
+	{
+		public:
+			const char * what () const throw ();
 	};
 };
 

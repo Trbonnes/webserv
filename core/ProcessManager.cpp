@@ -32,14 +32,13 @@ void ProcessManager::run(Runnable &proc, unsigned int n = 1)
 				try
 				{
 					cpy->run();
-			Log::debug("ok");
 				}
 				catch(const std::exception& e)
 				{
 					std::cerr << "Process error :" << e.what() << '\n';
 				}
 				delete cpy;
-				std::exit(0);
+				std::exit(0);// TO DO should we add a clean exit ? 
 			}
 			if (pid == -1)
 			{
@@ -49,9 +48,16 @@ void ProcessManager::run(Runnable &proc, unsigned int n = 1)
 		}
 		else
 		{
-			cpy->run();
+
+			try
+			{
+				cpy->run();
+			}
+			catch(const std::exception& e)
+			{
+				std::cerr << e.what() << '\n';
+			}	
 			delete cpy;
-			// manage errors
 		}
 		
 	}
@@ -62,12 +68,10 @@ void ProcessManager::manage()
 	pid_t pid;
 	int status;
 
-	while (1 && _process.size() > 0)
+	while (_process.size() > 0)
 	{
 		pid = wait(&status);
 		std::cout << "Process with pid " << pid << " was killed" << std::endl;
-		(void) status;
-		// TO DO check error codes
 		Runnable* proc = _process[pid];
 		if (proc->isRespawn())
 		{
