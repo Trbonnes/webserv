@@ -4,7 +4,7 @@
 HttpServer::HttpServer() {
     _config = NULL;
     _manager = NULL;
-	// TO DO set a default conifguration file
+	_config_path = "config/test.conf";
 }
 
 HttpServer &HttpServer::operator=(const HttpServer &s)
@@ -46,7 +46,7 @@ void HttpServer::run()
 	{
 		Log::debug("About to create workers");
 		initWorkers();
-		Log::debug("Workers have beent initated");
+		Log::debug("Workers have been instantiated");
 	}
 	catch(const std::exception& e)
 	{
@@ -63,9 +63,12 @@ void HttpServer::initConf() {
 	_config = NULL;
 	try
 	{
-		int fd = open("config/test.conf", O_RDWR); // for test purposes
+		int fd = open(_config_path.c_str(), O_RDONLY);
+		if (fd == -1)
+			throw OpenConfigfileFail();
 		_config = configFileParser(fd);
 		_manager = new ProcessManager();
+		close(fd);
 	}
 	catch (std::exception const &e) {
 		std::cout << "Exception: " << e.what() << std::endl;
@@ -78,22 +81,18 @@ void HttpServer::initConf() {
 void HttpServer::initListenSocket() // TO DO optimization
 {
 	std::cout << "Initializing listening sockets" << std::endl;
-	std::map<std::string, Location, Compare<std::string> >::iterator itl;
-	std::map<std::string, Location, Compare<std::string> > locations;
 	std::vector<ConfigServer> servers;
 	std::vector<int> ports;
 
 	servers = _config->getServerList();
 	// Initialize listening sockets that will be shared between workers
-	for (size_t i = 0; i < servers.size(); i++)
+	for (std::vector<ConfigServer>::iterator it = servers.begin(); it < servers.end(); it++)
 	{
-		ports = servers[i].getPort();
+		ports = it->getPort();
 		for (size_t j = 0; j < ports.size(); j++)
 			_listen_sockset.push_back(ListenSocket(ports[j])); // TO DO Check port already in use / Fix getPort()
 	}
 }
-
-//Define numver of workers
 
 void			HttpServer::masterLifecycle()
 {
@@ -123,10 +122,15 @@ void HttpServer::initWorkers() {
 
 const char * HttpServer::WorkersInitException::what () const throw ()
 {
-    		return "Workers failed to initialize"; // TO DO reimplement into the cpp file
+    		return "Workers failed to initialize"; 
 }
 
-void			HttpServer::setDefaultConfigPath(std::string &path)
+const char * HttpServer::OpenConfigfileFail	::what () const throw ()
 {
-	_defaultconfigpath = path;
+    		return strerror(errno);
+}
+
+void			HttpServer::setConfigPath(std::string &path)
+{
+	_config_path = path;
 }

@@ -27,7 +27,7 @@ static int parseArguments(HttpServer &server, const char **av)
 				opt = std::string(av[i]);
 				arg = std::string(av[i+1]);
 				if (opt == "-c")
-					server.setDefaultConfigPath(arg);
+					server.setConfigPath(arg);
 				else
 					return -1;
 				i++;

@@ -33,8 +33,13 @@ public:
 	void			run();
 
 	// Default configuration variables setters
-	void setDefaultConfigPath(std::string &);
+	void setConfigPath(std::string &);
 	class WorkersInitException: public std::exception
+	{
+	public:
+		const char * what () const throw ();
+	};
+	class OpenConfigfileFail: public std::exception
 	{
 	public:
 		const char * what () const throw ();
@@ -51,7 +56,7 @@ private:
 	void			masterLifecycle();
 
 	// Default configuration variables
-	std::string					_defaultconfigpath;
+	std::string					_config_path;
 	
 
 };
