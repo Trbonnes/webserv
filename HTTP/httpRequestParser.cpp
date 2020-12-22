@@ -6,7 +6,7 @@
 /*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/30 15:45:46 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/12/22 11:37:33 by user42           ###   ########.fr       */
+/*   Updated: 2020/12/22 12:24:17 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,20 +15,20 @@
 int		httpRequestParseChunckedBody(std::string request, Socket *socket, size_t pos) {
 	size_t chunkSize;
 	std::string convert;
-	std::string s = request.substr(pos, request.npos);
+	std::string s = request.substr(pos - 1, request.npos);
 	std::vector<std::string>	bodyV;
 	std::string body;
 
 	Log::debug("\033[0;32mCHUNCKED");
 	// Log::debug(s);
-	pos = s.find("0\r\n");
+	pos = s.find("\n0\r\n");
 	if (pos == s.npos) {
 		char	c[8192];
 		int		ret;
 		int 	debug = 0;
 
 		Log::debug("\033[0;32mRead in chuncked body");
-		while ((pos = s.find("0\r\n")) == s.npos) {
+		while ((pos = s.find("\n0\r\n")) >= s.npos) {
 			ft_bzero(c, 8192);
 			ret = read(socket->getFd(), c, 8192);
 			debug += ret;
@@ -40,7 +40,9 @@ int		httpRequestParseChunckedBody(std::string request, Socket *socket, size_t po
 		}
 		Log::debug("\033[0;32mRead over");
 		Log::debug(debug);
+		Log::debug("'");
 		Log::debug(s.substr(pos, s.npos).c_str());
+		Log::debug("'");
 	}
 	try {
 		chunkSize = 0;
@@ -288,45 +290,9 @@ Socket	*httpRequestParser(int fd) {
 	char	c[8192];
 	int		ret;
 	std::string request;
+	size_t debug = 0;
 
 	Log::debug("\033[0;32mRequestParsing Reading");
-	// ft_bzero(c, 8192);
-	// ret = read(fd, c, 8192);
-	// Log::debug("\033[0;32mret: ");
-	// Log::debug(ret);
-	// if (ret == -1)
-	// 	throw Socket::BadReadException();
-	// request.append(c, ret);
-	// ft_bzero(c, 8192);
-	// Log::debug("\"");
-	// Log::debug(request.c_str());
-	// Log::debug("\"");
-	// Log::debug("\033[0;32mret: ");
-	// Log::debug(ret);
-	// if (request.find("chunked") !=  request.npos) {
-	// 	Log::debug("chuncked");
-	// 	if (request.find("0\r\n") == request.npos)
-	// 		return NULL;
-	// }
-	// else if (request.find("Content-Length") != request.npos) {
-	// 	Log::debug("with body");
-	// 	if (request.find("\r\n\r\n") == request.npos)
-	// 		return NULL;
-	// 	else if (request.find("HEAD") == request.npos){
-	// 		Log::debug("not HEAD");
-	// 		size_t pos = request.find("\r\n\r\n");
-	// 		size_t pos2 = request.find("Content-Length");
-
-	// 		int length = atoi(ParseStdHeaders(request, pos2).c_str());
-	// 		if ((request.length() - pos + 3) < (size_t)length)
-	// 			return NULL;
-	// 	}
-	// }
-	// else if (request.find("\r\n\r\n") == request.npos && ret != 0) {
-	// 	return NULL;
-	// }
-
-	size_t debug = 0;
 
 	while (request.find("\r\n\r\n") >= request.npos && request.find("\n\n") >= request.npos)
 	{

@@ -6,7 +6,7 @@
 /*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/09 15:13:35 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/12/09 16:10:38 by user42           ###   ########.fr       */
+/*   Updated: 2020/12/22 11:49:49 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,12 +15,12 @@
 ConfigServer::ConfigServer() :
 _httpVersion("HTTP/1.1"),
 _serverSoftware("Server/2.0"),
-_putRoot("/home/pauline/webserver/put_test/"),
+_putRoot("/home/user42/Documents/42Jobs/webserver/put_test/"),
 _defaultClientBodySize(-1),
 _defaultType("text/plain"),
 _defaultCharset("utf-8"),
-_defaultAuth_basic("AUTHENTIFICATION"),
-_defaultAuth_basic_user_file("/home/pauline/webserver/HTTP/config/.htpasswd"),
+_defaultAuth_basic(""),
+_defaultAuth_basic_user_file(""),
 _defaultAutoindex(-1)
 {
 
