@@ -26,13 +26,6 @@ void HttpConnection::accept() {
 		throw HttpConnection::AcceptFailed();
 }
 
-
-void HttpConnection::read() {
-	memset(_buff, 0, CONNECTION_BUFF_SIZE); // TO DO is it allowed ?
-	recv(_sock, _buff, CONNECTION_BUFF_SIZE, 0);
-	std::cout << _buff << std::endl;
-}
-
 int HttpConnection::getPort() {
 	return _listen_sock.getPort();
 }

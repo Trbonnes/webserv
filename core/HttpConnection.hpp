@@ -10,9 +10,6 @@
 
 #include "ListenSocket.hpp"
 
-
-#define CONNECTION_BUFF_SIZE 8192
-
 class HttpConnection
 {
 public:
@@ -30,7 +27,6 @@ private:
 public:
 	void	accept();
 	void	write(char *data, size_t size);
-	void	read();
 	int		getSock();
 	int		getPort();
 	
