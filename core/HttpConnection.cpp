@@ -31,6 +31,11 @@ int HttpConnection::getPort() {
 }
 
 
+const char * HttpConnection::ConnectionClose::what () const throw ()
+{
+	return "Connection has been closed";
+}
+
 const char * HttpConnection::AcceptFailed::what () const throw ()
 {
 	return strerror(errno); // Maybe add Port or something
