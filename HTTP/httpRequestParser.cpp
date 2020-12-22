@@ -6,7 +6,7 @@
 /*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/30 15:45:46 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/12/11 11:11:26 by user42           ###   ########.fr       */
+/*   Updated: 2020/12/22 11:36:00 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,17 +25,22 @@ int		httpRequestParseChunckedBody(std::string request, Socket *socket, size_t po
 	if (pos == s.npos) {
 		char	c[8192];
 		int		ret;
+		int 	debug = 0;
 
 		Log::debug("\033[0;32mRead in chuncked body");
 		while ((pos = s.find("0\r\n")) == s.npos) {
 			ft_bzero(c, 8192);
 			ret = read(socket->getFd(), c, 8192);
+			debug += ret;
 			Log::debug("\033[0;32mread in chuncked ret: ");
 			Log::debug(ret);
 			s.append(c, ret);
 			// Log::debug("s:");
 			// Log::debug(s);
 		}
+		Log::debug("\033[0;32mRead over");
+		Log::debug(debug);
+		Log::debug(s.substr(pos, s.npos).c_str());
 	}
 	try {
 		chunkSize = 0;
@@ -321,15 +326,13 @@ Socket	*httpRequestParser(int fd) {
 	// 	return NULL;
 	// }
 
-	int i = 0;
+	size_t debug = 0;
+
 	while (request.find("\r\n\r\n") >= request.npos && request.find("\n\n") >= request.npos)
 	{
 		ft_bzero(c, 8192);
 		ret = read(fd, c, 8192);
-		i += ret;
-		Log::debug("\033[0;32mret: ");
-		std::cerr << "i: " << i << std::endl;
-		// Log::debug(ret);
+		debug += ret;
 		if (ret == 0)
 			throw HttpConnection::ConnectionClose();
 		// Log::debug("\033[0;32mret: ");
@@ -340,7 +343,8 @@ Socket	*httpRequestParser(int fd) {
 	}
 
 	Log::debug("\033[0;32mRequestParsing Reading End");
-	Log::debug(request.c_str());
+	Log::debug(debug);
+	// Log::debug(request.c_str());
 	socket = new Socket(fd);
 	Log::debug("\033[0;32mRequestParsing Creation");
 	httpRequestParseRequestLine(request, socket);
