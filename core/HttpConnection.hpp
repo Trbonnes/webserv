@@ -22,7 +22,6 @@ private:
 	int				_sock;
 	ListenSocket&	_listen_sock;
 	struct sockaddr	_client_name;
-	char			_buff[CONNECTION_BUFF_SIZE];
 
 public:
 	void	accept();
