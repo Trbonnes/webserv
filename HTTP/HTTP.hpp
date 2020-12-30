@@ -33,6 +33,11 @@ enum methods
 
 enum cgi_variables
 {
+    HTTP_HOST,
+    HTTP_REFERER,
+    HTTP_USER_AGENT,
+    HTTP_ACCEPT_ENCODING,
+    HTTP_TRANSFER_ENCODING,
     AUTH_TYPE,
     CONTENT_LENGTH,
     CONTENT_TYPE,
@@ -66,7 +71,7 @@ class   HTTP
     std::string                 _location;
     struct stat                 _stat;
     static const std::string    _base64_chars;
-    char                        *_cgi_env[18];
+    char                        *_cgi_env[NB_METAVARIABLES + 1];
 
     // headers
 

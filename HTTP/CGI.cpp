@@ -29,26 +29,30 @@ void        HTTP::cgi_metaVariables()
     std::string str;
     size_t      query;
 
+    _cgi._http_host = "127.0.0.1";
+    _cgi._http_referer = "";
+    _cgi._http_user_agent = _socket.getUserAgent();
+    _cgi._http_accept_encoding = "gzip";
+    _cgi._http_transfer_encoding = _socket.getTransferEncoding();
     _cgi._auth_type = _socket.getAuthorization();
     _cgi._content_length = _socket.getContentLength();
-    std::cerr << "SOCKET CONTENT LENGTH: " << _socket.getContentLength() << std::endl;
-    // _cgi._content_length = "100000000";
     _cgi._content_type = _socket.getContentType();
     _cgi._gateway_interface = "CGI/1.1";
     query = str.assign(_route).find('?', 0);
     //_cgi._path_info = _config.getCGI_root(_location);
     _cgi._path_info = "/directory/youpi.bla";
     //_cgi._path_translated = _cgi._path_info;
-    _cgi._path_translated = "/YoupiBanane/youpi.bla";
+    // _cgi._path_translated = "/home/pauline/webserver/HTTP/bin-cgi/ubuntu_cgi_tester";
+    _cgi._path_translated = "YoupiBanane/youpi.bla";
     if (query == str.npos)
        _cgi._query_string = str.assign(_route).erase(0, query);
     _cgi._remote_addr = "127.0.0.1"; // EN DUR! TO DO
     // _cgi._remote_addr = _socket.getRemoteAddr();
-    _cgi._remote_ident = "user"; // Default
+    _cgi._remote_ident = "login_user"; // Default
     _cgi._remote_user = "user"; // Default 
     _cgi._request_method = _socket.getMethod();
     _cgi._request_uri = _socket.getRequestURI();
-    _cgi._script_name = "/directory/youpi.bla";
+    _cgi._script_name = "ubuntu_cgi_tester";
     //_cgi._script_name = _config.getCGI_root(_location);
     _cgi._server_name = _config.getServerName()[0]; // TO DO quick fix
     _cgi._server_port = ft_itoa(_config.getPort()[0]); // TO DO fix getPort()
@@ -63,6 +67,11 @@ void        HTTP::cgi_metaVariables()
 // ** Set the environnement variables in a char** table **
 void        HTTP::setEnv()
 {
+    _cgi_env[HTTP_HOST] = ft_strdup(_cgi._http_host.insert(0, "HTTP_HOST=").c_str());
+    _cgi_env[HTTP_REFERER] = ft_strdup(_cgi._http_referer.insert(0, "HTTP_REFERER=").c_str());
+    _cgi_env[HTTP_USER_AGENT] = ft_strdup(_cgi._http_user_agent.insert(0, "HTTP_USER_AGENT=").c_str());
+    _cgi_env[HTTP_ACCEPT_ENCODING] = ft_strdup(_cgi._http_accept_encoding.insert(0, "HTTP_ACCEPT_ENCODING=").c_str());
+    _cgi_env[HTTP_TRANSFER_ENCODING] = ft_strdup(_cgi._http_transfer_encoding.insert(0, "HTTP_TRANSFER_ENCODING=").c_str());
     _cgi_env[AUTH_TYPE] = ft_strdup(_cgi._auth_type.insert(0, "AUTH_TYPE=").c_str());
     _cgi_env[CONTENT_LENGTH] = ft_strdup(_cgi._content_length.insert(0, "CONTENT_LENGTH=").c_str());
     _cgi_env[CONTENT_TYPE] = ft_strdup(_cgi._content_type.insert(0, "CONTENT_TYPE=").c_str());
@@ -125,15 +134,29 @@ void        HTTP::cgi_exe()
     int         fd[2];
     int         status;
     char*       args[2];
-    char        buf[2048];
+    char        buf[2049];
     int         mem;
     size_t      find;
+    int         i;
+    char        c;
 
-    ret = 0;
+    ret = EXIT_SUCCESS;
     ft_bzero(args, sizeof(args));
     ft_bzero(buf, sizeof(args));
     ft_bzero(fd, sizeof(fd));
     pipe(fd);
+    int cap = fcntl(fd[SIDE_IN], F_GETPIPE_SZ);
+    std::cout << "Pipe capacity int: " << cap << "\n";
+    // cap = fcntl(fd[SIDE_OUT], F_GETPIPE_SZ);
+    // std::cout << "Pipe capacity out: " << cap << "\n";
+    fcntl(fd[SIDE_IN], F_SETPIPE_SZ, ft_atoi(_socket.getContentLength().c_str()));
+    // fcntl(fd[SIDE_OUT], F_SETPIPE_SZ, ft_atoi(_socket.getContentLength().c_str()));
+    cap = fcntl(fd[SIDE_IN], F_GETPIPE_SZ);
+    std::cout << "Pipe capacity in: " << cap << "\n";    
+    // cap = fcntl(fd[SIDE_OUT], F_GETPIPE_SZ);
+    // std::cout << "Pipe capacity out: " << cap << "\n";
+    dup2(fd[SIDE_IN], STDOUT_FILENO);
+    dup2(fd[SIDE_OUT], STDIN_FILENO);
     pid = fork();
     if (pid < 0)
         _statusCode = INTERNAL_SERVER_ERROR;
@@ -141,14 +164,19 @@ void        HTTP::cgi_exe()
     {
         args[0] = ft_strdup(_config.getCGI_root(_location).c_str());
         args[1] = NULL;
-        dup2(fd[SIDE_IN], STDOUT_FILENO);
-        dup2(fd[SIDE_OUT], STDIN_FILENO);
-        write(STDOUT_FILENO, _socket.getBody().c_str(), ft_atoi(_socket.getContentLength().c_str()));
         if ((ret = execve(args[0], args, _cgi_env)) == -1)
             exit(EXIT_FAILURE);
     }
     else
     {
+        i = 0;
+        while (i < ft_atoi(_socket.getContentLength().c_str())) {
+            c = _socket.getBody().at(i++);
+            std::cerr << c << std::endl;
+            std::cerr << i << std::endl;
+            write(STDOUT_FILENO, &c, 1);
+            fflush(stdout);
+        }
         waitpid(-1, &status, 0);
         if (WIFEXITED(status))
             ret = WEXITSTATUS(status);
@@ -157,9 +185,12 @@ void        HTTP::cgi_exe()
         {
             mem = 0;
             find = _cgiResponse.npos;
-            while ((ret = read(fd[SIDE_OUT], buf, sizeof(buf))) != 0)
+            while ((ret = read(fd[SIDE_OUT], buf, 2048)) > 0)
             {
+                std::cerr << "ret: " << ret << std::endl;
                 _responseSize += ret;
+                buf[ret] = '\0';
+                std::cerr << "buf: " << buf << std::endl;
                 if (find == _cgiResponse.npos)
                 {
                     _cgiResponse.append(buf);
@@ -170,7 +201,8 @@ void        HTTP::cgi_exe()
                     if (mem == 0)
                     {                   
                         mem = _responseSize;
-                        _body = (char*)ft_calloc(mem, sizeof(char));
+                        if (!(_body = (char*)ft_calloc(mem, sizeof(char))))
+                            std::cerr << "malloc fail" << std::endl;
                         _contentLength = 0;
                         _contentLength += _cgiResponse.length() - find - 4;
                         _body = ft_memcat(_body, _cgiResponse.substr(find + 4, _cgiResponse.length()).c_str(), _cgiResponse.length() - find - 4);
@@ -178,18 +210,26 @@ void        HTTP::cgi_exe()
                     else if (mem < _responseSize)
                     {
                        mem *= 2;
-                        _body = (char*)ft_realloc(_body, sizeof(char) * mem);
+                        if (!(_body = (char*)ft_realloc(_body, sizeof(char) * mem)))
+                            std::cerr << "malloc fail" << std::endl;
                         _contentLength += ret;
                         _body = ft_memcat(_body, buf, ret);
                     }
                     _cgiResponse.erase(find + 2, _cgiResponse.length());
                 }
+                std::cerr << "2ret: " << ret << std::endl;
+                if (ret < 2048)
+                    close(fd[SIDE_OUT]);
             }
-            close(fd[SIDE_OUT]);
+                std::cerr << "3ret: " << ret << std::endl;
+            // close(fd[SIDE_OUT]);
         }
         else
             _statusCode = BAD_GATEWAY;
     }
+    std::cerr << "CGI RESPONSE: " << _cgiResponse << std::endl;
+    std::cerr << "BODY: " << _body << std::endl;
+    std::cerr << "TEST3" << std::endl;
     find = _cgiResponse.find("Status: ");
     _statusCode = ft_atoi(_cgiResponse.substr(find + ft_strlen("Status: "), find + ft_strlen("Status: ") + 3).c_str());
     find = _cgiResponse.find("Content-Type: ");

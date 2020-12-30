@@ -303,6 +303,7 @@ void         HTTP::setRoot()
         }
         _route.assign(str);
     }
+    std::cerr << _route << std::endl;
     return ;
 }
 

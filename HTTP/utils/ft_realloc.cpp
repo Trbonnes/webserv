@@ -6,9 +6,10 @@ char			*ft_realloc(char *src, size_t nb)
     char    *dest;
 	size_t  i;
 
-	dest = (char*)ft_calloc(nb, sizeof(char));
+	if (!(dest = (char*)ft_calloc(nb, sizeof(char))))
+		return (NULL);
 	i = 0;
-	while (i < nb)
+	while (src[i])
 	{
 		dest[i] = src[i];
 		i++;

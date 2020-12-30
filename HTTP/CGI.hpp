@@ -5,6 +5,11 @@
 
 struct              CGI
 {
+    std::string     _http_host;
+    std::string     _http_referer;
+    std::string     _http_user_agent;
+    std::string     _http_accept_encoding;
+    std::string     _http_transfer_encoding;
     std::string     _auth_type;
     std::string     _content_length;
     std::string     _content_type;
