@@ -1,5 +1,6 @@
 #include "utils.hpp"
 #include <stdlib.h>
+#include <iostream>
 
 char			*ft_realloc(char *src, size_t nb)
 {
@@ -14,6 +15,7 @@ char			*ft_realloc(char *src, size_t nb)
 		dest[i] = src[i];
 		i++;
 	}
+	dest[i] = '\0';
     free(src);
 	return (dest);
 }

@@ -182,26 +182,22 @@ void        HTTP::cgi_exe()
             }
             if (find != _cgiResponse.npos)
             {
-                    std::cerr << "mem0: " << mem << std::endl;
                 if (mem == 0)
                 {                   
                     mem = _responseSize;
-                    std::cerr << "mem1: " << mem << std::endl;
                     if (!(_body = (char*)ft_calloc(mem, sizeof(char))))
                         std::cerr << "malloc fail" << std::endl; // ERROR
                     _contentLength = 0;
                     _contentLength += _cgiResponse.length() - find - 4;
-                    _body = ft_memcat(_body, _cgiResponse.substr(find + 4, _cgiResponse.length()).c_str(), mem);
-                    // _body = ft_memcat(_body, _cgiResponse.substr(find + 4, _cgiResponse.length()).c_str(), _cgiResponse.length() - find - 4);
+                    // _body = ft_memcat(_body, _cgiResponse.substr(find + 4, _cgiResponse.length()).c_str(), mem);
+                    _body = ft_memcat(_body, _cgiResponse.substr(find + 4, _cgiResponse.length()).c_str(), _cgiResponse.length() - find - 4);
                 }
                 else if (mem < _responseSize)
                 {
-                    mem *= 2;
-                    std::cerr << "TEST6" << std::endl;
+                    mem = (_responseSize * 2);
                     if (!(_body = (char*)ft_realloc(_body, sizeof(char) * mem)))
                         std::cerr << "malloc fail" << std::endl; // ERROR
                     _contentLength += ret;
-                    std::cerr << "TEST" << std::endl;
                     _body = ft_memcat(_body, buf, mem);
                 }
                 _cgiResponse.erase(find + 2, _cgiResponse.length());
@@ -216,12 +212,11 @@ void        HTTP::cgi_exe()
     }
     dup2(save_stdout, STDOUT_FILENO);
     dup2(save_stdin, STDIN_FILENO);
-    // std::cerr << "CGI RESPONSE: " << std::endl << _cgiResponse << std::endl;
+    // _contentLength = ft_strlen(_body);
+    std::cerr << "CGI RESPONSE: " << std::endl << _cgiResponse << std::endl;
     // std::cerr << "BODY: " << std::endl << _body << std::endl;
-    std::cerr << "TEST3" << std::endl;
     find = _cgiResponse.find("Status: ");
     _statusCode = ft_atoi(_cgiResponse.substr(find + ft_strlen("Status: "), find + ft_strlen("Status: ") + 3).c_str());
     find = _cgiResponse.find("Content-Type: ");
     _contentType = _cgiResponse.substr(find + ft_strlen("Content-Type: "), _cgiResponse.find("\r\n", find) - find - ft_strlen("Content-Type: "));
-    std::cerr << "TEST4" << std::endl;
 }

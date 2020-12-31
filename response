@@ -1,0 +1,4 @@
+HTTP/1.1 204 No Content
+Server: Server/2.0
+Content-Location: http://localhost/home/pauline/webserver/put_test/file_should_exist_after
+
