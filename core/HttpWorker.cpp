@@ -93,15 +93,15 @@ void	HttpWorker::run()
 					
 					ConfigServer &ptr2 = _config->getServerList()[0];
 					HTTP method(socket, ptr2);
-					std::cout << "METHOD HAS BEEN CONSTRUCTED" << std::endl;		
+					std::cerr << "METHOD HAS BEEN CONSTRUCTED" << std::endl;		
 
-					std::cout << "ABOUT TO CREATE RESPONSE" << std::endl;
+					std::cerr << "ABOUT TO CREATE RESPONSE" << std::endl;
 					response = method.getResponse(); // TO DO make code more modulare and clean up names
 					responseSize = method.getResponseSize();
-					std::cout << "RESPONSE CREATED" << std::endl << std::endl;
+					std::cerr << "RESPONSE CREATED" << std::endl << std::endl;
 					// std::cerr << response << std::endl;
 					connections[i]->write(response, responseSize); // TO DO ugly
-					std::cout << std::endl << "ENDING REQUEST" << std::endl;
+					std::cerr << std::endl << "ENDING REQUEST" << std::endl;
 				}
 				catch(const HttpConnection::ConnectionClose& e)
 				{

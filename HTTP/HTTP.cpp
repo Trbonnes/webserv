@@ -85,6 +85,7 @@ _responseSize(0)
         cgi_metaVariables();
         cgi_exe();
         setDate();
+        std::cerr << "END" << std::endl;
     }
     else if (checkAllowMethods(_socket.getMethod()))
         callMethod(_socket.getMethod());
@@ -545,6 +546,7 @@ char*         HTTP::getResponse()
 {
     std::string response;
 
+    std::cerr << "RESPONSE" << std::endl;
     if (_statusCode >= 300)
         configureErrorFile();
     response.append(_config.getHttpVersion());

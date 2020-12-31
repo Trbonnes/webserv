@@ -131,107 +131,97 @@ void        HTTP::cgi_exe()
 {
     int         pid;
     int         ret;
-    int         fd[2];
+    int         side_in[2];
+    int         side_out[2];
+    int         save_stdout;
+    int         save_stdin;
     int         status;
     char*       args[2];
     char        buf[2049];
-    int         mem;
     size_t      find;
-    int         i;
-    char        c;
+    int         mem;
 
+    save_stdout = dup(STDOUT_FILENO);
+    save_stdin = dup(STDIN_FILENO);
     ret = EXIT_SUCCESS;
     ft_bzero(args, sizeof(args));
     ft_bzero(buf, sizeof(args));
-    ft_bzero(fd, sizeof(fd));
-    pipe(fd);
-    int cap = fcntl(fd[SIDE_IN], F_GETPIPE_SZ);
-    std::cout << "Pipe capacity int: " << cap << "\n";
-    // cap = fcntl(fd[SIDE_OUT], F_GETPIPE_SZ);
-    // std::cout << "Pipe capacity out: " << cap << "\n";
-    fcntl(fd[SIDE_IN], F_SETPIPE_SZ, ft_atoi(_socket.getContentLength().c_str()));
-    // fcntl(fd[SIDE_OUT], F_SETPIPE_SZ, ft_atoi(_socket.getContentLength().c_str()));
-    cap = fcntl(fd[SIDE_IN], F_GETPIPE_SZ);
-    std::cout << "Pipe capacity in: " << cap << "\n";    
-    // cap = fcntl(fd[SIDE_OUT], F_GETPIPE_SZ);
-    // std::cout << "Pipe capacity out: " << cap << "\n";
-    dup2(fd[SIDE_IN], STDOUT_FILENO);
-    dup2(fd[SIDE_OUT], STDIN_FILENO);
+    ft_bzero(side_in, sizeof(side_in));
+    ft_bzero(side_out, sizeof(side_out));
+    pipe(side_in);
+    pipe(side_out);
+    dup2(side_in[SIDE_IN], STDOUT_FILENO);
     pid = fork();
     if (pid < 0)
         _statusCode = INTERNAL_SERVER_ERROR;
     else if (pid == 0)
     {
+        close(side_in[SIDE_IN]);
+        close(side_out[SIDE_OUT]);
+        dup2(side_in[SIDE_OUT], STDIN_FILENO);
+        dup2(side_out[SIDE_IN], STDOUT_FILENO);
         args[0] = ft_strdup(_config.getCGI_root(_location).c_str());
-        args[1] = NULL;
         if ((ret = execve(args[0], args, _cgi_env)) == -1)
             exit(EXIT_FAILURE);
     }
     else
     {
-        i = 0;
-        while (i < ft_atoi(_socket.getContentLength().c_str())) {
-            c = _socket.getBody().at(i++);
-            std::cerr << c << std::endl;
-            std::cerr << i << std::endl;
-            write(STDOUT_FILENO, &c, 1);
-            fflush(stdout);
+        close(side_out[SIDE_IN]);
+        close(side_in[SIDE_OUT]);
+        write(side_in[SIDE_IN], _socket.getBody().c_str(), ft_atoi(_socket.getContentLength().c_str()));
+        close(side_in[SIDE_IN]);
+        mem = 0;
+        find = _cgiResponse.npos;
+        while ((ret = read(side_out[SIDE_OUT], buf, 2048)) > 0) {
+            _responseSize += ret;
+            buf[ret] = '\0';
+            if (find == _cgiResponse.npos)
+            {
+                _cgiResponse.append(buf);
+                find = _cgiResponse.find("\r\n\r\n");
+            }
+            if (find != _cgiResponse.npos)
+            {
+                    std::cerr << "mem0: " << mem << std::endl;
+                if (mem == 0)
+                {                   
+                    mem = _responseSize;
+                    std::cerr << "mem1: " << mem << std::endl;
+                    if (!(_body = (char*)ft_calloc(mem, sizeof(char))))
+                        std::cerr << "malloc fail" << std::endl; // ERROR
+                    _contentLength = 0;
+                    _contentLength += _cgiResponse.length() - find - 4;
+                    _body = ft_memcat(_body, _cgiResponse.substr(find + 4, _cgiResponse.length()).c_str(), mem);
+                    // _body = ft_memcat(_body, _cgiResponse.substr(find + 4, _cgiResponse.length()).c_str(), _cgiResponse.length() - find - 4);
+                }
+                else if (mem < _responseSize)
+                {
+                    mem *= 2;
+                    std::cerr << "TEST6" << std::endl;
+                    if (!(_body = (char*)ft_realloc(_body, sizeof(char) * mem)))
+                        std::cerr << "malloc fail" << std::endl; // ERROR
+                    _contentLength += ret;
+                    std::cerr << "TEST" << std::endl;
+                    _body = ft_memcat(_body, buf, mem);
+                }
+                _cgiResponse.erase(find + 2, _cgiResponse.length());
+            }
         }
+        close(side_out[SIDE_OUT]);
         waitpid(-1, &status, 0);
         if (WIFEXITED(status))
             ret = WEXITSTATUS(status);
-        close(fd[SIDE_IN]);
-        if (ret == EXIT_SUCCESS)
-        {
-            mem = 0;
-            find = _cgiResponse.npos;
-            while ((ret = read(fd[SIDE_OUT], buf, 2048)) > 0)
-            {
-                std::cerr << "ret: " << ret << std::endl;
-                _responseSize += ret;
-                buf[ret] = '\0';
-                std::cerr << "buf: " << buf << std::endl;
-                if (find == _cgiResponse.npos)
-                {
-                    _cgiResponse.append(buf);
-                    find = _cgiResponse.find("\r\n\r\n");
-                }
-                if (find != _cgiResponse.npos)
-                {
-                    if (mem == 0)
-                    {                   
-                        mem = _responseSize;
-                        if (!(_body = (char*)ft_calloc(mem, sizeof(char))))
-                            std::cerr << "malloc fail" << std::endl;
-                        _contentLength = 0;
-                        _contentLength += _cgiResponse.length() - find - 4;
-                        _body = ft_memcat(_body, _cgiResponse.substr(find + 4, _cgiResponse.length()).c_str(), _cgiResponse.length() - find - 4);
-                    }
-                    else if (mem < _responseSize)
-                    {
-                       mem *= 2;
-                        if (!(_body = (char*)ft_realloc(_body, sizeof(char) * mem)))
-                            std::cerr << "malloc fail" << std::endl;
-                        _contentLength += ret;
-                        _body = ft_memcat(_body, buf, ret);
-                    }
-                    _cgiResponse.erase(find + 2, _cgiResponse.length());
-                }
-                std::cerr << "2ret: " << ret << std::endl;
-                if (ret < 2048)
-                    close(fd[SIDE_OUT]);
-            }
-                std::cerr << "3ret: " << ret << std::endl;
-            // close(fd[SIDE_OUT]);
-        }
-        else
+        if (ret != EXIT_SUCCESS)
             _statusCode = BAD_GATEWAY;
     }
-    std::cerr << "CGI RESPONSE: " << _cgiResponse << std::endl;
-    std::cerr << "BODY: " << _body << std::endl;
+    dup2(save_stdout, STDOUT_FILENO);
+    dup2(save_stdin, STDIN_FILENO);
+    // std::cerr << "CGI RESPONSE: " << std::endl << _cgiResponse << std::endl;
+    // std::cerr << "BODY: " << std::endl << _body << std::endl;
     std::cerr << "TEST3" << std::endl;
     find = _cgiResponse.find("Status: ");
     _statusCode = ft_atoi(_cgiResponse.substr(find + ft_strlen("Status: "), find + ft_strlen("Status: ") + 3).c_str());
     find = _cgiResponse.find("Content-Type: ");
     _contentType = _cgiResponse.substr(find + ft_strlen("Content-Type: "), _cgiResponse.find("\r\n", find) - find - ft_strlen("Content-Type: "));
+    std::cerr << "TEST4" << std::endl;
 }

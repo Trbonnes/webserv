@@ -139,12 +139,10 @@ int		httpRequestParseBody(std::string request, Socket *socket) {
 			while (body.size() < contentLength) {
 				ft_bzero(c, 8192);
 				ret = read(socket->getFd(), c, 8192);
-				std::cerr << ret << std::endl;
-
 				body.append(c, ret);
 				std::cerr << body.size() << std::endl;
 			}
-				std::cerr << "end" << std::endl;
+			std::cerr << "sortie" << std::endl;
 			if (body.size() > contentLength)
 				body.erase(contentLength, body.npos);
 			socket->setBody(body);
