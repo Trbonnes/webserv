@@ -12,6 +12,7 @@ HttpWorker::HttpWorker(std::vector<ListenSocket> &listen, Config* config) : Runn
 HttpWorker::~HttpWorker() {
 }
 
+int _testFILE = 0; // TEST
 
 // TO DO Check config var regarding max connections and max port/server block
 void	HttpWorker::run()
@@ -99,8 +100,18 @@ void	HttpWorker::run()
 					response = method.getResponse(); // TO DO make code more modulare and clean up names
 					responseSize = method.getResponseSize();
 					std::cerr << "RESPONSE CREATED" << std::endl << std::endl;
-					int response_fd = open("response", O_RDWR | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR);
-					write(response_fd, response, responseSize);
+					
+					_testFILE += 1; // TEST
+					char*	test; // TEST
+
+					test = (char*)ft_calloc((ft_strlen("/home/pauline/webserver/responses/") + ft_strlen(ft_itoa(_testFILE))), sizeof(char)); // TEST
+					test = ft_strcpy(test, "/home/pauline/webserver/responses/"); // TEST
+					test = ft_strcat(test, ft_itoa(_testFILE)); // TEST
+
+					int fd_response = open(test, O_RDWR | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR); // TEST
+					
+					write(fd_response, response, responseSize); // TEST
+					free(test); // TEST
 					connections[i]->write(response, responseSize); // TO DO ugly
 					std::cerr << std::endl << "ENDING REQUEST" << std::endl;
 				}

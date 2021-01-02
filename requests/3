@@ -1,0 +1,4 @@
+HEAD / HTTP/1.1
+Host: localhost:8080
+User-Agent: Go-http-client/1.1
+

@@ -1,0 +1,14 @@
+HTTP/1.1 404 Not Found
+Server: Server/2.0
+Content-Type: text/html
+Content-Length: 71
+Charset: utf-8
+
+<!DOCTYPE html>
+<html>
+<body>
+
+<h1>404 Not Found</h1>
+
+</body>
+</html>

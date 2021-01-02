@@ -263,7 +263,6 @@ std::string                 ConfigServer::getAuth_basic(std::string location)
             return (itBegin->second._auth_basic);
         itBegin++;
     }
-    std::cerr << "_defaultAuth_basic: " << _defaultAuth_basic << std::endl;
     return _defaultAuth_basic;
 }
 

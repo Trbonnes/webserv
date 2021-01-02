@@ -1,0 +1,18 @@
+HTTP/1.1 200 OK
+Server: Server/2.0
+Date: Sat 02 Jan 2021 22:23:28 GMT
+Content-Type: text/html
+Content-Length: 388
+Charset: utf-8
+
+<html>
+<head><title>Index of /</title></head>
+<body>
+<h1>Index of /</h1><hr><pre>
+<a href="../">../</a>				02-Jan-2021 22:20		-
+<a href="Yeah/">Yeah/</a>				11-Dec-2020 13:39		-
+<a href="nop/">nop/</a>				11-Dec-2020 13:39		-
+<a href="youpi.bad_extension">youpi.bad_extension</a>				11-Dec-2020 13:39		19
+<a href="youpi.bla">youpi.bla</a>				11-Dec-2020 13:39		9
+</pre><hr></body>
+</html>

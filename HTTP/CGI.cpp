@@ -39,16 +39,15 @@ void        HTTP::cgi_metaVariables()
     std::string str;
     size_t      query;
 
-    _cgi._auth_type = _socket.getAuthorization();
+    std::cerr << "TEST" << std::endl;
+    if (_socket.getAuthorization().compare("1"))
+        _cgi._auth_type = _socket.getAuthorization();
     _cgi._content_length = _socket.getContentLength();
     _cgi._content_type = _socket.getContentType();
     _cgi._gateway_interface = "CGI/1.1";
     query = str.assign(_route).find('?', 0);
-    //_cgi._path_info = _config.getCGI_root(_location);
-    _cgi._path_info = "/directory/youpi.bla";
-    //_cgi._path_translated = _cgi._path_info;
-    // _cgi._path_translated = "/home/pauline/webserver/HTTP/bin-cgi/ubuntu_cgi_tester";
-    _cgi._path_translated = "YoupiBanane/youpi.bla";
+    _cgi._path_info = _socket.getRequestURI();
+    _cgi._path_translated = _route;
     if (query == str.npos)
        _cgi._query_string = str.assign(_route).erase(0, query);
     _cgi._remote_addr = "127.0.0.1"; // EN DUR! TO DO
@@ -57,8 +56,8 @@ void        HTTP::cgi_metaVariables()
     _cgi._remote_user = "user"; // Default 
     _cgi._request_method = _socket.getMethod();
     _cgi._request_uri = _socket.getRequestURI();
-    _cgi._script_name = "ubuntu_cgi_tester";
-    //_cgi._script_name = _config.getCGI_root(_location);
+    // _cgi._script_name = "ubuntu_cgi_tester";
+    _cgi._script_name = _config.getCGI_root(_location);
     _cgi._server_name = _config.getServerName()[0]; // TO DO quick fix
     _cgi._server_port = ft_itoa(_config.getPort()[0]); // TO DO fix getPort()
     _cgi._server_protocol = _config.getHttpVersion();
@@ -90,9 +89,11 @@ void        HTTP::setEnv()
     _cgi_env[SERVER_PROTOCOL] = ft_strdup(_cgi._server_protocol.insert(0, "SERVER_PROTOCOL=").c_str());
     _cgi_env[SERVER_SOFTWARE] = ft_strdup(_cgi._server_software.insert(0, "SERVER_SOFTWARE=").c_str());
     _cgi_env[NB_METAVARIABLES] = NULL;
-    int i = 0;
-    while (i < NB_METAVARIABLES)
-        printf("%s\n", _cgi_env[i++]);
+    if (_socket.getAuthorization().compare("1") == 0)
+        _cgi_env[X_SECRET] = ft_strdup("HTTP_X_SECRET_HEADER_FOR_TEST=1");
+    int i = 0; // TEST
+    while (i < NB_METAVARIABLES) // TEST
+        printf("%s\n", _cgi_env[i++]); // TEST
 }
 
 // ** Verify if the extensions correspond to the config file (CGI) ** 

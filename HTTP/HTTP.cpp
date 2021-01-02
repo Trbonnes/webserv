@@ -79,8 +79,6 @@ _responseSize(0)
         _statusCode = NO_CONTENT;
         return ;
     }
-    if (_socket.getRequestURI().compare("/directory/youpla.bla") == 0)
-        _route = "/home/pauline/webserver/YoupiBanane/youpla.bla";
     extension = _route.find_last_of('.');
     if (is_good_exe(str.assign(_route).erase(0, extension + 1)) && checkCGImethods(_socket.getMethod()))
     {
@@ -163,6 +161,11 @@ void        HTTP::callMethod(std::string method)
         put();
     else if (method.compare("DELETE") == 0)
         del();
+    else if (method.compare("POST") == 0)
+    {
+        _contentLength = 2;
+        _body = ft_strdup("OK");
+    }
 }
 
 //** Check request errors **
@@ -309,6 +312,8 @@ void         HTTP::setRoot()
         }
         _route.assign(str);
     }
+    if (open(_route.c_str(), O_RDONLY) == -1)
+        _route = _socket.getRequestURI();
     std::cerr << "3/ " << _route << std::endl;
     return ;
 }
@@ -612,13 +617,13 @@ char*         HTTP::getResponse()
             response.append("WWW-Authenticate: ").append("Basic realm=").append(_config.getAuth_basic(_location)).append("\r\n");
     }
     response.append("\r\n");
-    if (_socket.getMethod().compare("HEAD") && _contentLength > 0)
+    if (_socket.getMethod().compare("HEAD") && _contentLength >= 0)
         _responseSize = response.length() + _contentLength;
     else
         _responseSize = response.length();
     _response = (char*)ft_calloc(_responseSize + 1, sizeof(char));
     ft_strcpy(_response, response.c_str());
-    if (_socket.getMethod().compare("HEAD") && _contentLength > 0)
+    if (_socket.getMethod().compare("HEAD") && _contentLength >= 0)
         ft_memcat(_response, _body, _contentLength);
     return (_response);
 }

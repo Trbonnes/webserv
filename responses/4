@@ -1,0 +1,13 @@
+HTTP/1.1 200 OK
+Server: Server/2.0
+Date: Sat 02 Jan 2021 22:19:32 GMT
+Content-Type: text/html
+Content-Length: 107
+Charset: utf-8
+
+<html>
+<head><title>Index of /</title></head>
+<body>
+<h1>Index of /</h1><hr><pre>
+</pre><hr></body>
+</html>

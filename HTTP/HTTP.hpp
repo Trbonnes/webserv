@@ -50,6 +50,7 @@ enum cgi_variables
     SERVER_PORT,
     SERVER_PROTOCOL,
     SERVER_SOFTWARE,
+    X_SECRET,
     NB_METAVARIABLES
 };
 
