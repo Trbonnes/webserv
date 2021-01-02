@@ -10,17 +10,14 @@ void        HTTP::get()
     authorization();
     if (_statusCode == OK)
     {
-        if (_statusCode == OK)
-        {
-            setBody(fd);
-            setLastModified();
-            setContentType();
-            setCharset();
-            setContentLength();
-            setServerName();
-            setContentLocation();
-            setDate();
-        }
+        setBody(fd);
+        setLastModified();
+        setContentType();
+        setCharset();
+        setContentLength();
+        setServerName();
+        setContentLocation();
+        setDate();
     }
     else if (_statusCode != UNAUTHORIZED && _config.getAutoindex(_location) == true)
     {

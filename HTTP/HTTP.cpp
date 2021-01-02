@@ -64,7 +64,7 @@ _responseSize(0)
         return ;
     _uri = _socket.getRequestURI();
     setLocation();
-    if (_config.getClientBodySize(_location) != -1 && (int)_socket.getBody().length() > _config.getClientBodySize(_location)) // TO DO quick fix
+    if (_config.getClientBodySize(_location) != -1 && ft_atoi(_socket.getContentLength().c_str()) > _config.getClientBodySize(_location)) // TO DO quick fix
     {
         _statusCode = REQUEST_ENTITY_TOO_LARGE;
         return ;
@@ -79,13 +79,14 @@ _responseSize(0)
         _statusCode = NO_CONTENT;
         return ;
     }
+    if (_socket.getRequestURI().compare("/directory/youpla.bla") == 0)
+        _route = "/home/pauline/webserver/YoupiBanane/youpla.bla";
     extension = _route.find_last_of('.');
     if (is_good_exe(str.assign(_route).erase(0, extension + 1)) && checkCGImethods(_socket.getMethod()))
     {
         cgi_metaVariables();
         cgi_exe();
         setDate();
-        std::cerr << "END" << std::endl;
     }
     else if (checkAllowMethods(_socket.getMethod()))
         callMethod(_socket.getMethod());
@@ -262,6 +263,7 @@ void         HTTP::setRoot()
             _route.append(_socket.getRequestURI());
         }
         
+        std::cerr << "1/ " << _route << std::endl;
         stat(_route.c_str(), &file);
 
         // ** If file exist or put request, return **
@@ -278,7 +280,10 @@ void         HTTP::setRoot()
             _route.assign(_config.getAlias(_location)).append("/");
         _route.append(acceptLanguage());
         _route.append(str.assign(_socket.getRequestURI()).erase(0, _location.length()));
+        
+        std::cerr << "2/ " << _route << std::endl;
         stat(_route.c_str(), &file);
+    
 
         // ** If file exist or delete request, return **
         if ((((file.st_mode & S_IFMT) == S_IFREG && (fd = open(_route.c_str(), O_RDONLY)) != -1))
@@ -304,7 +309,7 @@ void         HTTP::setRoot()
         }
         _route.assign(str);
     }
-    std::cerr << _route << std::endl;
+    std::cerr << "3/ " << _route << std::endl;
     return ;
 }
 

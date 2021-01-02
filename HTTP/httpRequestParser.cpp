@@ -301,7 +301,7 @@ Socket	*httpRequestParser(int fd) {
 
 	Log::debug("\033[0;32mRequestParsing Reading");
 
-	int fd2 = open("/home/pauline/webserver/socket", O_WRONLY | O_TRUNC);
+	int fd2 = open("/home/pauline/webserver/request", O_RDWR | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR);
 	while (request.find("\r\n\r\n") >= request.npos && request.find("\n\n") >= request.npos)
 	{
 		ft_bzero(c, 8192);

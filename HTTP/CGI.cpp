@@ -1,6 +1,16 @@
 #include "HTTP.hpp"
 #include "CGI.hpp"
 
+bool        HTTP::cgi_fd_exist()
+{
+    int     fd;
+
+    fd = openFile();
+    if (_statusCode == OK)
+        return true;
+    return false;
+}
+
 //** Check if the method is autorized for the CGI locations **
 int         HTTP::checkCGImethods(std::string method)
 {
@@ -29,11 +39,6 @@ void        HTTP::cgi_metaVariables()
     std::string str;
     size_t      query;
 
-    _cgi._http_host = "127.0.0.1";
-    _cgi._http_referer = "";
-    _cgi._http_user_agent = _socket.getUserAgent();
-    _cgi._http_accept_encoding = "gzip";
-    _cgi._http_transfer_encoding = _socket.getTransferEncoding();
     _cgi._auth_type = _socket.getAuthorization();
     _cgi._content_length = _socket.getContentLength();
     _cgi._content_type = _socket.getContentType();
@@ -67,11 +72,6 @@ void        HTTP::cgi_metaVariables()
 // ** Set the environnement variables in a char** table **
 void        HTTP::setEnv()
 {
-    _cgi_env[HTTP_HOST] = ft_strdup(_cgi._http_host.insert(0, "HTTP_HOST=").c_str());
-    _cgi_env[HTTP_REFERER] = ft_strdup(_cgi._http_referer.insert(0, "HTTP_REFERER=").c_str());
-    _cgi_env[HTTP_USER_AGENT] = ft_strdup(_cgi._http_user_agent.insert(0, "HTTP_USER_AGENT=").c_str());
-    _cgi_env[HTTP_ACCEPT_ENCODING] = ft_strdup(_cgi._http_accept_encoding.insert(0, "HTTP_ACCEPT_ENCODING=").c_str());
-    _cgi_env[HTTP_TRANSFER_ENCODING] = ft_strdup(_cgi._http_transfer_encoding.insert(0, "HTTP_TRANSFER_ENCODING=").c_str());
     _cgi_env[AUTH_TYPE] = ft_strdup(_cgi._auth_type.insert(0, "AUTH_TYPE=").c_str());
     _cgi_env[CONTENT_LENGTH] = ft_strdup(_cgi._content_length.insert(0, "CONTENT_LENGTH=").c_str());
     _cgi_env[CONTENT_TYPE] = ft_strdup(_cgi._content_type.insert(0, "CONTENT_TYPE=").c_str());
@@ -175,33 +175,7 @@ void        HTTP::cgi_exe()
         while ((ret = read(side_out[SIDE_OUT], buf, 2048)) > 0) {
             _responseSize += ret;
             buf[ret] = '\0';
-            if (find == _cgiResponse.npos)
-            {
-                _cgiResponse.append(buf);
-                find = _cgiResponse.find("\r\n\r\n");
-            }
-            if (find != _cgiResponse.npos)
-            {
-                if (mem == 0)
-                {                   
-                    mem = _responseSize;
-                    if (!(_body = (char*)ft_calloc(mem, sizeof(char))))
-                        std::cerr << "malloc fail" << std::endl; // ERROR
-                    _contentLength = 0;
-                    _contentLength += _cgiResponse.length() - find - 4;
-                    // _body = ft_memcat(_body, _cgiResponse.substr(find + 4, _cgiResponse.length()).c_str(), mem);
-                    _body = ft_memcat(_body, _cgiResponse.substr(find + 4, _cgiResponse.length()).c_str(), _cgiResponse.length() - find - 4);
-                }
-                else if (mem < _responseSize)
-                {
-                    mem = (_responseSize * 2);
-                    if (!(_body = (char*)ft_realloc(_body, sizeof(char) * mem)))
-                        std::cerr << "malloc fail" << std::endl; // ERROR
-                    _contentLength += ret;
-                    _body = ft_memcat(_body, buf, mem);
-                }
-                _cgiResponse.erase(find + 2, _cgiResponse.length());
-            }
+            _cgiResponse.append(buf);
         }
         close(side_out[SIDE_OUT]);
         waitpid(-1, &status, 0);
@@ -212,9 +186,17 @@ void        HTTP::cgi_exe()
     }
     dup2(save_stdout, STDOUT_FILENO);
     dup2(save_stdin, STDIN_FILENO);
-    // _contentLength = ft_strlen(_body);
-    std::cerr << "CGI RESPONSE: " << std::endl << _cgiResponse << std::endl;
-    // std::cerr << "BODY: " << std::endl << _body << std::endl;
+    std::cerr << "response Size: " << _responseSize << std::endl;
+    std::cerr << _cgiResponse.substr(0, 100) << std::endl;
+    int response_fd = open("cgi_response", O_RDWR | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR);
+    write(response_fd, _cgiResponse.c_str(), _responseSize);
+    find = _cgiResponse.find("\r\n\r\n");
+    if (!(_body = (char*)ft_calloc(_responseSize - find - 4 + 1, sizeof(char))))
+        std::cerr << "malloc fail" << std::endl; // ERROR
+    _body = ft_memcat(_body, _cgiResponse.substr(find + 4, _responseSize).c_str(), _responseSize - find - 4);
+    _body[_responseSize - find - 4] = '\0';
+    _contentLength = ft_strlen(_body);
+    _cgiResponse.erase(find + 2, _cgiResponse.length());
     find = _cgiResponse.find("Status: ");
     _statusCode = ft_atoi(_cgiResponse.substr(find + ft_strlen("Status: "), find + ft_strlen("Status: ") + 3).c_str());
     find = _cgiResponse.find("Content-Type: ");

@@ -101,7 +101,6 @@ void	HttpWorker::run()
 					std::cerr << "RESPONSE CREATED" << std::endl << std::endl;
 					int response_fd = open("response", O_RDWR | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR);
 					write(response_fd, response, responseSize);
-					std::cerr << response << std::endl;
 					connections[i]->write(response, responseSize); // TO DO ugly
 					std::cerr << std::endl << "ENDING REQUEST" << std::endl;
 				}
