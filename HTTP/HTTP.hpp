@@ -120,6 +120,7 @@ class   HTTP
     void            setDate(void);
     void            setAutoindex(void);
 
+    // AUTHORIZATION BASE64
     static inline
     bool            is_base64(unsigned char c);
     std::string     base64_decode(std::string const& encoded_string);
@@ -134,20 +135,14 @@ class   HTTP
     int             is_good_exe(std::string exe);
     static bool     mypred(char val1, char val2);
 
-    // HEAD
-    void            head(void);
-
     // PUT
     void            put(void);
     
     // DELETE
     void            del(void);
 
-    // RESPONSE
-    void            configureErrorFile(void);
-
     // ERRORS
-
+    void            configureErrorFile(void);
     int             checkRequestErrors(void);
 
     public:
@@ -156,7 +151,14 @@ class   HTTP
     ~HTTP();
 
     HTTP            &operator=(HTTP &rhs);
+
+    // RESPONSE
     char*           getResponse();
+    void            setFirstHeadersResponse(std::string &response);
+    void            setAllowMethodsResponse(std::string &response);
+    void            setOtherHeaders(std::string &response);
+    void            setResponseSize(std::string &response);
+    void            setBodyResponse(std::string &response);
     int             getResponseSize();
 };
 

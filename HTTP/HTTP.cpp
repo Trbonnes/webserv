@@ -256,7 +256,6 @@ void         HTTP::setRoot()
         replaceURI(); 
 
         //** Relative path **
-
         if (_config.getAlias(_location).length() > 0)
             _route.assign(_config.getAlias(_location)).append("/");
         else
@@ -282,7 +281,6 @@ void         HTTP::setRoot()
         _route.append(str.assign(_socket.getRequestURI()).erase(0, _location.length()));
         
         stat(_route.c_str(), &file);
-    
         // ** If file exist or delete request, return **
         if ((((file.st_mode & S_IFMT) == S_IFREG && (fd = open(_route.c_str(), O_RDONLY)) != -1))
         || _socket.getMethod().compare("DELETE") == 0)
@@ -510,7 +508,7 @@ void        HTTP::configureErrorFile()
     int         fd;
     std::string body;
 
-    _route = _config.getErrorFilesRoot().append("/").append(ft_itoa(_statusCode));
+    _route = _config.getHTMLErrorPage(_statusCode);
     fd = open(_route.c_str(), O_RDONLY);
     if (fd == -1)
     {
@@ -548,29 +546,40 @@ char*         HTTP::getResponse()
 
     if (_statusCode >= 300)
         configureErrorFile();
+    setFirstHeadersResponse(response);
+    if (_socket.getMethod().compare("OPTIONS") == 0 || _statusCode == METHOD_NOT_ALLOWED)
+        setAllowMethodsResponse(response);
+    else
+        setOtherHeaders(response);
+    response.append("\r\n");
+    setResponseSize(response);
+    setBodyResponse(response);
+    return (_response);
+}
+
+void     HTTP::setFirstHeadersResponse(std::string &response)
+{
     response.append(_config.getHttpVersion());
     response.append(" ");
     response.append(ft_itoa(_statusCode)).append(" ");
     response.append(_mapCodes.codes[_statusCode]).append("\r\n");
     response.append("Server: ").append(_config.getServerSoftware()).append("\r\n"); //TO DO
-
     if (ft_strlen(_date) > 0)
         response.append("Date: ").append(_date).append("\r\n");
-
     if (_contentType.length() > 0)
         response.append("Content-Type: ").append(_contentType).append("\r\n");
-
     if (_contentLength >= 0)
         response.append("Content-Length: ").append(ft_itoa(_contentLength)).append("\r\n");
+}
 
-    if (_socket.getMethod().compare("OPTIONS") == 0 || _statusCode == METHOD_NOT_ALLOWED)
-    {
-        response.append("Allow: ");
+void            HTTP::setAllowMethodsResponse(std::string &response)
+{
         std::vector<std::string>::iterator it;
         std::vector<std::string>::iterator itEnd;
         std::size_t extension;
         std::string str;
 
+        response.append("Allow: ");
         extension = _route.find_last_of('.');
         if (is_good_exe(str.assign(_route).erase(0, extension + 1)))
         {
@@ -588,33 +597,39 @@ char*         HTTP::getResponse()
             it++;
         }
         response.append("\r\n");
-    }
-    else
+}
+
+void            HTTP::setOtherHeaders(std::string &response)
+{
+    if (_charset.length() > 0)
+        response.append("Charset: ").append(_charset).append("\r\n");
+    if (_statusCode < 300)
     {
-        if (_charset.length() > 0)
-            response.append("Charset: ").append(_charset).append("\r\n");
-        if (_statusCode < 300)
-        {
-            if (ft_strlen(_lastModified) > 0)
-                response.append("Last-Modified: ").append(_lastModified).append("\r\n");
-            if (_contentLocation.length() > 0)
-                response.append("Content-Location: ").append(_contentLocation).append("\r\n");
-            if (_contentLanguage.length() > 0 && _socket.getMethod().compare("PUT") && _socket.getMethod().compare("DELETE"))
-                response.append("Content-Language: ").append(_contentLanguage).append("\r\n");
-        }
-        else if (_statusCode == UNAUTHORIZED)
-            response.append("WWW-Authenticate: ").append("Basic realm=").append(_config.getAuth_basic(_location)).append("\r\n");
+        if (ft_strlen(_lastModified) > 0)
+            response.append("Last-Modified: ").append(_lastModified).append("\r\n");
+        if (_contentLocation.length() > 0)
+            response.append("Content-Location: ").append(_contentLocation).append("\r\n");
+        if (_contentLanguage.length() > 0 && _socket.getMethod().compare("PUT") && _socket.getMethod().compare("DELETE"))
+            response.append("Content-Language: ").append(_contentLanguage).append("\r\n");
     }
-    response.append("\r\n");
+    else if (_statusCode == UNAUTHORIZED)
+        response.append("WWW-Authenticate: ").append("Basic realm=").append(_config.getAuth_basic(_location)).append("\r\n");
+}
+
+void            HTTP::setResponseSize(std::string &response)
+{
     if (_socket.getMethod().compare("HEAD") && _contentLength >= 0)
         _responseSize = response.length() + _contentLength;
     else
         _responseSize = response.length();
+}
+
+void            HTTP::setBodyResponse(std::string &response)
+{
     _response = (char*)ft_calloc(_responseSize + 1, sizeof(char));
     ft_strcpy(_response, response.c_str());
     if (_socket.getMethod().compare("HEAD") && _contentLength >= 0)
         ft_memcat(_response, _body, _contentLength);
-    return (_response);
 }
 
 int             HTTP::getResponseSize()
