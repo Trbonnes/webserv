@@ -521,7 +521,7 @@ void        HTTP::configureErrorFile()
     }
     else
     {
-        body.assign("");
+        body.clear();
         while ((ret = read(fd, buf, 1024)) > 0)
         {
             buf[ret] = '\0';

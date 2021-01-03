@@ -129,7 +129,6 @@ int		httpRequestParseBody(std::string request, Socket *socket) {
 	try {
 		body = request.substr(pos, request.npos);
 		size_t	contentLength = atol(socket->getContentLength().c_str());
-		std::cout << body.size() << std::endl;
 		if (body.size() >= contentLength)
 			socket->setBody(body);
 		else {
@@ -140,7 +139,6 @@ int		httpRequestParseBody(std::string request, Socket *socket) {
 				ft_bzero(c, 8192);
 				ret = read(socket->getFd(), c, 8192);
 				body.append(c, ret);
-				std::cerr << body.size() << std::endl;
 			}
 			if (body.size() > contentLength)
 				body.erase(contentLength, body.npos);
@@ -302,19 +300,18 @@ Socket	*httpRequestParser(int fd) {
 	// Log::debug("\033[0;32mRequestParsing Reading");
 
 	_test += 1; // TEST
-	std::cerr << _test << std::endl; // TEST
-	char*	test; // TEST
+	// std::cerr << _test << std::endl; // TEST
+	// char*	test; // TEST
+	// test = (char*)ft_calloc((ft_strlen("requests/") + ft_strlen(ft_itoa(_test))), sizeof(char)); // TEST
+	// test = ft_strcpy(test, "requests/"); // TEST
+	// test = ft_strcat(test, ft_itoa(_test)); // TEST
+	// int fd_request = open(test, O_RDWR | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR); // TEST
 
-	test = (char*)ft_calloc((ft_strlen("/home/pauline/webserver/requests/") + ft_strlen(ft_itoa(_test))), sizeof(char)); // TEST
-	test = ft_strcpy(test, "/home/pauline/webserver/requests/"); // TEST
-	test = ft_strcat(test, ft_itoa(_test)); // TEST
-
-	int fd_request = open(test, O_RDWR | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR); 
 	while (request.find("\r\n\r\n") >= request.npos && request.find("\n\n") >= request.npos)
 	{
 		ft_bzero(c, 8192);
 		ret = read(fd, c, 8192);
-		write(fd_request, c, ret); // TEST
+		// write(fd_request, c, ret); // TEST
 		// debug += ret; // TEST
 		if (ret == 0)
 			throw HttpConnection::ConnectionClose();
@@ -325,7 +322,7 @@ Socket	*httpRequestParser(int fd) {
 			throw Socket::BadReadException();
 		request.append(c, ret);
 	}
-	free(test); // TEST
+	// free(test); // TEST
 	// Log::debug("\033[0;32mRequestParsing Reading End");
 	// Log::debug(debug);
 	// Log::debug(request.c_str());
