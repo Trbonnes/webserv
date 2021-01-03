@@ -1,9 +1,0 @@
-HTTP/1.1 200 OK
-Server: Server/2.0
-Date: Sat 02 Jan 2021 22:19:32 GMT
-Content-Type: text/plain
-Content-Length: 23
-Last-Modified: Fri 11 Dec 2020 13:39:36 GMT
-Content-Location: http://localhost/home/pauline/webserver/YoupiBanane/Yeah/not_happy.bad_extension
-
-not_happy.bad_extension

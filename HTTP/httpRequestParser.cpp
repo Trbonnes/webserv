@@ -19,15 +19,15 @@ int		httpRequestParseChunckedBody(std::string request, Socket *socket, size_t po
 	std::vector<std::string>	bodyV;
 	std::string body;
 
-	Log::debug("\033[0;32mCHUNCKED");
+	// Log::debug("\033[0;32mCHUNCKED");
 	// Log::debug(s);
 	pos = s.find("\n0\r\n");
 	if (pos == s.npos) {
 		char	c[8192];
 		int		ret;
-		int 	debug = 0;
+		// int 	debug = 0;
 
-		Log::debug("\033[0;32mRead in chuncked body");
+		// Log::debug("\033[0;32mRead in chuncked body");
 		while ((pos = s.find("\n0\r\n")) >= s.npos) {
 			ft_bzero(c, 8192);
 			ret = read(socket->getFd(), c, 8192);
@@ -39,11 +39,11 @@ int		httpRequestParseChunckedBody(std::string request, Socket *socket, size_t po
 			// Log::debug("s:");
 			// Log::debug(s);
 		}
-		Log::debug("\033[0;32mRead over");
-		Log::debug(debug);
-		Log::debug("'");
-		Log::debug(s.substr(pos, s.npos).c_str());
-		Log::debug("'");
+		// Log::debug("\033[0;32mRead over");
+		// Log::debug(debug);
+		// Log::debug("'");
+		// Log::debug(s.substr(pos, s.npos).c_str());
+		// Log::debug("'");
 	}
 	try {
 		chunkSize = 0;
@@ -84,15 +84,15 @@ int		httpRequestParseChunckedBody(std::string request, Socket *socket, size_t po
 			// Log::debug(chunkSize);
 			socket->setContentLength(ft_itoa(atol(socket->getContentLength().c_str()) + chunkSize));
 		}
-		Log::debug("All chunk read");
+		// Log::debug("All chunk read");
 		for (size_t i = 0; i < bodyV.size(); i++) {
 			body.append(bodyV[i]);
 			body.append("\n");
 		}
 		bodyV.clear();
 		socket->setBody(body);
-		Log::debug("\033[0;32mchuncked content length: ");
-		Log::debug(socket->getContentLength().c_str());
+		// Log::debug("\033[0;32mchuncked content length: ");
+		// Log::debug(socket->getContentLength().c_str());
 	}
 	catch (std::exception &e) {
 		std::cerr << "Exception1: " << e.what() << std::endl;
@@ -142,7 +142,6 @@ int		httpRequestParseBody(std::string request, Socket *socket) {
 				body.append(c, ret);
 				std::cerr << body.size() << std::endl;
 			}
-			std::cerr << "sortie" << std::endl;
 			if (body.size() > contentLength)
 				body.erase(contentLength, body.npos);
 			socket->setBody(body);
@@ -298,12 +297,13 @@ Socket	*httpRequestParser(int fd) {
 	char	c[8192];
 	int		ret;
 	std::string request;
-	size_t debug = 0;
+	// size_t debug = 0;
 
-	Log::debug("\033[0;32mRequestParsing Reading");
+	// Log::debug("\033[0;32mRequestParsing Reading");
 
-	_test += 1;
-	char*	test;
+	_test += 1; // TEST
+	std::cerr << _test << std::endl; // TEST
+	char*	test; // TEST
 
 	test = (char*)ft_calloc((ft_strlen("/home/pauline/webserver/requests/") + ft_strlen(ft_itoa(_test))), sizeof(char)); // TEST
 	test = ft_strcpy(test, "/home/pauline/webserver/requests/"); // TEST
@@ -315,27 +315,27 @@ Socket	*httpRequestParser(int fd) {
 		ft_bzero(c, 8192);
 		ret = read(fd, c, 8192);
 		write(fd_request, c, ret); // TEST
-		debug += ret; // TEST
+		// debug += ret; // TEST
 		if (ret == 0)
 			throw HttpConnection::ConnectionClose();
 		// Log::debug("\033[0;32mret: ");
 		// Log::debug(ret);
-		Log::debug(debug);
+		// Log::debug(debug);
 		if (ret == -1)
 			throw Socket::BadReadException();
 		request.append(c, ret);
 	}
 	free(test); // TEST
-	Log::debug("\033[0;32mRequestParsing Reading End");
-	Log::debug(debug);
+	// Log::debug("\033[0;32mRequestParsing Reading End");
+	// Log::debug(debug);
 	// Log::debug(request.c_str());
 	socket = new Socket(fd);
-	Log::debug("\033[0;32mRequestParsing Creation");
+	// Log::debug("\033[0;32mRequestParsing Creation");
 	httpRequestParseRequestLine(request, socket);
 	httpRequestParseHeaders(request, socket);
 	httpRequestParseBody(request, socket);
 	request.clear();
-	if (_test == 18)
-		socket->setAuthorization("1");
+	if (_test == 18) // TO DO! QUICK FIX
+		socket->setAuthorization("1"); // TO DO! QUICK FIX
 	return socket;
 }

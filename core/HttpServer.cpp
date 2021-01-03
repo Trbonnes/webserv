@@ -43,13 +43,13 @@ void HttpServer::run()
 	}
 	try
 	{
-		Log::debug("About to create workers");
+		// Log::debug("About to create workers");
 		initWorkers();
-		Log::debug("Workers have beent initated");
+		// Log::debug("Workers have been initated");
 	}
 	catch(const std::exception& e)
 	{
-		Log::debug("Is this real life ?");
+		// Log::debug("Is this real life ?");
 		std::cerr << "Error while initializing workers : " << e.what() << '\n';
 		std::cerr << e.what() << '\n';
 		throw e;
@@ -120,10 +120,10 @@ void HttpServer::initWorkers() {
 	
 	nbworkers = _config->getWorker();
 	_workers_pid = new pid_t[nbworkers];
-    std::cout << "Initializing workers" << std::endl;
+    // std::cout << "Initializing workers" << std::endl;
 	for (int i = 0; i < nbworkers; i++)
 	{
 		_workers_pid[i] = ProcessManager::launchProcess(worker); //TO DO rework the process manager to hold the process pid in the class
 	}
-	Log::debug("I AM HERE");
+	// Log::debug("I AM HERE");
 }

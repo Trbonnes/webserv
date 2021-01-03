@@ -83,7 +83,9 @@ _responseSize(0)
     if (is_good_exe(str.assign(_route).erase(0, extension + 1)) && checkCGImethods(_socket.getMethod()))
     {
         cgi_metaVariables();
+        setEnv();
         cgi_exe();
+        cgi_parse();
         setDate();
     }
     else if (checkAllowMethods(_socket.getMethod()))
@@ -152,7 +154,7 @@ HTTP     &HTTP::operator=(HTTP &rhs)
     return *this;
 }
 
-//** Call the non CGI methods, GET, HEAD and PUT / OPTIONS is managed in a different way **  //
+//** Call the non CGI methods, GET, HEAD, PUT, DELETE & (POST) / OPTIONS is managed in a different way **  //
 void        HTTP::callMethod(std::string method)
 {
     if (method.compare("GET") == 0 || method.compare("HEAD") == 0)
@@ -224,11 +226,8 @@ int         HTTP::openFile()
 
     fd = -1;
     stat(_route.c_str(), &file);
-    if (S_ISREG(file.st_mode))
-    {
-        fd = open(_route.c_str(), O_RDONLY);
+    if ((S_ISREG(file.st_mode) && (fd = open(_route.c_str(), O_RDONLY)) != -1))
         _statusCode = OK;
-    }
     else
         _statusCode = NOT_FOUND;
     return fd;
@@ -265,8 +264,6 @@ void         HTTP::setRoot()
             _route.assign(_config.getRoot(_location));
             _route.append(_socket.getRequestURI());
         }
-        
-        std::cerr << "1/ " << _route << std::endl;
         stat(_route.c_str(), &file);
 
         // ** If file exist or put request, return **
@@ -284,10 +281,8 @@ void         HTTP::setRoot()
         _route.append(acceptLanguage());
         _route.append(str.assign(_socket.getRequestURI()).erase(0, _location.length()));
         
-        std::cerr << "2/ " << _route << std::endl;
         stat(_route.c_str(), &file);
     
-
         // ** If file exist or delete request, return **
         if ((((file.st_mode & S_IFMT) == S_IFREG && (fd = open(_route.c_str(), O_RDONLY)) != -1))
         || _socket.getMethod().compare("DELETE") == 0)
@@ -314,7 +309,6 @@ void         HTTP::setRoot()
     }
     if (open(_route.c_str(), O_RDONLY) == -1)
         _route = _socket.getRequestURI();
-    std::cerr << "3/ " << _route << std::endl;
     return ;
 }
 
@@ -329,8 +323,6 @@ void            HTTP::setAutoindex(void)
     char                    lastModifications[100];
     std::stack<std::string> files;
     std::string             body;
-
-    // Verifier que DIR marche bien sur linux, car bug sur MACOS
 
     body.assign("<html>\n<head><title>Index of /</title></head>\n<body>\n<h1>Index of /</h1><hr><pre>\n");
     dir = opendir(_route.c_str());
@@ -400,7 +392,6 @@ void            HTTP::authorization()
             {
                 while ((ret = get_next_line(fd, &line)) > 0)
                 {
-                    // if (base64_decode("cGF1bGluZTpwYXVsaW5l").compare(line) == 0)
                     length = _socket.getAuthorization().length();
                     if (base64_decode(_socket.getAuthorization().substr(6, length)).compare(line) == 0)
                     {
@@ -410,7 +401,6 @@ void            HTTP::authorization()
                     free(line);
                     line = NULL;
                 }
-                // if (base64_decode("cGF1bGluZTpwYXVsaW5l").compare(line) == 0)
                 if (base64_decode(_socket.getAuthorization().substr(6, length)).compare(line) == 0)
                     _wwwAuthenticate.assign("OK");
                 if (_wwwAuthenticate.compare("OK") != 0)
@@ -457,16 +447,16 @@ std::string   HTTP::base64_encode(unsigned char const* bytes_to_encode, unsigned
   if (i)
   {
     for(j = i; j < 3; j++)
-      char_array_3[j] = '\0';
+        char_array_3[j] = '\0';
     char_array_4[0] = (char_array_3[0] & 0xfc) >> 2;
     char_array_4[1] = ((char_array_3[0] & 0x03) << 4) + ((char_array_3[1] & 0xf0) >> 4);
     char_array_4[2] = ((char_array_3[1] & 0x0f) << 2) + ((char_array_3[2] & 0xc0) >> 6);
     char_array_4[3] = char_array_3[2] & 0x3f;
     for (j = 0; (j < i + 1); j++)
-      ret += _base64_chars[char_array_4[j]];
+        ret += _base64_chars[char_array_4[j]];
 
     while((i++ < 3))
-      ret += '=';
+        ret += '=';
   }
   return ret;
 }
@@ -556,7 +546,6 @@ char*         HTTP::getResponse()
 {
     std::string response;
 
-    std::cerr << "RESPONSE" << std::endl;
     if (_statusCode >= 300)
         configureErrorFile();
     response.append(_config.getHttpVersion());

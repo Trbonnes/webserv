@@ -129,6 +129,7 @@ class   HTTP
     bool            cgi_fd_exist();
     void            cgi_metaVariables();
     void            cgi_exe();
+    void            cgi_parse();
     void            setEnv();
     int             is_good_exe(std::string exe);
     static bool     mypred(char val1, char val2);

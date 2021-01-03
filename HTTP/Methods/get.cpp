@@ -5,7 +5,6 @@ void        HTTP::get()
     std::string root;
     int         fd;
 
-    // setRoot();
     fd = openFile();
     authorization();
     if (_statusCode == OK)
@@ -25,7 +24,6 @@ void        HTTP::get()
         setDate();
         _contentLanguage = "";
         _statusCode = OK;
-        // TransferEncoding();
     }
     return ;
 }
