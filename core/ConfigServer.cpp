@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ConfigServer.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
+/*   By: trbonnes <trbonnes@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/09 15:13:35 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/12/22 11:49:49 by user42           ###   ########.fr       */
+/*   Updated: 2021/01/05 09:16:37 by trbonnes         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -475,6 +475,15 @@ void                    ConfigServer::setClientBodySize(int clientBodySize) {
 
 void                    ConfigServer::setAllow(std::vector<std::string> allow) {
     _defaultAllow = allow;
+}
+
+
+void					ConfigServer::setAuth_basic(std::string auth) {
+	_defaultAuth_basic = auth;
+}
+
+void					ConfigServer::setAuth_basic_user_file(std::string user_file) {
+	_defaultAuth_basic_user_file = user_file;
 }
 
 void					ConfigServer::setErrorRoot(std::string root) {

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   configFileParser.cpp                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
+/*   By: trbonnes <trbonnes@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/14 08:46:39 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/12/09 16:14:14 by user42           ###   ########.fr       */
+/*   Updated: 2021/01/05 10:27:13 by trbonnes         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -221,6 +221,23 @@ std::string		configFileParseServerLocation(std::string parseServer, ConfigServer
 		}
 		else
 			throw Config::InvalidConfigException();
+	}
+
+	//AUTH
+	if ((pos = s.find("auth_basic")) != s.npos) {
+		pos += 10;
+		checkEndLine(pos, s);
+		while (s[pos] != '\"') { pos++; }
+		i = s.find("\"", pos + 1);
+		location._auth_basic = s.substr(pos, i - pos);
+	}
+
+	if ((pos = s.find("auth_basic_user_file")) != s.npos) {
+		pos += 20;
+		checkEndLine(pos, s);
+		while (s[pos] == ' ') { pos++; }
+		i = s.find(";", pos);
+		location._auth_basic_user_file = s.substr(pos, i - pos);
 	}
 
 	server->insertLocation(location._location, location);
@@ -451,6 +468,24 @@ int		configFileParseServerUnit(std::string configFile, std::vector<ConfigServer>
 			throw Config::InvalidConfigException();
 	}
 
+	//AUTH
+	if ((pos = parseServer.find("auth_basic")) != parseServer.npos) {
+		pos += 10;
+		checkEndLine(pos, parseServer);
+		while (parseServer[pos] != '\"') { pos++; }
+		i = parseServer.find("\"", pos + 1);
+		v->back().setAuth_basic(parseServer.substr(pos, i - pos));
+	}
+
+	if ((pos = parseServer.find("auth_basic_user_file")) != parseServer.npos) {
+		pos += 20;
+		checkEndLine(pos, parseServer);
+		while (parseServer[pos] == ' ') { pos++; }
+		i = parseServer.find(";", pos);
+		v->back().setAuth_basic_user_file(parseServer.substr(pos, i - pos));
+	}
+
+
 	//ERROR PAGES
 	if ((pos = parseServer.find("error_root", i)) != parseServer.npos) {
 		pos += 10;
@@ -523,6 +558,10 @@ int		configFileParseServers(std::string configFile, Config *config) {
 	}
 
 	configFileParseServerUnit(configFile, &v);
+	for (i = 0; i < v.size(); i++) {
+		Log::debug(v[i].getAuth_basic("").c_str());
+		Log::debug(v[i].getAuth_basic_user_file("").c_str());
+	}
 	config->setServer(v);
 
 	return 0;

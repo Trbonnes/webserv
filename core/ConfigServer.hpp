@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ConfigServer.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
+/*   By: trbonnes <trbonnes@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/09 12:19:51 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/11/26 15:07:44 by user42           ###   ########.fr       */
+/*   Updated: 2021/01/05 09:15:11 by trbonnes         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,6 +104,8 @@ public:
     void                    setAutoIndex(int autoIndex);
     void                    setClientBodySize(int clientBodySize);
     void                    setAllow(std::vector<std::string> allow);
+    void					setAuth_basic(std::string auth);
+    void					setAuth_basic_user_file(std::string user_file);
 	void					setErrorRoot(std::string root);
     void                    setErrorPages(int error, std::string page);
 
