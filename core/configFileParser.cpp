@@ -6,7 +6,7 @@
 /*   By: trbonnes <trbonnes@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/14 08:46:39 by trbonnes          #+#    #+#             */
-/*   Updated: 2021/01/05 10:27:13 by trbonnes         ###   ########.fr       */
+/*   Updated: 2021/01/05 11:16:53 by trbonnes         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -228,7 +228,8 @@ std::string		configFileParseServerLocation(std::string parseServer, ConfigServer
 		pos += 10;
 		checkEndLine(pos, s);
 		while (s[pos] != '\"') { pos++; }
-		i = s.find("\"", pos + 1);
+		pos++;
+		i = s.find("\"", pos);
 		location._auth_basic = s.substr(pos, i - pos);
 	}
 
@@ -473,7 +474,8 @@ int		configFileParseServerUnit(std::string configFile, std::vector<ConfigServer>
 		pos += 10;
 		checkEndLine(pos, parseServer);
 		while (parseServer[pos] != '\"') { pos++; }
-		i = parseServer.find("\"", pos + 1);
+		pos++;
+		i = parseServer.find("\"", pos);
 		v->back().setAuth_basic(parseServer.substr(pos, i - pos));
 	}
 
