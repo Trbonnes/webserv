@@ -58,6 +58,7 @@ class   Socket
     std::string	                _host;
     std::string	                _userAgent;
 	std::string	                _referer;
+	std::string	                _xSecret;
 
     // BODY
 
@@ -91,6 +92,7 @@ class   Socket
 	std::string	                getReferer();
     std::string					getBody();
     std::string                 getRemoteAddr();
+    std::string                 getXSecret();
 
 
     void	setFd(int fd);
@@ -111,6 +113,7 @@ class   Socket
     void	setUserAgent(std::string UserAgent);
 	void	setReferer(std::string Referer);
     void	setBody(std::string sBody);
+	void	setXSecret(std::string XSecret);
 
 	class	BadReadException: public std::exception {
 		public:
@@ -133,6 +136,7 @@ void	ParseHost(Socket *socket, std::string request, size_t pos);
 void	ParseReferer(Socket *socket, std::string request, size_t pos);
 void	ParseTransferEncoding(Socket *socket, std::string request, size_t pos);
 void	ParseUserAgent(Socket *socket, std::string request, size_t pos);
+void	ParseXSecret(Socket *socket, std::string request, size_t pos);
 std::string ParseStdHeaders(std::string request, size_t pos);
 
 #endif

@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   socket.cpp                                         :+:      :+:    :+:   */
+/*   Socket.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
+/*   By: trbonnes <trbonnes@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/30 15:10:55 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/10/27 12:41:22 by user42           ###   ########.fr       */
+/*   Updated: 2021/01/05 14:25:08 by trbonnes         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,8 @@ _acceptLanguage(),
 _authorization(),
 _host(),
 _userAgent(),
-_body() {
+_body(),
+_xSecret() {
 }
 
 Socket::Socket(int fd) :
@@ -49,7 +50,8 @@ _acceptLanguage(),
 _authorization(),
 _host(),
 _userAgent(),
-_body() {
+_body(),
+_xSecret() {
 }
 
 Socket::Socket(Socket const &copy)
@@ -71,6 +73,7 @@ Socket::Socket(Socket const &copy)
     _host = copy._host;
     _userAgent = copy._userAgent;
     _body = copy._body;
+	_xSecret = copy._xSecret;
 }
 
 Socket::~Socket() {
@@ -95,6 +98,7 @@ Socket      &Socket::operator=(Socket const &rhs)
     _host = rhs._host;
     _userAgent = rhs._userAgent;
     _body = rhs._body;
+	_xSecret = rhs._xSecret;
     return *this;
 }
 
@@ -188,6 +192,14 @@ std::string     Socket::getBody()
     return _body;
 }
 
+std::string     Socket::getRemoteAddr()
+{
+    return _addr;
+}
+
+std::string		Socket::getXSecret() {
+	return _xSecret;
+}
 
 
 void	Socket::setFd(int fd) {
@@ -264,7 +276,6 @@ void	Socket::setBody(std::string Body) {
 	_body = Body;
 }
 
-std::string     Socket::getRemoteAddr()
-{
-    return _addr;
+void	Socket::setXSecret(std::string XSecret); {
+	_xSecret = XSecret
 }
