@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Socket.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: trbonnes <trbonnes@student.42.fr>          +#+  +:+       +#+        */
+/*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/30 15:10:55 by trbonnes          #+#    #+#             */
-/*   Updated: 2021/01/05 14:25:08 by trbonnes         ###   ########.fr       */
+/*   Updated: 2021/01/05 14:58:22 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,8 +29,8 @@ _acceptLanguage(),
 _authorization(),
 _host(),
 _userAgent(),
-_body(),
-_xSecret() {
+_xSecret(),
+_body() {
 }
 
 Socket::Socket(int fd) :
@@ -50,8 +50,8 @@ _acceptLanguage(),
 _authorization(),
 _host(),
 _userAgent(),
-_body(),
-_xSecret() {
+_xSecret(),
+_body() {
 }
 
 Socket::Socket(Socket const &copy)
@@ -276,6 +276,6 @@ void	Socket::setBody(std::string Body) {
 	_body = Body;
 }
 
-void	Socket::setXSecret(std::string XSecret); {
-	_xSecret = XSecret
+void	Socket::setXSecret(std::string XSecret) {
+	_xSecret = XSecret;
 }

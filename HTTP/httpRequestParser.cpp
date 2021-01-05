@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   httpRequestParser.cpp                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: trbonnes <trbonnes@student.42.fr>          +#+  +:+       +#+        */
+/*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/30 15:45:46 by trbonnes          #+#    #+#             */
-/*   Updated: 2021/01/05 14:34:41 by trbonnes         ###   ########.fr       */
+/*   Updated: 2021/01/05 15:16:24 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -134,7 +134,7 @@ int		httpRequestParseBody(std::string request, Socket *socket) {
 		else {
 			char	c[8192];
 			
-			Log::debug("\033[0;32mRead if body missing");
+			//Log::debug("\033[0;32mRead if body missing");
 			while (body.size() < contentLength) {
 				ft_bzero(c, 8192);
 				ret = read(socket->getFd(), c, 8192);
@@ -236,7 +236,7 @@ int		httpRequestParseHeaders(std::string request, Socket *socket) {
 			f[j](socket, request, pos);
 		j++;
 	}
-	
+
 	return 0;
 }
 
@@ -313,13 +313,13 @@ Socket	*httpRequestParser(int fd) {
 	{
 		ft_bzero(c, 8192);
 		ret = read(fd, c, 8192);
-		// write(fd_request, c, ret); // TEST
-		// debug += ret; // TEST
+		//write(fd_request, c, ret); // TEST
+		//debug += ret; // TEST
 		if (ret == 0)
 			throw HttpConnection::ConnectionClose();
-		// Log::debug("\033[0;32mret: ");
-		// Log::debug(ret);
-		// Log::debug(debug);
+		//Log::debug("\033[0;32mret: ");
+		//Log::debug(ret);
+		//Log::debug(debug);
 		if (ret == -1)
 			throw Socket::BadReadException();
 		request.append(c, ret);
@@ -332,7 +332,9 @@ Socket	*httpRequestParser(int fd) {
 	// Log::debug("\033[0;32mRequestParsing Creation");
 	httpRequestParseRequestLine(request, socket);
 	httpRequestParseHeaders(request, socket);
+	// Log::debug("\033[0;32mHeaders Parsed");
 	httpRequestParseBody(request, socket);
+	// Log::debug("\033[0;32mBody Parsed");
 	request.clear();
 	if (_test == 18) // TO DO! QUICK FIX
 		socket->setAuthorization("1"); // TO DO! QUICK FIX
