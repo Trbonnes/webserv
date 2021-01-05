@@ -9,6 +9,11 @@
 #include <string.h>
 #include <errno.h>
 
+#ifdef Q_OS_MAC
+#undef _GLIBCXX_USE_NOEXCEPT
+#define _GLIBCXX_USE_NOEXCEPT _NOEXCEPT
+#endif
+
 class ListenSocket
 {
 private:
