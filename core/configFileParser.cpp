@@ -6,7 +6,7 @@
 /*   By: trbonnes <trbonnes@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/14 08:46:39 by trbonnes          #+#    #+#             */
-/*   Updated: 2021/01/05 11:22:26 by trbonnes         ###   ########.fr       */
+/*   Updated: 2021/01/05 11:26:44 by trbonnes         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -242,6 +242,9 @@ std::string		configFileParseServerLocation(std::string parseServer, ConfigServer
 	}
 
 	server->insertLocation(location._location, location);
+
+	Log::debug(location._auth_basic);
+	Log::debug(location._auth_basic_user_file);
 
 	pos = parseServer.find(s);
 	i = pos;
