@@ -12,6 +12,7 @@ HttpWorker::HttpWorker(std::vector<ListenSocket> &listen, Config* config) : Runn
 HttpWorker::~HttpWorker() {
 }
 
+int _testFILE = 0; // TEST
 
 // TO DO Check config var regarding max connections and max port/server block
 void	HttpWorker::run()
@@ -44,10 +45,10 @@ void	HttpWorker::run()
 		// Waiting for an event on listen socket
 		if (select(FD_SETSIZE, &read_fs, NULL, NULL, NULL) == -1) // TO DO check if 0
 		{
-			std::cout << "Select error " << strerror(errno) << std::endl;
+			std::cerr << "Select error " << strerror(errno) << std::endl;
 			continue; // TO DO throw something ?
 		}
-		std::cout << "Event occured" << std::endl;
+		// std::cout << "Event occured" << std::endl;
 		i = 0;
 		for (i = 0; i < FD_SETSIZE; i++) // TO DO optimization ?
 		{
@@ -57,7 +58,7 @@ void	HttpWorker::run()
 			// if it is on a listening socket, create a new connection
 			if (listening[i])
 			{
-				std::cout << "New connection" << std::endl; // TO DO remove or change log
+				std::cerr << "New connection" << std::endl; // TO DO remove or change log
 				try
 				{
 					new_connection = new HttpConnection(*listening[i]);
@@ -75,7 +76,7 @@ void	HttpWorker::run()
 			// If it is a connection socket, do the job
 			else if (connections[i])
 			{
-				std::cout << "Event on connection" << std::endl;
+				// std::cout << "Event on connection" << std::endl;
 				FD_CLR(i, &read_fs);
 				// handle event with http Module
 				// char buff[408];
@@ -83,7 +84,7 @@ void	HttpWorker::run()
 				// {
 				// 	std::cout << buff << std::endl;
 				// }
-				std::cout << "ABOUT TO PARSE" << std::endl;
+				// std::cout << "ABOUT TO PARSE" << std::endl;
 				
 				try
 				{
@@ -93,15 +94,24 @@ void	HttpWorker::run()
 					
 					ConfigServer &ptr2 = _config->getServerList()[0];
 					HTTP method(socket, ptr2);
-					std::cout << "METHOD HAS BEEN CONSTRUCTED" << std::endl;		
+					// std::cerr << "METHOD HAS BEEN CONSTRUCTED" << std::endl;		
 
-					std::cout << "ABOUT TO CREATE RESPONSE" << std::endl;
+					// std::cerr << "ABOUT TO CREATE RESPONSE" << std::endl;
 					response = method.getResponse(); // TO DO make code more modulare and clean up names
 					responseSize = method.getResponseSize();
-					std::cout << "RESPONSE CREATED" << std::endl << std::endl;
-					std::cerr << response << std::endl;
+					// std::cerr << "RESPONSE CREATED" << std::endl << std::endl;
+					
+					// _testFILE += 1; // TEST
+					// char*	test; // TEST
+					// test = (char*)ft_calloc((ft_strlen("responses/") + ft_strlen(ft_itoa(_testFILE))), sizeof(char)); // TEST
+					// test = ft_strcpy(test, "responses/"); // TEST
+					// test = ft_strcat(test, ft_itoa(_testFILE)); // TEST
+					// int fd_response = open(test, O_RDWR | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR); // TEST
+					// write(fd_response, response, responseSize); // TEST
+					// free(test); // TEST
+					
 					connections[i]->write(response, responseSize); // TO DO ugly
-					std::cout << std::endl << "ENDING REQUEST" << std::endl;
+					// std::cerr << std::endl << "ENDING REQUEST" << std::endl;
 				}
 				catch(const HttpConnection::ConnectionClose& e)
 				{

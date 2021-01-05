@@ -7,6 +7,7 @@ char			*ft_memcat(char *dest, const char *src, size_t nb)
 	int		len_dest;
 
 	i = 0;
+	(void)nb;
 	len_dest = (int)ft_strlen((const char*)dest);
 	while (i < nb)
 	{

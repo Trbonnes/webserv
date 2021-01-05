@@ -15,12 +15,12 @@
 ConfigServer::ConfigServer() :
 _httpVersion("HTTP/1.1"),
 _serverSoftware("Server/2.0"),
-_putRoot("/home/user42/Documents/42Jobs/webserver/put_test/"),
+_putRoot("/home/pauline/webserver/put_test/"),
 _defaultClientBodySize(-1),
 _defaultType("text/plain"),
 _defaultCharset("utf-8"),
 _defaultAuth_basic(""),
-_defaultAuth_basic_user_file(""),
+_defaultAuth_basic_user_file("/home/pauline/webserver/HTTP/config/.htpasswd"),
 _defaultAutoindex(-1)
 {
 
@@ -263,7 +263,6 @@ std::string                 ConfigServer::getAuth_basic(std::string location)
             return (itBegin->second._auth_basic);
         itBegin++;
     }
-    std::cerr << "_defaultAuth_basic: " << _defaultAuth_basic << std::endl;
     return _defaultAuth_basic;
 }
 

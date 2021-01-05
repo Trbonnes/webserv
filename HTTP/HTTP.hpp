@@ -50,6 +50,7 @@ enum cgi_variables
     SERVER_PORT,
     SERVER_PROTOCOL,
     SERVER_SOFTWARE,
+    X_SECRET,
     NB_METAVARIABLES
 };
 
@@ -66,7 +67,7 @@ class   HTTP
     std::string                 _location;
     struct stat                 _stat;
     static const std::string    _base64_chars;
-    char                        *_cgi_env[18];
+    char                        *_cgi_env[NB_METAVARIABLES + 1];
 
     // headers
 
@@ -119,19 +120,20 @@ class   HTTP
     void            setDate(void);
     void            setAutoindex(void);
 
+    // AUTHORIZATION BASE64
     static inline
     bool            is_base64(unsigned char c);
     std::string     base64_decode(std::string const& encoded_string);
     std::string     base64_encode(unsigned char const* bytes_to_encode, unsigned int in_len);
 
+    // CGI
+    bool            cgi_fd_exist();
     void            cgi_metaVariables();
     void            cgi_exe();
+    void            cgi_parse();
     void            setEnv();
     int             is_good_exe(std::string exe);
     static bool     mypred(char val1, char val2);
-
-    // HEAD
-    void            head(void);
 
     // PUT
     void            put(void);
@@ -139,11 +141,8 @@ class   HTTP
     // DELETE
     void            del(void);
 
-    // RESPONSE
-    void            configureErrorFile(void);
-
     // ERRORS
-
+    void            configureErrorFile(void);
     int             checkRequestErrors(void);
 
     public:
@@ -152,7 +151,14 @@ class   HTTP
     ~HTTP();
 
     HTTP            &operator=(HTTP &rhs);
+
+    // RESPONSE
     char*           getResponse();
+    void            setFirstHeadersResponse(std::string &response);
+    void            setAllowMethodsResponse(std::string &response);
+    void            setOtherHeaders(std::string &response);
+    void            setResponseSize(std::string &response);
+    void            setBodyResponse(std::string &response);
     int             getResponseSize();
 };
 

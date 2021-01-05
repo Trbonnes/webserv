@@ -1,6 +1,16 @@
 #include "HTTP.hpp"
 #include "CGI.hpp"
 
+bool        HTTP::cgi_fd_exist()
+{
+    int     fd;
+
+    fd = openFile();
+    if (_statusCode == OK)
+        return true;
+    return false;
+}
+
 //** Check if the method is autorized for the CGI locations **
 int         HTTP::checkCGImethods(std::string method)
 {
@@ -29,32 +39,27 @@ void        HTTP::cgi_metaVariables()
     std::string str;
     size_t      query;
 
-    _cgi._auth_type = _socket.getAuthorization();
+    if (_socket.getAuthorization().compare("1")) // TO DO!!
+        _cgi._auth_type = _socket.getAuthorization(); 
     _cgi._content_length = _socket.getContentLength();
-    std::cerr << "SOCKET CONTENT LENGTH: " << _socket.getContentLength() << std::endl;
-    // _cgi._content_length = "100000000";
     _cgi._content_type = _socket.getContentType();
     _cgi._gateway_interface = "CGI/1.1";
     query = str.assign(_route).find('?', 0);
-    //_cgi._path_info = _config.getCGI_root(_location);
-    _cgi._path_info = "/directory/youpi.bla";
-    //_cgi._path_translated = _cgi._path_info;
-    _cgi._path_translated = "/YoupiBanane/youpi.bla";
+    _cgi._path_info = _socket.getRequestURI();
+    _cgi._path_translated = _route;
     if (query == str.npos)
        _cgi._query_string = str.assign(_route).erase(0, query);
     _cgi._remote_addr = "127.0.0.1"; // EN DUR! TO DO
     // _cgi._remote_addr = _socket.getRemoteAddr();
-    _cgi._remote_ident = "user"; // Default
+    _cgi._remote_ident = "login_user"; // Default
     _cgi._remote_user = "user"; // Default 
     _cgi._request_method = _socket.getMethod();
     _cgi._request_uri = _socket.getRequestURI();
-    _cgi._script_name = "/directory/youpi.bla";
-    //_cgi._script_name = _config.getCGI_root(_location);
+    _cgi._script_name = _config.getCGI_root(_location);
     _cgi._server_name = _config.getServerName()[0]; // TO DO quick fix
     _cgi._server_port = ft_itoa(_config.getPort()[0]); // TO DO fix getPort()
     _cgi._server_protocol = _config.getHttpVersion();
     _cgi._server_software = _config.getServerSoftware();
-    setEnv();
     return ;
 }
 
@@ -81,9 +86,11 @@ void        HTTP::setEnv()
     _cgi_env[SERVER_PROTOCOL] = ft_strdup(_cgi._server_protocol.insert(0, "SERVER_PROTOCOL=").c_str());
     _cgi_env[SERVER_SOFTWARE] = ft_strdup(_cgi._server_software.insert(0, "SERVER_SOFTWARE=").c_str());
     _cgi_env[NB_METAVARIABLES] = NULL;
-    int i = 0;
-    while (i < NB_METAVARIABLES)
-        printf("%s\n", _cgi_env[i++]);
+    if (_socket.getAuthorization().compare("1") == 0) // TO DO !!
+        _cgi_env[X_SECRET] = ft_strdup("HTTP_X_SECRET_HEADER_FOR_TEST=1");
+    // int i = 0; // TEST
+    // while (i < NB_METAVARIABLES) // TEST
+    //     printf("%s\n", _cgi_env[i++]); // TEST
 }
 
 // ** Verify if the extensions correspond to the config file (CGI) ** 
@@ -122,74 +129,72 @@ void        HTTP::cgi_exe()
 {
     int         pid;
     int         ret;
-    int         fd[2];
     int         status;
+    int         save_stdin;
+    int         save_stdout;
+    int         side_in[2];
+    int         side_out[2];
+    char        buf[2049];
     char*       args[2];
-    char        buf[2048];
-    int         mem;
     size_t      find;
 
-    ret = 0;
+    save_stdout = dup(STDOUT_FILENO);
+    save_stdin = dup(STDIN_FILENO);
+    ret = EXIT_SUCCESS;
     ft_bzero(args, sizeof(args));
     ft_bzero(buf, sizeof(args));
-    ft_bzero(fd, sizeof(fd));
-    pipe(fd);
+    ft_bzero(side_in, sizeof(side_in));
+    ft_bzero(side_out, sizeof(side_out));
+    pipe(side_in);
+    pipe(side_out);
+    dup2(side_in[SIDE_IN], STDOUT_FILENO);
     pid = fork();
     if (pid < 0)
         _statusCode = INTERNAL_SERVER_ERROR;
     else if (pid == 0)
     {
+        close(side_in[SIDE_IN]);
+        close(side_out[SIDE_OUT]);
+        dup2(side_in[SIDE_OUT], STDIN_FILENO);
+        dup2(side_out[SIDE_IN], STDOUT_FILENO);
         args[0] = ft_strdup(_config.getCGI_root(_location).c_str());
-        args[1] = NULL;
-        dup2(fd[SIDE_IN], STDOUT_FILENO);
-        dup2(fd[SIDE_OUT], STDIN_FILENO);
-        write(STDOUT_FILENO, _socket.getBody().c_str(), ft_atoi(_socket.getContentLength().c_str()));
         if ((ret = execve(args[0], args, _cgi_env)) == -1)
             exit(EXIT_FAILURE);
     }
     else
     {
+        close(side_out[SIDE_IN]);
+        close(side_in[SIDE_OUT]);
+        write(side_in[SIDE_IN], _socket.getBody().c_str(), ft_atoi(_socket.getContentLength().c_str()));
+        close(side_in[SIDE_IN]);
+        find = _cgiResponse.npos;
+        while ((ret = read(side_out[SIDE_OUT], buf, 2048)) > 0) {
+            _responseSize += ret;
+            buf[ret] = '\0';
+            _cgiResponse.append(buf);
+        }
+        close(side_out[SIDE_OUT]);
         waitpid(-1, &status, 0);
         if (WIFEXITED(status))
             ret = WEXITSTATUS(status);
-        close(fd[SIDE_IN]);
-        if (ret == EXIT_SUCCESS)
-        {
-            mem = 0;
-            find = _cgiResponse.npos;
-            while ((ret = read(fd[SIDE_OUT], buf, sizeof(buf))) != 0)
-            {
-                _responseSize += ret;
-                if (find == _cgiResponse.npos)
-                {
-                    _cgiResponse.append(buf);
-                    find = _cgiResponse.find("\r\n\r\n");
-                }
-                if (find != _cgiResponse.npos)
-                {
-                    if (mem == 0)
-                    {                   
-                        mem = _responseSize;
-                        _body = (char*)ft_calloc(mem, sizeof(char));
-                        _contentLength = 0;
-                        _contentLength += _cgiResponse.length() - find - 4;
-                        _body = ft_memcat(_body, _cgiResponse.substr(find + 4, _cgiResponse.length()).c_str(), _cgiResponse.length() - find - 4);
-                    }
-                    else if (mem < _responseSize)
-                    {
-                       mem *= 2;
-                        _body = (char*)ft_realloc(_body, sizeof(char) * mem);
-                        _contentLength += ret;
-                        _body = ft_memcat(_body, buf, ret);
-                    }
-                    _cgiResponse.erase(find + 2, _cgiResponse.length());
-                }
-            }
-            close(fd[SIDE_OUT]);
-        }
-        else
+        if (ret != EXIT_SUCCESS)
             _statusCode = BAD_GATEWAY;
     }
+    dup2(save_stdout, STDOUT_FILENO);
+    dup2(save_stdin, STDIN_FILENO);
+}
+
+void        HTTP::cgi_parse()
+{
+    size_t      find;
+
+    find = _cgiResponse.find("\r\n\r\n");
+    if (!(_body = (char*)ft_calloc(_responseSize - find - 4 + 1, sizeof(char))))
+        Log::debug("malloc error");
+    _body = ft_memcat(_body, _cgiResponse.substr(find + 4, _responseSize).c_str(), _responseSize - find - 4);
+    _body[_responseSize - find - 4] = '\0';
+    _contentLength = ft_strlen(_body);
+    _cgiResponse.erase(find + 2, _cgiResponse.length());
     find = _cgiResponse.find("Status: ");
     _statusCode = ft_atoi(_cgiResponse.substr(find + ft_strlen("Status: "), find + ft_strlen("Status: ") + 3).c_str());
     find = _cgiResponse.find("Content-Type: ");
