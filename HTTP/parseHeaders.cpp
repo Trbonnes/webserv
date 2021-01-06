@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parseHeaders.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: trbonnes <trbonnes@student.42.fr>          +#+  +:+       +#+        */
+/*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/30 18:55:18 by trbonnes          #+#    #+#             */
-/*   Updated: 2021/01/06 09:27:03 by trbonnes         ###   ########.fr       */
+/*   Updated: 2021/01/06 10:35:30 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -153,9 +153,9 @@ void ParseUserAgent(Socket *socket, std::string request, size_t pos) {
 	socket->setUserAgent(ParseStdHeaders(request, pos));
 }
 
-void	ParseXSecret(Socket *socket, std::string request, size_t pos) {
+void ParseXSecret(Socket *socket, std::string request, size_t pos) {
 	std::string s;
-
+	pos++;
 	while (request[pos] && request[pos] != '\n') {
 		s.push_back(request[pos++]);
 	}
