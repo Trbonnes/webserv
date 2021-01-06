@@ -163,7 +163,7 @@ void        HTTP::callMethod(std::string method)
         put();
     else if (method.compare("DELETE") == 0)
         del();
-    else if (method.compare("POST") == 0)
+    else
     {
         _contentLength = 2;
         _body = ft_strdup("OK");

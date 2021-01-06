@@ -336,7 +336,7 @@ Socket	*httpRequestParser(int fd) {
 	httpRequestParseBody(request, socket);
 	// Log::debug("\033[0;32mBody Parsed");
 	request.clear();
-	if (_test == 18) // TO DO! QUICK FIX
-		socket->setAuthorization("1"); // TO DO! QUICK FIX
+	// if (_test == 18) // TO DO! QUICK FIX
+	// 	socket->setAuthorization("1"); // TO DO! QUICK FIX
 	return socket;
 }

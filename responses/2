@@ -1,0 +1,14 @@
+HTTP/1.1 405 Method Not Allowed
+Server: Server/2.0
+Content-Type: text/html
+Content-Length: 80
+Allow: GET 
+
+<!DOCTYPE html>
+<html>
+<body>
+
+<h1>405 Method Not Allowed</h1>
+
+</body>
+</html>

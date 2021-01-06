@@ -17,10 +17,6 @@ _httpVersion("HTTP/1.1"),
 _serverSoftware("Server/2.0"),
 _putRoot("/home/pauline/webserver/put_test/"),
 _defaultClientBodySize(-1),
-_defaultType("text/plain"),
-_defaultCharset("utf-8"),
-_defaultAuth_basic(""),
-_defaultAuth_basic_user_file("/home/pauline/webserver/HTTP/config/.htpasswd"),
 _defaultAutoindex(-1)
 {
 
