@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   httpRequestParser.cpp                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: trbonnes <trbonnes@student.42.fr>          +#+  +:+       +#+        */
+/*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/30 15:45:46 by trbonnes          #+#    #+#             */
-/*   Updated: 2021/01/06 10:07:12 by trbonnes         ###   ########.fr       */
+/*   Updated: 2021/01/06 10:09:06 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -208,7 +208,7 @@ int		httpRequestParseHeaders(std::string request, Socket *socket) {
 		"\nHost",
 		"\nReferer",
 		"\nTransfer-Encoding",
-		"\nUser-Agen",
+		"\nUser-Agent",
 		"\nx_secret"
 	};
 	void (*f[])(Socket*, std::string, size_t) = {
