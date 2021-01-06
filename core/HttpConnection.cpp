@@ -22,19 +22,21 @@ void HttpConnection::accept() {
 
 	size = sizeof(_client_name);
 	_sock = ::accept( _listen_sock.getSock(), &_client_name, &size);
-	// TO DO throw error if accept fails
-}
-
-
-void HttpConnection::read() {
-    
-	char buff[1024]; // TO DO put buffer in class attribute	
-	
-	memset(buff, 0, 1024);
-	recv(_sock, buff, 1024, 0);
-	std::cout << buff << std::endl;
+	if (_sock == -1)
+		throw HttpConnection::AcceptFailed();
 }
 
 int HttpConnection::getPort() {
 	return _listen_sock.getPort();
+}
+
+
+const char * HttpConnection::ConnectionClose::what () const throw ()
+{
+	return "Connection has been closed";
+}
+
+const char * HttpConnection::AcceptFailed::what () const throw ()
+{
+	return strerror(errno); // Maybe add Port or something
 }

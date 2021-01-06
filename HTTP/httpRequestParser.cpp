@@ -6,7 +6,7 @@
 /*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/30 15:45:46 by trbonnes          #+#    #+#             */
-/*   Updated: 2021/01/06 10:09:06 by user42           ###   ########.fr       */
+/*   Updated: 2021/01/06 14:15:39 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,19 +25,12 @@ int		httpRequestParseChunckedBody(std::string request, Socket *socket, size_t po
 	if (pos == s.npos) {
 		char	c[8192];
 		int		ret;
-		// int 	debug = 0;
 
 		// Log::debug("\033[0;32mRead in chuncked body");
 		while ((pos = s.find("\n0\r\n")) >= s.npos) {
 			ft_bzero(c, 8192);
 			ret = read(socket->getFd(), c, 8192);
-			// debug += ret; // TEST
-			// Log::debug("\033[0;32mread in chuncked ret: ");
-			// Log::debug(debug);
-			// Log::debug(ret);
 			s.append(c, ret);
-			// Log::debug("s:");
-			// Log::debug(s);
 		}
 		// Log::debug("\033[0;32mRead over");
 		// Log::debug(debug);
@@ -48,12 +41,6 @@ int		httpRequestParseChunckedBody(std::string request, Socket *socket, size_t po
 	try {
 		chunkSize = 0;
 		pos = 0;
-		// Log::debug("s:");
-		// Log::debug(s);
-		// pos = s.find("\r\n") - 1;
-		// while (pos > 0) {
-		// 	pos--;
-		// }
 		while (s[pos] && s[pos] != '\r') {
 			convert.append(s.substr(pos, 1));
 			pos++;
@@ -68,17 +55,10 @@ int		httpRequestParseChunckedBody(std::string request, Socket *socket, size_t po
 			s.erase(0, convert.length() + 2 + chunkSize + 2);
 			convert.clear();
 			pos = 0;
-			// pos = s.find("\r\n") - 1;
-			// Log::debug("pos found");
-			// while (pos > 0) {
-			// 	pos--;
-			// }
-			// Log::debug("lol");
 			while (s[pos] && s[pos] != '\r') {
 				convert.append(s.substr(pos, 1));
 				pos++;
 			}
-			// Log::debug("lolilol");
 			chunkSize = strtol(convert.c_str(), NULL, 16);
 			// Log::debug("chunck Size: ");
 			// Log::debug(chunkSize);
@@ -143,7 +123,6 @@ int		httpRequestParseBody(std::string request, Socket *socket) {
 			if (body.size() > contentLength)
 				body.erase(contentLength, body.npos);
 			socket->setBody(body);
-			// Log::debug(body);
 		}
 	}
 	catch (std::exception &e) {
@@ -209,7 +188,7 @@ int		httpRequestParseHeaders(std::string request, Socket *socket) {
 		"\nReferer",
 		"\nTransfer-Encoding",
 		"\nUser-Agent",
-		"\nx_secret"
+		"\nX-Secret"
 	};
 	void (*f[])(Socket*, std::string, size_t) = {
 		&ParseAcceptCharset,
@@ -297,37 +276,24 @@ Socket	*httpRequestParser(int fd) {
 	char	c[8192];
 	int		ret;
 	std::string request;
-	// size_t debug = 0;
 
 	// Log::debug("\033[0;32mRequestParsing Reading");
 
-	_test += 1; // TEST
+	//_test += 1; // TEST
 	// std::cerr << _test << std::endl; // TEST
-	// char*	test; // TEST
-	// test = (char*)ft_calloc((ft_strlen("requests/") + ft_strlen(ft_itoa(_test))), sizeof(char)); // TEST
-	// test = ft_strcpy(test, "requests/"); // TEST
-	// test = ft_strcat(test, ft_itoa(_test)); // TEST
-	// int fd_request = open(test, O_RDWR | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR); // TEST
 
 	while (request.find("\r\n\r\n") >= request.npos && request.find("\n\n") >= request.npos)
 	{
 		ft_bzero(c, 8192);
 		ret = read(fd, c, 8192);
-		//write(fd_request, c, ret); // TEST
-		//debug += ret; // TEST
 		if (ret == 0)
 			throw HttpConnection::ConnectionClose();
-		//Log::debug("\033[0;32mret: ");
-		//Log::debug(ret);
-		//Log::debug(debug);
 		if (ret == -1)
 			throw Socket::BadReadException();
 		request.append(c, ret);
 	}
-	// free(test); // TEST
 	// Log::debug("\033[0;32mRequestParsing Reading End");
-	// Log::debug(debug);
-	// Log::debug(request.c_str());
+	Log::debug(request.c_str());
 	socket = new Socket(fd);
 	// Log::debug("\033[0;32mRequestParsing Creation");
 	httpRequestParseRequestLine(request, socket);
@@ -338,5 +304,6 @@ Socket	*httpRequestParser(int fd) {
 	request.clear();
 	// if (_test == 18) // TO DO! QUICK FIX
 	// 	socket->setAuthorization("1"); // TO DO! QUICK FIX
+	std::cerr << "X-Secret: " << socket->getXSecret() << std::endl << std::endl;
 	return socket;
 }

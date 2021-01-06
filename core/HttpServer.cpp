@@ -3,13 +3,14 @@
 
 HttpServer::HttpServer() {
     _config = NULL;
-    _workers_pid = NULL;
+    _manager = NULL;
+	_config_path = "config/test.conf";
 }
 
 HttpServer &HttpServer::operator=(const HttpServer &s)
 {
 	_config = s._config;
-	_workers_pid = s._workers_pid;
+	_manager = s._manager;
 	_listen_sockset = s._listen_sockset;
 	return *this;
 }
@@ -17,8 +18,8 @@ HttpServer &HttpServer::operator=(const HttpServer &s)
 HttpServer::~HttpServer() {
 	if (_config)
 		delete _config;
-	if (_workers_pid)
-		delete[] _workers_pid;
+	if (_manager)
+		delete _manager;
 }
 
 void HttpServer::run()
@@ -59,17 +60,15 @@ void HttpServer::run()
 
 void HttpServer::initConf() {
 	std::cout << "Initializing configuration" << std::endl;
-
-	int fd = open("config/webserv.conf", O_RDWR); // for test purposes
-
-
-
-	_config = 0;
-	try {
+	_config = NULL;
+	try
+	{
+		int fd = open(_config_path.c_str(), O_RDONLY);
+		if (fd == -1)
+			throw OpenConfigfileFail();
 		_config = configFileParser(fd);
-		std::cout << "Workers: " << _config->getWorker() << std::endl;
-		std::cout << "Worker connections: " << _config->getWorkerConnections() << std::endl;
-
+		_manager = new ProcessManager();
+		close(fd);
 	}
 	catch (std::exception const &e) {
 		std::cout << "Exception: " << e.what() << std::endl;
@@ -82,48 +81,56 @@ void HttpServer::initConf() {
 void HttpServer::initListenSocket() // TO DO optimization
 {
 	std::cout << "Initializing listening sockets" << std::endl;
-	std::map<std::string, Location, Compare<std::string> >::iterator itl;
-	std::map<std::string, Location, Compare<std::string> > locations;
 	std::vector<ConfigServer> servers;
 	std::vector<int> ports;
 
 	servers = _config->getServerList();
 	// Initialize listening sockets that will be shared between workers
-	for (size_t i = 0; i < servers.size(); i++)
+	for (std::vector<ConfigServer>::iterator it = servers.begin(); it < servers.end(); it++)
 	{
-		ports = servers[i].getPort();
+		ports = it->getPort();
 		for (size_t j = 0; j < ports.size(); j++)
 			_listen_sockset.push_back(ListenSocket(ports[j])); // TO DO Check port already in use / Fix getPort()
 	}
 }
 
-//Define numver of workers
-
 void			HttpServer::masterLifecycle()
 {
-	int status;
-	int nbworkers = _config->getWorker();
-
 	std::cout << "Master is entering is main lifecycle" << std::endl;
-	for (int i = 0; i < nbworkers; i++)
-	{
-		wait(&status);
-	}
+	_manager->manage();
 	// TO DO add process management / reload mechanics
 }
 
-
 void HttpServer::initWorkers() {
 
-	int nbworkers;
 	HttpWorker worker(_listen_sockset, _config);
-	
-	nbworkers = _config->getWorker();
-	_workers_pid = new pid_t[nbworkers];
-    // std::cout << "Initializing workers" << std::endl;
-	for (int i = 0; i < nbworkers; i++)
+	int nbworkers = _config->getWorker();
+
+	if (nbworkers < WORKER_MIN || nbworkers > WORKER_MAX)
+		nbworkers = WORKER_MIN;
+    std::cout << "Initializing " << nbworkers << " workers" << std::endl;
+	try
 	{
-		_workers_pid[i] = ProcessManager::launchProcess(worker); //TO DO rework the process manager to hold the process pid in the class
+		_manager->run(worker, nbworkers);
 	}
-	// Log::debug("I AM HERE");
+	catch(const std::exception& e)
+	{
+		std::cerr << "Cannot instantiate workers: " << e.what() << '\n';
+		throw HttpServer::WorkersInitException();
+	}
+}
+
+const char * HttpServer::WorkersInitException::what () const throw ()
+{
+    		return "Workers failed to initialize"; 
+}
+
+const char * HttpServer::OpenConfigfileFail	::what () const throw ()
+{
+    		return strerror(errno);
+}
+
+void			HttpServer::setConfigPath(std::string &path)
+{
+	_config_path = path;
 }

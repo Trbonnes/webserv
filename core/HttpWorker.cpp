@@ -9,6 +9,13 @@ HttpWorker::HttpWorker(std::vector<ListenSocket> &listen, Config* config) : Runn
     _listen_socket = listen;
 }
 
+HttpWorker::HttpWorker(const HttpWorker &w) : Runnable(w)
+{
+	std::cout << "Worker Initializing" << std::endl;
+	_config = w._config;
+    _listen_socket = w._listen_socket;
+}
+
 HttpWorker::~HttpWorker() {
 }
 
@@ -27,10 +34,10 @@ void	HttpWorker::run()
 	ListenSocket* 	listening[FD_SETSIZE]; // array of pointers
 
 	std::cout << "Running a worker" << std::endl;
-	// Important zeroing of the values
+	// Important zeroing-out of the arrays
 	ft_bzero(connections, FD_SETSIZE * sizeof(ListenSocket*)); 
 	ft_bzero(listening, FD_SETSIZE * sizeof(ListenSocket*));
-	// Transforming list in fdset and Listensocket hashmap (not sure about this name)
+	// Transforming list in fdset and ListenSocket in an array we can access with i directly without looping through the fdset
 	FD_ZERO(&active_fs);
 	for (unsigned int i = 0; i < _listen_socket.size(); i++)
 	{
@@ -43,14 +50,14 @@ void	HttpWorker::run()
 		//read fs is going to be modified by select call, so we must reattribute the set there
 		read_fs = active_fs;
 		// Waiting for an event on listen socket
-		if (select(FD_SETSIZE, &read_fs, NULL, NULL, NULL) == -1) // TO DO check if 0
+		if (select(FD_SETSIZE, &read_fs, NULL, NULL, NULL) == -1)
 		{
 			std::cerr << "Select error " << strerror(errno) << std::endl;
 			continue; // TO DO throw something ?
 		}
 		// std::cout << "Event occured" << std::endl;
 		i = 0;
-		for (i = 0; i < FD_SETSIZE; i++) // TO DO optimization ?
+		for (i = 0; i < FD_SETSIZE; i++)
 		{
 			// if the fd is not set then there's no event on that fd, next
 			if (!FD_ISSET(i, &read_fs))
@@ -78,40 +85,15 @@ void	HttpWorker::run()
 			{
 				// std::cout << "Event on connection" << std::endl;
 				FD_CLR(i, &read_fs);
-				// handle event with http Module
-				// char buff[408];
-				// while (read(connections[i]->getSock(), buff, 408))
-				// {
-				// 	std::cout << buff << std::endl;
-				// }
-				// std::cout << "ABOUT TO PARSE" << std::endl;
-				
 				try
 				{
 					Socket *socket = httpRequestParser(connections[i]->getSock()); // TO DO why would it return a socket class and not an httpRequest object ? 
-					// ConfigServer *ptr = _config->getServerUnit(connections[i]->getSock(), socket->getHost()); // TO DO check if null ?
-					// std::cout << "PASSED THIS POINT, value of ptr : " << ptr << socket->getHost() << std::endl;
-					
 					ConfigServer &ptr2 = _config->getServerList()[0];
 					HTTP method(socket, ptr2);
-					// std::cerr << "METHOD HAS BEEN CONSTRUCTED" << std::endl;		
 
-					// std::cerr << "ABOUT TO CREATE RESPONSE" << std::endl;
 					response = method.getResponse(); // TO DO make code more modulare and clean up names
-					responseSize = method.getResponseSize();
-					// std::cerr << "RESPONSE CREATED" << std::endl << std::endl;
-					
-					// _testFILE += 1; // TEST
-					// char*	test; // TEST
-					// test = (char*)ft_calloc((ft_strlen("responses/") + ft_strlen(ft_itoa(_testFILE))), sizeof(char)); // TEST
-					// test = ft_strcpy(test, "responses/"); // TEST
-					// test = ft_strcat(test, ft_itoa(_testFILE)); // TEST
-					// int fd_response = open(test, O_RDWR | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR); // TEST
-					// write(fd_response, response, responseSize); // TEST
-					// free(test); // TEST
-					
+					responseSize = method.getResponseSize();					
 					connections[i]->write(response, responseSize); // TO DO ugly
-					// std::cerr << std::endl << "ENDING REQUEST" << std::endl;
 				}
 				catch(const HttpConnection::ConnectionClose& e)
 				{
@@ -127,14 +109,13 @@ void	HttpWorker::run()
 					std::cerr << e.what() << '\n';
 				}
 			}
-			else
-			{
-				// TO DO or not ?
-			}
-			// TO DO wero it just in case ?
-			FD_ZERO(&read_fs);
 		}
 	// TO DO timeout for http
 	}
 	// TO DO delete connections
+}
+
+Runnable* HttpWorker::clone() const
+{
+	return new HttpWorker(*this);
 }
