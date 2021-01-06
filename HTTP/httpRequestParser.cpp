@@ -269,7 +269,6 @@ int		httpRequestParseRequestLine(std::string request, Socket *socket) {
 #include <sys/stat.h>
 #include <fcntl.h>
 
-int _test = 0; // TEST
 Socket	*httpRequestParser(int fd) {
 
 	Socket *socket;
@@ -278,9 +277,6 @@ Socket	*httpRequestParser(int fd) {
 	std::string request;
 
 	// Log::debug("\033[0;32mRequestParsing Reading");
-
-	//_test += 1; // TEST
-	// std::cerr << _test << std::endl; // TEST
 
 	while (request.find("\r\n\r\n") >= request.npos && request.find("\n\n") >= request.npos)
 	{
@@ -293,7 +289,7 @@ Socket	*httpRequestParser(int fd) {
 		request.append(c, ret);
 	}
 	// Log::debug("\033[0;32mRequestParsing Reading End");
-	Log::debug(request.c_str());
+	// Log::debug(request.c_str());
 	socket = new Socket(fd);
 	// Log::debug("\033[0;32mRequestParsing Creation");
 	httpRequestParseRequestLine(request, socket);
@@ -302,8 +298,5 @@ Socket	*httpRequestParser(int fd) {
 	httpRequestParseBody(request, socket);
 	// Log::debug("\033[0;32mBody Parsed");
 	request.clear();
-	// if (_test == 18) // TO DO! QUICK FIX
-	// 	socket->setAuthorization("1"); // TO DO! QUICK FIX
-	std::cerr << "X-Secret: " << socket->getXSecret() << std::endl << std::endl;
 	return socket;
 }
