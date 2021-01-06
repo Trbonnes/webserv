@@ -6,7 +6,7 @@
 /*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/09 15:13:35 by trbonnes          #+#    #+#             */
-/*   Updated: 2021/01/06 11:50:12 by user42           ###   ########.fr       */
+/*   Updated: 2021/01/06 14:18:45 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -491,9 +491,9 @@ void					ConfigServer::setErrorRoot(std::string root) {
 }
 
 void                    ConfigServer::setErrorPages(int error, std::string page) {
-    _errorPages.insert(std::pair<int, std::string>(error, page)); // TO DO previous in C++11 were emplace, is it still daijobu ?
+    _errorPages.insert(std::pair<int, std::string>(error, page));
 }
 
 void                    ConfigServer::insertLocation(std::string s, Location location) {
-    _locationList.insert(std::pair<std::string, Location>(s, location)); // TO DO previous in C++11 were emplace, is it still daijobu ?
+    _locationList.insert(std::pair<std::string, Location>(s, location));
 }
