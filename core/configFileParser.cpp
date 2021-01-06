@@ -616,7 +616,7 @@ Config *configFileParser(int fd) {
 	}
 	catch(const std::exception& e)
 	{
-		std::cerr << e.what() << '\n';
+		std::cerr << "Error while parsing : " << e.what() << '\n';
 		delete config;
 		throw Config::InvalidConfigException();
 	}

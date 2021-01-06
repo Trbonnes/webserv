@@ -21,7 +21,7 @@
 #include <string>
 
 
-#define WORKER_MAX 30 // TO DO is it un peu bourrin ?
+#define WORKER_MAX 128 // TO DO is it un peu bourrin ?
 #define WORKER_MIN 1
 
 class HttpServer

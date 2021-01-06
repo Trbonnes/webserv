@@ -6,6 +6,7 @@ HttpConnection::HttpConnection(ListenSocket& listen_sock) : _listen_sock(listen_
 
 HttpConnection::~HttpConnection()
 {
+	close(_sock);
 }
 
 void HttpConnection::write(char *data, size_t size) {

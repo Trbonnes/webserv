@@ -55,7 +55,7 @@ void	HttpWorker::run()
 			std::cerr << "Select error " << strerror(errno) << std::endl;
 			continue; // TO DO throw something ?
 		}
-		std::cout << "Event occured"<< std::endl;
+		// std::cout << "Event occured"<< std::endl;
 		i = 0;
 		for (i = 0; i < FD_SETSIZE; i++)
 		{
@@ -65,7 +65,7 @@ void	HttpWorker::run()
 			// if it is on a listening socket, create a new connection
 			if (listening[i])
 			{
-				std::cerr << "Locked and New connection" << std::endl; // TO DO remove or change log
+				// std::cerr << "Locked and New connection" << std::endl; // TO DO remove or change log
 				try
 				{
 					new_connection = new HttpConnection(*listening[i]);
@@ -73,9 +73,8 @@ void	HttpWorker::run()
 					connections[new_connection->getSock()] = new_connection;
 					FD_SET(new_connection->getSock(), &active_fs);
 				}
-				catch(const std::exception& e)
+				catch(const HttpConnection::AcceptFailed& e)
 				{
-					std::cerr << e.what() << '\n';
 					delete new_connection;
 				}
 				// std::cout << "Loop"<< std::endl;
@@ -83,7 +82,7 @@ void	HttpWorker::run()
 			// If it is a connection socket, do the job
 			else if (connections[i])
 			{
-				std::cout << "Event on connection" << std::endl;
+				// std::cout << "Event on connection" << std::endl;
 				FD_CLR(i, &read_fs);
 				try
 				{
@@ -105,8 +104,7 @@ void	HttpWorker::run()
 				}
 				catch(const std::exception& e)
 				{
-					std::cerr << "errno: ";
-					std::cerr << e.what() << '\n';
+					std::cerr << "Other connexion error :" << e.what() << '\n';
 				}
 			}
 		}

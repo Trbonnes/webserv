@@ -55,7 +55,7 @@ void ProcessManager::run(Runnable &proc, unsigned int n = 1)
 			}
 			catch(const std::exception& e)
 			{
-				std::cerr << e.what() << '\n';
+				std::cerr << "Encountered failure while running process" << e.what() << '\n';
 			}	
 			delete cpy;
 		}
