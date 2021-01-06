@@ -2,25 +2,24 @@
 
 
 //TO DO The runnable arguments might depend from the configuration file
-HttpWorker::HttpWorker(std::vector<ListenSocket> &listen, Config* config, pthread_mutex_t *accept_mutex) : Runnable(1, 1)
+HttpWorker::HttpWorker(std::vector<ListenSocket> &listen, Config* config) : Runnable(1, 1)
 {
 	std::cout << "Worker Initializing" << std::endl;
 	_config = config;
     _listen_socket = listen;
-	_accept_mutex = accept_mutex;
 }
 
 HttpWorker::HttpWorker(const HttpWorker &w) : Runnable(w)
 {
 	std::cout << "Worker Initializing" << std::endl;
 	_config = w._config;
-	_accept_mutex = w._accept_mutex;
     _listen_socket = w._listen_socket;
 }
 
 HttpWorker::~HttpWorker() {
 }
 
+int _testFILE = 0; // TEST
 
 // TO DO Check config var regarding max connections and max port/server block
 void	HttpWorker::run()
@@ -53,7 +52,7 @@ void	HttpWorker::run()
 		// Waiting for an event on listen socket
 		if (select(FD_SETSIZE, &read_fs, NULL, NULL, NULL) == -1)
 		{
-			std::cout << "Select error " << strerror(errno) << std::endl;
+			std::cerr << "Select error " << strerror(errno) << std::endl;
 			continue; // TO DO throw something ?
 		}
 		std::cout << "Event occured"<< std::endl;
@@ -66,23 +65,20 @@ void	HttpWorker::run()
 			// if it is on a listening socket, create a new connection
 			if (listening[i])
 			{
-				std::cout << "New connection" << std::endl; // TO DO remove or change log
+				std::cerr << "Locked and New connection" << std::endl; // TO DO remove or change log
 				try
 				{
-					pthread_mutex_lock(_accept_mutex);
 					new_connection = new HttpConnection(*listening[i]);
 					new_connection->accept();
 					connections[new_connection->getSock()] = new_connection;
 					FD_SET(new_connection->getSock(), &active_fs);
-					pthread_mutex_unlock(_accept_mutex);
 				}
 				catch(const std::exception& e)
 				{
 					std::cerr << e.what() << '\n';
-					pthread_mutex_unlock(_accept_mutex);
 					delete new_connection;
 				}
-				
+				// std::cout << "Loop"<< std::endl;
 			}
 			// If it is a connection socket, do the job
 			else if (connections[i])
@@ -94,13 +90,10 @@ void	HttpWorker::run()
 					Socket *socket = httpRequestParser(connections[i]->getSock()); // TO DO why would it return a socket class and not an httpRequest object ? 
 					ConfigServer &ptr2 = _config->getServerList()[0];
 					HTTP method(socket, ptr2);
-					std::cout << "ABOUT TO CREATE RESPONSE" << std::endl;
+
 					response = method.getResponse(); // TO DO make code more modulare and clean up names
-					responseSize = method.getResponseSize();
-					std::cout << "RESPONSE CREATED" << std::endl << std::endl;
-					std::cerr << response << std::endl;
+					responseSize = method.getResponseSize();					
 					connections[i]->write(response, responseSize); // TO DO ugly
-					std::cout << std::endl << "ENDING REQUEST" << std::endl;
 				}
 				catch(const HttpConnection::ConnectionClose& e)
 				{

@@ -6,7 +6,7 @@
 /*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/09 15:13:35 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/12/09 16:10:38 by user42           ###   ########.fr       */
+/*   Updated: 2021/01/06 14:18:45 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,10 +15,12 @@
 ConfigServer::ConfigServer() :
 _httpVersion("HTTP/1.1"),
 _serverSoftware("Server/2.0"),
-_putRoot("/home/pauline/webserver/"),
+_putRoot("/home/pauline/webserver/put_test/"),
 _defaultClientBodySize(-1),
 _defaultType("text/plain"),
 _defaultCharset("utf-8"),
+_defaultAuth_basic(""),
+_defaultAuth_basic_user_file("/home/pauline/webserver/HTTP/config/.htpasswd"),
 _defaultAutoindex(-1)
 {
 
@@ -118,12 +120,19 @@ std::string             ConfigServer::getLocation(std::string uri)
 {
     std::map<std::string, Location, Compare<std::string> >::iterator itBegin;
     std::map<std::string, Location, Compare<std::string> >::iterator itEnd;
+    std::string location;
+    size_t      length;
 
     itBegin = _locationList.begin();
     itEnd = _locationList.end();
     while (itBegin != itEnd)
     {
-        if (uri.find(itBegin->first) != std::string::npos)
+        length = itBegin->first.length();
+        if (itBegin->first[length - 1] == '*')
+            location = itBegin->first.substr(0, length - 1);
+        else
+            location = itBegin->first;        
+        if (uri.find(location) != std::string::npos)
             return (itBegin->first);
         itBegin++;
     }
@@ -254,7 +263,7 @@ std::string                 ConfigServer::getAuth_basic(std::string location)
             return (itBegin->second._auth_basic);
         itBegin++;
     }
-    return _defaultAuth_basic;   
+    return _defaultAuth_basic;
 }
 
 std::string                 ConfigServer::getAuth_basic_user_file(std::string location)
@@ -280,8 +289,8 @@ int                 ConfigServer::getAutoindex(std::string location)
 
     itBegin = _locationList.begin();
     itEnd = _locationList.end();
-    if (location.compare("/directory/") == 0) // QUICK FIX!
-        return 0;
+    // if (location.compare("/directory/") == 0) // QUICK FIX!
+        // return 0;
     while (itBegin != itEnd)
     {
         if (location.compare(itBegin->first) == 0 && itBegin->second._autoindex != -1)
@@ -332,7 +341,7 @@ std::string             ConfigServer::getCGI_root(std::string location)
     itEnd = _locationList.end();
     while (itBegin != itEnd)
     {
-        if (location.compare(itBegin->first) == 0)
+        if (location.compare(itBegin->first) == 0 && itBegin->second._cgi_root.compare(""))
             return (itBegin->second._cgi_root);
         itBegin++;
     }
@@ -468,14 +477,23 @@ void                    ConfigServer::setAllow(std::vector<std::string> allow) {
     _defaultAllow = allow;
 }
 
+
+void					ConfigServer::setAuth_basic(std::string auth) {
+	_defaultAuth_basic = auth;
+}
+
+void					ConfigServer::setAuth_basic_user_file(std::string user_file) {
+	_defaultAuth_basic_user_file = user_file;
+}
+
 void					ConfigServer::setErrorRoot(std::string root) {
 	_errorFilesRoot = root;
 }
 
 void                    ConfigServer::setErrorPages(int error, std::string page) {
-    _errorPages.insert(std::pair<int, std::string>(error, page)); // TO DO previous in C++11 were emplace, is it still daijobu ?
+    _errorPages.insert(std::pair<int, std::string>(error, page));
 }
 
 void                    ConfigServer::insertLocation(std::string s, Location location) {
-    _locationList.insert(std::pair<std::string, Location>(s, location)); // TO DO previous in C++11 were emplace, is it still daijobu ?
+    _locationList.insert(std::pair<std::string, Location>(s, location));
 }

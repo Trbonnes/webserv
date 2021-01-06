@@ -25,8 +25,10 @@ _contentType(""),
 _charset(""),
 _retryAfter(""),
 _transferEncoding(""),
-_body(),
-_response() {}
+_body(NULL),
+_cgiResponse(),
+_response(),
+_responseSize(0) {}
 
 HTTP::HTTP(Socket *socket, ConfigServer &config) :
 _socket(*socket),
@@ -49,8 +51,10 @@ _contentType(""),
 _charset(""),
 _retryAfter(""),
 _transferEncoding(""),
-_body(),
-_response()
+_body(NULL),
+_cgiResponse(),
+_response(),
+_responseSize(0)
 {
     size_t      extension;
     std::string str;
@@ -60,7 +64,7 @@ _response()
         return ;
     _uri = _socket.getRequestURI();
     setLocation();
-    if (_config.getClientBodySize(_location) != -1 && (int)_socket.getBody().length() > _config.getClientBodySize(_location)) // TO DO quick fix
+    if (_config.getClientBodySize(_location) != -1 && ft_atoi(_socket.getContentLength().c_str()) > _config.getClientBodySize(_location)) // TO DO quick fix
     {
         _statusCode = REQUEST_ENTITY_TOO_LARGE;
         return ;
@@ -79,7 +83,9 @@ _response()
     if (is_good_exe(str.assign(_route).erase(0, extension + 1)) && checkCGImethods(_socket.getMethod()))
     {
         cgi_metaVariables();
+        setEnv();
         cgi_exe();
+        cgi_parse();
         setDate();
     }
     else if (checkAllowMethods(_socket.getMethod()))
@@ -107,6 +113,9 @@ HTTP::HTTP(HTTP &copy)
     _retryAfter = copy._retryAfter;
     _transferEncoding = copy._transferEncoding;
     _body = ft_strdup(copy._body);
+    _cgiResponse = copy._cgiResponse;
+    _response = ft_strdup(copy._response);
+    _responseSize = copy._responseSize;
 }
 
 HTTP::~HTTP()
@@ -139,10 +148,13 @@ HTTP     &HTTP::operator=(HTTP &rhs)
     _retryAfter = rhs._retryAfter;
     _transferEncoding = rhs._transferEncoding;
     _body = ft_strdup(rhs._body);
+    _cgiResponse = rhs._cgiResponse;
+    _response = ft_strdup(rhs._response);
+    _responseSize = rhs._responseSize;
     return *this;
 }
 
-//** Call the non CGI methods, GET, HEAD and PUT / OPTIONS is managed in a different way **  //
+//** Call the non CGI methods, GET, HEAD, PUT, DELETE & (POST) / OPTIONS is managed in a different way **  //
 void        HTTP::callMethod(std::string method)
 {
     if (method.compare("GET") == 0 || method.compare("HEAD") == 0)
@@ -151,6 +163,11 @@ void        HTTP::callMethod(std::string method)
         put();
     else if (method.compare("DELETE") == 0)
         del();
+    else if (method.compare("POST") == 0)
+    {
+        _contentLength = 2;
+        _body = ft_strdup("OK");
+    }
 }
 
 //** Check request errors **
@@ -186,7 +203,7 @@ int         HTTP::checkAllowMethods(std::string method)
 //** Absolute location route for the server **
 void        HTTP::setLocation()
 {
-  _location = _config.getLocation(_uri);
+    _location = _config.getLocation(_uri);
 }
 
 //** Replace URI by the location **
@@ -209,11 +226,8 @@ int         HTTP::openFile()
 
     fd = -1;
     stat(_route.c_str(), &file);
-    if (S_ISREG(file.st_mode))
-    {
-        fd = open(_route.c_str(), O_RDONLY);
+    if ((S_ISREG(file.st_mode) && (fd = open(_route.c_str(), O_RDONLY)) != -1))
         _statusCode = OK;
-    }
     else
         _statusCode = NOT_FOUND;
     return fd;
@@ -241,16 +255,15 @@ void         HTTP::setRoot()
     {
         replaceURI(); 
 
-
         //** Relative path **
-        _route.assign(_config.getRoot(_location));
-        _route.append(_socket.getRequestURI());
-        stat(_route.c_str(), &file);
-
-        // std::cerr << "1/ route: " << _route << std::endl;
-
         if (_config.getAlias(_location).length() > 0)
             _route.assign(_config.getAlias(_location)).append("/");
+        else
+        {
+            _route.assign(_config.getRoot(_location));
+            _route.append(_socket.getRequestURI());
+        }
+        stat(_route.c_str(), &file);
 
         // ** If file exist or put request, return **
         if (((S_ISREG(file.st_mode) && (fd = open(_route.c_str(), O_RDONLY)) != -1)) || _socket.getMethod().compare("PUT") == 0
@@ -266,8 +279,8 @@ void         HTTP::setRoot()
             _route.assign(_config.getAlias(_location)).append("/");
         _route.append(acceptLanguage());
         _route.append(str.assign(_socket.getRequestURI()).erase(0, _location.length()));
+        
         stat(_route.c_str(), &file);
-
         // ** If file exist or delete request, return **
         if ((((file.st_mode & S_IFMT) == S_IFREG && (fd = open(_route.c_str(), O_RDONLY)) != -1))
         || _socket.getMethod().compare("DELETE") == 0)
@@ -292,6 +305,8 @@ void         HTTP::setRoot()
         }
         _route.assign(str);
     }
+    if (open(_route.c_str(), O_RDONLY) == -1)
+        _route = _socket.getRequestURI();
     return ;
 }
 
@@ -306,8 +321,6 @@ void            HTTP::setAutoindex(void)
     char                    lastModifications[100];
     std::stack<std::string> files;
     std::string             body;
-
-    // Verifier que DIR marche bien sur linux, car bug sur MACOS
 
     body.assign("<html>\n<head><title>Index of /</title></head>\n<body>\n<h1>Index of /</h1><hr><pre>\n");
     dir = opendir(_route.c_str());
@@ -365,21 +378,20 @@ void            HTTP::authorization()
     int     fd;
     int     ret;
     char    *line;
+    size_t  length;
 
-    if (_config.getAuth_basic(_location).compare("off") != 0)
+    if (_config.getAuth_basic(_location).compare("") != 0)
     {
-        if (_socket.getAuthorization().compare(""))
-        {
+        if (_socket.getAuthorization().compare("") == 0)
             _statusCode = UNAUTHORIZED;
-            _wwwAuthenticate.assign("Basic realm=").append(_config.getAuth_basic(_location));
-        }
         else
         {
             if ((fd = open(_config.getAuth_basic_user_file(_location).c_str(), O_RDONLY)) >= 0)
             {
                 while ((ret = get_next_line(fd, &line)) > 0)
                 {
-                    if (base64_decode(_socket.getAuthorization()).compare(line) == 0)
+                    length = _socket.getAuthorization().length();
+                    if (base64_decode(_socket.getAuthorization().substr(6, length)).compare(line) == 0)
                     {
                         _wwwAuthenticate.assign("OK");
                         break ;
@@ -387,13 +399,10 @@ void            HTTP::authorization()
                     free(line);
                     line = NULL;
                 }
-                if (base64_decode(_socket.getAuthorization()).compare(line) == 0)
+                if (base64_decode(_socket.getAuthorization().substr(6, length)).compare(line) == 0)
                     _wwwAuthenticate.assign("OK");
                 if (_wwwAuthenticate.compare("OK") != 0)
-                {
                     _statusCode = UNAUTHORIZED;
-                    _wwwAuthenticate.assign("Basic realm=").append(_config.getAuth_basic(_location));
-                }
                 free(line);
                 line = NULL;
             }
@@ -436,60 +445,60 @@ std::string   HTTP::base64_encode(unsigned char const* bytes_to_encode, unsigned
   if (i)
   {
     for(j = i; j < 3; j++)
-      char_array_3[j] = '\0';
+        char_array_3[j] = '\0';
     char_array_4[0] = (char_array_3[0] & 0xfc) >> 2;
     char_array_4[1] = ((char_array_3[0] & 0x03) << 4) + ((char_array_3[1] & 0xf0) >> 4);
     char_array_4[2] = ((char_array_3[1] & 0x0f) << 2) + ((char_array_3[2] & 0xc0) >> 6);
     char_array_4[3] = char_array_3[2] & 0x3f;
     for (j = 0; (j < i + 1); j++)
-      ret += _base64_chars[char_array_4[j]];
+        ret += _base64_chars[char_array_4[j]];
 
     while((i++ < 3))
-      ret += '=';
+        ret += '=';
   }
   return ret;
 }
 
 //** Decode password in base64 **
 std::string   HTTP::base64_decode(std::string const& encoded_string) {
-  int           in_len;
-  int           i;
-  int           j;
-  int           in_;
-  unsigned char char_array_4[4];
-  unsigned char char_array_3[3];
-  std::string   ret;
+    int           in_len;
+    int           i;
+    int           j;
+    int           in_;
+    unsigned char char_array_4[4];
+    unsigned char char_array_3[3];
+    std::string   ret;
 
-  in_len = encoded_string.size();
-  i = 0;
-  j = 0;
-  in_ = 0;
-  while (in_len-- && ( encoded_string[in_] != '=') && is_base64(encoded_string[in_]))
-  {
-    char_array_4[i++] = encoded_string[in_]; in_++;
-    if (i ==4) {
-      for (i = 0; i <4; i++)
-        char_array_4[i] = _base64_chars.find(char_array_4[i]);
-      char_array_3[0] = (char_array_4[0] << 2) + ((char_array_4[1] & 0x30) >> 4);
-      char_array_3[1] = ((char_array_4[1] & 0xf) << 4) + ((char_array_4[2] & 0x3c) >> 2);
-      char_array_3[2] = ((char_array_4[2] & 0x3) << 6) + char_array_4[3];
-      for (i = 0; (i < 3); i++)
-        ret += char_array_3[i];
-      i = 0;
+    in_len = encoded_string.size();
+    i = 0;
+    j = 0;
+    in_ = 0;
+    while (in_len-- && ( encoded_string[in_] != '=') && is_base64(encoded_string[in_]))
+    {
+        char_array_4[i++] = encoded_string[in_]; in_++;
+        if (i ==4) {
+        for (i = 0; i <4; i++)
+            char_array_4[i] = _base64_chars.find(char_array_4[i]);
+        char_array_3[0] = (char_array_4[0] << 2) + ((char_array_4[1] & 0x30) >> 4);
+        char_array_3[1] = ((char_array_4[1] & 0xf) << 4) + ((char_array_4[2] & 0x3c) >> 2);
+        char_array_3[2] = ((char_array_4[2] & 0x3) << 6) + char_array_4[3];
+        for (i = 0; (i < 3); i++)
+            ret += char_array_3[i];
+        i = 0;
+        }
     }
-  }
-  if (i) {
-    for (j = i; j <4; j++)
-      char_array_4[j] = 0;
-    for (j = 0; j <4; j++)
-      char_array_4[j] = _base64_chars.find(char_array_4[j]);
-    char_array_3[0] = (char_array_4[0] << 2) + ((char_array_4[1] & 0x30) >> 4);
-    char_array_3[1] = ((char_array_4[1] & 0xf) << 4) + ((char_array_4[2] & 0x3c) >> 2);
-    char_array_3[2] = ((char_array_4[2] & 0x3) << 6) + char_array_4[3];
-    for (j = 0; (j < i - 1); j++)
-      ret += char_array_3[j];
-  }
-  return ret;
+    if (i) {
+        for (j = i; j <4; j++)
+        char_array_4[j] = 0;
+        for (j = 0; j <4; j++)
+        char_array_4[j] = _base64_chars.find(char_array_4[j]);
+        char_array_3[0] = (char_array_4[0] << 2) + ((char_array_4[1] & 0x30) >> 4);
+        char_array_3[1] = ((char_array_4[1] & 0xf) << 4) + ((char_array_4[2] & 0x3c) >> 2);
+        char_array_3[2] = ((char_array_4[2] & 0x3) << 6) + char_array_4[3];
+        for (j = 0; (j < i - 1); j++)
+        ret += char_array_3[j];
+    }
+    return ret;
 }
 
 void        HTTP::configureErrorFile()
@@ -499,7 +508,7 @@ void        HTTP::configureErrorFile()
     int         fd;
     std::string body;
 
-    _route = _config.getErrorFilesRoot().append("/").append(ft_itoa(_statusCode));
+    _route = _config.getHTMLErrorPage(_statusCode);
     fd = open(_route.c_str(), O_RDONLY);
     if (fd == -1)
     {
@@ -512,7 +521,7 @@ void        HTTP::configureErrorFile()
     }
     else
     {
-        body.assign("");
+        body.clear();
         while ((ret = read(fd, buf, 1024)) > 0)
         {
             buf[ret] = '\0';
@@ -537,6 +546,19 @@ char*         HTTP::getResponse()
 
     if (_statusCode >= 300)
         configureErrorFile();
+    setFirstHeadersResponse(response);
+    if (_socket.getMethod().compare("OPTIONS") == 0 || _statusCode == METHOD_NOT_ALLOWED)
+        setAllowMethodsResponse(response);
+    else
+        setOtherHeaders(response);
+    response.append("\r\n");
+    setResponseSize(response);
+    setBodyResponse(response);
+    return (_response);
+}
+
+void     HTTP::setFirstHeadersResponse(std::string &response)
+{
     response.append(_config.getHttpVersion());
     response.append(" ");
     response.append(ft_itoa(_statusCode)).append(" ");
@@ -544,20 +566,20 @@ char*         HTTP::getResponse()
     response.append("Server: ").append(_config.getServerSoftware()).append("\r\n"); //TO DO
     if (ft_strlen(_date) > 0)
         response.append("Date: ").append(_date).append("\r\n");
-
     if (_contentType.length() > 0)
         response.append("Content-Type: ").append(_contentType).append("\r\n");
-
     if (_contentLength >= 0)
         response.append("Content-Length: ").append(ft_itoa(_contentLength)).append("\r\n");
-    if (_socket.getMethod().compare("OPTIONS") == 0 || _statusCode == METHOD_NOT_ALLOWED)
-    {
-        response.append("Allow: ");
+}
+
+void            HTTP::setAllowMethodsResponse(std::string &response)
+{
         std::vector<std::string>::iterator it;
         std::vector<std::string>::iterator itEnd;
         std::size_t extension;
         std::string str;
 
+        response.append("Allow: ");
         extension = _route.find_last_of('.');
         if (is_good_exe(str.assign(_route).erase(0, extension + 1)))
         {
@@ -575,33 +597,39 @@ char*         HTTP::getResponse()
             it++;
         }
         response.append("\r\n");
-    }
-    else
+}
+
+void            HTTP::setOtherHeaders(std::string &response)
+{
+    if (_charset.length() > 0)
+        response.append("Charset: ").append(_charset).append("\r\n");
+    if (_statusCode < 300)
     {
-        if (_charset.length() > 0)
-            response.append("Charset: ").append(_charset).append("\r\n");
-        if (_statusCode < 300)
-        {
-            if (ft_strlen(_lastModified) > 0)
-                response.append("Last-Modified: ").append(_lastModified).append("\r\n");
-            if (_contentLocation.length() > 0)
-                response.append("Content-Location: ").append(_contentLocation).append("\r\n");
-            if (_contentLanguage.length() > 0 && _socket.getMethod().compare("PUT") && _socket.getMethod().compare("DELETE"))
-                response.append("Content-Language: ").append(_contentLanguage).append("\r\n");
-        }
-        else if (_statusCode == UNAUTHORIZED)
-            response.append("WWW-Authenticate: ").append("Basic ").append(_config.getAuth_basic(_location)).append("\r\n");
+        if (ft_strlen(_lastModified) > 0)
+            response.append("Last-Modified: ").append(_lastModified).append("\r\n");
+        if (_contentLocation.length() > 0)
+            response.append("Content-Location: ").append(_contentLocation).append("\r\n");
+        if (_contentLanguage.length() > 0 && _socket.getMethod().compare("PUT") && _socket.getMethod().compare("DELETE"))
+            response.append("Content-Language: ").append(_contentLanguage).append("\r\n");
     }
-    response.append("\r\n");
-    if (_socket.getMethod().compare("HEAD") && _contentLength > 0)
+    else if (_statusCode == UNAUTHORIZED)
+        response.append("WWW-Authenticate: ").append("Basic realm=").append(_config.getAuth_basic(_location)).append("\r\n");
+}
+
+void            HTTP::setResponseSize(std::string &response)
+{
+    if (_socket.getMethod().compare("HEAD") && _contentLength >= 0)
         _responseSize = response.length() + _contentLength;
     else
         _responseSize = response.length();
+}
+
+void            HTTP::setBodyResponse(std::string &response)
+{
     _response = (char*)ft_calloc(_responseSize + 1, sizeof(char));
     ft_strcpy(_response, response.c_str());
-    if (_socket.getMethod().compare("HEAD") && _contentLength > 0)
+    if (_socket.getMethod().compare("HEAD") && _contentLength >= 0)
         ft_memcat(_response, _body, _contentLength);
-    return (_response);
 }
 
 int             HTTP::getResponseSize()

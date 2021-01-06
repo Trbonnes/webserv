@@ -19,7 +19,6 @@
 #include <cstring>
 #include <vector>
 #include <string>
-#include <pthread.h>
 
 
 #define WORKER_MAX 30 // TO DO is it un peu bourrin ?

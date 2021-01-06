@@ -6,7 +6,7 @@
 /*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/09 12:19:51 by trbonnes          #+#    #+#             */
-/*   Updated: 2020/11/26 15:07:44 by user42           ###   ########.fr       */
+/*   Updated: 2021/01/06 14:19:00 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,8 +65,8 @@ public:
 	ConfigServer &operator=(const ConfigServer &c);
 
     std::string                 getRoot(std::string _uri);
-    std::string                 getHttpVersion(void); // NEW
-    std::string                 getServerSoftware(void); // NEW
+    std::string                 getHttpVersion(void);
+    std::string                 getServerSoftware(void);
     std::vector<std::string>    getServerName(void);
     std::vector<std::string>    &getIndex(std::string location);
     std::string                 getType(std::string location);
@@ -104,6 +104,8 @@ public:
     void                    setAutoIndex(int autoIndex);
     void                    setClientBodySize(int clientBodySize);
     void                    setAllow(std::vector<std::string> allow);
+    void					setAuth_basic(std::string auth);
+    void					setAuth_basic_user_file(std::string user_file);
 	void					setErrorRoot(std::string root);
     void                    setErrorPages(int error, std::string page);
 

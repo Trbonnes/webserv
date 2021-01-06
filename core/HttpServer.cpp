@@ -44,13 +44,12 @@ void HttpServer::run()
 	}
 	try
 	{
-		Log::debug("About to create workers");
+		// Log::debug("About to create workers");
 		initWorkers();
-		Log::debug("Workers have been instantiated");
 	}
 	catch(const std::exception& e)
 	{
-		Log::debug("Is this real life ?");
+		// Log::debug("Is this real life ?");
 		std::cerr << "Error while initializing workers : " << e.what() << '\n';
 		std::cerr << e.what() << '\n';
 		throw e;
@@ -104,9 +103,7 @@ void			HttpServer::masterLifecycle()
 void HttpServer::initWorkers() {
 	int nbworkers = _config->getWorker();
 
-	if (pthread_mutex_init(&_accept_mutex, NULL) == -1)
-		throw HttpServer::WorkersInitException();
-	HttpWorker worker(_listen_sockset, _config, &_accept_mutex);
+	HttpWorker worker(_listen_sockset, _config);
 	if (nbworkers < WORKER_MIN || nbworkers > WORKER_MAX)
 		nbworkers = WORKER_MIN;
     std::cout << "Initializing " << nbworkers << " workers" << std::endl;

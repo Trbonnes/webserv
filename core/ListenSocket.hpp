@@ -8,6 +8,12 @@
 #include <string>
 #include <string.h>
 #include <errno.h>
+#include <fcntl.h>
+
+#ifdef Q_OS_MAC
+#undef _GLIBCXX_USE_NOEXCEPT
+#define _GLIBCXX_USE_NOEXCEPT _NOEXCEPT
+#endif
 
 class ListenSocket
 {

@@ -24,6 +24,7 @@ void HttpConnection::accept() {
 	_sock = ::accept( _listen_sock.getSock(), &_client_name, &size);
 	if (_sock == -1)
 		throw HttpConnection::AcceptFailed();
+	
 }
 
 int HttpConnection::getPort() {

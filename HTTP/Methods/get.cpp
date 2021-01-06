@@ -5,30 +5,24 @@ void        HTTP::get()
     std::string root;
     int         fd;
 
-    // setRoot();
     fd = openFile();
+    authorization();
     if (_statusCode == OK)
     {
-        authorization();
-        if (_statusCode == OK)
-        {
-            setBody(fd);
-            setLastModified();
-            setContentType();
-            setCharset();
-            setContentLength();
-            setServerName();
-            setContentLocation();
-            setDate();
-        }
+        setBody(fd);
+        setLastModified();
+        setContentType();
+        setCharset();
+        setContentLength();
+        setServerName();
+        setContentLocation();
+        setDate();
     }
-    else if (_config.getAutoindex(_location) == true)
+    else if (_statusCode != UNAUTHORIZED && _config.getAutoindex(_location) == true)
     {
-        std::cerr << "AUTO INDEX" << std::endl;
         setAutoindex();
         setDate();
         _contentLanguage = "";
-        // TransferEncoding();
         _statusCode = OK;
     }
     return ;

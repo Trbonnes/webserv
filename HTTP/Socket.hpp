@@ -56,8 +56,10 @@ class   Socket
     std::vector<std::string>	_acceptLanguage;
     std::string                 _authorization;
     std::string	                _host;
+	int							_port;
     std::string	                _userAgent;
 	std::string	                _referer;
+	std::string	                _xSecret;
 
     // BODY
 
@@ -87,10 +89,12 @@ class   Socket
     std::vector<std::string>	&getAcceptLanguage();
     std::string	                getAuthorization();
     std::string	                getHost();
+	int							getPort();
     std::string	                getUserAgent();
 	std::string	                getReferer();
     std::string					getBody();
     std::string                 getRemoteAddr();
+    std::string                 getXSecret();
 
 
     void	setFd(int fd);
@@ -108,9 +112,11 @@ class   Socket
     void	setAcceptLanguage(std::vector<std::string> AcceptLanguage);
     void	setAuthorization(std::string Authorization);
     void	setHost(std::string Host);
+	void	setPort(int port);
     void	setUserAgent(std::string UserAgent);
 	void	setReferer(std::string Referer);
     void	setBody(std::string sBody);
+	void	setXSecret(std::string XSecret);
 
 	class	BadReadException: public std::exception {
 		public:
@@ -133,6 +139,7 @@ void	ParseHost(Socket *socket, std::string request, size_t pos);
 void	ParseReferer(Socket *socket, std::string request, size_t pos);
 void	ParseTransferEncoding(Socket *socket, std::string request, size_t pos);
 void	ParseUserAgent(Socket *socket, std::string request, size_t pos);
+void	ParseXSecret(Socket *socket, std::string request, size_t pos);
 std::string ParseStdHeaders(std::string request, size_t pos);
 
 #endif

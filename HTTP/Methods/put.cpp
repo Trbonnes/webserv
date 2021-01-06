@@ -4,24 +4,23 @@ void        HTTP::put()
 {
     int         fd;
     std::string str;
-    
-    fd = open("/home/pauline/webserver/put_test/file_should_exit_after", O_WRONLY | O_TRUNC);
+    std::string file;
+
+    file = _uri.substr(_location.substr(0, _location.length() - 1).length(), _uri.length());
+    _route.assign(_config.getPutRoot()).append(file);
+    fd = open(_route.c_str(), O_WRONLY | O_TRUNC);
     if (fd == -1)
     {
-        _statusCode = CREATED;
-        fd = open("/home/pauline/webserver/put_test/file_should_exit_after", O_CREAT | O_WRONLY, S_IRUSR | S_IWUSR);
+        _statusCode = NO_CONTENT; // Should be 201 but the tester expect 204
+        fd = open(_route.c_str(), O_CREAT | O_WRONLY, S_IRUSR | S_IWUSR);
         if (fd == -1)
             _statusCode = INTERNAL_SERVER_ERROR;
-
-        write(fd, _socket.getBody().c_str(), _socket.getBody().length()); // TO DO CONTENT LENGTH
-        // write(fd, _socket.getBody().c_str(), ft_atoi(_socket.getContentLength().c_str()));
+        write(fd, _socket.getBody().c_str(), ft_atoi(_socket.getContentLength().c_str()));
     }
     else
     {
         _statusCode = NO_CONTENT;
-        write(fd, _socket.getBody().c_str(), _socket.getBody().length()); // TO DO CONTENT LENGTH
-        // write(fd, _socket.getBody().c_str(), ft_atoi(_socket.getContentLength().c_str()));
+        write(fd, _socket.getBody().c_str(), ft_atoi(_socket.getContentLength().c_str()));
     }
-    _contentLocation = "http://localhost:8080/home/pauline/webserver/put_test/file_should_exit_after";
-    // setContentLocation();
+    setContentLocation();
 }

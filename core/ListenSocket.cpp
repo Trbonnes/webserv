@@ -17,6 +17,17 @@ ListenSocket::ListenSocket(int port) {
 	int addrlen = sizeof(address);
 	(void) addrlen;
 
+	int flags = fcntl(_sock, F_GETFL, 0);
+	if (flags == -1)
+	{
+		// TO DO throw error
+	}
+	flags |= O_NONBLOCK;
+	if (fcntl(_sock, F_SETFL, flags) == -1)
+	{
+		// TO DO thrwo error
+	}
+
 	if (bind(_sock, (struct sockaddr *)&address,
                                  sizeof(address)))
 		throw BindingException(errno);

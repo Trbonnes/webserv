@@ -13,5 +13,6 @@ char	*ft_itoa(int n);
 char    *ft_strcat(char *dest, const char *src);
 void    *ft_calloc(size_t count, size_t size);
 char    *ft_memcat(char *dest, const char *src, size_t nb);
+char	*ft_realloc(char *src, size_t nb);
 
 #endif
