@@ -6,7 +6,7 @@
 /*   By: trbonnes <trbonnes@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/30 18:55:18 by trbonnes          #+#    #+#             */
-/*   Updated: 2021/01/05 14:28:48 by trbonnes         ###   ########.fr       */
+/*   Updated: 2021/01/06 08:53:09 by trbonnes         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -133,7 +133,11 @@ void ParseDate(Socket *socket, std::string request, size_t pos) {
 }
 
 void ParseHost(Socket *socket, std::string request, size_t pos) {
-	socket->setHost(ParseStdHeaders(request, pos));
+	std::string host = ParseStdHeaders(request, pos);
+	socket->setHost(host);
+	pos = host.find(":");
+	pos++
+	socket->setPort(stoi(host.substr(pos, npos)));
 }
 
 void ParseReferer(Socket *socket, std::string request, size_t pos) {
