@@ -30,7 +30,6 @@ int HttpConnection::getPort() {
 	return _listen_sock.getPort();
 }
 
-
 const char * HttpConnection::ConnectionClose::what () const throw ()
 {
 	return "Connection has been closed";

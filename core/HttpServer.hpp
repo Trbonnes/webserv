@@ -19,6 +19,7 @@
 #include <cstring>
 #include <vector>
 #include <string>
+#include <pthread.h>
 
 
 #define WORKER_MAX 30 // TO DO is it un peu bourrin ?
@@ -27,6 +28,7 @@
 class HttpServer
 {
 public:
+
 	HttpServer();
 	~HttpServer();
 	HttpServer &operator=(const HttpServer &);
@@ -49,6 +51,7 @@ private:
 	Config						*_config;
 	std::vector<ListenSocket>	_listen_sockset;
 	ProcessManager*				_manager;
+	pthread_mutex_t				_accept_mutex;
 	HttpServer(const HttpServer &);
 	void			initConf();
 	void			initListenSocket();

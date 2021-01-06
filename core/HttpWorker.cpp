@@ -2,17 +2,19 @@
 
 
 //TO DO The runnable arguments might depend from the configuration file
-HttpWorker::HttpWorker(std::vector<ListenSocket> &listen, Config* config) : Runnable(1, 1)
+HttpWorker::HttpWorker(std::vector<ListenSocket> &listen, Config* config, pthread_mutex_t *accept_mutex) : Runnable(1, 1)
 {
 	std::cout << "Worker Initializing" << std::endl;
 	_config = config;
     _listen_socket = listen;
+	_accept_mutex = accept_mutex;
 }
 
 HttpWorker::HttpWorker(const HttpWorker &w) : Runnable(w)
 {
 	std::cout << "Worker Initializing" << std::endl;
 	_config = w._config;
+	_accept_mutex = w._accept_mutex;
     _listen_socket = w._listen_socket;
 }
 
@@ -54,7 +56,7 @@ void	HttpWorker::run()
 			std::cout << "Select error " << strerror(errno) << std::endl;
 			continue; // TO DO throw something ?
 		}
-		std::cout << "Event occured" << std::endl;
+		std::cout << "Event occured"<< std::endl;
 		i = 0;
 		for (i = 0; i < FD_SETSIZE; i++)
 		{
@@ -67,14 +69,17 @@ void	HttpWorker::run()
 				std::cout << "New connection" << std::endl; // TO DO remove or change log
 				try
 				{
+					pthread_mutex_lock(_accept_mutex);
 					new_connection = new HttpConnection(*listening[i]);
 					new_connection->accept();
 					connections[new_connection->getSock()] = new_connection;
 					FD_SET(new_connection->getSock(), &active_fs);
+					pthread_mutex_unlock(_accept_mutex);
 				}
 				catch(const std::exception& e)
 				{
 					std::cerr << e.what() << '\n';
+					pthread_mutex_unlock(_accept_mutex);
 					delete new_connection;
 				}
 				

@@ -102,10 +102,11 @@ void			HttpServer::masterLifecycle()
 }
 
 void HttpServer::initWorkers() {
-
-	HttpWorker worker(_listen_sockset, _config);
 	int nbworkers = _config->getWorker();
 
+	if (pthread_mutex_init(&_accept_mutex, NULL) == -1)
+		throw HttpServer::WorkersInitException();
+	HttpWorker worker(_listen_sockset, _config, &_accept_mutex);
 	if (nbworkers < WORKER_MIN || nbworkers > WORKER_MAX)
 		nbworkers = WORKER_MIN;
     std::cout << "Initializing " << nbworkers << " workers" << std::endl;
