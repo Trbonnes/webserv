@@ -15,12 +15,8 @@
 ConfigServer::ConfigServer() :
 _httpVersion("HTTP/1.1"),
 _serverSoftware("Server/2.0"),
-_putRoot("/home/pauline/webserver/put_test/"),
+_putRoot("/home/user42/webserver/put_test/"),
 _defaultClientBodySize(-1),
-_defaultType("text/plain"),
-_defaultCharset("utf-8"),
-_defaultAuth_basic(""),
-_defaultAuth_basic_user_file("/home/pauline/webserver/HTTP/config/.htpasswd"),
 _defaultAutoindex(-1)
 {
 
@@ -33,17 +29,15 @@ _defaultAutoindex(-1)
     std::list<std::string>::iterator it;
     std::string::iterator s_it;
 
-    file.append("HTTP/config/mime.types");
+    file.append("config/mime.types");
     if ((fd = open(file.c_str(), O_RDONLY)) >= 0)
     {
         while ((ret = get_next_line(fd, &line)) > 0)
         {
-            string = line; // TO DO is implicit cast (call to string(char*)) ok ? 
-            _mimeTypes.push_back(string);
+            _mimeTypes.push_back(line);
             free(line);
         }
-        string = line;
-        _mimeTypes.push_back(string);
+        _mimeTypes.push_back(line);
         it = _mimeTypes.begin();
         while (it != _mimeTypes.end())
         {
@@ -289,8 +283,6 @@ int                 ConfigServer::getAutoindex(std::string location)
 
     itBegin = _locationList.begin();
     itEnd = _locationList.end();
-    // if (location.compare("/directory/") == 0) // QUICK FIX!
-        // return 0;
     while (itBegin != itEnd)
     {
         if (location.compare(itBegin->first) == 0 && itBegin->second._autoindex != -1)

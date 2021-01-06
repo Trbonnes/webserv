@@ -4,7 +4,7 @@
 HttpServer::HttpServer() {
     _config = NULL;
     _manager = NULL;
-	_config_path = "config/test.conf";
+	_config_path = "config/webserv.conf";
 }
 
 HttpServer &HttpServer::operator=(const HttpServer &s)
@@ -46,6 +46,7 @@ void HttpServer::run()
 	{
 		// Log::debug("About to create workers");
 		initWorkers();
+		// Log::debug("Workers have been initated");
 	}
 	catch(const std::exception& e)
 	{

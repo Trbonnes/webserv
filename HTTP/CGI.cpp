@@ -39,8 +39,7 @@ void        HTTP::cgi_metaVariables()
     std::string str;
     size_t      query;
 
-    if (_socket.getAuthorization().compare("1")) // TO DO!!
-        _cgi._auth_type = _socket.getAuthorization(); 
+    _cgi._auth_type = _socket.getAuthorization(); 
     _cgi._content_length = _socket.getContentLength();
     _cgi._content_type = _socket.getContentType();
     _cgi._gateway_interface = "CGI/1.1";
@@ -85,9 +84,9 @@ void        HTTP::setEnv()
     _cgi_env[SERVER_PORT] = ft_strdup(_cgi._server_port.insert(0, "SERVER_PORT=").c_str());
     _cgi_env[SERVER_PROTOCOL] = ft_strdup(_cgi._server_protocol.insert(0, "SERVER_PROTOCOL=").c_str());
     _cgi_env[SERVER_SOFTWARE] = ft_strdup(_cgi._server_software.insert(0, "SERVER_SOFTWARE=").c_str());
-    _cgi_env[NB_METAVARIABLES] = NULL;
-    if (_socket.getAuthorization().compare("1") == 0) // TO DO !!
+    if (_socket.getXSecret().compare(""))
         _cgi_env[X_SECRET] = ft_strdup("HTTP_X_SECRET_HEADER_FOR_TEST=1");
+    _cgi_env[NB_METAVARIABLES] = NULL;
     // int i = 0; // TEST
     // while (i < NB_METAVARIABLES) // TEST
     //     printf("%s\n", _cgi_env[i++]); // TEST
