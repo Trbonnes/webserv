@@ -19,17 +19,14 @@ class HttpWorker : public Runnable
 {
 public:
 	HttpWorker(std::vector<ListenSocket> &listen, Config* config);
-	~HttpWorker();
-
-private:
 	HttpWorker(const HttpWorker &);
 	HttpWorker &operator=(const HttpWorker &);
+	~HttpWorker();
+	void run();
+	Runnable* clone() const;
+
+private:
 	std::vector<ListenSocket>	_listen_socket;
 	Config						*_config;
-
-public:
-	void run();
-
-
 };
 #endif // HTTPWORKER

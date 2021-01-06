@@ -5,6 +5,8 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <unistd.h>
+#include <string.h>
+#include <errno.h>
 
 #include "ListenSocket.hpp"
 
@@ -24,17 +26,18 @@ private:
 public:
 	void	accept();
 	void	write(char *data, size_t size);
-	void	read();
 	int		getSock();
 	int		getPort();
 	
 	class ConnectionClose : public std::exception
 	{
 		public:
-			const char * what () const throw ()
-			{
-				return "Connection closed"; // Maybe add Port or something
-			}
+			const char * what () const throw ();
+	};
+	class AcceptFailed : public std::exception
+	{
+		public:
+			const char * what () const throw ();
 	};
 };
 

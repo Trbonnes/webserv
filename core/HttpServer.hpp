@@ -18,16 +18,11 @@
 #include <unistd.h>
 #include <cstring>
 #include <vector>
+#include <string>
 
-class WorkersInitException: public std::exception
-{
-	public:
-		const char * what () const throw ()
-    	{
-    		return "Workers failed to initialize"; // TO DO reimplement into the cpp file
-    	}
-};
 
+#define WORKER_MAX 30 // TO DO is it un peu bourrin ?
+#define WORKER_MIN 1
 
 class HttpServer
 {
@@ -35,20 +30,34 @@ public:
 	HttpServer();
 	~HttpServer();
 	HttpServer &operator=(const HttpServer &);
+	void			run();
+
+	// Default configuration variables setters
+	void setConfigPath(std::string &);
+	class WorkersInitException: public std::exception
+	{
+	public:
+		const char * what () const throw ();
+	};
+	class OpenConfigfileFail: public std::exception
+	{
+	public:
+		const char * what () const throw ();
+	};
 
 private:
 	Config						*_config;
 	std::vector<ListenSocket>	_listen_sockset;
-	pid_t*						_workers_pid; // might put into ProcessManager.hpp
+	ProcessManager*				_manager;
 	HttpServer(const HttpServer &);
 	void			initConf();
 	void			initListenSocket();
 	void			initWorkers();
 	void			masterLifecycle();
-	static	void	launchProcess(); // TO DO is it clean ?
 
-public:
-	void			run();
+	// Default configuration variables
+	std::string					_config_path;
+	
 
 };
 #endif // HTTPSERVER
