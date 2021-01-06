@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ConfigServer.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: trbonnes <trbonnes@student.42.fr>          +#+  +:+       +#+        */
+/*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/09 12:19:51 by trbonnes          #+#    #+#             */
-/*   Updated: 2021/01/05 09:15:11 by trbonnes         ###   ########.fr       */
+/*   Updated: 2021/01/06 14:19:00 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,8 +65,8 @@ public:
 	ConfigServer &operator=(const ConfigServer &c);
 
     std::string                 getRoot(std::string _uri);
-    std::string                 getHttpVersion(void); // NEW
-    std::string                 getServerSoftware(void); // NEW
+    std::string                 getHttpVersion(void);
+    std::string                 getServerSoftware(void);
     std::vector<std::string>    getServerName(void);
     std::vector<std::string>    &getIndex(std::string location);
     std::string                 getType(std::string location);

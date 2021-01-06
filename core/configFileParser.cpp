@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   configFileParser.cpp                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: trbonnes <trbonnes@student.42.fr>          +#+  +:+       +#+        */
+/*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/14 08:46:39 by trbonnes          #+#    #+#             */
-/*   Updated: 2021/01/05 11:33:08 by trbonnes         ###   ########.fr       */
+/*   Updated: 2021/01/06 14:17:48 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -560,10 +560,6 @@ int		configFileParseServers(std::string configFile, Config *config) {
 	}
 
 	configFileParseServerUnit(configFile, &v);
-	// for (i = 0; i < v.size(); i++) {
-	// 	Log::debug(v[i].getAuth_basic("").c_str());
-	// 	Log::debug(v[i].getAuth_basic_user_file("").c_str());
-	// }
 	config->setServer(v);
 
 	return 0;
