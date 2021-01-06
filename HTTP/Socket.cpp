@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Socket.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
+/*   By: trbonnes <trbonnes@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/30 15:10:55 by trbonnes          #+#    #+#             */
-/*   Updated: 2021/01/05 14:58:22 by user42           ###   ########.fr       */
+/*   Updated: 2021/01/06 09:10:20 by trbonnes         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,7 @@ _acceptCharset(),
 _acceptLanguage(),
 _authorization(),
 _host(),
+_port(),
 _userAgent(),
 _xSecret(),
 _body() {
@@ -49,6 +50,7 @@ _acceptCharset(),
 _acceptLanguage(),
 _authorization(),
 _host(),
+_port(),
 _userAgent(),
 _xSecret(),
 _body() {
@@ -71,6 +73,7 @@ Socket::Socket(Socket const &copy)
     _acceptLanguage = copy._acceptLanguage;
     _authorization = copy._authorization;
     _host = copy._host;
+	_port = copy._port;
     _userAgent = copy._userAgent;
     _body = copy._body;
 	_xSecret = copy._xSecret;
@@ -96,6 +99,7 @@ Socket      &Socket::operator=(Socket const &rhs)
     _acceptLanguage = rhs._acceptLanguage;
     _authorization = rhs._authorization;
     _host = rhs._host;
+	_port = rhs._port;
     _userAgent = rhs._userAgent;
     _body = rhs._body;
 	_xSecret = rhs._xSecret;
@@ -175,6 +179,10 @@ std::string     Socket::getAuthorization()
 std::string     Socket::getHost()
 {
     return _host;
+}
+
+int				Socket::getPort() {
+	return _port;
 }
 
 std::string     Socket::getUserAgent()
@@ -262,6 +270,10 @@ void	Socket::setAuthorization(std::string Authorization) {
 
 void	Socket::setHost(std::string Host) {
 	_host = Host;
+}
+
+void	Socket::setPort(int port) {
+	_port = port;
 }
 
 void	Socket::setUserAgent(std::string UserAgent) {

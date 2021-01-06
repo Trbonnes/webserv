@@ -56,6 +56,7 @@ class   Socket
     std::vector<std::string>	_acceptLanguage;
     std::string                 _authorization;
     std::string	                _host;
+	int							_port;
     std::string	                _userAgent;
 	std::string	                _referer;
 	std::string	                _xSecret;
@@ -88,6 +89,7 @@ class   Socket
     std::vector<std::string>	&getAcceptLanguage();
     std::string	                getAuthorization();
     std::string	                getHost();
+	int							getPort();
     std::string	                getUserAgent();
 	std::string	                getReferer();
     std::string					getBody();
@@ -110,6 +112,7 @@ class   Socket
     void	setAcceptLanguage(std::vector<std::string> AcceptLanguage);
     void	setAuthorization(std::string Authorization);
     void	setHost(std::string Host);
+	void	setPort(int port);
     void	setUserAgent(std::string UserAgent);
 	void	setReferer(std::string Referer);
     void	setBody(std::string sBody);

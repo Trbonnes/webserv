@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parseHeaders.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: trbonnes <trbonnes@student.42.fr>          +#+  +:+       +#+        */
+/*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/30 18:55:18 by trbonnes          #+#    #+#             */
-/*   Updated: 2021/01/05 14:28:48 by trbonnes         ###   ########.fr       */
+/*   Updated: 2021/01/06 10:35:30 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -133,7 +133,12 @@ void ParseDate(Socket *socket, std::string request, size_t pos) {
 }
 
 void ParseHost(Socket *socket, std::string request, size_t pos) {
-	socket->setHost(ParseStdHeaders(request, pos));
+	std::string host = ParseStdHeaders(request, pos);
+	pos = host.find(":");
+	pos++;
+	socket->setPort(ft_atoi(host.substr(pos, host.npos).c_str()));
+	host.erase(pos - 1, host.npos);
+	socket->setHost(host);
 }
 
 void ParseReferer(Socket *socket, std::string request, size_t pos) {
@@ -148,9 +153,9 @@ void ParseUserAgent(Socket *socket, std::string request, size_t pos) {
 	socket->setUserAgent(ParseStdHeaders(request, pos));
 }
 
-void	ParseXSecret(Socket *socket, std::string request, size_t pos) {
+void ParseXSecret(Socket *socket, std::string request, size_t pos) {
 	std::string s;
-
+	pos++;
 	while (request[pos] && request[pos] != '\n') {
 		s.push_back(request[pos++]);
 	}
