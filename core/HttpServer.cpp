@@ -46,11 +46,6 @@ void HttpServer::run()
 	{
 		// Log::debug("About to create workers");
 		initWorkers();
-<<<<<<< HEAD
-		// Log::debug("Workers have been initated");
-=======
-		Log::debug("Workers have been instantiated");
->>>>>>> coreModule
 	}
 	catch(const std::exception& e)
 	{
