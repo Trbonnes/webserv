@@ -6,7 +6,7 @@
 /*   By: trbonnes <trbonnes@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/30 15:45:46 by trbonnes          #+#    #+#             */
-/*   Updated: 2021/01/06 10:03:33 by trbonnes         ###   ########.fr       */
+/*   Updated: 2021/01/06 10:07:12 by trbonnes         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -198,18 +198,18 @@ int		httpRequestParseBody(std::string request, Socket *socket) {
 
 int		httpRequestParseHeaders(std::string request, Socket *socket) {
 	char const *x[] = {
-		"Accept-Charset:",
-		"Accept-Language:",
-		"Authorization:",
-		"Content-Length:",
-		"Content-Location:",
-		"Content-Type:",
-		"Date:",
-		"Host:",
-		"Referer:",
-		"Transfer-Encoding:",
-		"User-Agen:t",
-		"x_secret"
+		"\nAccept-Charset",
+		"\nAccept-Language",
+		"\nAuthorization",
+		"\nContent-Length",
+		"\nContent-Location",
+		"\nContent-Type",
+		"\nDate",
+		"\nHost",
+		"\nReferer",
+		"\nTransfer-Encoding",
+		"\nUser-Agen",
+		"\nx_secret"
 	};
 	void (*f[])(Socket*, std::string, size_t) = {
 		&ParseAcceptCharset,
