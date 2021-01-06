@@ -6,7 +6,7 @@
 /*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/30 15:45:46 by trbonnes          #+#    #+#             */
-/*   Updated: 2021/01/06 10:09:06 by user42           ###   ########.fr       */
+/*   Updated: 2021/01/06 11:45:18 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -209,7 +209,7 @@ int		httpRequestParseHeaders(std::string request, Socket *socket) {
 		"\nReferer",
 		"\nTransfer-Encoding",
 		"\nUser-Agent",
-		"\nx_secret"
+		"\nX-Secret"
 	};
 	void (*f[])(Socket*, std::string, size_t) = {
 		&ParseAcceptCharset,
@@ -301,7 +301,7 @@ Socket	*httpRequestParser(int fd) {
 
 	// Log::debug("\033[0;32mRequestParsing Reading");
 
-	_test += 1; // TEST
+	//_test += 1; // TEST
 	// std::cerr << _test << std::endl; // TEST
 	// char*	test; // TEST
 	// test = (char*)ft_calloc((ft_strlen("requests/") + ft_strlen(ft_itoa(_test))), sizeof(char)); // TEST
@@ -327,7 +327,7 @@ Socket	*httpRequestParser(int fd) {
 	// free(test); // TEST
 	// Log::debug("\033[0;32mRequestParsing Reading End");
 	// Log::debug(debug);
-	// Log::debug(request.c_str());
+	Log::debug(request.c_str());
 	socket = new Socket(fd);
 	// Log::debug("\033[0;32mRequestParsing Creation");
 	httpRequestParseRequestLine(request, socket);
@@ -336,7 +336,8 @@ Socket	*httpRequestParser(int fd) {
 	httpRequestParseBody(request, socket);
 	// Log::debug("\033[0;32mBody Parsed");
 	request.clear();
-	if (_test == 18) // TO DO! QUICK FIX
-		socket->setAuthorization("1"); // TO DO! QUICK FIX
+	// if (_test == 18) // TO DO! QUICK FIX
+	// 	socket->setAuthorization("1"); // TO DO! QUICK FIX
+	std::cerr << "X-Secret: " << socket->getXSecret() << std::endl << std::endl;
 	return socket;
 }
