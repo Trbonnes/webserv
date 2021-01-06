@@ -89,7 +89,7 @@ class   Socket
     std::vector<std::string>	&getAcceptLanguage();
     std::string	                getAuthorization();
     std::string	                getHost();
-	int							getport();
+	int							getPort();
     std::string	                getUserAgent();
 	std::string	                getReferer();
     std::string					getBody();
