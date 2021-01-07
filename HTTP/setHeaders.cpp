@@ -38,10 +38,10 @@ void        HTTP::setLastModified()
 {
     struct tm *timeinfo;
 
-	#if defined(TARGET_OS_MAC)
-            	timeinfo = localtime(&(directory.st_mtimespec.tv_sec)); // st_mtimespec.tv_sec = macos ; st_mtim = linux
-	#else
+	#ifdef __linux__
     		timeinfo = localtime(&(_stat.st_mtim.tv_sec));
+	#else
+            timeinfo = localtime(&(_stat.st_mtimespec.tv_sec)); // st_mtimespec.tv_sec = macos ; st_mtim = linux
 	#endif // TARGET_OS_MAC
     strftime(_lastModified, 100, "%a %d %b 20%y %OH:%OM:%OS GMT", timeinfo);
 }

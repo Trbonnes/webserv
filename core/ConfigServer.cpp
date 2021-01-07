@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ConfigServer.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
+/*   By: trbonnes <trbonnes@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/09 15:13:35 by trbonnes          #+#    #+#             */
-/*   Updated: 2021/01/06 14:18:45 by user42           ###   ########.fr       */
+/*   Updated: 2021/01/07 09:58:02 by trbonnes         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 ConfigServer::ConfigServer() :
 _httpVersion("HTTP/1.1"),
 _serverSoftware("Server/2.0"),
-_putRoot("/home/user42/webserver/put_test/"),
+_putRoot("/Users/trbonnes/Documents/Tristan42/webserver/put_test/"),
 _defaultClientBodySize(-1),
 _defaultAutoindex(-1)
 {

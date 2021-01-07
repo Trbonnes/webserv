@@ -77,14 +77,29 @@ ListenSocket::ListenException::ListenException(int errcode) : ListenSocketExcept
 {
 }
 
-ListenSocket::ListenSocketException::~ListenSocketException() _GLIBCXX_TXN_SAFE_DYN _GLIBCXX_USE_NOEXCEPT
-{
-}
+#ifdef __linux__
+	ListenSocket::ListenSocketException::~ListenSocketException() _GLIBCXX_TXN_SAFE_DYN _GLIBCXX_USE_NOEXCEPT
+	{
+	}
 
-ListenSocket::ListenException::~ListenException() _GLIBCXX_TXN_SAFE_DYN _GLIBCXX_USE_NOEXCEPT
-{
-}
+	ListenSocket::ListenException::~ListenException() _GLIBCXX_TXN_SAFE_DYN _GLIBCXX_USE_NOEXCEPT
+	{
+	}
 
-ListenSocket::BindingException::~BindingException() _GLIBCXX_TXN_SAFE_DYN _GLIBCXX_USE_NOEXCEPT
-{
-}
+	ListenSocket::BindingException::~BindingException() _GLIBCXX_TXN_SAFE_DYN _GLIBCXX_USE_NOEXCEPT
+	{
+	}
+
+#else
+	ListenSocket::ListenSocketException::~ListenSocketException() _NOEXCEPT
+	{
+	}
+
+	ListenSocket::ListenException::~ListenException() _NOEXCEPT
+	{
+	}
+
+	ListenSocket::BindingException::~BindingException() _NOEXCEPT
+	{
+	}
+#endif
