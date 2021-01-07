@@ -111,6 +111,7 @@ void	HttpWorker::run()
 	// TO DO timeout for http
 	}
 	// TO DO delete connections
+	exit(0);
 }
 
 Runnable* HttpWorker::clone() const
