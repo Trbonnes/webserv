@@ -15,7 +15,7 @@
 ConfigServer::ConfigServer() :
 _httpVersion("HTTP/1.1"),
 _serverSoftware("Server/2.0"),
-_putRoot("/Users/trbonnes/Documents/Tristan42/webserver/put_test/"),
+_putRoot("/home/user42/webserver/put_test/"),
 _defaultClientBodySize(-1),
 _defaultAutoindex(-1)
 {

@@ -33,9 +33,8 @@ void	HttpWorker::run()
 	HttpConnection*	connections[FD_SETSIZE]; // array of connections
 	ListenSocket* 	listening[FD_SETSIZE]; // array of pointers
 
-	std::cout << "Running a worker" << std::endl;
 	// Important zeroing-out of the arrays
-	ft_bzero(connections, FD_SETSIZE * sizeof(ListenSocket*)); 
+	ft_bzero(connections, FD_SETSIZE * sizeof(HttpConnection*)); 
 	ft_bzero(listening, FD_SETSIZE * sizeof(ListenSocket*));
 	// Transforming list in fdset and ListenSocket in an array we can access with i directly without looping through the fdset
 	FD_ZERO(&active_fs);
@@ -65,19 +64,21 @@ void	HttpWorker::run()
 			// if it is on a listening socket, create a new connection
 			if (listening[i])
 			{
-				// std::cerr << "Locked and New connection" << std::endl; // TO DO remove or change log
 				try
 				{
+					std::cout << "new connection " << getpid() << std::endl;
 					new_connection = new HttpConnection(*listening[i]);
 					new_connection->accept();
+					std::cout << new_connection->getSock() << std::endl;
 					connections[new_connection->getSock()] = new_connection;
 					FD_SET(new_connection->getSock(), &active_fs);
+					std::cout << "new connection end " << getpid() << std::endl;
+
 				}
 				catch(const HttpConnection::AcceptFailed& e)
 				{
 					delete new_connection;
 				}
-				// std::cout << "Loop"<< std::endl;
 			}
 			// If it is a connection socket, do the job
 			else if (connections[i])
@@ -86,6 +87,7 @@ void	HttpWorker::run()
 				FD_CLR(i, &read_fs);
 				try
 				{
+					// std::cout << "New event" << std::endl;
 					Socket *socket = httpRequestParser(connections[i]->getSock()); // TO DO why would it return a socket class and not an httpRequest object ? 
 					ConfigServer &ptr2 = _config->getServerList()[0];
 					HTTP method(socket, ptr2);
@@ -94,23 +96,20 @@ void	HttpWorker::run()
 					responseSize = method.getResponseSize();					
 					connections[i]->write(response, responseSize); // TO DO ugly
 				}
-				catch(const HttpConnection::ConnectionClose& e)
+				catch(const std::exception& e)
 				{
 					int index = connections[i]->getSock();
-					std::cerr << "Connection has been closed: " << e.what() << '\n';
+					// std::cerr << "Connection has been closed: " << e.what() << '\n';
 					FD_CLR(index, &active_fs);
 					delete connections[index];
 					connections[index] = 0;
-				}
-				catch(const std::exception& e)
-				{
-					std::cerr << "Other connexion error :" << e.what() << '\n';
 				}
 			}
 		}
 	// TO DO timeout for http
 	}
 	// TO DO delete connections
+	std::cout << "EXITING WORKER " << std::endl;
 	exit(0);
 }
 

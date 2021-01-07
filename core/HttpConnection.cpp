@@ -23,6 +23,7 @@ void HttpConnection::accept() {
 
 	size = sizeof(_client_name);
 	_sock = ::accept( _listen_sock.getSock(), &_client_name, &size);
+	// setsockopt(_sock, )
 	if (_sock == -1)
 		throw HttpConnection::AcceptFailed();
 	
