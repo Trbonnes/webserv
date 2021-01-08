@@ -10,54 +10,54 @@ ProcessManager &ProcessManager::operator=(const ProcessManager &) {
 	return *this;
 }
 
-ProcessManager::~ProcessManager() {   
+ProcessManager::~ProcessManager() {
+	for (std::list<Runnable*>::iterator it = _runnables.begin(); it != _runnables.end(); ++it)
+		delete *it;
 }
 
-void ProcessManager::run(Runnable &proc, unsigned int n = 1)
+
+void ProcessManager::run(Runnable &proc, unsigned int n = 1, bool clone = true)
 {
 	pid_t pid;
+	Runnable *ptr;
+
 
 	if (n  == 0)
 		return;
 
-	Runnable *cpy = proc.clone();
+	if (clone)
+	{
+		ptr = proc.clone();
+		_runnables.push_back(ptr);
+	}
+	else
+		ptr = &proc;
 	while (n-- > 0)
 	{	
-		if (cpy->isDetached())
+		if (ptr->isDetached())
 		{
 			pid = fork();
-			std::cout << pid << std::endl;
 			if (pid == 0)
 			{
-				try
-				{
-					cpy->run();
-				}
-				catch(const std::exception& e)
-				{
-					std::cerr << "Process error :" << e.what() << '\n';
-				}
-				delete cpy;
-				std::exit(0);// TO DO should we add a clean exit ? 
+				ptr->run();
 			}
 			if (pid == -1)
 			{
 				throw Runnable::RunnableLaunchException();
 			}
-			_process[pid] = cpy;
+			_process.erase(pid);
+			_process[pid] = ptr;
 		}
 		else
 		{
-
 			try
 			{
-				cpy->run();
+				ptr->run();
 			}
 			catch(const std::exception& e)
 			{
 				std::cerr << "Encountered failure while running process" << e.what() << '\n';
 			}	
-			delete cpy;
 		}
 		
 	}
@@ -71,14 +71,17 @@ void ProcessManager::manage()
 	while (_process.size() > 0)
 	{
 		pid = wait(&status);
+		std::cout << "Dead pid" << pid << std::endl;
+		std::cout << "Was signaled ? " << WIFSIGNALED(status) << std::endl;
+		std::cout << "What code ? " << WTERMSIG(status) << std::endl;
+		std::cout << "Core dump ? " << WCOREDUMP(status) << std::endl;
 		std::cout << "Process with pid " << pid << " was killed" << std::endl;
 		Runnable* proc = _process[pid];
+		std::cout << "Value of proc " << proc << std::endl;
 		if (proc->isRespawn())
 		{
 			std::cout << "Respawning the process" << std::endl;
-			this->run(*proc);
-			_process.erase(pid);
-			delete proc;
+			this->run(*proc, 1, false);
 		}
 	}
 }

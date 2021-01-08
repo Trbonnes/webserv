@@ -15,18 +15,20 @@
 #include <sys/wait.h>
 #include <stdlib.h>
 #include <map>
+#include <list>
 
 
 class ProcessManager
 {
 private:
-	std::map<pid_t, Runnable*> _process;
+	std::list<Runnable*>		_runnables;
+	std::map<pid_t, Runnable*>	_process;
 public:
 	ProcessManager();
 	ProcessManager(const ProcessManager &);
 	ProcessManager &operator=(const ProcessManager &);
 	~ProcessManager();
-	void run(Runnable &proc, unsigned int i);
+	void run(Runnable &proc, unsigned int i, bool clone);
 	void manage();
 };
 

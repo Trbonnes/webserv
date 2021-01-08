@@ -4,14 +4,12 @@
 //TO DO The runnable arguments might depend from the configuration file
 HttpWorker::HttpWorker(std::vector<ListenSocket> &listen, Config* config) : Runnable(1, 1)
 {
-	std::cout << "Worker Initializing" << std::endl;
 	_config = config;
     _listen_socket = listen;
 }
 
 HttpWorker::HttpWorker(const HttpWorker &w) : Runnable(w)
 {
-	std::cout << "Worker Initializing" << std::endl;
 	_config = w._config;
     _listen_socket = w._listen_socket;
 }
@@ -66,14 +64,10 @@ void	HttpWorker::run()
 			{
 				try
 				{
-					std::cout << "new connection " << getpid() << std::endl;
-					new_connection = new HttpConnection(*listening[i]);
+					new_connection = new HttpConnection(*listening[i]); // TO DO try to accept before allocating a new object just to delete it dumbass
 					new_connection->accept();
-					std::cout << new_connection->getSock() << std::endl;
 					connections[new_connection->getSock()] = new_connection;
 					FD_SET(new_connection->getSock(), &active_fs);
-					std::cout << "new connection end " << getpid() << std::endl;
-
 				}
 				catch(const HttpConnection::AcceptFailed& e)
 				{

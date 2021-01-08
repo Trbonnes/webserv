@@ -110,7 +110,7 @@ void HttpServer::initWorkers() {
     std::cout << "Initializing " << nbworkers << " workers" << std::endl;
 	try
 	{
-		_manager->run(worker, nbworkers);
+		_manager->run(worker, nbworkers, true);
 	}
 	catch(const std::exception& e)
 	{
