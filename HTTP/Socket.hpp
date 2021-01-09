@@ -21,10 +21,10 @@
 # include <stdlib.h>
 # include <sys/types.h>
 # include <sys/socket.h>
+# include <errno.h>
 
 # include "utils/utils.hpp"
 # include "statusCodes.hpp"
-# include "../core/HttpConnection.hpp"
 # include "../core/Log.hpp"
 
 class   Socket
@@ -124,6 +124,11 @@ class   Socket
 				return strerror(errno);
 			}
 	};
+    class   ConnectionClose : public std::exception
+	{
+		public:
+			const char * what () const throw ();
+	};    
 };
 
 Socket	*httpRequestParser(int fd);

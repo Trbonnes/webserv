@@ -24,16 +24,19 @@ void	HttpWorker::run()
 {
 	fd_set 	active_fs;
 	fd_set 	read_fs;
-	int 	i;
 	char* 	response;
 	int		responseSize;
-	HttpConnection*	new_connection; // temp pointer 
-	HttpConnection*	connections[FD_SETSIZE]; // array of connections
+	// HttpConnection*	new_connection; // temp pointer 
+	bool	connections[FD_SETSIZE]; // array of connections
 	ListenSocket* 	listening[FD_SETSIZE]; // array of pointers
 
 	// Important zeroing-out of the arrays
-	ft_bzero(connections, FD_SETSIZE * sizeof(HttpConnection*)); 
+	// ft_bzero(connections, FD_SETSIZE * sizeof(HttpConnection*)); 
+	ft_bzero(connections, FD_SETSIZE * sizeof(bool)); 
 	ft_bzero(listening, FD_SETSIZE * sizeof(ListenSocket*));
+
+
+	
 	// Transforming list in fdset and ListenSocket in an array we can access with i directly without looping through the fdset
 	FD_ZERO(&active_fs);
 	for (unsigned int i = 0; i < _listen_socket.size(); i++)
@@ -52,9 +55,7 @@ void	HttpWorker::run()
 			std::cerr << "Select error " << strerror(errno) << std::endl;
 			continue; // TO DO throw something ?
 		}
-		// std::cout << "Event occured"<< std::endl;
-		i = 0;
-		for (i = 0; i < FD_SETSIZE; i++)
+		for (int i = 0; i < FD_SETSIZE; i++)
 		{
 			// if the fd is not set then there's no event on that fd, next
 			if (!FD_ISSET(i, &read_fs))
@@ -62,41 +63,48 @@ void	HttpWorker::run()
 			// if it is on a listening socket, create a new connection
 			if (listening[i])
 			{
-				try
+				int s;
+
+				struct sockaddr	_client_name;
+				socklen_t size;
+
+				size = sizeof(_client_name);
+				s = ::accept(listening[i]->getSock(), &_client_name, &size);
+				if (s != -1 && s < FD_SETSIZE)
 				{
-					new_connection = new HttpConnection(*listening[i]); // TO DO try to accept before allocating a new object just to delete it dumbass
-					new_connection->accept();
-					connections[new_connection->getSock()] = new_connection;
-					FD_SET(new_connection->getSock(), &active_fs);
+					FD_SET(s, &active_fs);
+					connections[s] = true;
 				}
-				catch(const HttpConnection::AcceptFailed& e)
-				{
-					delete new_connection;
-				}
+				else
+					close(s);
 			}
 			// If it is a connection socket, do the job
 			else if (connections[i])
 			{
 				// std::cout << "Event on connection" << std::endl;
-				FD_CLR(i, &read_fs);
 				try
 				{
 					// std::cout << "New event" << std::endl;
-					Socket *socket = httpRequestParser(connections[i]->getSock()); // TO DO why would it return a socket class and not an httpRequest object ? 
+					// Socket *socket = httpRequestParser(connections[i]->getSock()); // TO DO why would it return a socket class and not an httpRequest object ? 
+					Socket *socket = httpRequestParser(i); // TO DO why would it return a socket class and not an httpRequest object ? 
 					ConfigServer &ptr2 = _config->getServerList()[0];
 					HTTP method(socket, ptr2);
 
 					response = method.getResponse(); // TO DO make code more modulare and clean up names
 					responseSize = method.getResponseSize();					
-					connections[i]->write(response, responseSize); // TO DO ugly
+					// connections[i]->write(response, responseSize); // TO DO ugly
+					write(i, response, responseSize); // TO DO ugly
 				}
 				catch(const std::exception& e)
 				{
-					int index = connections[i]->getSock();
-					// std::cerr << "Connection has been closed: " << e.what() << '\n';
-					FD_CLR(index, &active_fs);
-					delete connections[index];
-					connections[index] = 0;
+					// int index = connections[i]->getSock();
+					// // std::cerr << "Connection has been closed: " << e.what() << '\n';
+					// FD_CLR(index, &active_fs);
+					// delete connections[index];
+					// connections[index] = 0;
+					close(i);
+					connections[i] = false;
+					FD_CLR(i, &active_fs);
 				}
 			}
 		}

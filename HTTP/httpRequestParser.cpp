@@ -283,7 +283,7 @@ Socket	*httpRequestParser(int fd) {
 		ft_bzero(c, 8192);
 		ret = read(fd, c, 8192);
 		if (ret == 0)
-			throw HttpConnection::ConnectionClose();
+			throw Socket::ConnectionClose();
 		if (ret == -1)
 			throw Socket::BadReadException();
 		request.append(c, ret);

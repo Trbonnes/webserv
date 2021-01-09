@@ -291,3 +291,8 @@ void	Socket::setBody(std::string Body) {
 void	Socket::setXSecret(std::string XSecret) {
 	_xSecret = XSecret;
 }
+
+const char * Socket::ConnectionClose::what () const throw ()
+{
+	return "Connection has been closed";
+}

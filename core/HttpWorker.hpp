@@ -7,7 +7,6 @@
 #include <string.h>
 
 #include "ListenSocket.hpp"
-#include "HttpConnection.hpp"
 #include "Runnable.hpp"
 #include "Config.hpp"
 
