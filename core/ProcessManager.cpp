@@ -81,7 +81,7 @@ void ProcessManager::manage()
 		if (proc->isRespawn())
 		{
 			std::cout << "Respawning the process" << std::endl;
-			this->run(*proc, 1, false);
+			// this->run(*proc, 1, false);
 		}
 	}
 }

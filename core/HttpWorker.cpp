@@ -35,8 +35,6 @@ void	HttpWorker::run()
 	ft_bzero(connections, FD_SETSIZE * sizeof(bool)); 
 	ft_bzero(listening, FD_SETSIZE * sizeof(ListenSocket*));
 
-
-	
 	// Transforming list in fdset and ListenSocket in an array we can access with i directly without looping through the fdset
 	FD_ZERO(&active_fs);
 	for (unsigned int i = 0; i < _listen_socket.size(); i++)
