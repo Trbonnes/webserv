@@ -55,8 +55,8 @@ void        HTTP::cgi_metaVariables()
     _cgi._request_method = _socket.getMethod();
     _cgi._request_uri = _socket.getRequestURI();
     _cgi._script_name = _config.getCGI_root(_location);
-    _cgi._server_name = _config.getServerName()[0]; // TO DO quick fix
-    _cgi._server_port = ft_itoa(_config.getPort()[0]); // TO DO fix getPort()
+    _cgi._server_name = _socket.getHost();
+    _cgi._server_port = ft_itoa(_socket.getPort());
     _cgi._server_protocol = _config.getHttpVersion();
     _cgi._server_software = _config.getServerSoftware();
     return ;
@@ -188,14 +188,19 @@ void        HTTP::cgi_parse()
     size_t      find;
 
     find = _cgiResponse.find("\r\n\r\n");
-    if (!(_body = (char*)ft_calloc(_responseSize - find - 4 + 1, sizeof(char))))
-        Log::debug("malloc error");
-    _body = ft_memcat(_body, _cgiResponse.substr(find + 4, _responseSize).c_str(), _responseSize - find - 4);
-    _body[_responseSize - find - 4] = '\0';
-    _contentLength = ft_strlen(_body);
-    _cgiResponse.erase(find + 2, _cgiResponse.length());
+    if (find != _cgiResponse.npos)
+    {
+        if (!(_body = (char*)ft_calloc(_responseSize - find - 4 + 1, sizeof(char))))
+            Log::debug("malloc error");
+        _body = ft_memcat(_body, _cgiResponse.substr(find + 4, _responseSize).c_str(), _responseSize - find - 4);
+        _body[_responseSize - find - 4] = '\0';
+        _contentLength = ft_strlen(_body);
+        _cgiResponse.erase(find + 2, _cgiResponse.length());
+    }
     find = _cgiResponse.find("Status: ");
-    _statusCode = ft_atoi(_cgiResponse.substr(find + ft_strlen("Status: "), find + ft_strlen("Status: ") + 3).c_str());
+    if (find != _cgiResponse.npos)
+        _statusCode = ft_atoi(_cgiResponse.substr(find + ft_strlen("Status: "), find + ft_strlen("Status: ") + 3).c_str());
     find = _cgiResponse.find("Content-Type: ");
-    _contentType = _cgiResponse.substr(find + ft_strlen("Content-Type: "), _cgiResponse.find("\r\n", find) - find - ft_strlen("Content-Type: "));
+    if (find != _cgiResponse.npos)
+        _contentType = _cgiResponse.substr(find + ft_strlen("Content-Type: "), _cgiResponse.find("\r\n", find) - find - ft_strlen("Content-Type: "));
 }
