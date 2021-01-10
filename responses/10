@@ -1,9 +1,0 @@
-HTTP/1.1 200 OK
-Server: Server/2.0
-Date: Tue 05 Jan 2021 18:04:26 GMT
-Content-Type: text/plain
-Content-Length: 11
-Last-Modified: Fri 11 Dec 2020 13:39:36 GMT
-Content-Location: http://localhost/home/pauline/webserver/YoupiBanane/nop/other.pouic
-
-other.pouic

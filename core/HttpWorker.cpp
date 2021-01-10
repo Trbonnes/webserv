@@ -17,8 +17,6 @@ HttpWorker::HttpWorker(const HttpWorker &w) : Runnable(w)
 HttpWorker::~HttpWorker() {
 }
 
-int _testFILE = 0; // TEST
-
 // TO DO Check config var regarding max connections and max port/server block
 void	HttpWorker::run()
 {

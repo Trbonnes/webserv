@@ -3,7 +3,7 @@
 //** absolute location route for the user agent **
 void        HTTP::setContentLocation()
 {
-    _contentLocation.assign("http://").append(_config.getServerName()[0]).append(_route); // TO DO quick fix
+    _contentLocation.assign("http://").append(_socket.getHost()).append("/").append(_route); // TO DO quick fix
 }
 
 //** Copy file into body string **
