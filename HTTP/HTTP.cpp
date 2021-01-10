@@ -305,8 +305,10 @@ void         HTTP::setRoot()
         }
         _route.assign(str);
     }
-    if (open(_route.c_str(), O_RDONLY) == -1)
+    if ((fd = open(_route.c_str(), O_RDONLY)) == -1)
         _route = _socket.getRequestURI();
+    else
+        close(fd);
     return ;
 }
 

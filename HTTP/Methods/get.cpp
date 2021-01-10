@@ -25,6 +25,7 @@ void        HTTP::get()
         _contentLanguage = "";
         _statusCode = OK;
     }
+    close(fd);
     return ;
 }
 
