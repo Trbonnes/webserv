@@ -531,8 +531,7 @@ void        HTTP::configureErrorFile()
         }
         if (ret == -1)
             _statusCode = INTERNAL_SERVER_ERROR;
-        else
-            close(fd);
+        close(fd);
         setStat();
         setContentType();
         setContentLength();
