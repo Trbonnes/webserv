@@ -126,7 +126,7 @@ HTTP::~HTTP()
     while (i < NB_METAVARIABLES)
         free(_cgi_env[i++]);
     free(_body);
-    free(_response);
+    // free(_response);
 }
 
 HTTP     &HTTP::operator=(HTTP &rhs)
