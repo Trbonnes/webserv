@@ -306,10 +306,9 @@ void         HTTP::setRoot()
         _route.assign(str);
     }
     if ((fd = open(_route.c_str(), O_RDONLY)) == -1)
-    {
         _route = _socket.getRequestURI();
+    else
         close(fd);
-    }
     return ;
 }
 
@@ -533,8 +532,7 @@ void        HTTP::configureErrorFile()
         }
         if (ret == -1)
             _statusCode = INTERNAL_SERVER_ERROR;
-        else
-            close(fd);
+        close(fd);
         setStat();
         setContentType();
         setContentLength();

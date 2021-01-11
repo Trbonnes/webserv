@@ -15,7 +15,6 @@ void        HTTP::setBody(int fd)
     ret = read(fd, _body, _stat.st_size);
     if (ret == -1)
         _statusCode = INTERNAL_SERVER_ERROR;
-    close(fd);
 }
 
 void        HTTP::setCharset(void)

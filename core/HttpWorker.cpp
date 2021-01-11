@@ -58,7 +58,7 @@ void	HttpWorker::run()
 				continue ;
 			// if it is on a listening socket, create a new connection
 			if (listening[i])
-			{
+			{	
 				int s;
 
 				struct sockaddr	_client_name;
@@ -66,18 +66,21 @@ void	HttpWorker::run()
 
 				size = sizeof(_client_name);
 				s = ::accept(listening[i]->getSock(), &_client_name, &size);
-				if (s != -1 && s < FD_SETSIZE)
+				if (s != -1)
 				{
-					FD_SET(s, &active_fs);
-					connections[s] = true;
+					if (s < FD_SETSIZE)
+					{
+						FD_SET(s, &active_fs);
+						connections[s] = true;
+					}
+					else
+						close(s);
 				}
-				else
-					close(s);
+				
 			}
 			// If it is a connection socket, do the job
 			else if (connections[i])
 			{
-				// std::cout << "Event on connection" << std::endl;
 				try
 				{
 					// std::cout << "New event" << std::endl;
@@ -87,17 +90,16 @@ void	HttpWorker::run()
 					HTTP method(socket, configServer);
 
 					response = method.getResponse(); // TO DO make code more modulare and clean up names
-					responseSize = method.getResponseSize();					
-					// connections[i]->write(response, responseSize); // TO DO ugly
+					responseSize = method.getResponseSize();
+					// if (socket->getMethod().compare("PUT") == 0)
+					// {						
+					// 	std::cout << socket->getFd() << std::endl;				
+					// }
 					write(i, response, responseSize); // TO DO ugly
+					delete socket;
 				}
 				catch(const std::exception& e)
 				{
-					// int index = connections[i]->getSock();
-					// // std::cerr << "Connection has been closed: " << e.what() << '\n';
-					// FD_CLR(index, &active_fs);
-					// delete connections[index];
-					// connections[index] = 0;
 					close(i);
 					connections[i] = false;
 					FD_CLR(i, &active_fs);

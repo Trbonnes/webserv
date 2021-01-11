@@ -9,6 +9,7 @@
 #include "ListenSocket.hpp"
 #include "Runnable.hpp"
 #include "Config.hpp"
+#include "Log.hpp"
 
 #include "../HTTP/HTTP.hpp"
 #include "../HTTP/Socket.hpp"
