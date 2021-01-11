@@ -1,3 +1,4 @@
+..
 #include "HTTP.hpp"
 #include "CGI.hpp"
 
@@ -6,6 +7,7 @@ bool        HTTP::cgi_fd_exist()
     int     fd;
 
     fd = openFile();
+    close(fd);
     if (_statusCode == OK)
         return true;
     return false;

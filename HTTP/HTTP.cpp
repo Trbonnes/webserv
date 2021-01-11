@@ -30,9 +30,9 @@ _cgiResponse(),
 _response(),
 _responseSize(0) {}
 
-HTTP::HTTP(Socket *socket, ConfigServer &config) :
+HTTP::HTTP(Socket *socket, ConfigServer *config) :
 _socket(*socket),
-_config(config),
+_config(*config),
 _mapCodes(),
 _cgi(),
 _location(""),
@@ -246,7 +246,7 @@ void         HTTP::setRoot()
     if (_uri.compare(0, 4, "http") == 0)
     {
         //** Absolute path **
-        find = _route.append(_socket.getRequestURI()).find(_config.getServerName()[0]); // TO DO temp fix for compilation
+        find = _route.append(_socket.getRequestURI()).find(_socket.getHost()); // TO DO temp fix for compilation
         _route.erase(0, find + _config.getServerName()[0].length()); // TO DO quick fix
         _route.insert(0, _config.getRoot(_location));
         _route.insert(_config.getRoot(_location).length(), acceptLanguage());
@@ -305,8 +305,11 @@ void         HTTP::setRoot()
         }
         _route.assign(str);
     }
-    if (open(_route.c_str(), O_RDONLY) == -1)
+    if ((fd = open(_route.c_str(), O_RDONLY)) == -1)
+    {
         _route = _socket.getRequestURI();
+        close(fd);
+    }
     return ;
 }
 
@@ -405,6 +408,7 @@ void            HTTP::authorization()
                     _statusCode = UNAUTHORIZED;
                 free(line);
                 line = NULL;
+                close(fd);
             }
         }
     }
@@ -568,11 +572,11 @@ char*         HTTP::getResponse()
                 close(fd);
                 fd = open(str, O_CREAT | O_WRONLY, S_IRUSR | S_IWUSR);
                 write(fd, response.c_str(), response.length());
+                close(fd);
                 break;
             }
             else
                 i++;
-            close(fd);
         }
     }
     setResponseSize(response);

@@ -26,7 +26,7 @@ void        HTTP::setCharset(void)
 
 void        HTTP::setServerName()
 {
-    _server = _config.getServerName()[0]; // TO DO quick fix
+    _server = _socket.getHost();
 }
 
 void        HTTP::setContentLength()

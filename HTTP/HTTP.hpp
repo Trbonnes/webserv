@@ -146,7 +146,7 @@ class   HTTP
     int             checkRequestErrors(void);
 
     public:
-    HTTP(Socket *socket, ConfigServer &config);
+    HTTP(Socket *socket, ConfigServer *config);
     HTTP(HTTP &copy);
     ~HTTP();
 

@@ -22,5 +22,6 @@ void        HTTP::put()
         _statusCode = NO_CONTENT;
         write(fd, _socket.getBody().c_str(), ft_atoi(_socket.getContentLength().c_str()));
     }
+    close(fd);
     setContentLocation();
 }
