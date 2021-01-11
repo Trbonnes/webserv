@@ -1,4 +1,0 @@
-HTTP/1.1 204 No Content
-Server: Server/2.0
-Content-Location: http://localhost/put_test/multiple_same
-

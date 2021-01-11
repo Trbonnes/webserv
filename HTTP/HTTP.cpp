@@ -554,29 +554,6 @@ char*         HTTP::getResponse()
     else
         setOtherHeaders(response);
     response.append("\r\n");
-    if (_socket.getMethod().compare("PUT") == 0)
-    {
-        int i = 0;
-        char str[15];
-
-        ft_bzero(str, sizeof(str));
-        while (1)
-        {
-            ft_strcpy(str, "responses/");
-            ft_strcat(str, ft_itoa(i));
-            int fd = open(str, O_WRONLY | O_TRUNC);
-            if (fd == -1)
-            {
-                close(fd);
-                fd = open(str, O_CREAT | O_WRONLY, S_IRUSR | S_IWUSR);
-                write(fd, response.c_str(), response.length());
-                close(fd);
-                break;
-            }
-            else
-                i++;
-        }
-    }
     setResponseSize(response);
     setBodyResponse(response);
     return (_response);
