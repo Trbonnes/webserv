@@ -21,7 +21,8 @@ int		equalRequest(Socket *newSocket, Socket *lastSocket)
 {
 	if (lastSocket == NULL)
 		return 1;
-	if (newSocket->getMethod().compare(lastSocket->getMethod()))
+	if (newSocket->getMethod().compare(lastSocket->getMethod())
+	|| newSocket->getMethod().compare("PUT") == 0 || newSocket->getMethod().compare("POST") == 0)
 		return 1;
 	if (newSocket->getRequestURI().compare(lastSocket->getRequestURI()))
 		return 1;
@@ -166,7 +167,7 @@ void	HttpWorker::run()
 	// TO DO timeout for http
 	}
 	// TO DO delete connections
-	std::cout << "EXITING WORKER " << std::endl;
+	std::cerr << "EXITING WORKER " << std::endl;
 	exit(0);
 }
 

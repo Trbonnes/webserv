@@ -58,6 +58,7 @@ _body() {
 
 Socket::Socket(Socket const &copy)
 {
+    request = copy.request;
     _fd = copy._fd;
     _method = copy._method;
     _requestURI = copy._requestURI;
@@ -84,6 +85,7 @@ Socket::~Socket() {
 
 Socket      &Socket::operator=(Socket const &rhs)
 {
+    request = rhs.request;
     _fd = rhs._fd;
     _method = rhs._method;
     _requestURI = rhs._requestURI;
