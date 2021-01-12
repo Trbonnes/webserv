@@ -29,6 +29,9 @@
 
 class   Socket
 {
+    public:
+    std::string request;
+
     private:
 
     // SOCKET
@@ -132,6 +135,7 @@ class   Socket
 };
 
 Socket	*httpRequestParser(int fd);
+int		httpRequestParseBody(int fd, std::string request, Socket *socket);
 
 void	ParseAcceptCharset(Socket *socket, std::string request, size_t pos);
 void	ParseAcceptLanguage(Socket *socket, std::string request, size_t pos);

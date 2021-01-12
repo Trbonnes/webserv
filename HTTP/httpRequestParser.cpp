@@ -12,12 +12,14 @@
 
 #include "Socket.hpp"
 
-int		httpRequestParseChunckedBody(std::string request, Socket *socket, size_t pos) {
+int		httpRequestParseChunckedBody(int fd, std::string request, Socket *socket, size_t pos) {
 	size_t chunkSize;
 	std::string convert;
 	std::string s = request.substr(pos - 1, request.npos);
 	std::vector<std::string>	bodyV;
 	std::string body;
+
+	(void)fd;
 
 	// Log::debug("\033[0;32mCHUNCKED");
 	// Log::debug(s);
@@ -81,12 +83,13 @@ int		httpRequestParseChunckedBody(std::string request, Socket *socket, size_t po
 	return 0;
 }
 
-int		httpRequestParseBody(std::string request, Socket *socket) {
+int		httpRequestParseBody(int fd, std::string request, Socket *socket) {
 	std::string					content;
 	std::string					body;
 	size_t						chunkedPos = socket->getTransferEncoding().find("chunked");
 	size_t						ret;
 	
+	(void)fd;
 	if (!socket->getContentLength().size() && chunkedPos == std::string::npos){
 		socket->setBody("");
 		return 0;
@@ -104,13 +107,16 @@ int		httpRequestParseBody(std::string request, Socket *socket) {
 		return 0;
 	}
 	if (chunkedPos != std::string::npos)
-		return httpRequestParseChunckedBody(request, socket, pos);
+		return httpRequestParseChunckedBody(fd, request, socket, pos);
 
 	try {
 		body = request.substr(pos, request.npos);
 		size_t	contentLength = atol(socket->getContentLength().c_str());
 		if (body.size() >= contentLength)
+		{
+
 			socket->setBody(body);
+		}
 		else {
 			char	c[8192];
 			
@@ -276,7 +282,7 @@ Socket	*httpRequestParser(int fd) {
 	int		ret;
 	std::string request;
 
-	// Log::debug("\033[0;32mRequestParsing Reading");
+	Log::debug("\033[0;32mRequestParsing Reading");
 
 	while (request.find("\r\n\r\n") >= request.npos && request.find("\n\n") >= request.npos)
 	{
@@ -288,14 +294,16 @@ Socket	*httpRequestParser(int fd) {
 			throw Socket::BadReadException();
 		request.append(c, ret);
 	}
-	// Log::debug("\033[0;32mRequestParsing Reading End");
+	Log::debug("\033[0;32mRequestParsing Reading End");
 	// Log::debug(request.c_str());
 	socket = new Socket(fd);
+	socket->request = request;
 	// Log::debug("\033[0;32mRequestParsing Creation");
 	httpRequestParseRequestLine(request, socket);
 	httpRequestParseHeaders(request, socket);
 	// Log::debug("\033[0;32mHeaders Parsed");
-	httpRequestParseBody(request, socket);
+
+	// httpRequestParseBody(request, socket);
 	// Log::debug("\033[0;32mBody Parsed");
 	request.clear();
 	return socket;

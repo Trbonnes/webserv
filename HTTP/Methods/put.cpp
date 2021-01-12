@@ -16,12 +16,16 @@ void        HTTP::put()
         if (fd == -1)
             _statusCode = INTERNAL_SERVER_ERROR;
         else
-            write(fd, _socket.getBody().c_str(), ft_atoi(_socket.getContentLength().c_str()));
+        {
+            httpRequestParseBody(fd, _socket.request, &_socket);
+            // write(fd, _socket.getBody().c_str(), ft_atoi(_socket.getContentLength().c_str()));
+        }
     }
     else
     {
         _statusCode = NO_CONTENT;
-        write(fd, _socket.getBody().c_str(), ft_atoi(_socket.getContentLength().c_str()));
+        httpRequestParseBody(fd, _socket.request, &_socket);
+        // write(fd, _socket.getBody().c_str(), ft_atoi(_socket.getContentLength().c_str()));
     }
     close(fd);
     setContentLocation();
