@@ -70,10 +70,10 @@ int		httpRequestParseChunckedBody(int fd, std::string request, Socket *socket, s
 		}
 		Log::debug("All chunk read");
 		for (size_t i = 0; i < bodyV.size(); i++) {
-			//body.append(bodyV[i]);
+			body.append(bodyV[i]);
 			//body.append("\n");
 			Log::debug(i);
-			write(fd, bodyV[i].c_str(), bodyV[i].length());
+			//write(fd, bodyV[i].c_str(), bodyV[i].length());
 			//write(fd, "\n", 1);
 		}
 		bodyV.clear();
