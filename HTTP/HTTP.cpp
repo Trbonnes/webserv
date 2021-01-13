@@ -26,8 +26,8 @@ _charset(""),
 _retryAfter(""),
 _transferEncoding(""),
 _body(NULL),
-_cgiResponse(),
-_response(),
+_cgiResponse(""),
+_response(NULL),
 _responseSize(0) {}
 
 HTTP::HTTP(Socket *socket, ConfigServer *config) :
@@ -52,8 +52,8 @@ _charset(""),
 _retryAfter(""),
 _transferEncoding(""),
 _body(NULL),
-_cgiResponse(),
-_response(),
+_cgiResponse(""),
+_response(NULL),
 _responseSize(0)
 {
     size_t      extension;
@@ -225,6 +225,7 @@ int         HTTP::openFile()
     struct stat file;
 
     fd = -1;
+    ft_bzero(&file, sizeof(file));
     stat(_route.c_str(), &file);
     if ((S_ISREG(file.st_mode) && (fd = open(_route.c_str(), O_RDONLY)) != -1))
         _statusCode = OK;
@@ -243,6 +244,7 @@ void         HTTP::setRoot()
     std::vector<std::string>::iterator itIndexBegin;
     std::vector<std::string>::iterator itIndexEnd;
 
+    ft_bzero(&file, sizeof(file));
     if (_uri.compare(0, 4, "http") == 0)
     {
         //** Absolute path **
