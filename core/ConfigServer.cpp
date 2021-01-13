@@ -28,6 +28,11 @@ _defaultAutoindex(-1)
     std::string file;
     std::list<std::string>::iterator it;
     std::string::iterator s_it;
+    std::map<std::string, std::string> map;
+    size_t space;
+    size_t coma; 
+    std::string key;
+    std::string value;
 
     file.append("config/mime.types");
     if ((fd = open(file.c_str(), O_RDONLY)) >= 0)
@@ -44,11 +49,41 @@ _defaultAutoindex(-1)
             s_it = (*it).begin();
             while (*s_it == ' ')
                 s_it++;
-            (*it).erase((*it).begin(), s_it);
+            (*it).erase((*it).begin(), s_it); // erase espace du debut
+
+            space = (*it).find(' '); // trouve premier espace
+            value = (*it).substr(0, space); // trouve value
+            (*it).erase((*it).begin(), s_it + space); // efface value
+
+            while (1)
+            {
+                s_it = (*it).begin(); // retourne au debut
+                while (*s_it == ' ') // 
+                    s_it++;
+                (*it).erase((*it).begin(), s_it); // erase espace du debut
+
+                space = (*it).find(' '); // trouve prochain space
+                if (space != std::string::npos)
+                {
+                    key = (*it).substr(0, space);
+                    (*it).erase((*it).begin(), s_it + space); // efface value
+                    map[key] = value;
+                }
+                else
+                {
+                    coma = (*it).find(';');
+                    key = (*it).substr(0, coma);
+                    map[key] = value;
+                    break;
+                }
+            }
             it++;
         }
         free(line);
         close (fd);
+
+        for (std::map<std::string, std::string>::iterator it = map.begin(); it != map.end(); it++)
+            std::cerr << it->first << " => " << it->second << std::endl;
     }
 }
 
