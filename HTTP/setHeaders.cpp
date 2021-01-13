@@ -61,9 +61,7 @@ void        HTTP::setContentType()
 {
     int                     find;
     int                     length;
-    std::string             line;
-    std::list<std::string>  mimeTypes;
-    std::list<std::string>::iterator it;
+    std::map<std::string, std::string>::iterator it;
 
     find = _route.find_last_of('.');
     find += 1;
@@ -71,14 +69,15 @@ void        HTTP::setContentType()
     _contentType = _route.substr(find, length);
     find = -1;
     it = _config.getMimeTypes().begin();
+
     while (it != _config.getMimeTypes().end())
     {
-        if ((find = (*it).find(_contentType)) >= 0)
-            break ;
+        if ((it->first).compare(_contentType) == 0)
+            break;
         it++;
     }
-    if (find >= 0)
-        _contentType = (*it).substr(0, (*it).find(" "));
+    if (it != _config.getMimeTypes().end())
+        _contentType = it->second;
     else
         _contentType = _config.getType(_location);
 }

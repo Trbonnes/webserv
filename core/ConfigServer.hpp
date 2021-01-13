@@ -32,7 +32,8 @@ private:
 	// Server Software
     std::string                 _httpVersion;
     std::string                 _serverSoftware;
-    std::list<std::string>      _mimeTypes;
+    // std::list<std::string>      _mimeTypes;
+    std::map<std::string, std::string> _mimeTypes;
     std::string                 _configFilesRoot;
     std::string                 _errorFilesRoot;
     std::string                 _putRoot;
@@ -73,7 +74,7 @@ public:
     std::string                 getCharset(std::string location);
     std::vector<std::string>    &getLanguage(std::string location);
     std::vector<std::string>    &getAllow(std::string location);
-    std::list<std::string>      &getMimeTypes();
+    std::map<std::string, std::string>      &getMimeTypes();
 	std::string                 getErrorFilesRoot(void);
     std::string                 getLocation(std::string location);
     std::string                 getAuth_basic(std::string location);
