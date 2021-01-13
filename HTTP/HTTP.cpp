@@ -256,7 +256,7 @@ void         HTTP::setRoot()
     else
     {
         replaceURI(); 
-
+        
         //** Relative path **
         if (_config.getAlias(_location).length() > 0)
             _route.assign(_config.getAlias(_location)).append("/");
@@ -296,7 +296,8 @@ void         HTTP::setRoot()
         itIndexEnd = _config.getIndex(_location).end();
         stat(_route.c_str(), &file);
         str.assign(_route);
-        while (itIndexBegin != itIndexEnd && (file.st_mode & S_IFMT) != S_IFREG)
+        while (itIndexBegin != itIndexEnd &&
+        ((file.st_mode & S_IFMT) != S_IFREG && (fd = open(_route.c_str(), O_RDONLY)) != -1))
         {
             str.assign(_route);
             if (str.at(str.length() - 1) != '/')
@@ -306,6 +307,7 @@ void         HTTP::setRoot()
             itIndexBegin++;
         }
         _route.assign(str);
+        close(fd);
     }
     if ((fd = open(_route.c_str(), O_RDONLY)) == -1)
         _route = _socket.getRequestURI();
