@@ -159,6 +159,8 @@ void	HttpWorker::run()
 				catch(const std::exception& e)
 				{
 					close(i);
+					close(pipes[i][0]);
+					close(pipes[i][1]);
 					connections[i] = false;
 					FD_CLR(i, &active_fs);
 				}
