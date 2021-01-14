@@ -6,7 +6,7 @@
 /*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/30 15:45:46 by trbonnes          #+#    #+#             */
-/*   Updated: 2021/01/14 09:28:14 by user42           ###   ########.fr       */
+/*   Updated: 2021/01/14 17:54:17 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,58 +15,118 @@
 int		httpRequestParseChunckedBody(std::string request, Socket *socket, size_t pos) {
 	size_t chunkSize;
 	std::string convert;
-	std::string s = request.substr(pos - 1, request.npos);
+	std::string s = request.substr(pos, request.npos);
 	std::string body;
 
-	// Log::debug("\033[0;32mCHUNCKED");
-	pos = s.find("\n0\r\n");
-	if (pos == s.npos) {
+	Log::debug("\033[0;32mCHUNCKED");
+	try {
 		char	c[8192];
 		int		ret;
-
-		// Log::debug("\033[0;32mRead in chuncked body");
-		while ((pos = s.find("\n0\r\n")) >= s.npos) {
+		
+		while ((pos = s.find("\r\n")) == s.npos) {
 			ft_bzero(c, 8192);
-			ret = read(socket->getFd(), c, 8192);
+			ret = read(socket->getFd(), c, 1);
 			s.append(c, ret);
 		}
-		// Log::debug("\033[0;32mRead over");
-		// Log::debug(debug);
-	}
-	try {
-		chunkSize = 0;
 		pos = 0;
 		while (s[pos] && s[pos] != '\r') {
 			convert.append(s.substr(pos, 1));
 			pos++;
 		}
 		chunkSize = strtol(convert.c_str(), NULL, 16);
-		// Log::debug("chunck Size: ");
-		// Log::debug(chunkSize);
-		socket->setContentLength(ft_itoa(atol(socket->getContentLength().c_str()) + chunkSize));
+		Log::debug("chunck Size: ");
+		Log::debug(chunkSize);
 		while (chunkSize > 0) {
-			// Log::debug("new chunk");
-			body.append(s.substr(convert.length() + 3, chunkSize));
-			s.erase(0, convert.length() + 2 + chunkSize + 2);
+			Log::debug("new chunk");
+			socket->setContentLength(ft_itoa(atol(socket->getContentLength().c_str()) + chunkSize));
+			s.clear();
 			convert.clear();
+			for (int i = 0; i < (int)chunkSize; i += ret) {
+				if (chunkSize - i > 8192) {
+					ft_bzero(c, 8192);
+					ret = read(socket->getFd(), c, 8192);
+					body.append(c, ret);
+				}
+				else {
+					ft_bzero(c, 8192);
+					ret = read(socket->getFd(), c, chunkSize - i);
+					body.append(c, ret);
+				}
+			}
+			ft_bzero(c, 8192);
+			ret = read(socket->getFd(), c, 2);
+			while ((pos = s.find("\r\n")) == s.npos) {
+				ft_bzero(c, 2);
+				ret = read(socket->getFd(), c, 1);
+				s.append(c, ret);
+			}
 			pos = 0;
 			while (s[pos] && s[pos] != '\r') {
 				convert.append(s.substr(pos, 1));
 				pos++;
 			}
 			chunkSize = strtol(convert.c_str(), NULL, 16);
-			// Log::debug("chunck Size: ");
-			// Log::debug(chunkSize);
-			socket->setContentLength(ft_itoa(atol(socket->getContentLength().c_str()) + chunkSize));
+			Log::debug("chunck Size: ");
+			Log::debug(chunkSize);
 		}
-		// Log::debug("All chunk read");
+		Log::debug("All chunk read");
 		socket->setBody(body);
-		// Log::debug("\033[0;32mchuncked content length: ");
-		// Log::debug(socket->getContentLength().c_str());
+		Log::debug("\033[0;32mchuncked content length: ");
+		Log::debug(socket->getContentLength().c_str());
+		body.clear();
 	}
 	catch (std::exception &e) {
 		std::cerr << "Exception1: " << e.what() << std::endl;
 	}
+
+	// pos = s.find("\n0\r\n");
+	// if (pos == s.npos) {
+	// 	char	c[8192];
+	// 	int		ret;
+
+	// 	// Log::debug("\033[0;32mRead in chuncked body");
+	// 	while ((pos = s.find("\n0\r\n")) >= s.npos) {
+	// 		ft_bzero(c, 8192);
+	// 		ret = read(socket->getFd(), c, 8192);
+	// 		s.append(c, ret);
+	// 	}
+	// 	// Log::debug("\033[0;32mRead over");
+	// 	// Log::debug(debug);
+	// }
+	// try {
+	// 	chunkSize = 0;
+	// 	pos = 0;
+	// 	while (s[pos] && s[pos] != '\r') {
+	// 		convert.append(s.substr(pos, 1));
+	// 		pos++;
+	// 	}
+	// 	chunkSize = strtol(convert.c_str(), NULL, 16);
+	// 	// Log::debug("chunck Size: ");
+	// 	// Log::debug(chunkSize);
+	// 	socket->setContentLength(ft_itoa(atol(socket->getContentLength().c_str()) + chunkSize));
+	// 	while (chunkSize > 0) {
+	// 		// Log::debug("new chunk");
+	// 		body.append(s.substr(convert.length() + 3, chunkSize));
+	// 		s.erase(0, convert.length() + 2 + chunkSize + 2);
+	// 		convert.clear();
+	// 		pos = 0;
+	// 		while (s[pos] && s[pos] != '\r') {
+	// 			convert.append(s.substr(pos, 1));
+	// 			pos++;
+	// 		}
+	// 		chunkSize = strtol(convert.c_str(), NULL, 16);
+	// 		// Log::debug("chunck Size: ");
+	// 		// Log::debug(chunkSize);
+	// 		socket->setContentLength(ft_itoa(atol(socket->getContentLength().c_str()) + chunkSize));
+	// 	}
+	// 	// Log::debug("All chunk read");
+	// 	socket->setBody(body);
+	// 	// Log::debug("\033[0;32mchuncked content length: ");
+	// 	// Log::debug(socket->getContentLength().c_str());
+	// }
+	// catch (std::exception &e) {
+	// 	std::cerr << "Exception1: " << e.what() << std::endl;
+	// }
 	
 	return 0;
 }
@@ -76,7 +136,9 @@ int		httpRequestParseBody(std::string request, Socket *socket) {
 	std::string					body;
 	size_t						chunkedPos = socket->getTransferEncoding().find("chunked");
 	size_t						ret;
-	
+
+	Log::debug(request.c_str());
+
 	if (!socket->getContentLength().size() && chunkedPos == std::string::npos){
 		socket->setBody("");
 		return 0;
@@ -219,7 +281,7 @@ int		httpRequestParseRequestLine(std::string request, Socket *socket) {
 Socket	*httpRequestParser(int fd, int p[2]) {
 
 	Socket *socket;
-	char	c[8192];
+	char	c[2];
 	int		ret;
 	std::string request;
 
@@ -229,8 +291,8 @@ Socket	*httpRequestParser(int fd, int p[2]) {
 
 	while (request.find("\r\n\r\n") >= request.npos && request.find("\n\n") >= request.npos)
 	{
-		ft_bzero(c, 8192);
-		ret = read(fd, c, 8192);
+		ft_bzero(c, 2);
+		ret = read(fd, c, 2);
 		if (ret == 0)
 			throw Socket::ConnectionClose();
 		if (ret == -1)
