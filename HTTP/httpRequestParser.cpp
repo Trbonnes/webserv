@@ -6,7 +6,7 @@
 /*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/30 15:45:46 by trbonnes          #+#    #+#             */
-/*   Updated: 2021/01/06 14:15:39 by user42           ###   ########.fr       */
+/*   Updated: 2021/01/14 09:28:14 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,11 +16,9 @@ int		httpRequestParseChunckedBody(std::string request, Socket *socket, size_t po
 	size_t chunkSize;
 	std::string convert;
 	std::string s = request.substr(pos - 1, request.npos);
-	std::vector<std::string>	bodyV;
 	std::string body;
 
 	// Log::debug("\033[0;32mCHUNCKED");
-	// Log::debug(s);
 	pos = s.find("\n0\r\n");
 	if (pos == s.npos) {
 		char	c[8192];
@@ -34,9 +32,6 @@ int		httpRequestParseChunckedBody(std::string request, Socket *socket, size_t po
 		}
 		// Log::debug("\033[0;32mRead over");
 		// Log::debug(debug);
-		// Log::debug("'");
-		// Log::debug(s.substr(pos, s.npos).c_str());
-		// Log::debug("'");
 	}
 	try {
 		chunkSize = 0;
@@ -51,7 +46,7 @@ int		httpRequestParseChunckedBody(std::string request, Socket *socket, size_t po
 		socket->setContentLength(ft_itoa(atol(socket->getContentLength().c_str()) + chunkSize));
 		while (chunkSize > 0) {
 			// Log::debug("new chunk");
-			bodyV.push_back(s.substr(convert.length() + 3, chunkSize));
+			body.append(s.substr(convert.length() + 3, chunkSize));
 			s.erase(0, convert.length() + 2 + chunkSize + 2);
 			convert.clear();
 			pos = 0;
@@ -65,11 +60,6 @@ int		httpRequestParseChunckedBody(std::string request, Socket *socket, size_t po
 			socket->setContentLength(ft_itoa(atol(socket->getContentLength().c_str()) + chunkSize));
 		}
 		// Log::debug("All chunk read");
-		for (size_t i = 0; i < bodyV.size(); i++) {
-			body.append(bodyV[i]);
-			body.append("\n");
-		}
-		bodyV.clear();
 		socket->setBody(body);
 		// Log::debug("\033[0;32mchuncked content length: ");
 		// Log::debug(socket->getContentLength().c_str());
@@ -128,49 +118,6 @@ int		httpRequestParseBody(std::string request, Socket *socket) {
 	catch (std::exception &e) {
 		std::cerr << "Exception2: " << e.what() << std::endl;
 	}
-
-	//FOR MULPART BODY : NOT USEFUL IN OUR IMPLEMENTATION
-	// try {
-	// 	if (!socket->getMultipartContent()) {
-	// 		bodyV.push_back(request.substr(pos, request.npos));
-	// 	}
-	// 	else {
-	// 		std::string s = request;
-	// 		std::string boundary = "--" + socket->getContentBoundary();
-	// 		std::string endBoundary = "--" + socket->getContentBoundary() + "--";
-	// 		size_t endPos = s.find(endBoundary);
-	// 		size_t boundPos;
-
-	// 		content = socket->getContentType();
-	// 		bodyV.push_back("");
-	// 		s.erase(0, pos);
-	// 		endPos = s.find(endBoundary);
-	// 		while ((pos = s.find(boundary)) != endPos) {
-	// 			s.erase(0, pos + boundary.length() + 1);
-	// 			endPos = s.find(endBoundary);
-	// 			boundPos = s.find(boundary);
-	// 			pos = s.find("Content-Type");
-	// 			if (pos >= boundPos) {
-	// 				content.push_back("text/plain");
-	// 				bodyV.push_back(s.substr(0, boundPos - 1));
-	// 			}
-	// 			else {
-	// 				pos += 14;
-	// 				content.push_back(s.substr(pos, s.find("\n", pos) - 14));
-	// 				s.erase(0, s.find("\n", pos) + 1);;
-	// 				boundPos = s.find(boundary);
-	// 				bodyV.push_back(s.substr(0, boundPos - 1));
-	// 			}
-	// 			s.erase(0, boundPos);
-	// 			endPos = s.find(endBoundary);
-	// 		}
-	// 		socket->setContentType(content);
-	// 	}
-	// }
-	// catch (std::exception &e) {
-	// 	std::cout << "Exception: " << e.what() << std::endl;
-	// }
-	//socket->setBody(bodyV);
 	
 	return 0;
 }
