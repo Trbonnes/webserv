@@ -6,7 +6,7 @@
 /*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/30 15:45:46 by trbonnes          #+#    #+#             */
-/*   Updated: 2021/01/14 17:54:17 by user42           ###   ########.fr       */
+/*   Updated: 2021/01/14 20:08:54 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ int		httpRequestParseChunckedBody(std::string request, Socket *socket, size_t po
 	std::string s = request.substr(pos, request.npos);
 	std::string body;
 
-	Log::debug("\033[0;32mCHUNCKED");
+	// Log::debug("\033[0;32mCHUNCKED");
 	try {
 		char	c[8192];
 		int		ret;
@@ -34,10 +34,10 @@ int		httpRequestParseChunckedBody(std::string request, Socket *socket, size_t po
 			pos++;
 		}
 		chunkSize = strtol(convert.c_str(), NULL, 16);
-		Log::debug("chunck Size: ");
-		Log::debug(chunkSize);
+		// Log::debug("chunck Size: ");
+		// Log::debug(chunkSize);
 		while (chunkSize > 0) {
-			Log::debug("new chunk");
+			// Log::debug("new chunk");
 			socket->setContentLength(ft_itoa(atol(socket->getContentLength().c_str()) + chunkSize));
 			s.clear();
 			convert.clear();
@@ -66,67 +66,18 @@ int		httpRequestParseChunckedBody(std::string request, Socket *socket, size_t po
 				pos++;
 			}
 			chunkSize = strtol(convert.c_str(), NULL, 16);
-			Log::debug("chunck Size: ");
-			Log::debug(chunkSize);
+			// Log::debug("chunck Size: ");
+			// Log::debug(chunkSize);
 		}
-		Log::debug("All chunk read");
+		// Log::debug("All chunk read");
 		socket->setBody(body);
-		Log::debug("\033[0;32mchuncked content length: ");
-		Log::debug(socket->getContentLength().c_str());
+		// Log::debug("\033[0;32mchuncked content length: ");
+		// Log::debug(socket->getContentLength().c_str());
 		body.clear();
 	}
 	catch (std::exception &e) {
 		std::cerr << "Exception1: " << e.what() << std::endl;
 	}
-
-	// pos = s.find("\n0\r\n");
-	// if (pos == s.npos) {
-	// 	char	c[8192];
-	// 	int		ret;
-
-	// 	// Log::debug("\033[0;32mRead in chuncked body");
-	// 	while ((pos = s.find("\n0\r\n")) >= s.npos) {
-	// 		ft_bzero(c, 8192);
-	// 		ret = read(socket->getFd(), c, 8192);
-	// 		s.append(c, ret);
-	// 	}
-	// 	// Log::debug("\033[0;32mRead over");
-	// 	// Log::debug(debug);
-	// }
-	// try {
-	// 	chunkSize = 0;
-	// 	pos = 0;
-	// 	while (s[pos] && s[pos] != '\r') {
-	// 		convert.append(s.substr(pos, 1));
-	// 		pos++;
-	// 	}
-	// 	chunkSize = strtol(convert.c_str(), NULL, 16);
-	// 	// Log::debug("chunck Size: ");
-	// 	// Log::debug(chunkSize);
-	// 	socket->setContentLength(ft_itoa(atol(socket->getContentLength().c_str()) + chunkSize));
-	// 	while (chunkSize > 0) {
-	// 		// Log::debug("new chunk");
-	// 		body.append(s.substr(convert.length() + 3, chunkSize));
-	// 		s.erase(0, convert.length() + 2 + chunkSize + 2);
-	// 		convert.clear();
-	// 		pos = 0;
-	// 		while (s[pos] && s[pos] != '\r') {
-	// 			convert.append(s.substr(pos, 1));
-	// 			pos++;
-	// 		}
-	// 		chunkSize = strtol(convert.c_str(), NULL, 16);
-	// 		// Log::debug("chunck Size: ");
-	// 		// Log::debug(chunkSize);
-	// 		socket->setContentLength(ft_itoa(atol(socket->getContentLength().c_str()) + chunkSize));
-	// 	}
-	// 	// Log::debug("All chunk read");
-	// 	socket->setBody(body);
-	// 	// Log::debug("\033[0;32mchuncked content length: ");
-	// 	// Log::debug(socket->getContentLength().c_str());
-	// }
-	// catch (std::exception &e) {
-	// 	std::cerr << "Exception1: " << e.what() << std::endl;
-	// }
 	
 	return 0;
 }
@@ -137,7 +88,7 @@ int		httpRequestParseBody(std::string request, Socket *socket) {
 	size_t						chunkedPos = socket->getTransferEncoding().find("chunked");
 	size_t						ret;
 
-	Log::debug(request.c_str());
+	// Log::debug(request.c_str());
 
 	if (!socket->getContentLength().size() && chunkedPos == std::string::npos){
 		socket->setBody("");
