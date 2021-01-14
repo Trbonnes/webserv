@@ -26,8 +26,8 @@ _charset(""),
 _retryAfter(""),
 _transferEncoding(""),
 _body(NULL),
-_cgiResponse(),
-_response(),
+_cgiResponse(""),
+_response(NULL),
 _responseSize(0) {}
 
 HTTP::HTTP(Socket *socket, ConfigServer *config) :
@@ -52,8 +52,8 @@ _charset(""),
 _retryAfter(""),
 _transferEncoding(""),
 _body(NULL),
-_cgiResponse(),
-_response(),
+_cgiResponse(""),
+_response(NULL),
 _responseSize(0)
 {
     size_t      extension;
@@ -126,7 +126,7 @@ HTTP::~HTTP()
     while (i < NB_METAVARIABLES)
         free(_cgi_env[i++]);
     free(_body);
-    free(_response);
+    // free(_response);
 }
 
 HTTP     &HTTP::operator=(HTTP &rhs)
@@ -225,6 +225,7 @@ int         HTTP::openFile()
     struct stat file;
 
     fd = -1;
+    ft_bzero(&file, sizeof(file));
     stat(_route.c_str(), &file);
     if ((S_ISREG(file.st_mode) && (fd = open(_route.c_str(), O_RDONLY)) != -1))
         _statusCode = OK;
@@ -243,6 +244,7 @@ void         HTTP::setRoot()
     std::vector<std::string>::iterator itIndexBegin;
     std::vector<std::string>::iterator itIndexEnd;
 
+    ft_bzero(&file, sizeof(file));
     if (_uri.compare(0, 4, "http") == 0)
     {
         //** Absolute path **
@@ -254,7 +256,7 @@ void         HTTP::setRoot()
     else
     {
         replaceURI(); 
-
+        
         //** Relative path **
         if (_config.getAlias(_location).length() > 0)
             _route.assign(_config.getAlias(_location)).append("/");
@@ -294,7 +296,8 @@ void         HTTP::setRoot()
         itIndexEnd = _config.getIndex(_location).end();
         stat(_route.c_str(), &file);
         str.assign(_route);
-        while (itIndexBegin != itIndexEnd && (file.st_mode & S_IFMT) != S_IFREG)
+        while (itIndexBegin != itIndexEnd &&
+        ((file.st_mode & S_IFMT) != S_IFREG && (fd = open(_route.c_str(), O_RDONLY)) != -1))
         {
             str.assign(_route);
             if (str.at(str.length() - 1) != '/')
@@ -304,6 +307,7 @@ void         HTTP::setRoot()
             itIndexBegin++;
         }
         _route.assign(str);
+        close(fd);
     }
     if ((fd = open(_route.c_str(), O_RDONLY)) == -1)
         _route = _socket.getRequestURI();
@@ -554,29 +558,6 @@ char*         HTTP::getResponse()
     else
         setOtherHeaders(response);
     response.append("\r\n");
-    if (_socket.getMethod().compare("PUT") == 0)
-    {
-        int i = 0;
-        char str[15];
-
-        ft_bzero(str, sizeof(str));
-        while (1)
-        {
-            ft_strcpy(str, "responses/");
-            ft_strcat(str, ft_itoa(i));
-            int fd = open(str, O_WRONLY | O_TRUNC);
-            if (fd == -1)
-            {
-                close(fd);
-                fd = open(str, O_CREAT | O_WRONLY, S_IRUSR | S_IWUSR);
-                write(fd, response.c_str(), response.length());
-                close(fd);
-                break;
-            }
-            else
-                i++;
-        }
-    }
     setResponseSize(response);
     setBodyResponse(response);
     return (_response);

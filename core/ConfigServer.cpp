@@ -26,29 +26,61 @@ _defaultAutoindex(-1)
     char        *line;
     std::string string;
     std::string file;
-    std::list<std::string>::iterator it;
+    std::string it;
     std::string::iterator s_it;
+    // std::map<std::string, std::string> map;
+    size_t space;
+    size_t coma; 
+    std::string key;
+    std::string value;
 
     file.append("config/mime.types");
     if ((fd = open(file.c_str(), O_RDONLY)) >= 0)
     {
         while ((ret = get_next_line(fd, &line)) > 0)
         {
-            _mimeTypes.push_back(line);
+            it = line;
             free(line);
-        }
-        _mimeTypes.push_back(line);
-        it = _mimeTypes.begin();
-        while (it != _mimeTypes.end())
-        {
-            s_it = (*it).begin();
+            
+            s_it = it.begin();
             while (*s_it == ' ')
                 s_it++;
-            (*it).erase((*it).begin(), s_it);
-            it++;
+            it.erase(it.begin(), s_it); // erase espace du debut
+
+            space = it.find(' '); // trouve premier espace
+            value = it.substr(0, space); // trouve value
+            if (space != std::string::npos)
+                it.erase(it.begin(), it.begin() + space); // efface value
+            while (1)
+            {
+                s_it = it.begin(); // retourne au debut
+                while (*s_it == ' ') // 
+                    s_it++;
+                it.erase(it.begin(), s_it); // erase espace du debut
+
+                s_it = it.begin(); // retourne au debut
+                space = it.find(' '); // trouve prochain space
+                coma = it.find(';');
+                if (space != std::string::npos)
+                {
+                    key = it.substr(0, space);
+                    it.erase(it.begin(), s_it + space); // efface value
+                    _mimeTypes[key] = value;
+                }
+                else if (coma != std::string::npos)
+                {
+                    coma = it.find(';');
+                    key = it.substr(0, coma);
+                    _mimeTypes[key] = value;
+                    break;
+                }
+                else
+                    break;
+            }
         }
         free(line);
         close (fd);
+
     }
 }
 
@@ -191,7 +223,7 @@ std::string                 ConfigServer::getType(std::string location)
     return _defaultType;
 }
 
-std::list<std::string>      &ConfigServer::getMimeTypes()
+std::map<std::string, std::string>      &ConfigServer::getMimeTypes()
 {
     return _mimeTypes;
 }
