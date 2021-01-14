@@ -130,7 +130,7 @@ void	HttpWorker::run()
 					// std::cout << "New event" << std::endl;
 					// Socket *socket = httpRequestParser(connections[i]->getSock()); // TO DO why would it return a socket class and not an httpRequest object ? 
 					// Socket *socket = httpRequestParser(i); // TO DO why would it return a socket class and not an httpRequest object ? 
-					Socket *newSocket = httpRequestParser(i); // TO DO why would it return a socket class and not an httpRequest object ? 
+					Socket *newSocket = httpRequestParser(i, pipes[i]); // TO DO why would it return a socket class and not an httpRequest object ? 
 
 					if (equalRequest(newSocket, lastSocket))
 					{

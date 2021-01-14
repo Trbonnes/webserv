@@ -131,7 +131,7 @@ class   Socket
 	};    
 };
 
-Socket	*httpRequestParser(int fd);
+Socket	*httpRequestParser(int fd, int p[2]);
 
 void	ParseAcceptCharset(Socket *socket, std::string request, size_t pos);
 void	ParseAcceptLanguage(Socket *socket, std::string request, size_t pos);

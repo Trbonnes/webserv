@@ -269,7 +269,7 @@ int		httpRequestParseRequestLine(std::string request, Socket *socket) {
 #include <sys/stat.h>
 #include <fcntl.h>
 
-Socket	*httpRequestParser(int fd) {
+Socket	*httpRequestParser(int fd, int p[2]) {
 
 	Socket *socket;
 	char	c[8192];
@@ -277,6 +277,8 @@ Socket	*httpRequestParser(int fd) {
 	std::string request;
 
 	// Log::debug("\033[0;32mRequestParsing Reading");
+
+	(void) p; // TO DO remove, it's just there to enable compilation until the deed is done
 
 	while (request.find("\r\n\r\n") >= request.npos && request.find("\n\n") >= request.npos)
 	{
