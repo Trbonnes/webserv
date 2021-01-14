@@ -27,6 +27,7 @@ void	HttpWorker::run()
 	// HttpConnection*	new_connection; // temp pointer 
 	bool	connections[FD_SETSIZE]; // array of connections
 	ListenSocket* 	listening[FD_SETSIZE]; // array of pointers
+	int		pipes[FD_SETSIZE][2]; // array of pipes
 
 	// Important zeroing-out of the arrays
 	// ft_bzero(connections, FD_SETSIZE * sizeof(HttpConnection*)); 
@@ -68,7 +69,7 @@ void	HttpWorker::run()
 				s = ::accept(listening[i]->getSock(), &_client_name, &size);
 				if (s != -1)
 				{
-					if (s < FD_SETSIZE)
+					if (s < FD_SETSIZE && (pipe(pipes[i]) != -1))
 					{
 						FD_SET(s, &active_fs);
 						connections[s] = true;
