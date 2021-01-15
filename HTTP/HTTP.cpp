@@ -305,9 +305,9 @@ void         HTTP::setRoot()
             str.append(*itIndexBegin);
             stat(str.c_str(), &file);
             itIndexBegin++;
+            close(fd);
         }
         _route.assign(str);
-        close(fd);
     }
     if ((fd = open(_route.c_str(), O_RDONLY)) == -1)
         _route = _socket.getRequestURI();

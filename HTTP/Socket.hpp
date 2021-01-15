@@ -13,6 +13,8 @@
 #ifndef SOCKET_HPP
 # define SOCKET_HPP
 
+# define READ 131072
+
 # include <iostream>
 # include <string>
 # include <list>

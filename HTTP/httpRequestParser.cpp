@@ -21,11 +21,11 @@ int		httpRequestParseChunckedBody(std::string request, Socket *socket, size_t po
 	// Log::debug("\033[0;32mCHUNCKED");
 	body.reserve(100000000);
 	try {
-		char	c[8192];
+		char	c[READ];
 		int		ret;
 		
 		while ((pos = s.find("\r\n")) == s.npos) {
-			ft_bzero(c, 8192);
+			ft_bzero(c, READ);
 			ret = read(fd_read, c, 1);
 			s.append(c, ret);
 		}
@@ -43,13 +43,13 @@ int		httpRequestParseChunckedBody(std::string request, Socket *socket, size_t po
 			s.clear();
 			convert.clear();
 			for (int i = 0; i < (int)chunkSize; i += ret) {
-				if (chunkSize - i > 8192) {
-					ft_bzero(c, 8192);
-					ret = read(fd_read, c, 8192);
+				if (chunkSize - i > READ) {
+					ft_bzero(c, READ);
+					ret = read(fd_read, c, READ);
 					body.append(c, ret);
 				}
 				else {
-					ft_bzero(c, 8192);
+					ft_bzero(c, READ);
 					ret = read(fd_read, c, chunkSize - i);
 					body.append(c, ret);
 				}
@@ -121,7 +121,7 @@ int		httpRequestParseBody(std::string request, Socket *socket) {
 			//Log::debug("\033[0;32mRead if body missing");
 			while (body.size() < contentLength) {
 				ft_bzero(c, 8192);
-				ret = read(socket->getFd(), c, 8192);
+				ret = read(socket->getFd(), c, READ);
 				body.append(c, ret);
 			}
 			if (body.size() > contentLength)
