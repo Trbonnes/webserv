@@ -133,10 +133,25 @@ void        HTTP::cgi_exe()
     int         save_stdin;
     int         save_stdout;
     int         side_in[2];
-    int         side_out[2];
+    // int         side_out[2];
     char        buf[2049];
     char*       args[2];
     size_t      find;
+
+    int side_out;
+    int file = 0;
+    std::string route;
+
+    route = "cgi/";
+    route.append(ft_itoa(file));
+    while ((side_out = open(route.c_str(), O_WRONLY | O_TRUNC)) != -1)
+    {
+        close(side_out);
+        file++;
+        route = "cgi/";
+        route.append(ft_itoa(file));
+    }
+    side_out = open(route.c_str(), O_CREAT | O_RDWR, S_IRUSR | S_IWUSR);
 
     _cgiResponse.reserve(ft_atoi(_socket.getContentLength().c_str()) + 100);
     save_stdout = dup(STDOUT_FILENO);
@@ -145,9 +160,9 @@ void        HTTP::cgi_exe()
     ft_bzero(args, sizeof(args));
     ft_bzero(buf, sizeof(args));
     ft_bzero(side_in, sizeof(side_in));
-    ft_bzero(side_out, sizeof(side_out));
+    // ft_bzero(side_out, sizeof(side_out));
     pipe(side_in);
-    pipe(side_out);
+    // pipe(side_out);
     dup2(side_in[SIDE_IN], STDOUT_FILENO);
     pid = fork();
     if (pid < 0)
@@ -155,28 +170,34 @@ void        HTTP::cgi_exe()
     else if (pid == 0)
     {
         close(side_in[SIDE_IN]);
-        close(side_out[SIDE_OUT]);
+        // close(side_out[SIDE_OUT]);
         dup2(side_in[SIDE_OUT], STDIN_FILENO);
-        dup2(side_out[SIDE_IN], STDOUT_FILENO);
+        // dup2(side_out[SIDE_IN], STDOUT_FILENO);
+        dup2(side_out, STDOUT_FILENO);
         args[0] = ft_strdup(_config.getCGI_root(_location).c_str());
         if ((ret = execve(args[0], args, _cgi_env)) == -1)
             exit(EXIT_FAILURE);
     }
     else
     {
-        close(side_out[SIDE_IN]);
+        // close(side_out[SIDE_IN]);
         close(side_in[SIDE_OUT]);
         write(side_in[SIDE_IN], _socket.getBody().c_str(), ft_atoi(_socket.getContentLength().c_str()));
         close(side_in[SIDE_IN]);
+        _socket.getBody().clear();
+        std::cerr << route << std::endl;
+        waitpid(-1, &status, 0);
+        close(side_out);
         find = _cgiResponse.npos;
-        while ((ret = read(side_out[SIDE_OUT], buf, 2048)) > 0) {
+        side_out = open(route.c_str(), O_RDONLY, S_IRUSR | S_IWUSR);
+        while ((ret = read(side_out, buf, 1024)) > 0) {
             _responseSize += ret;
             buf[ret] = '\0';
             _cgiResponse.append(buf);
         }
-        close(side_out[SIDE_OUT]);
-        waitpid(-1, &status, 0);
-        _socket.getBody().clear();
+        // close(side_out[SIDE_OUT]);
+        close(side_out);
+        unlink(route.c_str());
         if (WIFEXITED(status))
             ret = WEXITSTATUS(status);
         if (ret != EXIT_SUCCESS)
