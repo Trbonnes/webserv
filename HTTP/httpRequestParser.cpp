@@ -17,15 +17,16 @@ int		httpRequestParseChunckedBody(std::string request, Socket *socket, size_t po
 	std::string convert;
 	std::string s = request.substr(pos, request.npos);
 	std::string body;
-
+	int	fd_read = socket->getFd();
 	// Log::debug("\033[0;32mCHUNCKED");
+	body.reserve(100000000);
 	try {
 		char	c[8192];
 		int		ret;
 		
 		while ((pos = s.find("\r\n")) == s.npos) {
 			ft_bzero(c, 8192);
-			ret = read(socket->getFd(), c, 1);
+			ret = read(fd_read, c, 1);
 			s.append(c, ret);
 		}
 		pos = 0;
@@ -44,20 +45,20 @@ int		httpRequestParseChunckedBody(std::string request, Socket *socket, size_t po
 			for (int i = 0; i < (int)chunkSize; i += ret) {
 				if (chunkSize - i > 8192) {
 					ft_bzero(c, 8192);
-					ret = read(socket->getFd(), c, 8192);
+					ret = read(fd_read, c, 8192);
 					body.append(c, ret);
 				}
 				else {
 					ft_bzero(c, 8192);
-					ret = read(socket->getFd(), c, chunkSize - i);
+					ret = read(fd_read, c, chunkSize - i);
 					body.append(c, ret);
 				}
 			}
 			ft_bzero(c, 8192);
-			ret = read(socket->getFd(), c, 2);
+			ret = read(fd_read, c, 2);
 			while ((pos = s.find("\r\n")) == s.npos) {
 				ft_bzero(c, 2);
-				ret = read(socket->getFd(), c, 1);
+				ret = read(fd_read, c, 1);
 				s.append(c, ret);
 			}
 			pos = 0;
@@ -73,7 +74,7 @@ int		httpRequestParseChunckedBody(std::string request, Socket *socket, size_t po
 		socket->setBody(body);
 		// Log::debug("\033[0;32mchuncked content length: ");
 		// Log::debug(socket->getContentLength().c_str());
-		body.clear();
+		// body.clear();
 	}
 	catch (std::exception &e) {
 		std::cerr << "Exception1: " << e.what() << std::endl;
@@ -84,14 +85,14 @@ int		httpRequestParseChunckedBody(std::string request, Socket *socket, size_t po
 
 int		httpRequestParseBody(std::string request, Socket *socket) {
 	std::string					content;
-	std::string					body;
+	std::string					body = "";
 	size_t						chunkedPos = socket->getTransferEncoding().find("chunked");
 	size_t						ret;
 
 	// Log::debug(request.c_str());
 
 	if (!socket->getContentLength().size() && chunkedPos == std::string::npos){
-		socket->setBody("");
+		socket->setBody(body);
 		return 0;
 	}
 	
@@ -103,7 +104,7 @@ int		httpRequestParseBody(std::string request, Socket *socket) {
 	else 
 		pos += 4;
 	if (pos >= request.npos) {
-		socket->setBody("");
+		socket->setBody(body);
 		return 0;
 	}
 	if (chunkedPos != std::string::npos)

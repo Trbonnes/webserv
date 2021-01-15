@@ -284,7 +284,7 @@ void	Socket::setReferer(std::string Referer) {
 	_referer = Referer;
 }
 
-void	Socket::setBody(std::string Body) {
+void	Socket::setBody(std::string &Body) {
 	_body = Body;
 }
 

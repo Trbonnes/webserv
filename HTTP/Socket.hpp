@@ -115,7 +115,7 @@ class   Socket
 	void	setPort(int port);
     void	setUserAgent(std::string UserAgent);
 	void	setReferer(std::string Referer);
-    void	setBody(std::string sBody);
+    void	setBody(std::string &sBody);
 	void	setXSecret(std::string XSecret);
 
 	class	BadReadException: public std::exception {
