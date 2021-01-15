@@ -138,6 +138,7 @@ void        HTTP::cgi_exe()
     char*       args[2];
     size_t      find;
 
+    _cgiResponse.reserve(ft_atoi(_socket.getContentLength().c_str()) + 100);
     save_stdout = dup(STDOUT_FILENO);
     save_stdin = dup(STDIN_FILENO);
     ret = EXIT_SUCCESS;
@@ -175,6 +176,7 @@ void        HTTP::cgi_exe()
         }
         close(side_out[SIDE_OUT]);
         waitpid(-1, &status, 0);
+        _socket.getBody().clear();
         if (WIFEXITED(status))
             ret = WEXITSTATUS(status);
         if (ret != EXIT_SUCCESS)
@@ -204,4 +206,5 @@ void        HTTP::cgi_parse()
     find = _cgiResponse.find("Content-Type: ");
     if (find != _cgiResponse.npos)
         _contentType = _cgiResponse.substr(find + ft_strlen("Content-Type: "), _cgiResponse.find("\r\n", find) - find - ft_strlen("Content-Type: "));
+    _cgiResponse.clear();
 }

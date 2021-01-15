@@ -147,6 +147,8 @@ void	HttpWorker::run()
 						if (lastSocket != NULL)
 							delete lastSocket;
 						lastSocket = newSocket;
+						if (lastSocket->getMethod().compare("POST") == 0)
+							free(response);
 					}
 					else
 						write(i, response, responseSize); // TO DO ugly
