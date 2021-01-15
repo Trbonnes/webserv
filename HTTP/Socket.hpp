@@ -34,6 +34,8 @@ class   Socket
     // SOCKET
 
     int                         _fd;
+    int*                        _pipe;
+    std::string                 _request;
 
     std::string                 _addr;
 
@@ -75,6 +77,8 @@ class   Socket
 
     Socket                      &operator=(Socket const &rhs);
     int             			getFd();
+    int*                        getPipe();
+    std::string                 getRequest();
     std::string     			getMethod();
     std::string     			getRequestURI();
     std::string     			getHttpVersion();
@@ -98,6 +102,8 @@ class   Socket
 
 
     void	setFd(int fd);
+    void    setPipe(int *pipe);
+    void    setRequest(std::string &request);
     void	setMethod(std::string method);
     void	setRequestURI(std::string RequestURI);
     void	setHttpVersion(std::string httpVersion);
@@ -132,6 +138,7 @@ class   Socket
 };
 
 Socket	*httpRequestParser(int fd, int p[2]);
+int		httpRequestParseBody(Socket *socket);
 
 void	ParseAcceptCharset(Socket *socket, std::string request, size_t pos);
 void	ParseAcceptLanguage(Socket *socket, std::string request, size_t pos);

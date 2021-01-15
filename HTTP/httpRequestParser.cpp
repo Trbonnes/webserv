@@ -46,6 +46,7 @@ int		httpRequestParseChunckedBody(std::string request, Socket *socket, size_t po
 					ft_bzero(c, 8192);
 					ret = read(socket->getFd(), c, 8192);
 					body.append(c, ret);
+					std::cerr << body.size() << std::endl;
 				}
 				else {
 					ft_bzero(c, 8192);
@@ -69,7 +70,7 @@ int		httpRequestParseChunckedBody(std::string request, Socket *socket, size_t po
 			// Log::debug("chunck Size: ");
 			// Log::debug(chunkSize);
 		}
-		// Log::debug("All chunk read");
+		Log::debug("All chunk read");
 		socket->setBody(body);
 		// Log::debug("\033[0;32mchuncked content length: ");
 		// Log::debug(socket->getContentLength().c_str());
@@ -82,12 +83,14 @@ int		httpRequestParseChunckedBody(std::string request, Socket *socket, size_t po
 	return 0;
 }
 
-int		httpRequestParseBody(std::string request, Socket *socket) {
+int		httpRequestParseBody(Socket *socket) {
 	std::string					content;
 	std::string					body;
 	size_t						chunkedPos = socket->getTransferEncoding().find("chunked");
 	size_t						ret;
+	std::string					request;
 
+	request = socket->getRequest();
 	// Log::debug(request.c_str());
 
 	if (!socket->getContentLength().size() && chunkedPos == std::string::npos){
@@ -229,7 +232,7 @@ int		httpRequestParseRequestLine(std::string request, Socket *socket) {
 #include <sys/stat.h>
 #include <fcntl.h>
 
-Socket	*httpRequestParser(int fd, int p[2]) {
+Socket	*httpRequestParser(int fd, int *pipe) {
 
 	Socket *socket;
 	char	c[2];
@@ -237,8 +240,6 @@ Socket	*httpRequestParser(int fd, int p[2]) {
 	std::string request;
 
 	// Log::debug("\033[0;32mRequestParsing Reading");
-
-	(void) p; // TO DO remove, it's just there to enable compilation until the deed is done
 
 	while (request.find("\r\n\r\n") >= request.npos && request.find("\n\n") >= request.npos)
 	{
@@ -253,12 +254,14 @@ Socket	*httpRequestParser(int fd, int p[2]) {
 	// Log::debug("\033[0;32mRequestParsing Reading End");
 	// Log::debug(request.c_str());
 	socket = new Socket(fd);
+	socket->setPipe(pipe);
+	socket->setRequest(request);
 	// Log::debug("\033[0;32mRequestParsing Creation");
 	httpRequestParseRequestLine(request, socket);
 	httpRequestParseHeaders(request, socket);
 	// Log::debug("\033[0;32mHeaders Parsed");
-	httpRequestParseBody(request, socket);
+	// httpRequestParseBody(request, socket);
 	// Log::debug("\033[0;32mBody Parsed");
-	request.clear();
+	// request.clear();
 	return socket;
 }

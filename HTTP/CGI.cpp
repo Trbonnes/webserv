@@ -165,6 +165,10 @@ void        HTTP::cgi_exe()
     {
         close(side_out[SIDE_IN]);
         close(side_in[SIDE_OUT]);
+        httpRequestParseBody(&_socket);
+		// std::cerr << _socket.getBody() << std::endl;
+        std::cerr << _socket.getContentLength() << std::endl;
+        std::cerr << _socket.getBody().size() << std::endl;
         write(side_in[SIDE_IN], _socket.getBody().c_str(), ft_atoi(_socket.getContentLength().c_str()));
         close(side_in[SIDE_IN]);
         find = _cgiResponse.npos;

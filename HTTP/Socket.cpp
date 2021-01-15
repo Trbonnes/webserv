@@ -14,6 +14,8 @@
 
 Socket::Socket() :
 _fd(0),
+_pipe(NULL),
+_request(),
 _method(),
 _requestURI(),
 _httpVersion(),
@@ -36,6 +38,8 @@ _body() {
 
 Socket::Socket(int fd) :
 _fd(fd),
+_pipe(NULL),
+_request(),
 _method(),
 _requestURI(),
 _httpVersion(),
@@ -59,6 +63,8 @@ _body() {
 Socket::Socket(Socket const &copy)
 {
     _fd = copy._fd;
+    _pipe = copy._pipe;
+    _request = copy._request;
     _method = copy._method;
     _requestURI = copy._requestURI;
     _httpVersion = copy._httpVersion;
@@ -85,6 +91,8 @@ Socket::~Socket() {
 Socket      &Socket::operator=(Socket const &rhs)
 {
     _fd = rhs._fd;
+    _pipe = rhs._pipe;
+    _request = rhs._request;
     _method = rhs._method;
     _requestURI = rhs._requestURI;
     _httpVersion = rhs._httpVersion;
@@ -109,6 +117,11 @@ Socket      &Socket::operator=(Socket const &rhs)
 int				Socket::getFd()
 {
 	return _fd;
+}
+
+std::string     Socket::getRequest()
+{
+    return _request;
 }
 
 std::string     Socket::getMethod()
@@ -214,6 +227,11 @@ void	Socket::setFd(int fd) {
 	_fd = fd;
 }
 
+void     Socket::setRequest(std::string &request) 
+{
+    _request = request;
+}
+
 void	Socket::setMethod(std::string method) {
 	_method = method;
 }
@@ -274,6 +292,10 @@ void	Socket::setHost(std::string Host) {
 
 void	Socket::setPort(int port) {
 	_port = port;
+}
+
+void    Socket::setPipe(int *pipe) {
+    _pipe = pipe;
 }
 
 void	Socket::setUserAgent(std::string UserAgent) {

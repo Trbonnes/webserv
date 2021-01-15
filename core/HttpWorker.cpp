@@ -21,6 +21,9 @@ int		equalRequest(Socket *newSocket, Socket *lastSocket)
 {
 	if (lastSocket == NULL)
 		return 1;
+	if (newSocket->getMethod().compare("PUT") == 0 
+		|| newSocket->getMethod().compare("POST") == 0)
+		return 1;
 	if (newSocket->getMethod().compare(lastSocket->getMethod()))
 		return 1;
 	if (newSocket->getRequestURI().compare(lastSocket->getRequestURI()))
@@ -92,7 +95,7 @@ void	HttpWorker::run()
 		// Waiting for an event on listen socket
 		if (select(FD_SETSIZE, &read_fs, NULL, NULL, NULL) == -1)
 		{
-			std::cerr << "Select error " << strerror(errno) << std::endl;
+			// std::cerr << "Select error " << strerror(errno) << std::endl;
 			continue; // TO DO throw something ?
 		}
 		for (int i = 0; i < FD_SETSIZE; i++)
@@ -137,11 +140,9 @@ void	HttpWorker::run()
 						ConfigServer *configServer = _config->getServerUnit(newSocket->getPort(), newSocket->getHost());
 						HTTP method(newSocket, configServer);
 						response = method.getResponse(); // TO DO make code more modulare and clean up names
-						// std::cerr << response << std::endl;
 						
 						responseSize = method.getResponseSize();
 						write(i, response, responseSize); // TO DO ugly
-						// std::cerr << responseSize << std::endl;
 						if (lastSocket != NULL)
 							delete lastSocket;
 						lastSocket = newSocket;

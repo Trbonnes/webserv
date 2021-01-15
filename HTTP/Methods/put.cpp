@@ -16,11 +16,19 @@ void        HTTP::put()
         if (fd == -1)
             _statusCode = INTERNAL_SERVER_ERROR;
         else
+        {
+            std::cerr << "1: " << _socket.getContentLength() << std::endl;
+            httpRequestParseBody(&_socket);
+            std::cerr << "2: " << _socket.getContentLength() << std::endl;
             write(fd, _socket.getBody().c_str(), ft_atoi(_socket.getContentLength().c_str()));
+        }
     }
     else
     {
         _statusCode = NO_CONTENT;
+        std::cerr << "3: " << _socket.getContentLength() << std::endl;
+        httpRequestParseBody(&_socket);
+        std::cerr << "4: " << _socket.getContentLength() << std::endl;
         write(fd, _socket.getBody().c_str(), ft_atoi(_socket.getContentLength().c_str()));
     }
     close(fd);
