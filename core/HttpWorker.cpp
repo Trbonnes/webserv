@@ -21,8 +21,6 @@ int		equalRequest(Socket *newSocket, Socket *lastSocket)
 {
 	if (lastSocket == NULL)
 		return 1;
-	if (newSocket->getMethod().compare("POST") == 0)
-		return 1
 ;	if (newSocket->getMethod().compare(lastSocket->getMethod()))
 		return 1;
 	if (newSocket->getRequestURI().compare(lastSocket->getRequestURI()))
@@ -74,6 +72,7 @@ void	HttpWorker::run()
 	ListenSocket* 	listening[FD_SETSIZE]; // array of pointers
 	int		pipes[FD_SETSIZE][2]; // array of pipes
 
+	response = NULL;
 	// Important zeroing-out of the arrays
 	// ft_bzero(connections, FD_SETSIZE * sizeof(HttpConnection*)); 
 	ft_bzero(connections, FD_SETSIZE * sizeof(bool)); 
@@ -136,22 +135,33 @@ void	HttpWorker::run()
 
 					if (equalRequest(newSocket, lastSocket))
 					{
+						if (response != NULL)
+						{
+							free(response);
+							response = NULL;
+						}
 						ConfigServer *configServer = _config->getServerUnit(newSocket->getPort(), newSocket->getHost());
 						HTTP method(newSocket, configServer);
 						response = method.getResponse(); // TO DO make code more modulare and clean up names
-						// std::cerr << response << std::endl;
 						
 						responseSize = method.getResponseSize();
 						write(i, response, responseSize); // TO DO ugly
-						// std::cerr << responseSize << std::endl;
 						if (lastSocket != NULL)
 							delete lastSocket;
-						lastSocket = newSocket;
-						if (lastSocket->getMethod().compare("POST") == 0)
+						if (newSocket->getMethod().compare("POST") == 0)
+						{
 							free(response);
+							response = NULL;
+							delete newSocket;
+							newSocket = NULL;
+						}
+						lastSocket = newSocket;
 					}
 					else
+					{
+						delete newSocket;
 						write(i, response, responseSize); // TO DO ugly
+					}
 					// if (socket->getMethod().compare("PUT") == 0)
 					// {						
 					// 	std::cout << socket->getFd() << std::endl;				
