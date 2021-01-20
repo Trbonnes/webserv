@@ -68,14 +68,12 @@ void	HttpWorker::run()
 	char* 	response;
 	int		responseSize;
 	// HttpConnection*	new_connection; // temp pointer 
-	bool	connections[FD_SETSIZE]; // array of connections
 	ListenSocket* 	listening[FD_SETSIZE]; // array of pointers
 	int		pipes[FD_SETSIZE][2]; // array of pipes
 
 	response = NULL;
 	// Important zeroing-out of the arrays
 	// ft_bzero(connections, FD_SETSIZE * sizeof(HttpConnection*)); 
-	ft_bzero(connections, FD_SETSIZE * sizeof(bool)); 
 	ft_bzero(listening, FD_SETSIZE * sizeof(ListenSocket*));
 
 	// Transforming list in fdset and ListenSocket in an array we can access with i directly without looping through the fdset
@@ -116,7 +114,6 @@ void	HttpWorker::run()
 					if (s < FD_SETSIZE && (pipe(pipes[s]) != -1))
 					{
 						FD_SET(s, &active_fs);
-						connections[s] = true;
 					}
 					else
 						close(s);
@@ -124,7 +121,7 @@ void	HttpWorker::run()
 				
 			}
 			// If it is a connection socket, do the job
-			else if (connections[i])
+			else
 			{
 				try
 				{
@@ -172,10 +169,10 @@ void	HttpWorker::run()
 				}
 				catch(const std::exception& e)
 				{
+					std::cout << "Connection "<< i << " has been closed" << std::endl;
 					close(i);
 					close(pipes[i][0]);
 					close(pipes[i][1]);
-					connections[i] = false;
 					FD_CLR(i, &active_fs);
 				}
 			}
