@@ -118,16 +118,20 @@ void	HttpWorker::run()
 					else
 						close(s);
 				}
-				
+				else
+				{
+					std::cerr << "Connection "<< i << " has been closed here" << std::endl;
+					close(i);
+					close(pipes[i][0]);
+					close(pipes[i][1]);
+					FD_CLR(i, &active_fs);
+				}
 			}
 			// If it is a connection socket, do the job
 			else
 			{
 				try
 				{
-					// std::cout << "New event" << std::endl;
-					// Socket *socket = httpRequestParser(connections[i]->getSock()); // TO DO why would it return a socket class and not an httpRequest object ? 
-					// Socket *socket = httpRequestParser(i); // TO DO why would it return a socket class and not an httpRequest object ? 
 					Socket *newSocket = httpRequestParser(i, pipes[i]); // TO DO why would it return a socket class and not an httpRequest object ? 
 
 					if (equalRequest(newSocket, lastSocket))
@@ -159,17 +163,10 @@ void	HttpWorker::run()
 						delete newSocket;
 						write(i, response, responseSize); // TO DO ugly
 					}
-					// if (socket->getMethod().compare("PUT") == 0)
-					// {						
-					// 	std::cout << socket->getFd() << std::endl;				
-					// }
-					// std::cerr << response << std::endl;
-					// write(i, response, responseSize); // TO DO ugly
-					// delete socket;
 				}
 				catch(const std::exception& e)
 				{
-					std::cout << "Connection "<< i << " has been closed" << std::endl;
+					std::cerr << "Connection "<< i << " has been closed" << std::endl;
 					close(i);
 					close(pipes[i][0]);
 					close(pipes[i][1]);
@@ -180,7 +177,7 @@ void	HttpWorker::run()
 	// TO DO timeout for http
 	}
 	// TO DO delete connections
-	std::cout << "EXITING WORKER " << std::endl;
+	std::cerr << "EXITING WORKER " << std::endl;
 	exit(0);
 }
 

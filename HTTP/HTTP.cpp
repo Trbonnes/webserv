@@ -124,8 +124,13 @@ HTTP::~HTTP()
 
     i = 0;
     while (i < NB_METAVARIABLES)
-        free(_cgi_env[i++]);
+    {
+        free(_cgi_env[i]);
+        _cgi_env[i] = NULL;
+        i++;
+    }
     free(_body);
+    _body = NULL;
     // free(_response);
 }
 

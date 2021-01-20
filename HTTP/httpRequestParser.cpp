@@ -248,7 +248,8 @@ Socket	*httpRequestParser(int fd, int p[2]) {
 		if (ret == 0)
 			throw Socket::ConnectionClose();
 		if (ret == -1)
-			throw Socket::BadReadException();
+			throw Socket::ConnectionClose();
+			// throw Socket::BadReadException();
 		request.append(c, ret);
 	}
 	// Log::debug("\033[0;32mRequestParsing Reading End");

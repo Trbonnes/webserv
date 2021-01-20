@@ -4,10 +4,10 @@
 
 static void printUsage()
 {
-	std::cout << "Usage: ./webserv [option argument]" << std::endl;
-	std::cout << std::endl;
-	std::cout << "Available options:" << std::endl;
-	std::cout << "\r-c : set the path to configuration file to the next argument" << std::endl;
+	std::cerr << "Usage: ./webserv [option argument]" << std::endl;
+	std::cerr << std::endl;
+	std::cerr << "Available options:" << std::endl;
+	std::cerr << "\r-c : set the path to configuration file to the next argument" << std::endl;
 }
 
 static int parseArguments(HttpServer &server, const char **av)

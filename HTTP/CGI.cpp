@@ -133,7 +133,6 @@ void        HTTP::cgi_exe()
     int         save_stdin;
     int         save_stdout;
     int         side_in[2];
-    // int         side_out[2];
     char        buf[2049];
     char*       args[2];
 
@@ -158,9 +157,7 @@ void        HTTP::cgi_exe()
     ft_bzero(args, sizeof(args));
     ft_bzero(buf, sizeof(args));
     ft_bzero(side_in, sizeof(side_in));
-    // ft_bzero(side_out, sizeof(side_out));
     pipe(side_in);
-    // pipe(side_out);
     dup2(side_in[SIDE_IN], STDOUT_FILENO);
     pid = fork();
     if (pid < 0)
@@ -168,9 +165,7 @@ void        HTTP::cgi_exe()
     else if (pid == 0)
     {
         close(side_in[SIDE_IN]);
-        // close(side_out[SIDE_OUT]);
         dup2(side_in[SIDE_OUT], STDIN_FILENO);
-        // dup2(side_out[SIDE_IN], STDOUT_FILENO);
         dup2(side_out, STDOUT_FILENO);
         args[0] = ft_strdup(_config.getCGI_root(_location).c_str());
         if ((ret = execve(args[0], args, _cgi_env)) == -1)
@@ -178,18 +173,12 @@ void        HTTP::cgi_exe()
     }
     else
     {
-        // close(side_out[SIDE_IN]);
         close(side_in[SIDE_OUT]);
         write(side_in[SIDE_IN], _socket.getBody().c_str(), ft_atoi(_socket.getContentLength().c_str()));
         _socket.getBody().clear();
         close(side_in[SIDE_IN]);
         waitpid(-1, &status, 0);
         close(side_out);
-        int output = open("output", O_WRONLY | O_APPEND);
-        write(output, route.c_str(), route.length());
-        write(output, "\n", 1);
-        close(output);
-        // std::cerr << route << std::endl;
         if ((side_out = open(route.c_str(), O_RDONLY, S_IRUSR | S_IWUSR)) == -1)
             Log::debug("Open fail");
         while ((ret = read(side_out, buf, 1024)) > 0) {
@@ -197,7 +186,6 @@ void        HTTP::cgi_exe()
             buf[ret] = '\0';
             _cgiResponse.append(buf);
         }
-        // close(side_out[SIDE_OUT]);
         close(side_out);
         unlink(route.c_str());
         if (WIFEXITED(status))

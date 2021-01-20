@@ -71,16 +71,16 @@ void ProcessManager::manage()
 	while (_process.size() > 0)
 	{
 		pid = wait(&status);
-		std::cout << "Dead pid" << pid << std::endl;
-		std::cout << "Was signaled ? " << WIFSIGNALED(status) << std::endl;
-		std::cout << "What code ? " << WTERMSIG(status) << std::endl;
-		std::cout << "Core dump ? " << WCOREDUMP(status) << std::endl;
-		std::cout << "Process with pid " << pid << " was killed" << std::endl;
+		std::cerr << "Dead pid" << pid << std::endl;
+		std::cerr << "Was signaled ? " << WIFSIGNALED(status) << std::endl;
+		std::cerr << "What code ? " << WTERMSIG(status) << std::endl;
+		std::cerr << "Core dump ? " << WCOREDUMP(status) << std::endl;
+		std::cerr << "Process with pid " << pid << " was killed" << std::endl;
 		Runnable* proc = _process[pid];
-		std::cout << "Value of proc " << proc << std::endl;
+		std::cerr << "Value of proc " << proc << std::endl;
 		if (proc->isRespawn())
 		{
-			std::cout << "Respawning the process" << std::endl;
+			std::cerr << "Respawning the process" << std::endl;
 			// this->run(*proc, 1, false);
 		}
 	}
