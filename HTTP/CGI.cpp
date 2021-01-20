@@ -142,6 +142,12 @@ void        HTTP::cgi_exe()
 
     route = "HTTP/cgi/";
     route.append(ft_itoa(file));
+    
+    int output = open("output", O_WRONLY | O_APPEND);
+    write(output, route.c_str(), route.length());
+    write(output, "\n", 1);
+    close(output);
+
     while ((side_out = open(route.c_str(), O_WRONLY | O_TRUNC)) != -1)
     {
         close(side_out);
