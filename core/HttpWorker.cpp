@@ -113,7 +113,7 @@ void	HttpWorker::run()
 				s = ::accept(listening[i]->getSock(), &_client_name, &size);
 				if (s != -1)
 				{
-					if (s < FD_SETSIZE && (pipe(pipes[i]) != -1))
+					if (s < FD_SETSIZE && (pipe(pipes[s]) != -1))
 					{
 						FD_SET(s, &active_fs);
 						connections[s] = true;
