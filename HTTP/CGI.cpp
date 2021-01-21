@@ -50,10 +50,9 @@ void        HTTP::cgi_metaVariables()
     _cgi._path_translated = _route;
     if (query == str.npos)
        _cgi._query_string = str.assign(_route).erase(0, query);
-    _cgi._remote_addr = "127.0.0.1"; // EN DUR! TO DO
-    // _cgi._remote_addr = _socket.getRemoteAddr();
-    _cgi._remote_ident = "login_user"; // Default
-    _cgi._remote_user = "user"; // Default 
+    _cgi._remote_addr = "127.0.0.1";
+    _cgi._remote_ident = "login_user";
+    _cgi._remote_user = "user";
     _cgi._request_method = _socket.getMethod();
     _cgi._request_uri = _socket.getRequestURI();
     _cgi._script_name = _config.getCGI_root(_location);
@@ -63,8 +62,6 @@ void        HTTP::cgi_metaVariables()
     _cgi._server_software = _config.getServerSoftware();
     return ;
 }
-
-# include <stdio.h> // TEST
 
 // ** Set the environnement variables in a char** table **
 void        HTTP::setEnv()
@@ -90,9 +87,6 @@ void        HTTP::setEnv()
     if (_socket.getXSecret().compare(""))
         _cgi_env[X_SECRET] = ft_strdup("HTTP_X_SECRET_HEADER_FOR_TEST=1");
     _cgi_env[NB_METAVARIABLES] = NULL;
-    // int i = 0; // TEST
-    // while (i < NB_METAVARIABLES) // TEST
-    //     printf("%s\n", _cgi_env[i++]); // TEST
 }
 
 // ** Verify if the extensions correspond to the config file (CGI) ** 
@@ -152,10 +146,8 @@ void        HTTP::cgi_exe()
     ft_bzero(buf, sizeof(args));
     ft_bzero(side_in, sizeof(side_in));
     pipe(side_in);
-
     route = "HTTP/cgi/";
     route.append(ft_itoa(file));
-    
     while ((side_out = open(route.c_str(), O_RDONLY)) != -1)
     {
         close(side_out);
@@ -164,12 +156,6 @@ void        HTTP::cgi_exe()
         route.append(ft_itoa(file));
     }
     while ((side_out = open(route.c_str(), O_CREAT | O_EXCL | O_RDWR, S_IRUSR | S_IWUSR)) == -1) ;
-
-    int output = open("output", O_WRONLY | O_APPEND); // TEST
-    write(output, route.c_str(), route.length()); // TEST
-    write(output, "\n", 1); // TEST
-    close(output); // TEST
-
     pid = fork();
     if (pid < 0)
         _statusCode = INTERNAL_SERVER_ERROR;

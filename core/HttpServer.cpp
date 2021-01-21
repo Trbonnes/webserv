@@ -59,7 +59,7 @@ void HttpServer::run()
 }
 
 void HttpServer::initConf() {
-	std::cerr << "Initializing configuration" << std::endl;
+	// std::cerr << "Initializing configuration" << std::endl;
 	_config = NULL;
 	try
 	{
@@ -80,7 +80,7 @@ void HttpServer::initConf() {
 
 void HttpServer::initListenSocket() // TO DO optimization
 {
-	std::cerr << "Initializing listening sockets" << std::endl;
+	// std::cerr << "Initializing listening sockets" << std::endl;
 	std::vector<ConfigServer> servers;
 	std::vector<int> ports;
 
@@ -96,7 +96,7 @@ void HttpServer::initListenSocket() // TO DO optimization
 
 void			HttpServer::masterLifecycle()
 {
-	std::cerr << "Master is entering is main lifecycle" << std::endl;
+	// std::cerr << "Master is entering is main lifecycle" << std::endl;
 	_manager->manage();
 	// TO DO add process management / reload mechanics
 }
@@ -107,7 +107,7 @@ void HttpServer::initWorkers() {
 	HttpWorker worker(_listen_sockset, _config);
 	if (nbworkers < WORKER_MIN || nbworkers > WORKER_MAX)
 		nbworkers = WORKER_MIN;
-    std::cerr << "Initializing " << nbworkers << " workers" << std::endl;
+    // std::cerr << "Initializing " << nbworkers << " workers" << std::endl;
 	try
 	{
 		_manager->run(worker, nbworkers, true);

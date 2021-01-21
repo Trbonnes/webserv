@@ -8,7 +8,7 @@
         <div id="container">
             <!-- zone de connexion -->
             
-            <form action="principale.php" method="POST">
+            <form action="response_post.php" method="post">
                 <h1>Connexion</h1>
                 
                 <label><b>Nom d'utilisateur</b></label>

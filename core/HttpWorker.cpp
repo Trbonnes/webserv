@@ -124,8 +124,7 @@ void	HttpWorker::run()
 			{
 				try
 				{
-					Socket *newSocket = httpRequestParser(i, pipes[i]); // TO DO why would it return a socket class and not an httpRequest object ? 
-
+					Socket *newSocket = httpRequestParser(i, pipes[i]);
 					if (equalRequest(newSocket, lastSocket))
 					{
 						if (response != NULL)
@@ -135,10 +134,10 @@ void	HttpWorker::run()
 						}
 						ConfigServer *configServer = _config->getServerUnit(newSocket->getPort(), newSocket->getHost());
 						HTTP method(newSocket, configServer);
-						response = method.getResponse(); // TO DO make code more modulare and clean up names
+						response = method.getResponse();
 						
 						responseSize = method.getResponseSize();
-						write(i, response, responseSize); // TO DO ugly
+						write(i, response, responseSize);
 						if (lastSocket != NULL)
 							delete lastSocket;
 						if (newSocket->getMethod().compare("POST") == 0)
@@ -153,12 +152,11 @@ void	HttpWorker::run()
 					else
 					{
 						delete newSocket;
-						write(i, response, responseSize); // TO DO ugly
+						write(i, response, responseSize);
 					}
 				}
 				catch(const std::exception& e)
 				{
-					std::cerr << "Connection "<< i << " has been closed" << std::endl;
 					close(i);
 					close(pipes[i][0]);
 					close(pipes[i][1]);

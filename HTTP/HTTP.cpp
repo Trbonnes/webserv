@@ -131,7 +131,6 @@ HTTP::~HTTP()
     }
     free(_body);
     _body = NULL;
-    // free(_response);
 }
 
 HTTP     &HTTP::operator=(HTTP &rhs)

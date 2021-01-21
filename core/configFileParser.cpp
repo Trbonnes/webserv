@@ -518,7 +518,6 @@ int		configFileParseServerUnit(std::string configFile, std::vector<ConfigServer>
 				j = pos;
 				while (parseServer[j] != ' ' && j != i) { j++; }
 				errorCode = parseServer.substr(pos, j - pos);
-				std::cerr << '"' << errorCode << '"' << errorCode[errorCode.size() - 1] << std::endl;
 				if (isX) {
 					page[tmp - 1] = errorCode[errorCode.size() - 1];
 				}

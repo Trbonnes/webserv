@@ -19,8 +19,8 @@ void        HTTP::setBody(int fd)
 
 void        HTTP::setCharset(void)
 {
-    if (_contentType.compare("text/html") == 0)
-        _charset = _config.getCharset(_location);
+    // if (_contentType.compare("text/html") == 0)
+    _charset = _config.getCharset(_location);
 }
 
 void        HTTP::setServerName()
