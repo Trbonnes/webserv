@@ -6,4 +6,3 @@ test/
 .vscode
 curl_output/
 test_put.sh
-put_test/
