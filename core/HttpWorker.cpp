@@ -118,14 +118,6 @@ void	HttpWorker::run()
 					else
 						close(s);
 				}
-				// else
-				// {
-				// 	std::cerr << "Connection "<< i << " has been closed here" << std::endl;
-				// 	close(i);
-				// 	close(pipes[i][0]);
-				// 	close(pipes[i][1]);
-				// 	FD_CLR(i, &active_fs);
-				// }
 			}
 			// If it is a connection socket, do the job
 			else

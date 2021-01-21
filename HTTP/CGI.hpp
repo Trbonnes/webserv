@@ -5,6 +5,7 @@
 
 struct              CGI
 {
+    std::string     _redirect_status;
     std::string     _auth_type;
     std::string     _content_length;
     std::string     _content_type;

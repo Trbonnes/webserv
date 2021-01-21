@@ -33,6 +33,7 @@ enum methods
 
 enum cgi_variables
 {
+    REDIRECT_STATUS,
     AUTH_TYPE,
     CONTENT_LENGTH,
     CONTENT_TYPE,

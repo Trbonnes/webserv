@@ -40,6 +40,7 @@ void        HTTP::cgi_metaVariables()
     std::string str;
     size_t      query;
 
+    _cgi._redirect_status = "200";
     _cgi._auth_type = _socket.getAuthorization(); 
     _cgi._content_length = _socket.getContentLength();
     _cgi._content_type = _socket.getContentType();
@@ -68,6 +69,7 @@ void        HTTP::cgi_metaVariables()
 // ** Set the environnement variables in a char** table **
 void        HTTP::setEnv()
 {
+    _cgi_env[REDIRECT_STATUS] = ft_strdup(_cgi._redirect_status.insert(0, "REDIRECT_STATUS=").c_str());
     _cgi_env[AUTH_TYPE] = ft_strdup(_cgi._auth_type.insert(0, "AUTH_TYPE=").c_str());
     _cgi_env[CONTENT_LENGTH] = ft_strdup(_cgi._content_length.insert(0, "CONTENT_LENGTH=").c_str());
     _cgi_env[CONTENT_TYPE] = ft_strdup(_cgi._content_type.insert(0, "CONTENT_TYPE=").c_str());
@@ -161,8 +163,7 @@ void        HTTP::cgi_exe()
         route = "HTTP/cgi/";
         route.append(ft_itoa(file));
     }
-    while ((side_out = open(route.c_str(), O_CREAT | O_EXCL | O_RDWR, S_IRUSR | S_IWUSR)) == -1)
-        Log::debug("Creation file fail");
+    while ((side_out = open(route.c_str(), O_CREAT | O_EXCL | O_RDWR, S_IRUSR | S_IWUSR)) == -1) ;
 
     int output = open("output", O_WRONLY | O_APPEND); // TEST
     write(output, route.c_str(), route.length()); // TEST
@@ -189,8 +190,7 @@ void        HTTP::cgi_exe()
         waitpid(-1, &status, 0);
         close(side_in[SIDE_IN]);
         _socket.getBody().clear();
-        while ((side_out = open(route.c_str(), O_RDONLY, S_IRUSR | S_IWUSR)) == -1)
-            Log::debug("Open fail");
+        while ((side_out = open(route.c_str(), O_RDONLY, S_IRUSR | S_IWUSR)) == -1) ;
         while ((ret = read(side_out, buf, 1024)) > 0) {
             _responseSize += ret;
             buf[ret] = '\0';
