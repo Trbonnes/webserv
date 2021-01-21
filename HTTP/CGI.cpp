@@ -140,26 +140,8 @@ void        HTTP::cgi_exe()
     int file = 0;
     std::string route;
 
-    route = "HTTP/cgi/";
-    route.append(ft_itoa(file));
-    
 
 
-    while ((side_out = open(route.c_str(), O_RDONLY)) != -1)
-    {
-        close(side_out);
-        file++;
-        route = "HTTP/cgi/";
-        route.append(ft_itoa(file));
-    }
-
-    while ((side_out = open(route.c_str(), O_CREAT | O_EXCL | O_RDWR, S_IRUSR | S_IWUSR)) == -1)
-        Log::debug("Creation file fail");
-    int output = open("output", O_WRONLY | O_APPEND);
-    // write(output, "OK\n", 3);
-    write(output, route.c_str(), route.length());
-    write(output, "\n", 1);
-    close(output);
     _cgiResponse.reserve(ft_atoi(_socket.getContentLength().c_str()) + 100);
     save_stdout = dup(STDOUT_FILENO);
     save_stdin = dup(STDIN_FILENO);
@@ -168,7 +150,25 @@ void        HTTP::cgi_exe()
     ft_bzero(buf, sizeof(args));
     ft_bzero(side_in, sizeof(side_in));
     pipe(side_in);
-    dup2(side_in[SIDE_IN], STDOUT_FILENO);
+
+    route = "HTTP/cgi/";
+    route.append(ft_itoa(file));
+    
+    while ((side_out = open(route.c_str(), O_RDONLY)) != -1)
+    {
+        close(side_out);
+        file++;
+        route = "HTTP/cgi/";
+        route.append(ft_itoa(file));
+    }
+    while ((side_out = open(route.c_str(), O_CREAT | O_EXCL | O_RDWR, S_IRUSR | S_IWUSR)) == -1)
+        Log::debug("Creation file fail");
+
+    int output = open("output", O_WRONLY | O_APPEND); // TEST
+    write(output, route.c_str(), route.length()); // TEST
+    write(output, "\n", 1); // TEST
+    close(output); // TEST
+
     pid = fork();
     if (pid < 0)
         _statusCode = INTERNAL_SERVER_ERROR;
@@ -183,12 +183,12 @@ void        HTTP::cgi_exe()
     }
     else
     {
+        close(side_out);
         close(side_in[SIDE_OUT]);
         write(side_in[SIDE_IN], _socket.getBody().c_str(), ft_atoi(_socket.getContentLength().c_str()));
-        close(side_in[SIDE_IN]);
         waitpid(-1, &status, 0);
+        close(side_in[SIDE_IN]);
         _socket.getBody().clear();
-        close(side_out);
         while ((side_out = open(route.c_str(), O_RDONLY, S_IRUSR | S_IWUSR)) == -1)
             Log::debug("Open fail");
         while ((ret = read(side_out, buf, 1024)) > 0) {
