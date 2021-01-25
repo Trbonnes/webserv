@@ -1,6 +1,7 @@
 #include "Runnable.hpp"
 
-Runnable::Runnable() {
+Runnable::Runnable() :
+_respawn(0) {
 }
 
 Runnable::Runnable(int respawn, int detached) {

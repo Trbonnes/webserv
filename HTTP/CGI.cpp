@@ -131,12 +131,9 @@ void        HTTP::cgi_exe()
     int         side_in[2];
     char        buf[2049];
     char*       args[2];
-
-    int side_out;
-    int file = 0;
+    int         side_out;
+    int         file = 0;
     std::string route;
-
-
 
     _cgiResponse.reserve(ft_atoi(_socket.getContentLength().c_str()) + 100);
     save_stdout = dup(STDOUT_FILENO);
@@ -156,6 +153,9 @@ void        HTTP::cgi_exe()
         route.append(ft_itoa(file));
     }
     while ((side_out = open(route.c_str(), O_CREAT | O_EXCL | O_RDWR, S_IRUSR | S_IWUSR)) == -1) ;
+
+    
+
     pid = fork();
     if (pid < 0)
         _statusCode = INTERNAL_SERVER_ERROR;
