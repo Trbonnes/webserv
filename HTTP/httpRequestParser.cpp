@@ -19,7 +19,8 @@ int		httpRequestParseChunckedBody(std::string request, Socket *socket, size_t po
 	std::string body;
 	int	fd_read = socket->getFd();
 	// Log::debug("\033[0;32mCHUNCKED");
-	body.reserve(100000000);
+
+	LoadController::loadController(10000000, body);
 	try {
 		char	c[READ];
 		int		ret;
@@ -248,8 +249,7 @@ Socket	*httpRequestParser(int fd, int p[2]) {
 		if (ret == 0)
 			throw Socket::ConnectionClose();
 		if (ret == -1)
-			throw Socket::ConnectionClose();
-			// throw Socket::BadReadException();
+			throw Socket::BadReadException();
 		request.append(c, ret);
 	}
 	// Log::debug("\033[0;32mRequestParsing Reading End");

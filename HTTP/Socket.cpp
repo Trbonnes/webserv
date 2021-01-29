@@ -195,7 +195,7 @@ std::string Socket::getReferer()
 	return _referer;
 }
 
-std::string     Socket::getBody()
+std::string     &Socket::getBody()
 {
     return _body;
 }

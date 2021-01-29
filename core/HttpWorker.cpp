@@ -1,4 +1,5 @@
 #include "HttpWorker.hpp"
+#include <sys/sysinfo.h>
 
 
 //TO DO The runnable arguments might depend from the configuration file
@@ -70,7 +71,7 @@ void	HttpWorker::run()
 	// HttpConnection*	new_connection; // temp pointer 
 	ListenSocket* 	listening[FD_SETSIZE]; // array of pointers
 	int		pipes[FD_SETSIZE][2]; // array of pipes
-
+	ConfigServer *configServer = NULL;
 	response = NULL;
 	// Important zeroing-out of the arrays
 	// ft_bzero(connections, FD_SETSIZE * sizeof(HttpConnection*)); 
@@ -118,6 +119,11 @@ void	HttpWorker::run()
 					else
 						close(s);
 				}
+				else
+				{
+					close(s);
+				}
+				
 			}
 			// If it is a connection socket, do the job
 			else
@@ -132,14 +138,18 @@ void	HttpWorker::run()
 							free(response);
 							response = NULL;
 						}
-						ConfigServer *configServer = _config->getServerUnit(newSocket->getPort(), newSocket->getHost());
+						if (lastSocket != NULL)
+						{
+							delete lastSocket;
+							lastSocket = NULL;
+						}
+						configServer = _config->getServerUnit(newSocket->getPort(), newSocket->getHost());
+
 						HTTP method(newSocket, configServer);
 						response = method.getResponse();
-						
 						responseSize = method.getResponseSize();
 						write(i, response, responseSize);
-						if (lastSocket != NULL)
-							delete lastSocket;
+
 						if (newSocket->getMethod().compare("POST") == 0)
 						{
 							free(response);
@@ -152,6 +162,7 @@ void	HttpWorker::run()
 					else
 					{
 						delete newSocket;
+						newSocket = NULL;
 						write(i, response, responseSize);
 					}
 				}

@@ -28,6 +28,7 @@
 # include "utils/utils.hpp"
 # include "statusCodes.hpp"
 # include "../core/Log.hpp"
+# include "LoadController.hpp"
 
 class   Socket
 {
@@ -94,7 +95,7 @@ class   Socket
 	int							getPort();
     std::string	                getUserAgent();
 	std::string	                getReferer();
-    std::string					getBody();
+    std::string					&getBody();
     std::string                 getRemoteAddr();
     std::string                 getXSecret();
 

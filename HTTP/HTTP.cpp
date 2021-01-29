@@ -59,6 +59,12 @@ _responseSize(0)
     size_t      extension;
     std::string str;
 
+    // std::cerr << get_phys_pages() << std::endl;
+    // if (_socket.getMethod().compare("POST") == 0)
+        // std::cerr << "1/ " << get_avphys_pages() << std::endl;
+    // std::cerr << sysconf(_SC_PHYS_PAGES) << std::endl;
+    // std::cerr << sysconf(_SC_AVPHYS_PAGES) << std::endl;
+    // std::cerr << sysconf(_SC_PAGESIZE) << std::endl;
     ft_bzero(_cgi_env, sizeof(_cgi_env));
     if (checkRequestErrors() != OK)
         return ;
@@ -129,8 +135,8 @@ HTTP::~HTTP()
         _cgi_env[i] = NULL;
         i++;
     }
-    free(_body);
-    _body = NULL;
+    // free(_body);
+    // _body = NULL;
 }
 
 HTTP     &HTTP::operator=(HTTP &rhs)
@@ -636,10 +642,27 @@ void            HTTP::setResponseSize(std::string &response)
 
 void            HTTP::setBodyResponse(std::string &response)
 {
+    size_t      find;
+
+    LoadController::waitController(_responseSize + 1);
     _response = (char*)ft_calloc(_responseSize + 1, sizeof(char));
     ft_strcpy(_response, response.c_str());
-    if (_socket.getMethod().compare("HEAD") && _contentLength >= 0)
+    if (_socket.getMethod().compare("POST") == 0)
+    {
+        find = _cgiResponse.find("\r\n\r\n");
+        if (find != _cgiResponse.npos)
+            ft_memcat(_response, _cgiResponse.substr(find + 4, _responseSize).c_str(), _contentLength);
+        _cgiResponse.clear();
+        std::string().swap(_cgiResponse);
+    }
+    else if (_socket.getMethod().compare("HEAD") && _contentLength >= 0)
         ft_memcat(_response, _body, _contentLength);
+    
+    if (_body != NULL)
+    {
+        free(_body);
+        _body = NULL;
+    }
 }
 
 int             HTTP::getResponseSize()

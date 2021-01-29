@@ -20,6 +20,7 @@
 # include "utils/utils.hpp"
 # include "statusCodes.hpp"
 # include "CGI.hpp"
+# include "LoadController.hpp"
 
 # define SIDE_OUT 0
 # define SIDE_IN 1

@@ -135,7 +135,6 @@ void        HTTP::cgi_exe()
     int         file = 0;
     std::string route;
 
-    _cgiResponse.reserve(ft_atoi(_socket.getContentLength().c_str()) + 100);
     save_stdout = dup(STDOUT_FILENO);
     save_stdin = dup(STDIN_FILENO);
     ret = EXIT_SUCCESS;
@@ -153,9 +152,6 @@ void        HTTP::cgi_exe()
         route.append(ft_itoa(file));
     }
     while ((side_out = open(route.c_str(), O_CREAT | O_EXCL | O_RDWR, S_IRUSR | S_IWUSR)) == -1) ;
-
-    
-
     pid = fork();
     if (pid < 0)
         _statusCode = INTERNAL_SERVER_ERROR;
@@ -176,6 +172,8 @@ void        HTTP::cgi_exe()
         waitpid(-1, &status, 0);
         close(side_in[SIDE_IN]);
         _socket.getBody().clear();
+        std::string().swap(_socket.getBody());
+	    LoadController::loadController(ft_atoi(_socket.getContentLength().c_str() + 100), _cgiResponse);
         while ((side_out = open(route.c_str(), O_RDONLY, S_IRUSR | S_IWUSR)) == -1) ;
         while ((ret = read(side_out, buf, 1024)) > 0) {
             _responseSize += ret;
@@ -199,19 +197,11 @@ void        HTTP::cgi_parse()
 
     find = _cgiResponse.find("\r\n\r\n");
     if (find != _cgiResponse.npos)
-    {
-        if (!(_body = (char*)ft_calloc(_responseSize - find - 4 + 1, sizeof(char))))
-            Log::debug("malloc error");
-        _body = ft_memcat(_body, _cgiResponse.substr(find + 4, _responseSize).c_str(), _responseSize - find - 4);
-        _body[_responseSize - find - 4] = '\0';
-        _contentLength = ft_strlen(_body);
-        _cgiResponse.erase(find + 2, _cgiResponse.length());
-    }
+        _contentLength = _responseSize - find - 4;
     find = _cgiResponse.find("Status: ");
     if (find != _cgiResponse.npos)
         _statusCode = ft_atoi(_cgiResponse.substr(find + ft_strlen("Status: "), find + ft_strlen("Status: ") + 3).c_str());
     find = _cgiResponse.find("Content-Type: ");
     if (find != _cgiResponse.npos)
         _contentType = _cgiResponse.substr(find + ft_strlen("Content-Type: "), _cgiResponse.find("\r\n", find) - find - ft_strlen("Content-Type: "));
-    _cgiResponse.clear();
 }

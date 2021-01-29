@@ -5,6 +5,7 @@
 #include <vector>
 #include <errno.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include "ListenSocket.hpp"
 #include "Runnable.hpp"
