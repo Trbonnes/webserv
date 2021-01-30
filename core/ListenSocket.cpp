@@ -25,13 +25,13 @@ ListenSocket::ListenSocket(int port) {
 	flags |= O_NONBLOCK;
 	if (fcntl(_sock, F_SETFL, flags) == -1)
 	{
-		// TO DO thrwo error
+		// TO DO throw error
 	}
 
 	if (bind(_sock, (struct sockaddr *)&address,
                                  sizeof(address)))
 		throw BindingException(errno);
-	if (listen(_sock, 3))
+	if (listen(_sock, 1024))
 		throw ListenException(errno);
 }
 
