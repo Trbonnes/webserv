@@ -1,50 +1,18 @@
 #ifndef LOADCONTROLLER_HPP
 # define LOADCONTROLLER_HPP
 
+# include <string>
 # include <sys/sysinfo.h>
 # include <stdlib.h>
+# include <unistd.h>
 
 # define MULT 7
 
 class LoadController
 {
     public:
-    static void    loadController(int nb, std::string &str)
-    {
-        long alloc;
-        int timerand;
-        int i;
-
-        timerand = rand() % 10;
-        usleep(timerand);
-        i = 1000;
-        while (str.capacity() < (unsigned long)nb)
-        {
-            while (1)
-            {
-                alloc = get_avphys_pages();
-                if (alloc > (nb / 4096) * MULT)
-                    break;
-            }
-            str.reserve(i);
-            i *= 10;
-        }
-    }
-
-    static void    waitController(int nb)
-    {
-        long alloc;
-        int timerand;
-
-        timerand = rand() % 10;
-        usleep(timerand);
-        while (1)
-        {
-            alloc = get_avphys_pages();
-            if (alloc > (nb / 4096) * (MULT - 2))
-                break;
-        }
-    }
+    static void    loadController(int nb, std::string &str);
+    static void    waitController(int nb);
 };
 
 #endif

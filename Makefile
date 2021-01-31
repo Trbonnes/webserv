@@ -21,6 +21,7 @@ HTTPSRC = 	HTTP/HTTP.cpp \
 			HTTP/parseHeaders.cpp \
 			HTTP/setHeaders.cpp \
 			HTTP/Socket.cpp \
+			HTTP/LoadController.cpp \
 			HTTP/Methods/del.cpp \
 			HTTP/Methods/get.cpp \
 			HTTP/Methods/put.cpp \
