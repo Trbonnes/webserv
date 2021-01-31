@@ -1,1 +1,2 @@
 curl -X OPTIONS http://localhost:3000/ -i
+curl -X DELETE http://localhost:3000/delete_directory/file -i
