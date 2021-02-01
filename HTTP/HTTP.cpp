@@ -64,7 +64,7 @@ _responseSize(0)
         return ;
     _uri = _socket.getRequestURI();
     setLocation();
-    if (_config.getClientBodySize(_location) != -1 && ft_atoi(_socket.getContentLength().c_str()) > _config.getClientBodySize(_location)) // TO DO quick fix
+    if (_config.getClientBodySize(_location) != -1 && ft_atoi(_socket.getContentLength().c_str()) > _config.getClientBodySize(_location))
     {
         _statusCode = REQUEST_ENTITY_TOO_LARGE;
         return ;
@@ -250,8 +250,8 @@ void         HTTP::setRoot()
     if (_uri.compare(0, 4, "http") == 0)
     {
         //** Absolute path **
-        find = _route.append(_socket.getRequestURI()).find(_socket.getHost()); // TO DO temp fix for compilation
-        _route.erase(0, find + _config.getServerName()[0].length()); // TO DO quick fix
+        find = _route.append(_socket.getRequestURI()).find(_socket.getHost());
+        _route.erase(0, find + _config.getServerName()[0].length());
         _route.insert(0, _config.getRoot(_location));
         _route.insert(_config.getRoot(_location).length(), acceptLanguage());
     }
@@ -571,7 +571,7 @@ void     HTTP::setFirstHeadersResponse(std::string &response)
     response.append(" ");
     response.append(ft_itoa(_statusCode)).append(" ");
     response.append(_mapCodes.codes[_statusCode]).append("\r\n");
-    response.append("Server: ").append(_config.getServerSoftware()).append("\r\n"); //TO DO
+    response.append("Server: ").append(_config.getServerSoftware()).append("\r\n");
     if (ft_strlen(_date) > 0)
         response.append("Date: ").append(_date).append("\r\n");
     if (_contentType.length() > 0)

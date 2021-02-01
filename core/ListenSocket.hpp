@@ -34,36 +34,31 @@ public:
 		protected:
 			std::string _msg;
 		public:
+			virtual ~ListenSocketException() throw() {return ;}
 			ListenSocketException(std::string msg, int errcode);
 			virtual const char * what () const throw ();
-			#ifdef __linux__
-    			virtual ~ListenSocketException() _GLIBCXX_TXN_SAFE_DYN _GLIBCXX_USE_NOEXCEPT;
-			#else
-    			virtual ~ListenSocketException() _NOEXCEPT;
-			#endif
 
 	};
 	class BindingException : public ListenSocketException
 	{
 		public:
 			BindingException(int errcode);
-			#ifdef __linux__
-    			virtual ~BindingException() _GLIBCXX_TXN_SAFE_DYN _GLIBCXX_USE_NOEXCEPT;
-			#else
-    			virtual ~BindingException() _NOEXCEPT;
-			#endif
 	};
 	class ListenException : public ListenSocketException
 	{
 		public:
 			ListenException(int errcode);
-			#ifdef __linux__
-    			virtual ~ListenException() _GLIBCXX_TXN_SAFE_DYN _GLIBCXX_USE_NOEXCEPT;
-			#else
-    			virtual ~ListenException() _NOEXCEPT;
-			#endif
 	};
-
+	class FcntlException : public ListenSocketException
+	{
+		public:
+			FcntlException(int errcode);
+	};
+	class SocketCreationException : public ListenSocketException
+	{
+		public:
+			SocketCreationException(int errcode);
+	};
 };
 
 #endif // LISTENSOCKET

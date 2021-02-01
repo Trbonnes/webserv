@@ -1,31 +1,28 @@
 #include "ListenSocket.hpp"
 
 ListenSocket::ListenSocket(int port) {
+	int flags;
+	int opt;
+	struct sockaddr_in address;
+
 	_port = port;
     _sock = socket(AF_INET, SOCK_STREAM, 0);
 	if (_sock < 0)
 	{
-		std::cout << "Errorrrororororororor\n" << std::endl;
+		throw SocketCreationException(errno);
 	}
-	int opt = 1;
-	setsockopt(_sock, SOL_SOCKET, SO_REUSEADDR, 
-                                                  &opt, sizeof(opt));
-	struct sockaddr_in address;
+	opt = 1;
+	setsockopt(_sock, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
 	address.sin_family = AF_INET;
     address.sin_addr.s_addr = INADDR_ANY;
     address.sin_port = htons( port ); // program from configuration
-	int addrlen = sizeof(address);
-	(void) addrlen;
-
-	int flags = fcntl(_sock, F_GETFL, 0);
+	flags = fcntl(_sock, F_GETFL, 0);
 	if (flags == -1)
-	{
-		// throw ListenSocketException();
-	}
+		throw FcntlException(errno);
 	flags |= O_NONBLOCK;
 	if (fcntl(_sock, F_SETFL, flags) == -1)
 	{
-		std::cout << "Errorrrororororororor\n" << std::endl;
+		throw FcntlException(errno);
 	}
 
 	if (bind(_sock, (struct sockaddr *)&address,
@@ -77,29 +74,10 @@ ListenSocket::ListenException::ListenException(int errcode) : ListenSocketExcept
 {
 }
 
-#ifdef __linux__
-	ListenSocket::ListenSocketException::~ListenSocketException() _GLIBCXX_TXN_SAFE_DYN _GLIBCXX_USE_NOEXCEPT
-	{
-	}
+ListenSocket::FcntlException::FcntlException(int errcode) : ListenSocketException("Fcntl error", errcode)
+{
+}
 
-	ListenSocket::ListenException::~ListenException() _GLIBCXX_TXN_SAFE_DYN _GLIBCXX_USE_NOEXCEPT
-	{
-	}
-
-	ListenSocket::BindingException::~BindingException() _GLIBCXX_TXN_SAFE_DYN _GLIBCXX_USE_NOEXCEPT
-	{
-	}
-
-#else
-	ListenSocket::ListenSocketException::~ListenSocketException() _NOEXCEPT
-	{
-	}
-
-	ListenSocket::ListenException::~ListenException() _NOEXCEPT
-	{
-	}
-
-	ListenSocket::BindingException::~BindingException() _NOEXCEPT
-	{
-	}
-#endif
+ListenSocket::SocketCreationException::SocketCreationException(int errcode) : ListenSocketException("Socket creation error", errcode)
+{
+}
