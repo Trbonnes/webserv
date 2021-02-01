@@ -78,7 +78,7 @@ void HttpServer::initConf() {
 	}
 }
 
-void HttpServer::initListenSocket() // TO DO optimization
+void HttpServer::initListenSocket()
 {
 	// std::cerr << "Initializing listening sockets" << std::endl;
 	std::vector<ConfigServer> servers;
@@ -90,15 +90,20 @@ void HttpServer::initListenSocket() // TO DO optimization
 	{
 		ports = it->getPort();
 		for (size_t j = 0; j < ports.size(); j++)
-			_listen_sockset.push_back(ListenSocket(ports[j])); // TO DO Check port already in use / Fix getPort()
+			try
+			{
+				_listen_sockset.push_back(ListenSocket(ports[j])); // TO DO Check port already in use / Fix getPort()
+			}
+			catch(const ListenSocket::ListenSocketException& e)
+			{
+				throw e;
+			}
 	}
 }
 
 void			HttpServer::masterLifecycle()
 {
-	// std::cerr << "Master is entering is main lifecycle" << std::endl;
 	_manager->manage();
-	// TO DO add process management / reload mechanics
 }
 
 void HttpServer::initWorkers() {

@@ -5,11 +5,11 @@ ListenSocket::ListenSocket(int port) {
     _sock = socket(AF_INET, SOCK_STREAM, 0);
 	if (_sock < 0)
 	{
-		// TO DO throw error
+		std::cout << "Errorrrororororororor\n" << std::endl;
 	}
 	int opt = 1;
-	setsockopt(_sock, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, 
-                                                  &opt, sizeof(opt)); // TO DO WItchcraft
+	setsockopt(_sock, SOL_SOCKET, SO_REUSEADDR, 
+                                                  &opt, sizeof(opt));
 	struct sockaddr_in address;
 	address.sin_family = AF_INET;
     address.sin_addr.s_addr = INADDR_ANY;
@@ -20,12 +20,12 @@ ListenSocket::ListenSocket(int port) {
 	int flags = fcntl(_sock, F_GETFL, 0);
 	if (flags == -1)
 	{
-		// TO DO throw error
+		// throw ListenSocketException();
 	}
 	flags |= O_NONBLOCK;
 	if (fcntl(_sock, F_SETFL, flags) == -1)
 	{
-		// TO DO throw error
+		std::cout << "Errorrrororororororor\n" << std::endl;
 	}
 
 	if (bind(_sock, (struct sockaddr *)&address,

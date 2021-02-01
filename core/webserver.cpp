@@ -65,7 +65,7 @@ int main(int ac, const char** av, const char** env) {
 	}
 	catch(const std::exception& e)
 	{
-		std::cerr << "Erro while running server :" << e.what() << '\n';
+		std::cerr << "Error while running server" << std::endl;
 		return 1;
 	}
 	return 0;
