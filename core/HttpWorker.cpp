@@ -66,7 +66,6 @@ void	HttpWorker::run()
 	char* 	response;
 	int		responseSize;
 	ListenSocket* 	listening[FD_SETSIZE]; // array of pointers
-	int		pipes[FD_SETSIZE][2]; // array of pipes
 	ConfigServer *configServer = NULL;
 	response = NULL;
 
@@ -109,7 +108,7 @@ void	HttpWorker::run()
 				s = ::accept(listening[i]->getSock(), &_client_name, &size);
 				if (s != -1)
 				{
-					if (s < FD_SETSIZE && (pipe(pipes[s]) != -1))
+					if (s < FD_SETSIZE)
 					{
 						FD_SET(s, &active_fs);
 					}
@@ -127,7 +126,7 @@ void	HttpWorker::run()
 			{
 				try
 				{
-					Socket *newSocket = httpRequestParser(i, pipes[i]);
+					Socket *newSocket = httpRequestParser(i);
 					if (equalRequest(newSocket, lastSocket))
 					{
 						if (response != NULL)
@@ -166,8 +165,6 @@ void	HttpWorker::run()
 				catch(const std::exception& e)
 				{
 					close(i);
-					close(pipes[i][0]);
-					close(pipes[i][1]);
 					FD_CLR(i, &active_fs);
 				}
 			}

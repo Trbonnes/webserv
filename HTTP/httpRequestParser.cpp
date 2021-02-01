@@ -6,7 +6,7 @@
 /*   By: yorn <yorn@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/30 15:45:46 by trbonnes          #+#    #+#             */
-/*   Updated: 2021/02/01 15:08:18 by yorn             ###   ########.fr       */
+/*   Updated: 2021/02/01 15:10:42 by yorn             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -231,16 +231,12 @@ int		httpRequestParseRequestLine(std::string request, Socket *socket) {
 #include <sys/stat.h>
 #include <fcntl.h>
 
-Socket	*httpRequestParser(int fd, int p[2]) {
+Socket	*httpRequestParser(int fd) {
 
 	Socket *socket;
 	char	c[2];
 	int		ret;
 	std::string request;
-
-	// Log::debug("\033[0;32mRequestParsing Reading");
-
-	(void) p; // TO DO remove, it's just there to enable compilation until the deed is done
 
 	while (request.find("\r\n\r\n") >= request.npos && request.find("\n\n") >= request.npos)
 	{
