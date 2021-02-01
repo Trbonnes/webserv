@@ -1,8 +1,6 @@
 #include "HttpWorker.hpp"
 #include <sys/sysinfo.h>
 
-
-//TO DO The runnable arguments might depend from the configuration file
 HttpWorker::HttpWorker(std::vector<ListenSocket> &listen, Config* config) : Runnable(1, 1)
 {
 	_config = config;
@@ -59,7 +57,6 @@ int		equalRequest(Socket *newSocket, Socket *lastSocket)
 	return 0;
 }
 
-// TO DO Check config var regarding max connections and max port/server block
 void	HttpWorker::run()
 {
 	Socket *lastSocket = new Socket();
@@ -68,11 +65,11 @@ void	HttpWorker::run()
 	fd_set 	read_fs;
 	char* 	response;
 	int		responseSize;
-	// HttpConnection*	new_connection; // temp pointer 
 	ListenSocket* 	listening[FD_SETSIZE]; // array of pointers
 	int		pipes[FD_SETSIZE][2]; // array of pipes
 	ConfigServer *configServer = NULL;
 	response = NULL;
+
 	// Important zeroing-out of the arrays
 	// ft_bzero(connections, FD_SETSIZE * sizeof(HttpConnection*)); 
 	ft_bzero(listening, FD_SETSIZE * sizeof(ListenSocket*));
@@ -92,8 +89,8 @@ void	HttpWorker::run()
 		// Waiting for an event on listen socket
 		if (select(FD_SETSIZE, &read_fs, NULL, NULL, NULL) == -1)
 		{
-			// std::cerr << "Select error " << strerror(errno) << std::endl;
-			continue; // TO DO throw something ?
+			std::cout << "Select error : " << strerror(errno) << std::endl;
+			continue;
 		}
 		for (int i = 0; i < FD_SETSIZE; i++)
 		{
@@ -175,9 +172,7 @@ void	HttpWorker::run()
 				}
 			}
 		}
-	// TO DO timeout for http
 	}
-	// TO DO delete connections
 	std::cerr << "EXITING WORKER " << std::endl;
 	exit(0);
 }

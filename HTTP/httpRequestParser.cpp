@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   httpRequestParser.cpp                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
+/*   By: yorn <yorn@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/30 15:45:46 by trbonnes          #+#    #+#             */
-/*   Updated: 2021/01/14 20:08:54 by user42           ###   ########.fr       */
+/*   Updated: 2021/02/01 15:08:18 by yorn             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -252,15 +252,10 @@ Socket	*httpRequestParser(int fd, int p[2]) {
 			throw Socket::BadReadException();
 		request.append(c, ret);
 	}
-	// Log::debug("\033[0;32mRequestParsing Reading End");
-	// Log::debug(request.c_str());
 	socket = new Socket(fd);
-	// Log::debug("\033[0;32mRequestParsing Creation");
 	httpRequestParseRequestLine(request, socket);
 	httpRequestParseHeaders(request, socket);
-	// Log::debug("\033[0;32mHeaders Parsed");
 	httpRequestParseBody(request, socket);
-	// Log::debug("\033[0;32mBody Parsed");
 	request.clear();
 	return socket;
 }

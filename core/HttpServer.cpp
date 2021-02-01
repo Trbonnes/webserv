@@ -92,7 +92,7 @@ void HttpServer::initListenSocket()
 		for (size_t j = 0; j < ports.size(); j++)
 			try
 			{
-				_listen_sockset.push_back(ListenSocket(ports[j])); // TO DO Check port already in use / Fix getPort()
+				_listen_sockset.push_back(ListenSocket(ports[j]));
 			}
 			catch(const ListenSocket::ListenSocketException& e)
 			{

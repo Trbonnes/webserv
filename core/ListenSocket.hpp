@@ -29,7 +29,6 @@ public:
 	int	getSock();
 	int	getPort();
 
-	// TO DO not sure about those extension's names
 	class ListenSocketException : public std::exception 
 	{
 		protected:

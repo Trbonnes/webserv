@@ -16,7 +16,7 @@ public:
 		public:
 			const char * what () const throw ()
 			{
-				return "Runnable failed to launch"; // TO DO think to use log function
+				return "Runnable failed to launch";
 			}
 	};
 	Runnable();
