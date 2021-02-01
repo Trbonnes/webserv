@@ -44,13 +44,10 @@ void HttpServer::run()
 	}
 	try
 	{
-		// Log::debug("About to create workers");
 		initWorkers();
-		// Log::debug("Workers have been initated");
 	}
 	catch(const std::exception& e)
 	{
-		// Log::debug("Is this real life ?");
 		std::cerr << "Error while initializing workers : " << e.what() << '\n';
 		std::cerr << e.what() << '\n';
 		throw e;
@@ -59,7 +56,6 @@ void HttpServer::run()
 }
 
 void HttpServer::initConf() {
-	// std::cerr << "Initializing configuration" << std::endl;
 	_config = NULL;
 	try
 	{
@@ -68,10 +64,10 @@ void HttpServer::initConf() {
 			throw OpenConfigfileFail();
 		_config = configFileParser(fd);
 		_manager = new ProcessManager();
+		std::cout << "Runnig on configuration specified in : " << _config_path.c_str() << std::endl;
 		close(fd);
 	}
-	catch (std::exception const &e) {
-		std::cerr << "Exception: " << e.what() << std::endl;
+	catch (OpenConfigfileFail const &e) {
 		if (_config)
 			delete _config;
 		throw e;
