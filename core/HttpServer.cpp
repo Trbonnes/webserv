@@ -64,7 +64,7 @@ void HttpServer::initConf() {
 			throw OpenConfigfileFail();
 		_config = configFileParser(fd);
 		_manager = new ProcessManager();
-		std::cout << "Running on configuration specified in : " << _config_path.c_str() << std::endl;
+		std::cout << "Running configuration specified in : " << _config_path.c_str() << std::endl;
 		close(fd);
 	}
 	catch (OpenConfigfileFail const &e) {
