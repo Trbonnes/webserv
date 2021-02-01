@@ -1,6 +1,7 @@
 # Implicit variable definition
 CXX = clang++
 CXXFLAGS = -Wall -Wextra -Werror -g -std=c++98 #-fsanitize=address # TO DO remove fsanitize of produciton
+INCLUDES = -I core/ -I HTTP/
 
 # Sources files
 
@@ -39,43 +40,55 @@ HTTPSRC = 	HTTP/HTTP.cpp \
 			HTTP/CGI.cpp
 
 
+HEADERS = 	core/Location.hpp \
+			core/Config.hpp \
+			core/Runnable.hpp \
+			core/Log.hpp \
+			core/ProcessManager.hpp \
+			core/Compare.hpp \
+			core/HttpWorker.hpp \
+			core/ListenSocket.hpp \
+			core/ConfigServer.hpp \
+			core/HttpServer.hpp \
+			HTTP/utils/utils.hpp \
+			HTTP/statusCodes.hpp \
+			HTTP/LoadController.hpp \
+			HTTP/HTTP.hpp \
+			HTTP/Socket.hpp \
+			HTTP/CGI.hpp
+
+
 SRCS = $(CORESRC) $(HTTPSRC)
 
-
-# TO DO ADD HEADERS
-
-# Headers files
-
-INCLUDES = -I core/ -I HTTP/
+NAME = webserv
 
 # Object files
 
 OBJECTSDIR = objs
 OBJECTS = $(addprefix $(OBJECTSDIR)/, $(subst .cpp,.o,$(SRCS)))
 
-$(OBJECTSDIR)/%.o: ./%.cpp
-	mkdir -p $(OBJECTSDIR)/core $(OBJECTSDIR)/HTTP/bin-cgi $(OBJECTSDIR)/HTTP/Methods $(OBJECTSDIR)/HTTP/utils
+OBJECTSDIRS = 	$(OBJECTSDIR)/core \
+				$(OBJECTSDIR)/HTTP/bin-cgi \
+				$(OBJECTSDIR)/HTTP/Methods \
+				$(OBJECTSDIR)/HTTP/utils
+
+
+$(OBJECTSDIR)/%.o: ./%.cpp $(HEADERS)
+	@mkdir -p $(OBJECTSDIRS)
 	$(CXX) $(CXXFLAGS) -c $< -o $@ $(INCLUDES)
-
-# Executable
-
-NAME = webserv
-
-# Explicit rules
 
 all:	$(NAME)
 
-
-$(NAME):	$(OBJECTS)
+$(NAME):	$(HEADERS) $(OBJECTS) | $(OBJECTSDIRS)
 			$(CXX) $(CXXFLAGS) $(OBJECTS) -o $(NAME)
 
 clean:
 		rm -f $(OBJECTS)
-		rm -r $(OBJECTSDIR)
+		rm -rf $(OBJECTSDIR)
 
 fclean: clean
 		rm -f $(NAME)
 
 re: fclean all
 
-.PHONY: all clean fclean re $(OBJECTSDIR) $(NAME)
+.PHONY: all clean fclean re $(OBJECTSDIR)

@@ -134,7 +134,7 @@ const char * HttpServer::OpenConfigfileFail	::what () const throw ()
     		return strerror(errno);
 }
 
-void			HttpServer::setConfigPath(std::string &path)
+void		HttpServer::setConfigPath(std::string &path)
 {
 	_config_path = path;
 }
