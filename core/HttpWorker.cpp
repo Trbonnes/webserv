@@ -140,7 +140,8 @@ void	HttpWorker::run()
 							lastSocket = NULL;
 						}
 						configServer = _config->getServerUnit(newSocket->getPort(), newSocket->getHost());
-
+						if (configServer == NULL)
+							throw Socket::ConnectionClose();
 						HTTP method(newSocket, configServer);
 						response = method.getResponse();
 						responseSize = method.getResponseSize();
