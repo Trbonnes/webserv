@@ -176,7 +176,7 @@ std::string             ConfigServer::getRoot(std::string location)
     while (itBegin != itEnd)
     {
         if (location.compare(itBegin->first) == 0 && (itBegin->second._root).compare(""))
-            return (str.assign((itBegin->second._root)).append(itBegin->second._location, itBegin->second._location.size() - 1));
+            return (str.assign((itBegin->second._root)).append(itBegin->second._location));
         else if (location.compare(itBegin->first) == 0)
             break;
         itBegin++;
