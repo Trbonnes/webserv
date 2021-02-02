@@ -88,7 +88,7 @@ void	HttpWorker::run()
 		// Waiting for an event on listen socket
 		if (select(FD_SETSIZE, &read_fs, NULL, NULL, NULL) == -1)
 		{
-			std::cout << "Select error : " << strerror(errno) << std::endl;
+			std::cerr << "Select error : " << strerror(errno) << std::endl;
 			continue;
 		}
 		for (int i = 0; i < FD_SETSIZE; i++)
