@@ -29,7 +29,7 @@ public:
 
 private:
 	std::list<ListenSocket>	_listen_socket;
-	std::list<Connection>	_connections;
+	std::list<Connection*>	_connections;
 	Config						*_config;
 };
 #endif // HTTPWORKER

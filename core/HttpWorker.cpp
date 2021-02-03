@@ -73,11 +73,14 @@ void	HttpWorker::run()
 
 	//List iterators;
 	std::list<ListenSocket>::iterator il;
-	std::list<Connection>::iterator ic, tmp;
+	std::list<Connection*>::iterator ic, tmp;
 
 	// add Listen sockets in active_read
 	for (il = _listen_socket.begin(); il != _listen_socket.end(); il++)
-		FD_SET((*il).getSock(), &active_read);
+	{
+		FD_SET(il->getSock(), &active_read);
+		std::cerr << "Listen socket on " << il->getSock() << std::endl;
+	}
 	
 
 	// Main loop
@@ -86,12 +89,19 @@ void	HttpWorker::run()
 		read_fs = active_read;
 		write_fs = active_write;
 
+		// std::cerr << "=============== SELECT START ===============" << std::endl;
 		// std::cerr << "Number of actives connections " << _connections.size() << std::endl;
+		// usleep(80000);
 		//SELECT
-		if (select(FD_SETSIZE, &read_fs, &write_fs, NULL, NULL))
+		int r = 0;
+		// std::cerr << "FD_SETSIZE :" << FD_SETSIZE << std::endl;
+		if ((r = select(FD_SETSIZE, &read_fs, &write_fs, NULL, NULL)) == -1)
 		{
+			std::cerr << "Select error: " << strerror(errno) << std::endl;
 			// TO DO ERROR
 		}
+
+		// std::cerr << "Loop: " << r << "fds to go" << std::endl;
 
 		// New connection
 		for (il = _listen_socket.begin(); il != _listen_socket.end(); il++)
@@ -99,61 +109,65 @@ void	HttpWorker::run()
 			{
 				try
 				{
-					Connection c = Connection(il->getSock());
+					Connection *c = new Connection(il->getSock());
 					_connections.push_front(c);
-					FD_SET(c.getSock(), &active_read);
+					FD_SET(c->getSock(), &active_read);
+					// std::cerr << "New connection " << c->getSock() << std::endl;
 				}
 				catch(const std::exception& e)
 				{
-					std::cerr << e.what() << '\n';
-				}	
+				}
 			}
-
-		// Read ready on active connection
-		for (ic = _connections.begin(); ic != _connections.end(); ic++)
-			if (FD_ISSET(ic->getSock(), &read_fs))
+		ic = _connections.begin();
+		while (ic != _connections.end())
+		{
+			Connection* c = *ic;
+			// Read ready on active connection
+			// std::cerr << "Socket for loop : " << ic->getSock() << std::endl;
+			if (FD_ISSET(c->getSock(), &read_fs))
 			{
+				// std::cerr << "About to read " << c->getSock() << std::endl;
 				Socket *newSocket;
 				try
 				{
-					 newSocket = httpRequestParser(ic->getSock());
+					 newSocket = httpRequestParser(c->getSock());
 				}
 				catch(const std::exception& e)
 				{
-					// std::cerr << "Connection close" << std::endl;
-					FD_CLR(ic->getSock(), &active_read);
-					ic->clearRequest();
-					tmp = ic;
-					ic++;
-					_connections.erase(tmp);
+					FD_CLR(c->getSock(), &active_write);
+					FD_CLR(c->getSock(), &active_read);
+					c->clearRequest();
+					// std::cerr << "Connection close for " << c->getSock() << std::endl;
+					ic = _connections.erase(ic);
+					delete c;
 					continue;
 				}
-				ic->setRequest(newSocket);
-				FD_SET(ic->getSock(), &active_write);
-				FD_CLR(ic->getSock(), &active_read);
-				
+				c->setRequest(newSocket);
+				FD_SET(c->getSock(), &active_write);
+				FD_CLR(c->getSock(), &active_read);
+				// std::cerr << "READ"<< std::endl;
 			}
-
-		// Write ready on active connection
-		for (ic = _connections.begin(); ic != _connections.end(); ic++)
-		{
-			if (FD_ISSET(ic->getSock(), &write_fs))
+			// Write ready on active connection
+			else if (FD_ISSET(c->getSock(), &write_fs))
 			{
-				configServer = _config->getServerUnit(ic->getRequest()->getPort(), ic->getRequest()->getHost());
+				// std::cerr << "About to write on " << c->getSock() << std::endl;
+				configServer = _config->getServerUnit(c->getRequest()->getPort(), c->getRequest()->getHost());
 				if (configServer == NULL)
-						throw Socket::ConnectionClose();
-				HTTP method(ic->getRequest(), configServer);
+						throw Socket::ConnectionClose(); // TO DO put in a try catch block
+				HTTP method(c->getRequest(), configServer); 
 				char * response = method.getResponse();
 				size_t responseSize = method.getResponseSize();
-				write(ic->getSock(), response, responseSize);
-				FD_SET(ic->getSock(), &active_read);
-				FD_CLR(ic->getSock(), &active_write);
-				ic->clearRequest();
+				if (write(c->getSock(), response, responseSize) == -1)
+				{
+					std::cerr << "Tried to write but didn't work" << std::endl;
+				} // TO DO check error and close the connection
+				FD_SET(c->getSock(), &active_read);
+				FD_CLR(c->getSock(), &active_write);
+				c->clearRequest();
+				// std::cerr << "WRITE"<< std::endl;
 			}
+			ic++;
 		}
-
-		
-
 	}
 
 

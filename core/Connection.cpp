@@ -61,6 +61,7 @@ void Connection::clearRequest()
 
 Connection::~Connection()
 {
+	close();
 	if (_request)
 		delete _request;
 }
