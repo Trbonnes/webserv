@@ -1,6 +1,6 @@
 # Implicit variable definition
 CXX = clang++
-CXXFLAGS = -Wall -Wextra -Werror -g -std=c++98
+CXXFLAGS = -Wall -Wextra -Werror -g -std=c++98 -fsanitize=address # TO DO remove fsanitize
 INCLUDES = -I core/ -I HTTP/
 
 # Sources files
@@ -15,7 +15,8 @@ CORESRC = 	core/Runnable.cpp \
 			core/ConfigServer.cpp \
 			core/configFileParser.cpp \
 			core/Location.cpp \
-			core/Config.cpp
+			core/Config.cpp \
+			core/Connection.cpp
 
 HTTPSRC = 	HTTP/HTTP.cpp \
 			HTTP/httpRequestParser.cpp \
@@ -55,7 +56,8 @@ HEADERS = 	core/Location.hpp \
 			HTTP/LoadController.hpp \
 			HTTP/HTTP.hpp \
 			HTTP/Socket.hpp \
-			HTTP/CGI.hpp
+			HTTP/CGI.hpp \
+			core/Connection.hpp
 
 
 SRCS = $(CORESRC) $(HTTPSRC)

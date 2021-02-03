@@ -11,6 +11,7 @@
 #include "Runnable.hpp"
 #include "Config.hpp"
 #include "Log.hpp"
+#include "Connection.hpp"
 
 #include "../HTTP/HTTP.hpp"
 #include "../HTTP/Socket.hpp"
@@ -19,7 +20,7 @@
 class HttpWorker : public Runnable
 {
 public:
-	HttpWorker(std::vector<ListenSocket> &listen, Config* config);
+	HttpWorker(std::list<ListenSocket> &listen, Config* config);
 	HttpWorker(const HttpWorker &);
 	HttpWorker &operator=(const HttpWorker &);
 	~HttpWorker();
@@ -27,7 +28,8 @@ public:
 	Runnable* clone() const;
 
 private:
-	std::vector<ListenSocket>	_listen_socket;
+	std::list<ListenSocket>	_listen_socket;
+	std::list<Connection>	_connections;
 	Config						*_config;
 };
 #endif // HTTPWORKER

@@ -48,7 +48,7 @@ public:
 
 private:
 	Config						*_config;
-	std::vector<ListenSocket>	_listen_sockset;
+	std::list<ListenSocket>	_listen_sockset;
 	ProcessManager*				_manager;
 	pthread_mutex_t				_accept_mutex;
 	HttpServer(const HttpServer &);
