@@ -33,6 +33,10 @@ private:
 	Config						*_config;
 	fd_set 					_active_read;
 	fd_set 					_active_write;
+	// Simple caching
+	Socket*					_cacheSocket;
+	char*					_cacheResponse;
+	size_t					_cacheResponseSize;
 
 	void	acceptConnection(int sock);
 	void	readRequest(Connection *c);

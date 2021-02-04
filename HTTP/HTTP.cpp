@@ -362,7 +362,11 @@ void            HTTP::setAutoindex(void)
             if (dirent->d_type == DT_DIR)
                 str.append("-");
             else
-                str.append(ft_itoa(directory.st_size));
+            {
+                char *dirSize = ft_itoa(directory.st_size);
+                str.append(dirSize);
+                free(dirSize);
+            }
             str.append("\n");
             files.push(str);
         }
@@ -570,7 +574,9 @@ void     HTTP::setFirstHeadersResponse(std::string &response)
 {
     response.append(_config.getHttpVersion());
     response.append(" ");
-    response.append(ft_itoa(_statusCode)).append(" ");
+    char *tmp = ft_itoa(_statusCode);
+    response.append(tmp).append(" ");
+    free(tmp);
     response.append(_mapCodes.codes[_statusCode]).append("\r\n");
     response.append("Server: ").append(_config.getServerSoftware()).append("\r\n");
     if (ft_strlen(_date) > 0)
@@ -578,7 +584,11 @@ void     HTTP::setFirstHeadersResponse(std::string &response)
     if (_contentType.length() > 0)
         response.append("Content-Type: ").append(_contentType).append("\r\n");
     if (_contentLength >= 0)
-        response.append("Content-Length: ").append(ft_itoa(_contentLength)).append("\r\n");
+    {
+        tmp = ft_itoa(_contentLength);
+        response.append("Content-Length: ").append(tmp).append("\r\n");
+        free(tmp);
+    }
 }
 
 void            HTTP::setAllowMethodsResponse(std::string &response)

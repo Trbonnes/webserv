@@ -58,24 +58,56 @@ int		equalRequest(Socket *newSocket, Socket *lastSocket)
 }
 void	HttpWorker::writeResponse(Connection *c)
 {
-	ConfigServer *configServer = NULL;
-	char * response;
-	configServer = _config->getServerUnit(c->getRequest()->getPort(), c->getRequest()->getHost());
-	if (configServer == NULL)
-			throw Socket::ConnectionClose(); // TO DO put in a try catch block
+	char *response;
+	size_t responseSize;
+
+	if (equalRequest(c->getRequest(), _cacheSocket) == 0)
+	{
+		c->clearRequest();
+		response = _cacheResponse;
+		responseSize = _cacheResponseSize;
+	}
+	else
+	{
+		if (_cacheResponse != NULL)
+		{
+			free(_cacheResponse);
+			_cacheResponse = NULL;
+		}
+		if (_cacheSocket != NULL)
+		{
+			delete _cacheSocket;
+			_cacheSocket = NULL;
+		}
+		ConfigServer *configServer = NULL;
+		configServer = _config->getServerUnit(c->getRequest()->getPort(), c->getRequest()->getHost());
+		if (configServer == NULL)
+				throw Socket::ConnectionClose(); // TO DO put in a try catch block
+		HTTP method(c->getRequest(), configServer); 
+		response = method.getResponse();
+		responseSize = method.getResponseSize();
+	}
+
 	
 	
-	HTTP method(c->getRequest(), configServer); 
-	response = method.getResponse();
-	size_t responseSize = method.getResponseSize();
 	if (write(c->getSock(), response, responseSize) == -1)
 	{
 		std::cerr << "Tried to write but didn't work" << std::endl;
 	} // TO DO check error and close the connection
-	free(response); // TO DO not to do here wtf
+
+	// if (c->getRequest()->getMethod().compare("POST") == 0)
+	// {
+	// 	free(response);
+	// 	response = NULL;
+	// 	delete newSocket;
+	// 	newSocket = NULL;
+	// }
+	_cacheSocket = c->getRequest();
+	_cacheResponse = response;
+	_cacheResponseSize = responseSize;
+	c->setRequest(NULL);
 	FD_SET(c->getSock(), &_active_read);
 	FD_CLR(c->getSock(), &_active_write);
-	c->clearRequest();
 }
 
 void	HttpWorker::acceptConnection(int s)
@@ -105,6 +137,11 @@ void	HttpWorker::run()
 	// FD_SETS
 	fd_set 	write_fs = { 0 };
 	fd_set 	read_fs = { 0 };
+
+	//Cache sockt init
+	_cacheSocket = new Socket();
+	_cacheResponse = NULL;
+	_cacheResponseSize = 0;
 
 	FD_ZERO(&_active_read);
 	FD_ZERO(&_active_write);
