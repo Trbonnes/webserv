@@ -527,7 +527,9 @@ void        HTTP::configureErrorFile()
     if (fd == -1)
     {
         body.assign("<!DOCTYPE html>\n<html>\n<body>\n\n<h1>");
-        body.append(ft_itoa(_statusCode)).append(" ").append(_mapCodes.codes[_statusCode]);
+        char *tmp = ft_itoa(_statusCode);
+        body.append(tmp).append(" ").append(_mapCodes.codes[_statusCode]);
+        free(tmp);
         body.append("</h1>\n\n</body>\n</html>\n");
         _contentType = "text/html";
         _charset = "utf-8";

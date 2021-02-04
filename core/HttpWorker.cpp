@@ -86,6 +86,9 @@ void	HttpWorker::writeResponse(Connection *c)
 		HTTP method(c->getRequest(), configServer); 
 		response = method.getResponse();
 		responseSize = method.getResponseSize();
+		_cacheSocket = c->getRequest();
+		_cacheResponse = response;
+		_cacheResponseSize = responseSize;
 	}
 
 	
@@ -93,6 +96,8 @@ void	HttpWorker::writeResponse(Connection *c)
 	if (write(c->getSock(), response, responseSize) == -1)
 	{
 		std::cerr << "Tried to write but didn't work" << std::endl;
+
+		//TO DO delete cahce if error
 	} // TO DO check error and close the connection
 
 	// if (c->getRequest()->getMethod().compare("POST") == 0)
@@ -102,9 +107,6 @@ void	HttpWorker::writeResponse(Connection *c)
 	// 	delete newSocket;
 	// 	newSocket = NULL;
 	// }
-	_cacheSocket = c->getRequest();
-	_cacheResponse = response;
-	_cacheResponseSize = responseSize;
 	c->setRequest(NULL);
 	FD_SET(c->getSock(), &_active_read);
 	FD_CLR(c->getSock(), &_active_write);

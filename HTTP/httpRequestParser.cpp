@@ -6,7 +6,7 @@
 /*   By: yorn <yorn@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/30 15:45:46 by trbonnes          #+#    #+#             */
-/*   Updated: 2021/02/01 15:10:42 by yorn             ###   ########.fr       */
+/*   Updated: 2021/02/04 14:10:18 by yorn             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,9 @@ int		httpRequestParseChunckedBody(std::string request, Socket *socket, size_t po
 		// Log::debug(chunkSize);
 		while (chunkSize > 0) {
 			// Log::debug("new chunk");
-			socket->setContentLength(ft_itoa(atol(socket->getContentLength().c_str()) + chunkSize));
+			char *tmp = ft_itoa(atol(socket->getContentLength().c_str()) + chunkSize);
+			socket->setContentLength(tmp);
+			free(tmp);
 			s.clear();
 			convert.clear();
 			for (int i = 0; i < (int)chunkSize; i += ret) {

@@ -143,13 +143,17 @@ void        HTTP::cgi_exe()
     ft_bzero(side_in, sizeof(side_in));
     pipe(side_in);
     route = "HTTP/cgi/";
-    route.append(ft_itoa(file));
+    char *tmp = ft_itoa(file);
+    route.append(tmp);
+    free(tmp);
     while ((side_out = open(route.c_str(), O_RDONLY)) != -1)
     {
         close(side_out);
         file++;
         route = "HTTP/cgi/";
-        route.append(ft_itoa(file));
+        tmp = ft_itoa(file);
+        route.append(tmp);
+        free(tmp);
     }
     while ((side_out = open(route.c_str(), O_CREAT | O_EXCL | O_RDWR, S_IRUSR | S_IWUSR)) == -1) ;
     pid = fork();
