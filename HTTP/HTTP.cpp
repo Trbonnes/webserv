@@ -372,6 +372,7 @@ void            HTTP::setAutoindex(void)
             files.pop();
         }
     }
+    closedir(dir);
     body.append("</pre><hr></body>\n</html>");
     _contentLength = body.length();
     _contentType = "text/html";

@@ -173,7 +173,7 @@ void        HTTP::cgi_exe()
         close(side_in[SIDE_IN]);
         _socket.getBody().clear();
         std::string().swap(_socket.getBody());
-	    LoadController::loadController(ft_atoi(_socket.getContentLength().c_str() + 100), _cgiResponse);
+	    LoadController::loadController(ft_atoi(_socket.getContentLength().c_str()) + 100, _cgiResponse);
         while ((side_out = open(route.c_str(), O_RDONLY, S_IRUSR | S_IWUSR)) == -1) ;
         while ((ret = read(side_out, buf, 1024)) > 0) {
             _responseSize += ret;
