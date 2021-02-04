@@ -161,6 +161,7 @@ void	HttpWorker::run()
 				{
 					std::cerr << "Tried to write but didn't work" << std::endl;
 				} // TO DO check error and close the connection
+				free(response); // TO DO not to do here wtf
 				FD_SET(c->getSock(), &active_read);
 				FD_CLR(c->getSock(), &active_write);
 				c->clearRequest();
