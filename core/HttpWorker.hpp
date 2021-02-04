@@ -31,5 +31,12 @@ private:
 	std::list<ListenSocket>	_listen_socket;
 	std::list<Connection*>	_connections;
 	Config						*_config;
+	fd_set 					_active_read;
+	fd_set 					_active_write;
+
+	void	acceptConnection(int sock);
+	void	readRequest(Connection *c);
+	void	writeResponse(Connection *c);
+
 };
 #endif // HTTPWORKER

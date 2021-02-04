@@ -56,242 +56,108 @@ int		equalRequest(Socket *newSocket, Socket *lastSocket)
 		return 1;
 	return 0;
 }
+void	HttpWorker::writeResponse(Connection *c)
+{
+	ConfigServer *configServer = NULL;
+	char * response;
+	configServer = _config->getServerUnit(c->getRequest()->getPort(), c->getRequest()->getHost());
+	if (configServer == NULL)
+			throw Socket::ConnectionClose(); // TO DO put in a try catch block
+	
+	
+	HTTP method(c->getRequest(), configServer); 
+	response = method.getResponse();
+	size_t responseSize = method.getResponseSize();
+	if (write(c->getSock(), response, responseSize) == -1)
+	{
+		std::cerr << "Tried to write but didn't work" << std::endl;
+	} // TO DO check error and close the connection
+	free(response); // TO DO not to do here wtf
+	FD_SET(c->getSock(), &_active_read);
+	FD_CLR(c->getSock(), &_active_write);
+	c->clearRequest();
+}
+
+void	HttpWorker::acceptConnection(int s)
+{
+	try
+	{
+		Connection *c = new Connection(s);
+		_connections.push_front(c);
+		FD_SET(c->getSock(), &_active_read);
+		// std::cerr << "New connection " << c->getSock() << std::endl;
+	}
+	catch(const std::exception& e)
+	{
+	}
+}
+
+void	HttpWorker::readRequest(Connection *c)
+{
+		Socket *newSocket = httpRequestParser(c->getSock());
+		c->setRequest(newSocket);
+		FD_SET(c->getSock(), &_active_write);
+		FD_CLR(c->getSock(), &_active_read);
+}
 
 void	HttpWorker::run()
 {
-
-	//MISC
-	ConfigServer *configServer = NULL;
-	// Cache request
-	// Socket *lastSocket = new Socket();
-
 	// FD_SETS
 	fd_set 	write_fs = { 0 };
 	fd_set 	read_fs = { 0 };
-	fd_set 	active_read = { 0 };
-	fd_set 	active_write = { 0 };
 
+	FD_ZERO(&_active_read);
+	FD_ZERO(&_active_write);
 	//List iterators;
 	std::list<ListenSocket>::iterator il;
-	std::list<Connection*>::iterator ic, tmp;
+	std::list<Connection*>::iterator ic;
 
-	// add Listen sockets in active_read
+	// add Listen sockets in _active_read
 	for (il = _listen_socket.begin(); il != _listen_socket.end(); il++)
-	{
-		FD_SET(il->getSock(), &active_read);
-		std::cerr << "Listen socket on " << il->getSock() << std::endl;
-	}
-	
+		FD_SET(il->getSock(), &_active_read);
 
 	// Main loop
 	while (1)
 	{
-		read_fs = active_read;
-		write_fs = active_write;
+		read_fs = _active_read;
+		write_fs = _active_write;
 
-		// std::cerr << "=============== SELECT START ===============" << std::endl;
-		// std::cerr << "Number of actives connections " << _connections.size() << std::endl;
-		// usleep(80000);
-		//SELECT
-		int r = 0;
-		// std::cerr << "FD_SETSIZE :" << FD_SETSIZE << std::endl;
-		if ((r = select(FD_SETSIZE, &read_fs, &write_fs, NULL, NULL)) == -1)
+		if (select(FD_SETSIZE, &read_fs, &write_fs, NULL, NULL) == -1)
 		{
 			std::cerr << "Select error: " << strerror(errno) << std::endl;
 			// TO DO ERROR
 		}
 
-		// std::cerr << "Loop: " << r << "fds to go" << std::endl;
-
 		// New connection
 		for (il = _listen_socket.begin(); il != _listen_socket.end(); il++)
 			if (FD_ISSET(il->getSock(), &read_fs))
-			{
-				try
-				{
-					Connection *c = new Connection(il->getSock());
-					_connections.push_front(c);
-					FD_SET(c->getSock(), &active_read);
-					// std::cerr << "New connection " << c->getSock() << std::endl;
-				}
-				catch(const std::exception& e)
-				{
-				}
-			}
+				acceptConnection(il->getSock());
+
 		ic = _connections.begin();
 		while (ic != _connections.end())
 		{
 			Connection* c = *ic;
-			// Read ready on active connection
-			// std::cerr << "Socket for loop : " << ic->getSock() << std::endl;
-			if (FD_ISSET(c->getSock(), &read_fs))
+			try
 			{
-				// std::cerr << "About to read " << c->getSock() << std::endl;
-				Socket *newSocket;
-				try
-				{
-					 newSocket = httpRequestParser(c->getSock());
-				}
-				catch(const std::exception& e)
-				{
-					FD_CLR(c->getSock(), &active_write);
-					FD_CLR(c->getSock(), &active_read);
-					c->clearRequest();
-					// std::cerr << "Connection close for " << c->getSock() << std::endl;
-					ic = _connections.erase(ic);
-					delete c;
-					continue;
-				}
-				c->setRequest(newSocket);
-				FD_SET(c->getSock(), &active_write);
-				FD_CLR(c->getSock(), &active_read);
-				// std::cerr << "READ"<< std::endl;
+				// Read ready on active connection
+				if (FD_ISSET(c->getSock(), &read_fs))
+					readRequest(c);
+				// Write ready on active connection
+				else if (FD_ISSET(c->getSock(), &write_fs))
+					writeResponse(c);		
 			}
-			// Write ready on active connection
-			else if (FD_ISSET(c->getSock(), &write_fs))
+			catch(const std::exception& e)
 			{
-				// std::cerr << "About to write on " << c->getSock() << std::endl;
-				configServer = _config->getServerUnit(c->getRequest()->getPort(), c->getRequest()->getHost());
-				if (configServer == NULL)
-						throw Socket::ConnectionClose(); // TO DO put in a try catch block
-				HTTP method(c->getRequest(), configServer); 
-				char * response = method.getResponse();
-				size_t responseSize = method.getResponseSize();
-				if (write(c->getSock(), response, responseSize) == -1)
-				{
-					std::cerr << "Tried to write but didn't work" << std::endl;
-				} // TO DO check error and close the connection
-				free(response); // TO DO not to do here wtf
-				FD_SET(c->getSock(), &active_read);
-				FD_CLR(c->getSock(), &active_write);
+				FD_CLR(c->getSock(), &_active_write);
+				FD_CLR(c->getSock(), &_active_read);
 				c->clearRequest();
-				// std::cerr << "WRITE"<< std::endl;
+				ic = _connections.erase(ic);
+				delete c;
+				continue;
 			}
 			ic++;
 		}
 	}
-
-
-
-
-
-	// Socket *lastSocket = new Socket();
-
-	// fd_set 	active_fs;
-	// fd_set 	read_fs;
-	// char* 	response;
-	// int		responseSize;
-	// ListenSocket* 	listening[FD_SETSIZE]; // array of pointers
-	// ConfigServer *configServer = NULL;
-	// response = NULL;
-
-
-	// std::list<int>
-
-	// // Important zeroing-out of the arrays
-	// // ft_bzero(connections, FD_SETSIZE * sizeof(HttpConnection*)); 
-	// ft_bzero(listening, FD_SETSIZE * sizeof(ListenSocket*));
-
-	// // Transforming list in fdset and ListenSocket in an array we can access with i directly without looping through the fdset
-	// FD_ZERO(&active_fs);
-	// for (unsigned int i = 0; i < _listen_socket.size(); i++)
-	// {
-	// 	listening[_listen_socket[i].getSock()] = &_listen_socket[i];
-	// 	FD_SET(_listen_socket[i].getSock(), &active_fs);
-	// }
-	// // Main loop of the worker
-	// while (1)
-	// {
-	// 	//read fs is going to be modified by select call, so we must reattribute the set there
-	// 	read_fs = active_fs;
-	// 	// Waiting for an event on listen socket
-	// 	if (select(FD_SETSIZE, &read_fs, NULL, NULL, NULL) == -1)
-	// 	{
-	// 		std::cerr << "Select error : " << strerror(errno) << std::endl;
-	// 		continue;
-	// 	}
-	// 	for (int i = 0; i < FD_SETSIZE; i++)
-	// 	{
-	// 		// if the fd is not set then there's no event on that fd, next
-	// 		if (!FD_ISSET(i, &read_fs))
-	// 			continue ;
-	// 		// if it is on a listening socket, create a new connection
-	// 		if (listening[i])
-	// 		{	
-	// 			int s;
-
-	// 			struct sockaddr	_client_name;
-	// 			socklen_t size;
-
-	// 			size = sizeof(_client_name);
-	// 			s = ::accept(listening[i]->getSock(), &_client_name, &size);
-	// 			if (s != -1)
-	// 			{
-	// 				if (s < FD_SETSIZE)
-	// 				{
-	// 					FD_SET(s, &active_fs);
-	// 				}
-	// 				else
-	// 					close(s);
-	// 			}
-	// 			else
-	// 			{
-	// 				close(s);
-	// 			}
-				
-	// 		}
-	// 		// If it is a connection socket, do the job
-	// 		else
-	// 		{
-	// 			try
-	// 			{
-	// 				Socket *newSocket = httpRequestParser(i);
-	// 				if (equalRequest(newSocket, lastSocket))
-	// 				{
-	// 					if (response != NULL)
-	// 					{
-	// 						free(response);
-	// 						response = NULL;
-	// 					}
-	// 					if (lastSocket != NULL)
-	// 					{
-	// 						delete lastSocket;
-	// 						lastSocket = NULL;
-	// 					}
-	// 					configServer = _config->getServerUnit(newSocket->getPort(), newSocket->getHost());
-	// 					if (configServer == NULL)
-	// 						throw Socket::ConnectionClose();
-	// 					HTTP method(newSocket, configServer);
-	// 					response = method.getResponse();
-	// 					responseSize = method.getResponseSize();
-	// 					write(i, response, responseSize);
-
-	// 					if (newSocket->getMethod().compare("POST") == 0)
-	// 					{
-	// 						free(response);
-	// 						response = NULL;
-	// 						delete newSocket;
-	// 						newSocket = NULL;
-	// 					}
-	// 					lastSocket = newSocket;
-	// 				}
-	// 				else
-	// 				{
-	// 					delete newSocket;
-	// 					newSocket = NULL;
-	// 					write(i, response, responseSize);
-	// 				}
-	// 			}
-	// 			catch(const std::exception& e)
-	// 			{
-	// 				close(i);
-	// 				FD_CLR(i, &active_fs);
-	// 			}
-	// 		}
-	// 	}
-	// }
-	// std::cerr << "EXITING WORKER " << std::endl;
-	// exit(0);
 }
 
 Runnable* HttpWorker::clone() const
