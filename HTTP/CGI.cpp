@@ -57,7 +57,9 @@ void        HTTP::cgi_metaVariables()
     _cgi._request_uri = _socket.getRequestURI();
     _cgi._script_name = _config.getCGI_root(_location);
     _cgi._server_name = _socket.getHost();
-    _cgi._server_port = ft_itoa(_socket.getPort());
+    char *tmp = ft_itoa(_socket.getPort());
+    _cgi._server_port = tmp;
+    free(tmp);
     _cgi._server_protocol = _config.getHttpVersion();
     _cgi._server_software = _config.getServerSoftware();
     return ;
