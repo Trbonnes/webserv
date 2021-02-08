@@ -24,6 +24,7 @@ HttpServer::~HttpServer() {
 
 void HttpServer::run()
 {
+	signal(SIGINT, sigint_handler);
 	try
 	{
 		initConf();
@@ -118,6 +119,11 @@ void HttpServer::initWorkers() {
 		std::cerr << "Cannot instantiate workers: " << e.what() << '\n';
 		throw HttpServer::WorkersInitException();
 	}
+}
+
+void HttpServer::shutdown()
+{
+	
 }
 
 const char * HttpServer::WorkersInitException::what () const throw ()

@@ -2,7 +2,6 @@
 #define HTTPSERVER
 
 
-
 #include "Config.hpp"
 #include "HttpWorker.hpp"
 #include "ProcessManager.hpp"
@@ -56,11 +55,11 @@ private:
 	void			initListenSocket();
 	void			initWorkers();
 	void			masterLifecycle();
+	void			shutdown();
 
 	// Default configuration variables
 	std::string					_config_path;
-	
-
 };
+
 #endif // HTTPSERVER
 

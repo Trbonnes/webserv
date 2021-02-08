@@ -1,5 +1,7 @@
 #include "ProcessManager.hpp"
 
+bool		g_ismaster = true;
+
 ProcessManager::ProcessManager() {
 }
 
@@ -14,7 +16,6 @@ ProcessManager::~ProcessManager() {
 	for (std::list<Runnable*>::iterator it = _runnables.begin(); it != _runnables.end(); ++it)
 		delete *it;
 }
-
 
 void ProcessManager::run(Runnable &proc, unsigned int n = 1, bool clone = true)
 {
@@ -39,6 +40,7 @@ void ProcessManager::run(Runnable &proc, unsigned int n = 1, bool clone = true)
 			pid = fork();
 			if (pid == 0)
 			{
+				g_ismaster = false;
 				ptr->run();
 			}
 			if (pid == -1)
@@ -70,20 +72,12 @@ void ProcessManager::manage()
 
 	while (_process.size() > 0)
 	{
-		// pid = wait(&status);
-        waitpid(-1, &status, 0);
-
-		std::cerr << "Dead pid" << pid << std::endl;
-		std::cerr << "Was signaled ? " << WIFSIGNALED(status) << std::endl;
-		std::cerr << "What code ? " << WTERMSIG(status) << std::endl;
-		std::cerr << "Core dump ? " << WCOREDUMP(status) << std::endl;
-		std::cerr << "Process with pid " << pid << " was killed" << std::endl;
+        pid = waitpid(-1, &status, 0);
 		Runnable* proc = _process[pid];
-		std::cerr << "Value of proc " << proc << std::endl;
 		if (proc->isRespawn())
 		{
-			std::cerr << "Respawning the process" << std::endl;
-			// this->run(*proc, 1, false);
+			std::cerr << "Respawning a worker" << std::endl;
+			this->run(*proc, 1, false);
 		}
 	}
 }

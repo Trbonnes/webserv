@@ -1,8 +1,6 @@
 #include "HttpServer.hpp"
-#include <string>
 
-
-static void printUsage()
+void printUsage()
 {
 	std::cerr << "Usage: ./webserv [option argument]" << std::endl;
 	std::cerr << std::endl;
@@ -50,7 +48,9 @@ int main(int ac, const char** av, const char** env) {
 	(void) ac;
 	(void) av;
 	(void) env;
-
+	
+	// g_ismaster = true;
+	// g_serverptr = &server;
 	if (ac > 1)
 	{
 		if (parseArguments(server, av))

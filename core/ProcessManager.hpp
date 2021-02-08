@@ -16,6 +16,7 @@
 #include <stdlib.h>
 #include <map>
 #include <list>
+#include <signal.h>
 
 
 class ProcessManager
@@ -31,5 +32,13 @@ public:
 	void run(Runnable &proc, unsigned int i, bool clone);
 	void manage();
 };
+
+extern bool		g_ismaster;
+
+
+void	sigint_handler(int sig);
+
+// HttpServer*	g_serverptr;
+
 
 #endif // PROCESSMANAGER
