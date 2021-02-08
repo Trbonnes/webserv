@@ -55,7 +55,8 @@ void HttpServer::run()
 		std::cerr << e.what() << '\n';
 		throw e;
 	}
-	masterLifecycle();
+	if (g_ismaster)
+		masterLifecycle();
 }
 
 void HttpServer::initConf() {

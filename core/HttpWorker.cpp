@@ -162,9 +162,14 @@ void	HttpWorker::run()
 		write_fs = _active_write;
 
 		if (select(FD_SETSIZE, &read_fs, &write_fs, NULL, NULL) == -1)
-			std::cerr << "Select error: " << strerror(errno) << std::endl;
+		{
+			if (g_server->getStatus() == HttpServer::STOPPING)
+				break;
+			else
+				std::cerr << "Select error: " << strerror(errno) << std::endl;
+		}
 		if (g_server->getStatus() == HttpServer::STOPPING)
-			break;
+				break;
 		// New connection
 		for (il = _listen_socket.begin(); il != _listen_socket.end(); il++)
 			if (FD_ISSET(il->getSock(), &read_fs))
@@ -195,7 +200,6 @@ void	HttpWorker::run()
 			ic++;
 		}
 	}
-
 	closeConnections();
 	if (_cacheSocket)
 		delete _cacheSocket;
@@ -205,11 +209,17 @@ void	HttpWorker::run()
 
 void		HttpWorker::closeConnections()
 {
-	std::list<Connection*>::iterator ic;
+	std::list<Connection*>::iterator ic,next;
 
 	ic = _connections.begin();
 	while (ic != _connections.end())
+	{
+		next = ic;
+		next++;
 		delete *ic;
+		_connections.erase(ic);
+		ic = next;
+	}
 }
 
 Runnable*	HttpWorker::clone() const

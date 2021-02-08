@@ -20,10 +20,8 @@ void ProcessManager::run(Runnable &proc, unsigned int n = 1, bool clone = true)
 	pid_t pid;
 	Runnable *ptr;
 
-
-	if (n  == 0)
+	if (n == 0)
 		return;
-
 	if (clone)
 	{
 		ptr = proc.clone();
@@ -46,7 +44,6 @@ void ProcessManager::run(Runnable &proc, unsigned int n = 1, bool clone = true)
 			{
 				throw Runnable::RunnableLaunchException();
 			}
-			_process.erase(pid);
 			_process[pid] = ptr;
 		}
 		else
@@ -72,11 +69,19 @@ void ProcessManager::manage()
 	while (_process.size() > 0)
 	{
         pid = waitpid(-1, &status, 0);
+		if (errno == ECHILD)
+			break;
 		Runnable* proc = _process[pid];
+		_process[pid] = 0;
 		if (proc->isRespawn() && g_server->getStatus() != HttpServer::STOPPING)
 		{
 			std::cerr << "Respawning a worker" << std::endl;
 			this->run(*proc, 1, false);
+			// If it's a worker exiting
+			if (g_ismaster == false)
+			{
+				break ;
+			}
 		}
 		else
 			_process.erase(pid);
@@ -86,6 +91,13 @@ void ProcessManager::manage()
 
 void ProcessManager::killProcesses(int sig)
 {
-	for (std::map<pid_t, Runnable*>::iterator it = _process.begin(); it != _process.end(); it++)
+	std::map<pid_t, Runnable*>::iterator next, it = _process.begin();
+	while (it != _process.end())
+	{
+		// This is to avoid concurrency problem with an entry being erased before next loop iteration
+		next = it;
+		next++;
 		kill(it->first, sig);
+		it = next;
+	}
 }
