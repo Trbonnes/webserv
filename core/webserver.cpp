@@ -2,6 +2,7 @@
 
 bool		g_ismaster;
 HttpServer	*g_server;
+int			g_singaled;
 
 void printUsage()
 {
@@ -54,6 +55,7 @@ int main(int ac, const char** av, const char** env) {
 	
 	g_ismaster = true;
 	g_server = &server;
+	g_singaled = 0;
 	if (ac > 1)
 	{
 		if (parseArguments(server, av))

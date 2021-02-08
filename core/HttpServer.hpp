@@ -71,6 +71,7 @@ private:
 
 extern HttpServer	*g_server;
 extern bool			g_ismaster;
+extern int			g_singaled;
 
 #endif // HTTPSERVER
 
