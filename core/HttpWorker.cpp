@@ -82,7 +82,7 @@ void	HttpWorker::writeResponse(Connection *c)
 		ConfigServer *configServer = NULL;
 		configServer = _config->getServerUnit(c->getRequest()->getPort(), c->getRequest()->getHost());
 		if (configServer == NULL)
-				throw Socket::ConnectionClose(); // TO DO put in a try catch block
+				throw Socket::ConnectionClose();
 		HTTP method(c->getRequest(), configServer); 
 		response = method.getResponse();
 		responseSize = method.getResponseSize();
@@ -95,18 +95,8 @@ void	HttpWorker::writeResponse(Connection *c)
 	
 	if (write(c->getSock(), response, responseSize) == -1)
 	{
-		std::cerr << "Tried to write but didn't work" << std::endl;
-
-		//TO DO delete cahce if error
-	} // TO DO check error and close the connection
-
-	// if (c->getRequest()->getMethod().compare("POST") == 0)
-	// {
-	// 	free(response);
-	// 	response = NULL;
-	// 	delete newSocket;
-	// 	newSocket = NULL;
-	// }
+		throw Socket::ConnectionClose();
+	}
 	c->setRequest(NULL);
 	FD_SET(c->getSock(), &_active_read);
 	FD_CLR(c->getSock(), &_active_write);
