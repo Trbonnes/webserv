@@ -4,6 +4,7 @@
 HttpServer::HttpServer() {
     _config = NULL;
     _manager = NULL;
+	_status = RUNNING;
 	_config_path = "config/webserv.conf";
 }
 
@@ -24,7 +25,8 @@ HttpServer::~HttpServer() {
 
 void HttpServer::run()
 {
-	signal(SIGINT, sigint_handler);
+	signal(SIGINT, sig_handler);
+	signal(SIGTERM, sig_handler);
 	try
 	{
 		initConf();
@@ -121,11 +123,6 @@ void HttpServer::initWorkers() {
 	}
 }
 
-void HttpServer::shutdown()
-{
-	
-}
-
 const char * HttpServer::WorkersInitException::what () const throw ()
 {
     		return "Workers failed to initialize"; 
@@ -139,4 +136,20 @@ const char * HttpServer::OpenConfigfileFail	::what () const throw ()
 void		HttpServer::setConfigPath(std::string &path)
 {
 	_config_path = path;
+}
+
+
+HttpServer::e_status	HttpServer::getStatus()
+{
+	return _status;
+}
+
+void					HttpServer::setStatus(e_status status)
+{
+	_status = status;
+}
+
+void		HttpServer::killWorkers(int sig)
+{
+	_manager->killProcesses(sig);
 }

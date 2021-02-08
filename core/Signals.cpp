@@ -1,14 +1,17 @@
 #include "ProcessManager.hpp"
 
-void	sigint_handler(int sig)
+void	sig_handler(int sig)
 {
+	g_server->setStatus(HttpServer::STOPPING);
 	if (g_ismaster)
 	{
-		std::cerr << "Caught SIGINT signal, exiting...." << std::endl;
+		std::cerr << "Caught SIGINT signal, exiting....\n";
+		g_server->killWorkers(sig);
 	}
 	else
 	{
-		std::cerr << "Worker exiting" << std::endl;
+		std::cerr << "Worker exiting\n";
 	}
-	exit(sig);
+	(void) sig;
+	// exit(sig);
 }

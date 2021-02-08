@@ -12,6 +12,7 @@
 #include "Config.hpp"
 #include "Log.hpp"
 #include "Connection.hpp"
+#include "HttpServer.hpp"
 
 #include "../HTTP/HTTP.hpp"
 #include "../HTTP/Socket.hpp"
@@ -41,6 +42,6 @@ private:
 	void	acceptConnection(int sock);
 	void	readRequest(Connection *c);
 	void	writeResponse(Connection *c);
-
+	void	closeConnections();
 };
 #endif // HTTPWORKER

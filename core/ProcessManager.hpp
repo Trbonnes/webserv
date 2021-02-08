@@ -3,6 +3,7 @@
 
 #include "Runnable.hpp"
 #include "Log.hpp"
+#include "HttpServer.hpp"
 
 #include <sys/time.h>
 #include <sys/types.h>
@@ -31,14 +32,11 @@ public:
 	~ProcessManager();
 	void run(Runnable &proc, unsigned int i, bool clone);
 	void manage();
+	void killProcesses(int);
 };
 
-extern bool		g_ismaster;
 
-
-void	sigint_handler(int sig);
-
-// HttpServer*	g_serverptr;
+void	sig_handler(int sig);
 
 
 #endif // PROCESSMANAGER

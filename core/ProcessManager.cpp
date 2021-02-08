@@ -1,7 +1,5 @@
 #include "ProcessManager.hpp"
 
-bool		g_ismaster = true;
-
 ProcessManager::ProcessManager() {
 }
 
@@ -42,6 +40,7 @@ void ProcessManager::run(Runnable &proc, unsigned int n = 1, bool clone = true)
 			{
 				g_ismaster = false;
 				ptr->run();
+				break;
 			}
 			if (pid == -1)
 			{
@@ -74,10 +73,19 @@ void ProcessManager::manage()
 	{
         pid = waitpid(-1, &status, 0);
 		Runnable* proc = _process[pid];
-		if (proc->isRespawn())
+		if (proc->isRespawn() && g_server->getStatus() != HttpServer::STOPPING)
 		{
 			std::cerr << "Respawning a worker" << std::endl;
 			this->run(*proc, 1, false);
 		}
+		else
+			_process.erase(pid);
 	}
+}
+
+
+void ProcessManager::killProcesses(int sig)
+{
+	for (std::map<pid_t, Runnable*>::iterator it = _process.begin(); it != _process.end(); it++)
+		kill(it->first, sig);
 }

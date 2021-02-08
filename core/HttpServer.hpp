@@ -23,9 +23,15 @@
 #define WORKER_MAX 128
 #define WORKER_MIN 1
 
+class ProcessManager;
+
 class HttpServer
 {
 public:
+	typedef enum status {
+		RUNNING,
+		STOPPING
+	} e_status;
 
 	HttpServer();
 	~HttpServer();
@@ -34,6 +40,9 @@ public:
 
 	// Default configuration variables setters
 	void setConfigPath(std::string &);
+	e_status		getStatus();
+	void			setStatus(e_status);
+	void			killWorkers(int);
 	class WorkersInitException: public std::exception
 	{
 	public:
@@ -50,16 +59,18 @@ private:
 	std::list<ListenSocket>	_listen_sockset;
 	ProcessManager*				_manager;
 	pthread_mutex_t				_accept_mutex;
+	e_status					_status;
 	HttpServer(const HttpServer &);
 	void			initConf();
 	void			initListenSocket();
 	void			initWorkers();
 	void			masterLifecycle();
-	void			shutdown();
-
 	// Default configuration variables
 	std::string					_config_path;
 };
+
+extern HttpServer	*g_server;
+extern bool			g_ismaster;
 
 #endif // HTTPSERVER
 
