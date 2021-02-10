@@ -38,6 +38,7 @@ std::string     HTTP::acceptLanguage()
     std::string str;
     std::string trydir;
     struct stat dir;
+    int r;
 
     if (!_config.getLanguage(_location).empty())
     {
@@ -53,8 +54,8 @@ std::string     HTTP::acceptLanguage()
                 _contentLanguage = *itServer;
                 str.assign(*itServer);
                 str.append("/");
-                stat(trydir.assign(_route).append(str).c_str(), &dir);
-                if ((dir.st_mode & S_IFMT) == S_IFDIR)
+                r = stat(trydir.assign(_route).append(str).c_str(), &dir);
+                if (r != -1 && (dir.st_mode & S_IFMT) == S_IFDIR)
                     return (str);
                 else
                     _contentLanguage.assign("");
@@ -63,8 +64,8 @@ std::string     HTTP::acceptLanguage()
         }
         _contentLanguage = *(_config.getLanguage(_location).begin());
         str.append(*(_config.getLanguage(_uri).begin()));
-        stat(trydir.assign(_route).append(str).c_str(), &dir);
-        if ((dir.st_mode & S_IFMT) == S_IFDIR)
+        r = stat(trydir.assign(_route).append(str).c_str(), &dir);
+        if (r != -1 && (dir.st_mode & S_IFMT) == S_IFDIR)
             return (str);
         else
             return (_contentLanguage.assign(""));
