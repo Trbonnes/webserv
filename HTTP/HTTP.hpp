@@ -64,6 +64,9 @@ class   HTTP
     ConfigServer                _config;
     StatusCode                  _mapCodes;
     CGI                         _cgi;
+    bool                        _use_cgi;
+    int                         _cgi_in[2];
+    int                         _cgi_out[2];
     std::string                 _uri;
     std::string                 _route;
     std::string                 _location;
@@ -129,6 +132,7 @@ class   HTTP
     std::string     base64_encode(unsigned char const* bytes_to_encode, unsigned int in_len);
 
     // CGI
+    void            prepare_cgi();
     bool            cgi_fd_exist();
     void            cgi_metaVariables();
     void            cgi_exe();
@@ -155,6 +159,12 @@ class   HTTP
     HTTP            &operator=(HTTP &rhs);
 
     // RESPONSE
+    void            read_cgi_response();
+    int             write_cgi_request();
+    int             get_cgi_in();
+    int             get_cgi_out();
+    bool            use_cgi();
+    void            processResponse();
     char*           getResponse();
     void            setFirstHeadersResponse(std::string &response);
     void            setAllowMethodsResponse(std::string &response);

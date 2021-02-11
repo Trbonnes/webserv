@@ -56,50 +56,87 @@ int		equalRequest(Socket *newSocket, Socket *lastSocket)
 		return 1;
 	return 0;
 }
-void	HttpWorker::writeResponse(Connection *c)
+
+void	HttpWorker::handleCGIRead(Connection *c)
 {
-	char *response;
+	HTTP* method;
+	// Log::debug("CGI READ\n");
+
+	method = c->getMethod();
+	FD_CLR(method->get_cgi_out(), &_active_read);
+	method->read_cgi_response();
+	// Log::debug(method->getResponse());
+	FD_SET(c->getSock(), &_active_write);
+}
+
+void	HttpWorker::handleCGIWrite(Connection *c)
+{
+	// Log::debug("CGI WRITE\n");
+	HTTP* method = c->getMethod();
+	
+	// Remove cgi_in from 
+	FD_CLR(method->get_cgi_in(), &_active_write);
+    if (c->getMethod()->write_cgi_request() == -1)
+	{
+		// TO DO kill CGI process ?
+		delete method;
+		throw Socket::ConnectionClose();
+	}
+	FD_SET(method->get_cgi_out(), &_active_read);
+}
+
+void	HttpWorker::handleWrite(Connection *c)
+{
+	HTTP* method;
+	char* response;
 	size_t responseSize;
 
-	if (equalRequest(c->getRequest(), _cacheSocket) == 0)
-	{
-		c->clearRequest();
-		response = _cacheResponse;
-		responseSize = _cacheResponseSize;
-	}
-	else
-	{
-		if (_cacheResponse != NULL)
-		{
-			free(_cacheResponse);
-			_cacheResponse = NULL;
-		}
-		if (_cacheSocket != NULL)
-		{
-			delete _cacheSocket;
-			_cacheSocket = NULL;
-		}
-		ConfigServer *configServer = NULL;
-		configServer = _config->getServerUnit(c->getRequest()->getPort(), c->getRequest()->getHost());
-		if (configServer == NULL)
-				throw Socket::ConnectionClose();
-		HTTP method(c->getRequest(), configServer); 
-		response = method.getResponse();
-		responseSize = method.getResponseSize();
-		_cacheSocket = c->getRequest();
-		_cacheResponse = response;
-		_cacheResponseSize = responseSize;
-	}
-
-	
-	
+	// Log::debug("About to write\n"ss);
+	method = c->getMethod();
+	response = method->getResponse();
+	responseSize = method->getResponseSize();
 	if (write(c->getSock(), response, responseSize) == -1)
 	{
 		throw Socket::ConnectionClose();
 	}
-	c->setRequest(NULL);
+	c->clearSocket();
+	delete method;
+	free(response);
+	c->setMethod(NULL);
 	FD_SET(c->getSock(), &_active_read);
 	FD_CLR(c->getSock(), &_active_write);
+}
+
+
+
+void	HttpWorker::handleRead(Connection *c)
+{
+	// Log::debug("About to read\n");
+	HTTP *method;
+
+	Socket *newSocket = httpRequestParser(c->getSock());
+	c->setSocket(newSocket);
+	ConfigServer *configServer = NULL;
+	configServer = _config->getServerUnit(c->getSocket()->getPort(), c->getSocket()->getHost());
+	if (configServer == NULL)
+			throw Socket::ConnectionClose();
+	method = new HTTP(c->getSocket(), configServer);
+	c->setMethod(method);
+	if (method->use_cgi())
+	{
+		// Log::debug("Method uses CGI\n");
+		// add cgi in to write set
+		FD_SET(method->get_cgi_in(), &_active_write);
+	}
+	// if not cgi, directly add cgi to write
+	else
+	{
+		method->processResponse();
+		// Log::debug("Get sock to write\n");
+		FD_SET(c->getSock(), &_active_write);
+	}
+	// Remove socket from read set
+	FD_CLR(c->getSock(), &_active_read);
 }
 
 void	HttpWorker::acceptConnection(int s)
@@ -116,14 +153,6 @@ void	HttpWorker::acceptConnection(int s)
 	}
 }
 
-void	HttpWorker::readRequest(Connection *c)
-{
-		Socket *newSocket = httpRequestParser(c->getSock());
-		c->setRequest(newSocket);
-		FD_SET(c->getSock(), &_active_write);
-		FD_CLR(c->getSock(), &_active_read);
-}
-
 void	HttpWorker::run()
 {
 	// FD_SETS
@@ -133,7 +162,6 @@ void	HttpWorker::run()
 	//Cache sockt init
 	_cacheSocket = new Socket();
 	_cacheResponse = NULL;
-	_cacheResponseSize = 0;
 
 	FD_ZERO(&_active_read);
 	FD_ZERO(&_active_write);
@@ -150,7 +178,7 @@ void	HttpWorker::run()
 	{
 		read_fs = _active_read;
 		write_fs = _active_write;
-
+				// Log::debug("Looping");
 		if (select(FD_SETSIZE, &read_fs, &write_fs, NULL, NULL) == -1)
 		{
 			if (g_server->getStatus() == HttpServer::STOPPING)
@@ -171,18 +199,21 @@ void	HttpWorker::run()
 			Connection* c = *ic;
 			try
 			{
-				// Read ready on active connection
 				if (FD_ISSET(c->getSock(), &read_fs))
-					readRequest(c);
+					handleRead(c);
 				// Write ready on active connection
 				else if (FD_ISSET(c->getSock(), &write_fs))
-					writeResponse(c);		
+					handleWrite(c);
+				else if (c->getMethod() && c->getMethod()->get_cgi_out() != -1 && FD_ISSET(c->getMethod()->get_cgi_out(), &read_fs))
+					handleCGIRead(c);
+				else if (c->getMethod() && c->getMethod()->get_cgi_in() != -1 && FD_ISSET(c->getMethod()->get_cgi_in(), &write_fs))
+					handleCGIWrite(c);
 			}
 			catch(const std::exception& e)
 			{
 				FD_CLR(c->getSock(), &_active_write);
 				FD_CLR(c->getSock(), &_active_read);
-				c->clearRequest();
+				c->clearSocket();
 				ic = _connections.erase(ic);
 				delete c;
 				continue;

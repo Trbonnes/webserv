@@ -10,6 +10,7 @@ _socket(0),
 _config(),
 _mapCodes(),
 _cgi(),
+_use_cgi(false),
 _location(""),
 _stat(),
 _allow(0),
@@ -35,6 +36,7 @@ _socket(*socket),
 _config(*config),
 _mapCodes(),
 _cgi(),
+_use_cgi(false),
 _location(""),
 _stat(),
 _statusCode(OK),
@@ -59,6 +61,10 @@ _responseSize(0)
     size_t      extension;
     std::string str;
 
+    _cgi_in[0] = -1;
+    _cgi_in[1] = -1;
+    _cgi_out[0] = -1;
+    _cgi_out[1] = -1;
     ft_bzero(_cgi_env, sizeof(_cgi_env));
     if (checkRequestErrors() != OK)
         return ;
@@ -82,11 +88,8 @@ _responseSize(0)
     extension = _route.find_last_of('.');
     if (is_good_exe(str.assign(_route).erase(0, extension + 1)) && checkCGImethods(_socket.getMethod()))
     {
-        cgi_metaVariables();
-        setEnv();
-        cgi_exe();
-        cgi_parse();
-        setDate();
+        _use_cgi = true;
+        prepare_cgi();
     }
     else if (checkAllowMethods(_socket.getMethod()))
         callMethod(_socket.getMethod());
@@ -555,7 +558,7 @@ void        HTTP::configureErrorFile()
 }
 
 // ** Create the response socket **
-char*         HTTP::getResponse()
+void         HTTP::processResponse()
 {
     std::string response;
 
@@ -569,7 +572,6 @@ char*         HTTP::getResponse()
     response.append("\r\n");
     setResponseSize(response);
     setBodyResponse(response);
-    return (_response);
 }
 
 void     HTTP::setFirstHeadersResponse(std::string &response)
@@ -670,6 +672,11 @@ void            HTTP::setBodyResponse(std::string &response)
         free(_body);
         _body = NULL;
     }
+}
+
+char*         HTTP::getResponse()
+{
+    return _response;
 }
 
 int             HTTP::getResponseSize()

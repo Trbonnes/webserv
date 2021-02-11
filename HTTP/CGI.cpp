@@ -127,74 +127,36 @@ void        HTTP::cgi_exe()
 {
     int         pid;
     int         ret;
-    int         status;
-    int         save_stdin;
-    int         save_stdout;
-    int         side_in[2];
-    char        buf[2049];
     char*       args[2];
-    int         side_out;
-    int         file = 0;
     std::string route;
 
-    save_stdout = dup(STDOUT_FILENO);
-    save_stdin = dup(STDIN_FILENO);
     ret = EXIT_SUCCESS;
     ft_bzero(args, sizeof(args));
-    ft_bzero(buf, sizeof(args));
-    ft_bzero(side_in, sizeof(side_in));
-    pipe(side_in);
-    route = "HTTP/cgi/";
-    char *tmp = ft_itoa(file);
-    route.append(tmp);
-    free(tmp);
-    while ((side_out = open(route.c_str(), O_RDONLY)) != -1)
-    {
-        close(side_out);
-        file++;
-        route = "HTTP/cgi/";
-        tmp = ft_itoa(file);
-        route.append(tmp);
-        free(tmp);
-    }
-    while ((side_out = open(route.c_str(), O_CREAT | O_EXCL | O_RDWR, S_IRUSR | S_IWUSR)) == -1) ;
+    pipe(_cgi_in);
+    pipe(_cgi_out); // TO DO check error
+
     pid = fork();
     if (pid < 0)
         _statusCode = INTERNAL_SERVER_ERROR;
     else if (pid == 0)
     {
-        close(side_in[SIDE_IN]);
-        dup2(side_in[SIDE_OUT], STDIN_FILENO);
-        dup2(side_out, STDOUT_FILENO);
+        close(_cgi_in[SIDE_IN]);
+        close(_cgi_out[SIDE_OUT]);
+        dup2(_cgi_in[SIDE_OUT], STDIN_FILENO);
+        dup2(_cgi_out[SIDE_IN], STDOUT_FILENO);
         args[0] = ft_strdup(_config.getCGI_root(_location).c_str());
         if ((ret = execve(args[0], args, _cgi_env)) == -1)
+        {
+            Log::debug("CGI launch error\n");
             exit(EXIT_FAILURE);
+        }
+        // TO DO test for bad gateway just in case
     }
     else
     {
-        close(side_out);
-        close(side_in[SIDE_OUT]);
-        write(side_in[SIDE_IN], _socket.getBody().c_str(), ft_atoi(_socket.getContentLength().c_str()));
-        waitpid(-1, &status, 0);
-        close(side_in[SIDE_IN]);
-        _socket.getBody().clear();
-        std::string().swap(_socket.getBody());
-	    LoadController::loadController(ft_atoi(_socket.getContentLength().c_str()) + 100, _cgiResponse);
-        while ((side_out = open(route.c_str(), O_RDONLY, S_IRUSR | S_IWUSR)) == -1) ;
-        while ((ret = read(side_out, buf, 1024)) > 0) {
-            _responseSize += ret;
-            buf[ret] = '\0';
-            _cgiResponse.append(buf);
-        }
-        close(side_out);
-        unlink(route.c_str());
-        if (WIFEXITED(status))
-            ret = WEXITSTATUS(status);
-        if (ret != EXIT_SUCCESS)
-            _statusCode = BAD_GATEWAY;
+        close(_cgi_in[SIDE_OUT]);
+        close(_cgi_out[SIDE_IN]);
     }
-    dup2(save_stdout, STDOUT_FILENO);
-    dup2(save_stdin, STDIN_FILENO);
 }
 
 void        HTTP::cgi_parse()
@@ -210,4 +172,64 @@ void        HTTP::cgi_parse()
     find = _cgiResponse.find("Content-Type: ");
     if (find != _cgiResponse.npos)
         _contentType = _cgiResponse.substr(find + ft_strlen("Content-Type: "), _cgiResponse.find("\r\n", find) - find - ft_strlen("Content-Type: "));
+}
+
+
+void            HTTP::prepare_cgi()
+{
+    cgi_metaVariables();
+    setEnv();
+    cgi_exe();
+}
+
+void            HTTP::read_cgi_response()
+{
+    int ret;
+    char        buf[1024];
+
+    ft_bzero(buf, 1024);
+    std::string().swap(_socket.getBody());
+    LoadController::loadController(ft_atoi(_socket.getContentLength().c_str()) + 100, _cgiResponse);
+    while ((ret = read(_cgi_out[SIDE_OUT], buf, 1024)) > 0) {
+        _responseSize += ret;
+        buf[ret] = '\0';
+        _cgiResponse.append(buf);
+    }
+
+     if (ret == -1)
+        _statusCode = BAD_GATEWAY;
+
+    close(_cgi_in[SIDE_IN]);
+    close(_cgi_out[SIDE_OUT]);
+    // if (WIFEXITED(status))
+    //     ret = WEXITSTATUS(status);
+    // if (ret != EXIT_SUCCESS)
+    //     _statusCode = BAD_GATEWAY;
+    cgi_parse();
+    setDate();
+	processResponse();
+}
+
+int           HTTP::write_cgi_request()
+{
+    int ret;
+
+    ret = write(_cgi_in[SIDE_IN], _socket.getBody().c_str(), ft_atoi(_socket.getContentLength().c_str()));
+     _socket.getBody().clear(); 
+    return ret;
+}
+
+int           HTTP::get_cgi_in()
+{
+    return  _cgi_in[SIDE_IN];
+}
+
+int           HTTP::get_cgi_out()
+{
+    return  _cgi_out[SIDE_OUT];
+}
+
+bool          HTTP::use_cgi()
+{
+    return _use_cgi;
 }

@@ -36,12 +36,14 @@ private:
 	fd_set 					_active_write;
 	// Simple caching
 	Socket*					_cacheSocket;
-	char*					_cacheResponse;
-	size_t					_cacheResponseSize;
+	HTTP*					_cacheResponse;
 
 	void	acceptConnection(int sock);
-	void	readRequest(Connection *c);
-	void	writeResponse(Connection *c);
+	void	handleRead(Connection *c);
+	void	handleReadCGI(Connection *c);
+	void	handleWrite(Connection *c);
+	void	handleCGIRead(Connection *c);
+	void	handleCGIWrite(Connection *c);
 	void	closeConnections();
 };
 #endif // HTTPWORKER

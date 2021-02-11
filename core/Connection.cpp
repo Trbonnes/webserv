@@ -5,6 +5,7 @@ Connection::Connection(int listen_socket)
 	socklen_t size;
 
 	_request = NULL;
+	_response = NULL;
 	size = sizeof(_client_name);
 	_socket = ::accept(listen_socket, &_client_name, &size);
 	if (_socket == -1)
@@ -42,21 +43,31 @@ void Connection::close()
 	::close(_socket);
 }
 
-void Connection::setRequest(Socket *s)
+void Connection::setSocket(Socket *s)
 {
 	_request = s;
 }
 
 
-Socket *Connection::getRequest()
+Socket *Connection::getSocket()
 {
 	return _request;
 }
 
-void Connection::clearRequest()
+void Connection::clearSocket()
 {
 	delete _request;
 	_request = NULL;
+}
+
+HTTP* Connection::getMethod()
+{
+	return _response;
+}
+
+void Connection::setMethod(HTTP* r)
+{
+	_response = r;
 }
 
 Connection::~Connection()
