@@ -140,6 +140,8 @@ void        HTTP::cgi_exe()
         _statusCode = INTERNAL_SERVER_ERROR;
     else if (pid == 0)
     {
+            Log::debug("CGI launched\n");
+
         close(_cgi_in[SIDE_IN]);
         close(_cgi_out[SIDE_OUT]);
         dup2(_cgi_in[SIDE_OUT], STDIN_FILENO);
@@ -214,8 +216,11 @@ int           HTTP::write_cgi_request()
 {
     int ret;
 
+    Log::debug("About to write to CGI");
+    sleep(5);
     ret = write(_cgi_in[SIDE_IN], _socket.getBody().c_str(), ft_atoi(_socket.getContentLength().c_str()));
-     _socket.getBody().clear(); 
+    Log::debug("Wrote to CGI");
+     _socket.getBody().clear();
     return ret;
 }
 

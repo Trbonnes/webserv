@@ -60,7 +60,7 @@ int		equalRequest(Socket *newSocket, Socket *lastSocket)
 void	HttpWorker::handleCGIRead(Connection *c)
 {
 	HTTP* method;
-	// Log::debug("CGI READ\n");
+	Log::debug("CGI READ\n");
 
 	method = c->getMethod();
 	FD_CLR(method->get_cgi_out(), &_active_read);
@@ -71,7 +71,7 @@ void	HttpWorker::handleCGIRead(Connection *c)
 
 void	HttpWorker::handleCGIWrite(Connection *c)
 {
-	// Log::debug("CGI WRITE\n");
+	Log::debug("CGI WRITE\n");
 	HTTP* method = c->getMethod();
 	
 	// Remove cgi_in from 
@@ -91,7 +91,7 @@ void	HttpWorker::handleWrite(Connection *c)
 	char* response;
 	size_t responseSize;
 
-	// Log::debug("About to write\n"ss);
+	Log::debug("About to write\n");
 	method = c->getMethod();
 	response = method->getResponse();
 	responseSize = method->getResponseSize();
@@ -111,7 +111,7 @@ void	HttpWorker::handleWrite(Connection *c)
 
 void	HttpWorker::handleRead(Connection *c)
 {
-	// Log::debug("About to read\n");
+	Log::debug("About to read\n");
 	HTTP *method;
 
 	Socket *newSocket = httpRequestParser(c->getSock());
@@ -124,7 +124,7 @@ void	HttpWorker::handleRead(Connection *c)
 	c->setMethod(method);
 	if (method->use_cgi())
 	{
-		// Log::debug("Method uses CGI\n");
+		Log::debug("Method uses CGI\n");
 		// add cgi in to write set
 		FD_SET(method->get_cgi_in(), &_active_write);
 	}
@@ -132,7 +132,8 @@ void	HttpWorker::handleRead(Connection *c)
 	else
 	{
 		method->processResponse();
-		// Log::debug("Get sock to write\n");
+		// Log::debug(method->met);
+		Log::debug("Get sock to write\n");
 		FD_SET(c->getSock(), &_active_write);
 	}
 	// Remove socket from read set
@@ -179,6 +180,7 @@ void	HttpWorker::run()
 		read_fs = _active_read;
 		write_fs = _active_write;
 				// Log::debug("Looping");
+		Log::debug("Before select\n");
 		if (select(FD_SETSIZE, &read_fs, &write_fs, NULL, NULL) == -1)
 		{
 			if (g_server->getStatus() == HttpServer::STOPPING)
@@ -186,6 +188,8 @@ void	HttpWorker::run()
 			else
 				std::cerr << "Select error: " << strerror(errno) << std::endl;
 		}
+		Log::debug("After select\n");
+
 		if (g_server->getStatus() == HttpServer::STOPPING)
 				break;
 		// New connection
