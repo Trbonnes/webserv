@@ -65,6 +65,7 @@ void	HttpWorker::handleCGIRead(Connection *c)
 	method = c->getMethod();
 	FD_CLR(method->get_cgi_out(), &_active_read);
 	method->read_cgi_response();
+	method->processResponse();
 	// Log::debug(method->getResponse());
 	FD_SET(c->getSock(), &_active_write);
 }
@@ -99,6 +100,8 @@ void	HttpWorker::handleWrite(Connection *c)
 	{
 		throw Socket::ConnectionClose();
 	}
+	Log::debug("Written\n");
+	Log::debug(response);
 	c->clearSocket();
 	delete method;
 	free(response);
@@ -132,7 +135,6 @@ void	HttpWorker::handleRead(Connection *c)
 	else
 	{
 		method->processResponse();
-		// Log::debug(method->met);
 		Log::debug("Get sock to write\n");
 		FD_SET(c->getSock(), &_active_write);
 	}
@@ -180,7 +182,6 @@ void	HttpWorker::run()
 		read_fs = _active_read;
 		write_fs = _active_write;
 				// Log::debug("Looping");
-		Log::debug("Before select\n");
 		if (select(FD_SETSIZE, &read_fs, &write_fs, NULL, NULL) == -1)
 		{
 			if (g_server->getStatus() == HttpServer::STOPPING)
@@ -188,7 +189,6 @@ void	HttpWorker::run()
 			else
 				std::cerr << "Select error: " << strerror(errno) << std::endl;
 		}
-		Log::debug("After select\n");
 
 		if (g_server->getStatus() == HttpServer::STOPPING)
 				break;
