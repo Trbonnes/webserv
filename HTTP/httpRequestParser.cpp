@@ -6,7 +6,7 @@
 /*   By: yorn <yorn@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/30 15:45:46 by trbonnes          #+#    #+#             */
-/*   Updated: 2021/02/04 14:37:39 by yorn             ###   ########.fr       */
+/*   Updated: 2021/02/12 02:19:27 by yorn             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -124,7 +124,7 @@ int		httpRequestParseBody(std::string request, Socket *socket) {
 			//Log::debug("\033[0;32mRead if body missing");
 			while (body.size() < contentLength) {
 				ft_bzero(c, 8192);
-				ret = read(socket->getFd(), c, READ);
+				ret = read(socket->getFd(), c, 8192);
 				body.append(c, ret);
 			}
 			if (body.size() > contentLength)

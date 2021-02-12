@@ -217,7 +217,6 @@ int           HTTP::write_cgi_request()
     int ret;
 
     Log::debug("About to write to CGI");
-    sleep(5);
     ret = write(_cgi_in[SIDE_IN], _socket.getBody().c_str(), ft_atoi(_socket.getContentLength().c_str()));
     Log::debug("Wrote to CGI");
      _socket.getBody().clear();
