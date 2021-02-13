@@ -1,7 +1,6 @@
 #include "ListenSocket.hpp"
 
 ListenSocket::ListenSocket(int port) {
-	int flags;
 	int opt;
 	struct sockaddr_in address;
 
@@ -16,11 +15,7 @@ ListenSocket::ListenSocket(int port) {
 	address.sin_family = AF_INET;
     address.sin_addr.s_addr = INADDR_ANY;
     address.sin_port = htons( port ); // program from configuration
-	flags = fcntl(_sock, F_GETFL, 0);
-	if (flags == -1)
-		throw FcntlException(errno);
-	flags |= O_NONBLOCK;
-	if (fcntl(_sock, F_SETFL, flags) == -1)
+	if (fcntl(_sock, F_SETFL, O_NONBLOCK) == -1)
 	{
 		throw FcntlException(errno);
 	}
