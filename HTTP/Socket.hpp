@@ -137,18 +137,18 @@ class   Socket
 
 Socket	*httpRequestParser(int fd);
 
-void	ParseAcceptCharset(Socket *socket, std::string request, size_t pos);
-void	ParseAcceptLanguage(Socket *socket, std::string request, size_t pos);
-void	ParseAutorization(Socket *socket, std::string request, size_t pos);
-void	ParseContentLength(Socket *socket, std::string request, size_t pos);
-void	ParseContentLocation(Socket *socket, std::string request, size_t pos);
-void	ParseContentType(Socket *socket, std::string request, size_t pos);
-void	ParseDate(Socket *socket, std::string request, size_t pos);
-void	ParseHost(Socket *socket, std::string request, size_t pos);
-void	ParseReferer(Socket *socket, std::string request, size_t pos);
-void	ParseTransferEncoding(Socket *socket, std::string request, size_t pos);
-void	ParseUserAgent(Socket *socket, std::string request, size_t pos);
-void	ParseXSecret(Socket *socket, std::string request, size_t pos);
-std::string ParseStdHeaders(std::string request, size_t pos);
+void	ParseAcceptCharset(Socket *socket, std::string& request, size_t pos);
+void	ParseAcceptLanguage(Socket *socket, std::string& request, size_t pos);
+void	ParseAutorization(Socket *socket, std::string& request, size_t pos);
+void	ParseContentLength(Socket *socket, std::string& request, size_t pos);
+void	ParseContentLocation(Socket *socket, std::string& request, size_t pos);
+void	ParseContentType(Socket *socket, std::string& request, size_t pos);
+void	ParseDate(Socket *socket, std::string& request, size_t pos);
+void	ParseHost(Socket *socket, std::string& request, size_t pos);
+void	ParseReferer(Socket *socket, std::string& request, size_t pos);
+void	ParseTransferEncoding(Socket *socket, std::string& request, size_t pos);
+void	ParseUserAgent(Socket *socket, std::string& request, size_t pos);
+void	ParseXSecret(Socket *socket, std::string& request, size_t pos);
+std::string ParseStdHeaders(std::string& request, size_t pos);
 
 #endif
