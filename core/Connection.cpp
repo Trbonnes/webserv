@@ -32,6 +32,88 @@ Connection& Connection::operator=(const Connection& c)
 	return (*this);
 }
 
+void Connection::subWrite(int fd)
+{
+	FD_SET(fd, _active_write);
+}
+
+void Connection::subRead(int fd)
+{
+	FD_SET(fd, _active_read);
+}
+
+void Connection::subStreamWrite(int fd)
+{
+	_stream_write = fd;
+	FD_SET(fd, _active_write);
+}
+
+void Connection::subStreamRead(int fd)
+{
+	_stream_read = fd;
+	FD_SET(fd, _active_read);
+}
+
+int	Connection::isWriteReady()
+{
+	return FD_ISSET(_socket, _active_write);
+}
+
+int	Connection::isReadReady()
+{
+	return FD_ISSET(_socket, _active_read);
+}
+
+int	Connection::isStreamWriteReady()
+{
+	return _stream_write != -1 && FD_ISSET(_stream_write, _active_write);
+}
+
+int	Connection::isStreamReadReady()
+{
+	return _stream_read != -1 && FD_ISSET(_stream_read, _active_read);
+}
+
+int	Connection::write()
+{
+	try
+	{
+		BufferChain::writeBufferToFd(_write_chain, _socket);
+	}
+	catch(const IOError& e)
+	{
+		throw;
+	}
+}
+
+int	Connection::read()
+{
+	try
+	{
+		BufferChain::readToBuffer(_read_chain, _socket);
+	}
+	catch(const IOError& e)
+	{
+		throw;
+	}
+}
+
+int	Connection::streamWrite()
+{}
+
+int	Connection::streamRead()
+{}
+
+
+
+
+
+
+
+
+
+
+
 
 int Connection::getSock()
 {
@@ -42,12 +124,6 @@ void Connection::close()
 {
 	::close(_socket);
 }
-
-void Connection::setSocket(Socket *s)
-{
-	_request = s;
-}
-
 
 Socket *Connection::getSocket()
 {

@@ -66,7 +66,7 @@ int		BufferChain::writeBufferToFd(BufferChain& chain, FD fd)
 	return ret;
 }
 
-int		BufferChain::readIntoBuffer(BufferChain& chain, FD fd)
+int		BufferChain::readToBuffer(BufferChain& chain, FD fd)
 {
 	int ret;
 	
