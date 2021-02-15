@@ -162,8 +162,8 @@ void	HttpWorker::run()
 			Connection* c = *ic;
 			try
 			{
-				// if (FD_ISSET(c->getSock(), &read_fs))
-				// 	handleRead(c);
+				if (c->isReadReady(&read_fs))
+					c->read();
 				// // Write ready on active connection
 				// else if (FD_ISSET(c->getSock(), &write_fs))
 				// 	handleWrite(c);
@@ -174,9 +174,6 @@ void	HttpWorker::run()
 			}
 			catch(const std::exception& e)
 			{
-				FD_CLR(c->getSock(), &_active_write);
-				FD_CLR(c->getSock(), &_active_read);
-				c->clearSocket();
 				ic = _connections.erase(ic);
 				delete c;
 				continue;

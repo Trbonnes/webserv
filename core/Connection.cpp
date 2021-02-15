@@ -7,6 +7,8 @@ _module(*this)
 {
 	socklen_t size;
 
+	_stream_write = -1;
+	_stream_read = -1;
 	size = sizeof(_client_name);
 	_socket = ::accept(listen_socket, &_client_name, &size);
 	if (_socket == -1)
@@ -16,6 +18,7 @@ _module(*this)
 		::close(_socket);
 		throw Connectionfailed();
 	}
+	subRead();
 }
 
 Connection::Connection(const Connection& c) :
@@ -40,46 +43,64 @@ Connection& Connection::operator=(const Connection& c)
 	return (*this);
 }
 
-void Connection::subWrite(int fd)
+void Connection::subWrite()
 {
-	FD_SET(fd, _active_write);
+	FD_SET(_socket, _active_write);
 }
 
-void Connection::subRead(int fd)
+void Connection::subRead()
 {
-	FD_SET(fd, _active_read);
+	FD_SET(_socket, _active_read);
 }
 
-void Connection::subStreamWrite(int fd)
+void Connection::subStreamWrite()
 {
-	_stream_write = fd;
-	FD_SET(fd, _active_write);
+	FD_SET(_stream_write, _active_write);
 }
 
-void Connection::subStreamRead(int fd)
+void Connection::subStreamRead()
 {
-	_stream_read = fd;
-	FD_SET(fd, _active_read);
+	FD_SET(_stream_read, _active_read);
 }
 
-int	Connection::isWriteReady()
+void Connection::unsubWrite()
 {
-	return FD_ISSET(_socket, _active_write);
+	FD_CLR(_socket, _active_write);
 }
 
-int	Connection::isReadReady()
+void Connection::unsubRead()
 {
-	return FD_ISSET(_socket, _active_read);
+	FD_CLR(_socket, _active_read);
 }
 
-int	Connection::isStreamWriteReady()
+void Connection::unsubStreamWrite()
 {
-	return _stream_write != -1 && FD_ISSET(_stream_write, _active_write);
+	FD_CLR(_stream_write, _active_write);
 }
 
-int	Connection::isStreamReadReady()
+void Connection::unsubStreamRead()
 {
-	return _stream_read != -1 && FD_ISSET(_stream_read, _active_read);
+	FD_CLR(_stream_read, _active_read);
+}
+
+int	Connection::isWriteReady(fd_set* set)
+{
+	return FD_ISSET(_socket, set);
+}
+
+int	Connection::isReadReady(fd_set* set)
+{
+	return FD_ISSET(_socket, set);
+}
+
+int	Connection::isStreamWriteReady(fd_set* set)
+{
+	return _stream_write != -1 && FD_ISSET(_stream_write, set);
+}
+
+int	Connection::isStreamReadReady(fd_set* set)
+{
+	return _stream_read != -1 && FD_ISSET(_stream_read, set);
 }
 
 void Connection::write()
@@ -96,13 +117,19 @@ void Connection::write()
 
 void Connection::read()
 {
+	int read;
+
 	try
 	{
-		BufferChain::readToBuffer(_read_chain, _socket);
+		read = BufferChain::readToBuffer(_read_chain, _socket);
 	}
 	catch(const IOError& e)
 	{
 		throw;
+	}
+	if (read == 0)
+	{
+	 	throw ConnectionClose();
 	}
 }
 
@@ -111,12 +138,6 @@ void Connection::streamWrite()
 
 void Connection::streamRead()
 {}
-
-
-
-
-
-
 
 
 BufferChain& Connection::getWriteChain()
@@ -136,15 +157,31 @@ int Connection::getSock()
 
 void Connection::close()
 {
-	::close(_socket);
+	if (_socket != -1)
+		::close(_socket);
+	if (_stream_read != -1)
+		::close(_stream_read);
+	if (_stream_write != -1)
+		::close(_stream_read);
 }
 
 Connection::~Connection()
 {
+	//unsubbing fd from sets
+	unsubRead();
+	unsubWrite();
+	unsubStreamRead();
+	unsubStreamWrite();
+	//closing all the fds
 	close();
 }
 
 const char* Connection::Connectionfailed::what() const throw()
 {
 	return "Connection failed at creation";
+}
+
+const char * Connection::ConnectionClose::what() const throw ()
+{
+	return "Connection close";
 }

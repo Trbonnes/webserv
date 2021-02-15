@@ -29,7 +29,9 @@ _transferEncoding(""),
 _body(NULL),
 _cgiResponse(""),
 _response(NULL),
-_responseSize(0) {}
+_responseSize(0) {
+    ft_bzero(_cgi_env, sizeof(NB_METAVARIABLES + 1));
+}
 
 HttpResponse::HttpResponse(HttpRequest *socket, ConfigServer *config) :
 _socket(*socket),
@@ -65,7 +67,7 @@ _responseSize(0)
     _cgi_in[1] = -1;
     _cgi_out[0] = -1;
     _cgi_out[1] = -1;
-    ft_bzero(_cgi_env, sizeof(_cgi_env));
+    ft_bzero(_cgi_env, sizeof(NB_METAVARIABLES + 1));
     if (checkRequestErrors() != OK)
         return ;
     _uri = _socket.getRequestURI();
@@ -128,7 +130,8 @@ HttpResponse::~HttpResponse()
     i = 0;
     while (i < NB_METAVARIABLES)
     {
-        free(_cgi_env[i]);
+        if (_cgi_env[i])
+            free(_cgi_env[i]);
         _cgi_env[i] = NULL;
         i++;
     }

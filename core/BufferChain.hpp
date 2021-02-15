@@ -3,6 +3,7 @@
 
 #include <sys/types.h>
 #include <unistd.h>
+#include <stdlib.h>
 #include <queue>
 #include <cstring> 
 
@@ -10,7 +11,8 @@
 // default nginx client buffer size on 64 bit systems 
 // It should be enough to hold most Http request headers, but we got to implement the case where it is too small
 #define BUFFER_SIZE_MEDIUM 16384
-#define BUFFER_SIZE_LARGE 1024000
+// #define BUFFER_SIZE_LARGE 1024000
+#define BUFFER_SIZE_LARGE 10 // TO DO don't forget to remove
 
 
 // Buffer used in socket and filesystem read
@@ -23,19 +25,20 @@ typedef int FD;
 // They can vary in size
 class BufferChain
 {
-
-private:
-	// The buffer pair structure
-	typedef struct	buffer_s
+public:
+	typedef struct	buffer_s // TO DO should put this in private ?
 	{
 		char *data;
 		size_t size;
 	}				buffer_t;
 
+private:
+
 	// The actual buffer list
 	std::queue<buffer_t> _chain;
 
 public:
+	// The buffer pair structure
 
 	// Cooplien
 	BufferChain();

@@ -19,7 +19,6 @@ typedef int FD;
 private:
 	// stream in (CGI or filestream)
 	FD _in;
-
 	// stream out
 	FD _out;
 
@@ -27,10 +26,10 @@ private:
 	Connection& _connection;
 
 	// Headers of the request
-	HttpRequest _req;
+	HttpRequest *_req;
 
 	// Header of the response
-	HttpResponse _rep;
+	HttpResponse *_rep;
 
 	// Pointers to socket buffer's chain
 	BufferChain		_stream_read_chain;

@@ -50,16 +50,22 @@ public:
 	~Connection();
 
 	// Functions a module will use to sub write/read event to the workers select() fd sets
-	void subWrite(int);
-	void subRead(int);
-	void subStreamWrite(int);
-	void subStreamRead(int);
+	void subWrite();
+	void subRead();
+	void subStreamWrite();
+	void subStreamRead();
+	// unsub
+	void unsubWrite();
+	void unsubRead();
+	void unsubStreamWrite();
+	void unsubStreamRead();
+
 
 	// Functions to check if fds are active
-	int	isWriteReady();
-	int	isReadReady();
-	int	isStreamWriteReady();
-	int	isStreamReadReady();
+	int	isWriteReady(fd_set* set);
+	int	isReadReady(fd_set* set);
+	int	isStreamWriteReady(fd_set* set);
+	int	isStreamReadReady(fd_set* set);
 	
 	//Functions to call module's write and read operation
 	void write();
@@ -83,6 +89,11 @@ public:
 		public:
 			virtual const char* what() const throw();
 	};
+	class   ConnectionClose : public std::exception
+	{
+		public:
+			const char * what () const throw ();
+	};    
 };
 
 

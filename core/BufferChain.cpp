@@ -20,6 +20,7 @@ BufferChain& BufferChain::operator=(BufferChain&)
 
 BufferChain::~BufferChain()
 {
+	flush();
 }
 
 void	BufferChain::pushBack(char* toadd, size_t size)
@@ -55,7 +56,13 @@ BufferChain::buffer_t BufferChain::popFirst()
 
 void	BufferChain::flush()
 {
-	// TO DO deep destruction
+	buffer_t tmp;
+
+	while (_chain.size() > 0)
+	{
+		tmp = popFirst();
+		delete[] tmp.data;
+	}
 }
 
 int		BufferChain::writeBufferToFd(BufferChain& chain, FD fd)
@@ -77,7 +84,8 @@ int		BufferChain::readToBuffer(BufferChain& chain, FD fd)
 	ret = read(fd, g_read_large, BUFFER_SIZE_LARGE); // TO DO keep this size ?
 	if (ret == -1)
 		throw IOError();
-	chain.copyPushBack(g_read_large, ret);
+	if (ret > 0)
+		chain.copyPushBack(g_read_large, ret);
 	return ret;
 }
 
