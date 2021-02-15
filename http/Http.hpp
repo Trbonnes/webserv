@@ -2,7 +2,6 @@
 #define HTTP
 
 
-#include "core/Connection.hpp"
 #include "core/BufferChain.hpp"
 
 
@@ -10,6 +9,7 @@
 // This is the entrypoint of the http module
 // All of the filesystem write/read are handled by this module
 // The connection socket read and write are handled by the Worker itself
+class Connection;
 
 class Http
 {
@@ -39,10 +39,18 @@ private:
 	// Reference to connection socket buffer chains
 	BufferChain&		_read_chain;
 	BufferChain&		_write_chain;
+	
+	// Prevent call to these functions
+	Http();
 
 public:
-	Http();
+	Http(Connection &c);
+	Http(const Http&);
+	Http& operator=(const Http&);
 	~Http();
 
 };
+
+#include "core/Connection.hpp"
+
 #endif // HTTP

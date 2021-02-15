@@ -1,11 +1,12 @@
 #include "Connection.hpp"
 
-Connection::Connection(int listen_socket, fd_set* r, fd_set* w)
+Connection::Connection(int listen_socket, fd_set* r, fd_set* w) :
+_active_read(r),
+_active_write(w),
+_module(*this)
 {
 	socklen_t size;
 
-	_active_read = r;
-	_active_write = w;
 	size = sizeof(_client_name);
 	_socket = ::accept(listen_socket, &_client_name, &size);
 	if (_socket == -1)
@@ -17,17 +18,15 @@ Connection::Connection(int listen_socket, fd_set* r, fd_set* w)
 	}
 }
 
-Connection::Connection(const Connection& c)
+Connection::Connection(const Connection& c) :
+_module(const_cast<Connection&>(c))
 {
 	_socket = c._socket;
 	_stream_read = c._stream_read;
 	_stream_write = c._stream_write;
 	_client_name = c._client_name;
-	_module = c._module;
 	_active_read = c._active_read;
 	_active_write = c._active_write;
-	_read_chain = c._read_chain;
-	_write_chain = c._write_chain;
 }
 
 Connection& Connection::operator=(const Connection& c)
@@ -36,11 +35,8 @@ Connection& Connection::operator=(const Connection& c)
 	_stream_read = c._stream_read;
 	_stream_write = c._stream_write;
 	_client_name = c._client_name;
-	_module = c._module;
 	_active_read = c._active_read;
 	_active_write = c._active_write;
-	_read_chain = c._read_chain;
-	_write_chain = c._write_chain;
 	return (*this);
 }
 
@@ -86,7 +82,7 @@ int	Connection::isStreamReadReady()
 	return _stream_read != -1 && FD_ISSET(_stream_read, _active_read);
 }
 
-int	Connection::write()
+void Connection::write()
 {
 	try
 	{
@@ -98,7 +94,7 @@ int	Connection::write()
 	}
 }
 
-int	Connection::read()
+void Connection::read()
 {
 	try
 	{
@@ -110,10 +106,10 @@ int	Connection::read()
 	}
 }
 
-int	Connection::streamWrite()
+void Connection::streamWrite()
 {}
 
-int	Connection::streamRead()
+void Connection::streamRead()
 {}
 
 
@@ -123,9 +119,15 @@ int	Connection::streamRead()
 
 
 
+BufferChain& Connection::getWriteChain()
+{
+	return _write_chain;
+}
 
-
-
+BufferChain& Connection::getReadChain()
+{
+	return _read_chain;
+}
 
 int Connection::getSock()
 {
@@ -137,22 +139,9 @@ void Connection::close()
 	::close(_socket);
 }
 
-HttpRequest *Connection::getSocket()
-{
-	return _request;
-}
-
-void Connection::clearSocket()
-{
-	delete _request;
-	_request = NULL;
-}
-
 Connection::~Connection()
 {
 	close();
-	if (_request)
-		delete _request;
 }
 
 const char* Connection::Connectionfailed::what() const throw()

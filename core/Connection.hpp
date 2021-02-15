@@ -13,10 +13,7 @@
 #include "ListenSocket.hpp"
 
 // HTTP Module
-#include "http/HttpRequest.hpp"
 #include "http/Http.hpp"
-#include "http/HttpResponse.hpp"
-
 
 // The Connection class represents the interface between the server and the client
 // The read and write on a socket are performed by this class
@@ -26,29 +23,30 @@ class Connection
 private:
 	// server <-> client socket
 	FD				_socket;
-
 	FD				_stream_read;
 	FD				_stream_write;
 	//client addr structure
 	struct sockaddr	_client_name;
 	
-	// The http module, it processes the imcoming read
-	Http			_module;
 
 	// Reference to the worker sets
 	fd_set*			_active_read;
 	fd_set*			_active_write;
 
-	// Pointers to socket buffer's chain
-	BufferChain		_read_chain;
-	BufferChain		_write_chain;
+	// References to socket buffer's chain, used to add buffer to the soket write
+	BufferChain	_read_chain;
+	BufferChain	_write_chain;
 
+	// The http module, it processes the imcoming read
+	Http			_module;
+
+	Connection();
+	Connection(const Connection&);
+	Connection &operator=(const Connection &);
 public:
 
 	// Coplien
 	Connection(int, fd_set* r, fd_set* w);
-	Connection(const Connection&);
-	Connection &operator=(const Connection &);
 	~Connection();
 
 	// Functions a module will use to sub write/read event to the workers select() fd sets
@@ -64,19 +62,17 @@ public:
 	int	isStreamReadReady();
 	
 	//Functions to call module's write and read operation
-	int	write();
-	int	read();
-	int	streamWrite();
-	int	streamRead();
+	void write();
+	void read();
+	void streamWrite();
+	void streamRead();
 
 	// Getters
 	int getSock();
 	BufferChain& getWriteChain();
 	BufferChain& getReadChain();
-	HttpRequest *getSocket();
 	
 	// Setters
-	void setSocket(HttpRequest *s);
 	void clearSocket();
 
 	// Close the connection

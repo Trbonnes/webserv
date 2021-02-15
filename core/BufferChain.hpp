@@ -57,7 +57,7 @@ public:
 	// Destroy and free every buffer in the list
 	void	flush();
 	static int	writeBufferToFd(BufferChain&, FD);
-	static int	readToBuffer(BufferChain&, FD, size_t);
+	static int	readToBuffer(BufferChain&, FD);
 };
 
 class	IOError: public std::exception {
