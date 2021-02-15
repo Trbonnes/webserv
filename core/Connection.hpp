@@ -11,12 +11,16 @@
 
 #include "BufferChain.hpp"
 #include "ListenSocket.hpp"
+
+// HTTP Module
 #include "http/HttpRequest.hpp"
 #include "http/Http.hpp"
 #include "http/HttpResponse.hpp"
 
 
 // The Connection class represents the interface between the server and the client
+// The read and write on a socket are performed by this class
+// The input data is put in buffer chained for the http module to handle
 class Connection
 {
 private:

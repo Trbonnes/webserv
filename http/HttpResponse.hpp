@@ -152,6 +152,7 @@ class   HttpResponse
     int             checkRequestErrors(void);
 
     public:
+    HttpResponse();
     HttpResponse(HttpRequest *socket, ConfigServer *config);
     HttpResponse(HttpResponse &copy);
     ~HttpResponse();

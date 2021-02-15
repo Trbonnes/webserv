@@ -1,9 +1,11 @@
 #include "Connection.hpp"
 
-Connection::Connection(int listen_socket)
+Connection::Connection(int listen_socket, fd_set* r, fd_set* w)
 {
 	socklen_t size;
 
+	_active_read = r;
+	_active_write = w;
 	size = sizeof(_client_name);
 	_socket = ::accept(listen_socket, &_client_name, &size);
 	if (_socket == -1)
@@ -18,15 +20,27 @@ Connection::Connection(int listen_socket)
 Connection::Connection(const Connection& c)
 {
 	_socket = c._socket;
-	_request = c._request;
+	_stream_read = c._stream_read;
+	_stream_write = c._stream_write;
 	_client_name = c._client_name;
+	_module = c._module;
+	_active_read = c._active_read;
+	_active_write = c._active_write;
+	_read_chain = c._read_chain;
+	_write_chain = c._write_chain;
 }
 
 Connection& Connection::operator=(const Connection& c)
 {
 	_socket = c._socket;
-	_request = c._request;
+	_stream_read = c._stream_read;
+	_stream_write = c._stream_write;
 	_client_name = c._client_name;
+	_module = c._module;
+	_active_read = c._active_read;
+	_active_write = c._active_write;
+	_read_chain = c._read_chain;
+	_write_chain = c._write_chain;
 	return (*this);
 }
 
@@ -132,16 +146,6 @@ void Connection::clearSocket()
 {
 	delete _request;
 	_request = NULL;
-}
-
-HTTP* Connection::getMethod()
-{
-	return _response;
-}
-
-void Connection::setMethod(HTTP* r)
-{
-	_response = r;
 }
 
 Connection::~Connection()

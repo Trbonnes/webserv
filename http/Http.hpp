@@ -40,7 +40,6 @@ private:
 public:
 	Http();
 	~Http();
-	~Http();
 
 };
 #endif // HTTP
