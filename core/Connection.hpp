@@ -67,10 +67,12 @@ public:
 
 	// Getters
 	int getSock();
-	Socket *getSocket();
+	BufferChain& getWriteChain();
+	BufferChain& getReadChain();
+	httpRequest *getSocket();
 	
 	// Setters
-	void setSocket(Socket *s);
+	void setSocket(httpRequest *s);
 	void clearSocket();
 
 	// Close the connection

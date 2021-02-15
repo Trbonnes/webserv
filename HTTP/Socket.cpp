@@ -6,13 +6,13 @@
 /*   By: yorn <yorn@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/30 15:10:55 by trbonnes          #+#    #+#             */
-/*   Updated: 2021/02/13 15:25:14 by yorn             ###   ########.fr       */
+/*   Updated: 2021/02/15 15:24:06 by yorn             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Socket.hpp"
 
-Socket::Socket() :
+httpRequest::httpRequest() :
 _fd(0),
 _method(),
 _requestURI(),
@@ -34,7 +34,7 @@ _xSecret(),
 _body() {
 }
 
-Socket::Socket(int fd) :
+httpRequest::httpRequest(int fd) :
 _fd(fd),
 _method(),
 _requestURI(),
@@ -56,7 +56,7 @@ _xSecret(),
 _body() {
 }
 
-Socket::Socket(Socket const &copy)
+httpRequest::httpRequest(httpRequest const &copy)
 {
     _fd = copy._fd;
     _method = copy._method;
@@ -79,10 +79,10 @@ Socket::Socket(Socket const &copy)
 	_xSecret = copy._xSecret;
 }
 
-Socket::~Socket() {
+httpRequest::~httpRequest() {
 }
 
-Socket      &Socket::operator=(Socket const &rhs)
+httpRequest      &httpRequest::operator=(httpRequest const &rhs)
 {
     _fd = rhs._fd;
     _method = rhs._method;
@@ -106,193 +106,193 @@ Socket      &Socket::operator=(Socket const &rhs)
     return *this;
 }
 
-int				Socket::getFd()
+int				httpRequest::getFd()
 {
 	return _fd;
 }
 
-std::string     Socket::getMethod()
+std::string     httpRequest::getMethod()
 {
     return _method;
 }
 
-std::string     Socket::getRequestURI()
+std::string     httpRequest::getRequestURI()
 {
     return _requestURI;
 }
 
-std::string     Socket::getHttpVersion()
+std::string     httpRequest::getHttpVersion()
 {
     return _httpVersion;
 }
 
-std::string     Socket::getContentLength()
+std::string     httpRequest::getContentLength()
 {
     return _contentLength;
 }
 
-std::string     Socket::getContentLocation()
+std::string     httpRequest::getContentLocation()
 {
     return _contentLocation;
 }
 
-std::string     Socket::getContentType()
+std::string     httpRequest::getContentType()
 {
     return _contentType;
 }
 
-bool    Socket::getMultipartContent()
+bool    httpRequest::getMultipartContent()
 {
     return _multipartContent;
 }
 
-std::string     Socket::getContentBoundary()
+std::string     httpRequest::getContentBoundary()
 {
     return _contentBoundary;
 }
 
-std::string     Socket::getDate()
+std::string     httpRequest::getDate()
 {
     return _date;
 }
 
-std::string     Socket::getTransferEncoding()
+std::string     httpRequest::getTransferEncoding()
 {
     return _transferEncoding;
 }
 
-std::vector<std::string>     &Socket::getAcceptCharset()
+std::vector<std::string>     &httpRequest::getAcceptCharset()
 {
     return _acceptCharset;
 }
 
-std::vector<std::string>     &Socket::getAcceptLanguage()
+std::vector<std::string>     &httpRequest::getAcceptLanguage()
 {
     return _acceptLanguage;
 }
 
-std::string     Socket::getAuthorization()
+std::string     httpRequest::getAuthorization()
 {
     return _authorization;
 }
 
-std::string     Socket::getHost()
+std::string     httpRequest::getHost()
 {
     return _host;
 }
 
-int				Socket::getPort() {
+int				httpRequest::getPort() {
 	return _port;
 }
 
-std::string     Socket::getUserAgent()
+std::string     httpRequest::getUserAgent()
 {
     return _userAgent;
 }
 
-std::string Socket::getReferer()
+std::string httpRequest::getReferer()
 {
 	return _referer;
 }
 
-std::string     &Socket::getBody()
+std::string     &httpRequest::getBody()
 {
     return _body;
 }
 
-std::string     Socket::getRemoteAddr()
+std::string     httpRequest::getRemoteAddr()
 {
     return _addr;
 }
 
-std::string		Socket::getXSecret() {
+std::string		httpRequest::getXSecret() {
 	return _xSecret;
 }
 
 
-void	Socket::setFd(int fd) {
+void	httpRequest::setFd(int fd) {
 	_fd = fd;
 }
 
-void	Socket::setMethod(std::string method) {
+void	httpRequest::setMethod(std::string method) {
 	_method = method;
 }
 
-void	Socket::setRequestURI(std::string RequestURI) {
+void	httpRequest::setRequestURI(std::string RequestURI) {
 	_requestURI = RequestURI;
 }
 
-void	Socket::setHttpVersion(std::string httpVersion) {
+void	httpRequest::setHttpVersion(std::string httpVersion) {
 	_httpVersion = httpVersion;
 }
 
-void	Socket::setContentLength(std::string ContentLength) {
+void	httpRequest::setContentLength(std::string ContentLength) {
 	_contentLength = ContentLength;
 }
 
-void	Socket::setContentLocation(std::string ContentLocation) {
+void	httpRequest::setContentLocation(std::string ContentLocation) {
 	_contentLocation = ContentLocation;
 }
 
-void	Socket::setContentType(std::string ContentType) {
+void	httpRequest::setContentType(std::string ContentType) {
 	_contentType = ContentType;
 }
 
-void    Socket::setMultipartContent(bool multipart)
+void    httpRequest::setMultipartContent(bool multipart)
 {
     _multipartContent = multipart;
 }
 
-void     Socket::setContentBoundary(std::string boundary)
+void     httpRequest::setContentBoundary(std::string boundary)
 {
     _contentBoundary = boundary;
 }
 
-void	Socket::setDate(std::string Date) {
+void	httpRequest::setDate(std::string Date) {
 	_date = Date;
 }
 
-void	Socket::setTransferEncoding(std::string TransferEncoding) {
+void	httpRequest::setTransferEncoding(std::string TransferEncoding) {
 	_transferEncoding = TransferEncoding;
 }
 
-void	Socket::setAcceptCharset(std::vector<std::string> AcceptCharset) {
+void	httpRequest::setAcceptCharset(std::vector<std::string> AcceptCharset) {
 	_acceptCharset = AcceptCharset;
 }
 
-void	Socket::setAcceptLanguage(std::vector<std::string> AcceptLanguage) {
+void	httpRequest::setAcceptLanguage(std::vector<std::string> AcceptLanguage) {
 	_acceptLanguage = AcceptLanguage;
 }
 
-void	Socket::setAuthorization(std::string Authorization) {
+void	httpRequest::setAuthorization(std::string Authorization) {
 	_authorization = Authorization;
 }
 
-void	Socket::setHost(std::string Host) {
+void	httpRequest::setHost(std::string Host) {
 	_host = Host;
 }
 
-void	Socket::setPort(int port) {
+void	httpRequest::setPort(int port) {
 	_port = port;
 }
 
-void	Socket::setUserAgent(std::string UserAgent) {
+void	httpRequest::setUserAgent(std::string UserAgent) {
 	_userAgent = UserAgent;
 }
 
-void	Socket::setReferer(std::string Referer) {
+void	httpRequest::setReferer(std::string Referer) {
 	_referer = Referer;
 }
 
-void	Socket::setBody(std::string &Body) {
+void	httpRequest::setBody(std::string &Body) {
 	_body = Body;
 }
 
-void	Socket::setXSecret(std::string XSecret) {
+void	httpRequest::setXSecret(std::string XSecret) {
 	_xSecret = XSecret;
 }
 
-const char * Socket::ConnectionClose::what () const throw ()
+const char * httpRequest::ConnectionClose::what () const throw ()
 {
 	return "Connection has been closed";
 }

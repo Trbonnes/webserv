@@ -31,7 +31,7 @@
 # include "../core/Log.hpp"
 # include "LoadController.hpp"
 
-class   Socket
+class   httpRequest
 {
     private:
 
@@ -72,12 +72,12 @@ class   Socket
     // PRIVATE FUNCTIONS
 
     public:
-    Socket();
-    Socket(int fd);
-    Socket(Socket const &copy);
-    ~Socket();
+    httpRequest();
+    httpRequest(int fd);
+    httpRequest(httpRequest const &copy);
+    ~httpRequest();
 
-    Socket                      &operator=(Socket const &rhs);
+    httpRequest                      &operator=(httpRequest const &rhs);
     int             			getFd();
     std::string     			getMethod();
     std::string     			getRequestURI();
@@ -135,20 +135,20 @@ class   Socket
 	};    
 };
 
-Socket	*httpRequestParser(int fd);
+httpRequest	*httpRequestParser(int fd);
 
-void	ParseAcceptCharset(Socket *socket, std::string& request, size_t pos);
-void	ParseAcceptLanguage(Socket *socket, std::string& request, size_t pos);
-void	ParseAutorization(Socket *socket, std::string& request, size_t pos);
-void	ParseContentLength(Socket *socket, std::string& request, size_t pos);
-void	ParseContentLocation(Socket *socket, std::string& request, size_t pos);
-void	ParseContentType(Socket *socket, std::string& request, size_t pos);
-void	ParseDate(Socket *socket, std::string& request, size_t pos);
-void	ParseHost(Socket *socket, std::string& request, size_t pos);
-void	ParseReferer(Socket *socket, std::string& request, size_t pos);
-void	ParseTransferEncoding(Socket *socket, std::string& request, size_t pos);
-void	ParseUserAgent(Socket *socket, std::string& request, size_t pos);
-void	ParseXSecret(Socket *socket, std::string& request, size_t pos);
+void	ParseAcceptCharset(httpRequest *socket, std::string& request, size_t pos);
+void	ParseAcceptLanguage(httpRequest *socket, std::string& request, size_t pos);
+void	ParseAutorization(httpRequest *socket, std::string& request, size_t pos);
+void	ParseContentLength(httpRequest *socket, std::string& request, size_t pos);
+void	ParseContentLocation(httpRequest *socket, std::string& request, size_t pos);
+void	ParseContentType(httpRequest *socket, std::string& request, size_t pos);
+void	ParseDate(httpRequest *socket, std::string& request, size_t pos);
+void	ParseHost(httpRequest *socket, std::string& request, size_t pos);
+void	ParseReferer(httpRequest *socket, std::string& request, size_t pos);
+void	ParseTransferEncoding(httpRequest *socket, std::string& request, size_t pos);
+void	ParseUserAgent(httpRequest *socket, std::string& request, size_t pos);
+void	ParseXSecret(httpRequest *socket, std::string& request, size_t pos);
 std::string ParseStdHeaders(std::string& request, size_t pos);
 
 #endif

@@ -21,7 +21,7 @@ private:
 	FD _out;
 
 	// reference to the upstream connection
-	Connection& _c;
+	Connection& _connection;
 
 	// Headers of the request
 	httpRequest _req;
@@ -43,15 +43,6 @@ public:
 	~Http();
 
 };
-
-Http::Http(/* args */)
-{
-}
-
-Http::~Http()
-{
-}
-
 
 
 #endif // HTTP

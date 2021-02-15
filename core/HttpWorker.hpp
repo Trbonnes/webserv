@@ -34,16 +34,13 @@ private:
 	Config						*_config;
 	fd_set 					_active_read;
 	fd_set 					_active_write;
-	// Simple caching
-	Socket*					_cacheSocket;
-	HTTP*					_cacheResponse;
 
 	void	acceptConnection(int sock);
 	void	handleRead(Connection *c);
 	void	handleReadCGI(Connection *c);
 	void	handleWrite(Connection *c);
-	void	handleCGIRead(Connection *c);
-	void	handleCGIWrite(Connection *c);
+	void	handleStreamRead(Connection *c);
+	void	handleStreamWrite(Connection *c);
 	void	closeConnections();
 };
 #endif // HTTPWORKER

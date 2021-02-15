@@ -31,7 +31,7 @@ _cgiResponse(""),
 _response(NULL),
 _responseSize(0) {}
 
-HTTP::HTTP(Socket *socket, ConfigServer *config) :
+HTTP::HTTP(httpRequest *socket, ConfigServer *config) :
 _socket(*socket),
 _config(*config),
 _mapCodes(),

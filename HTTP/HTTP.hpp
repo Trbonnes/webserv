@@ -60,7 +60,7 @@ class   HTTP
 {
     private:
 
-    Socket                      _socket;
+    httpRequest                      _socket;
     ConfigServer                _config;
     StatusCode                  _mapCodes;
     CGI                         _cgi;
@@ -99,7 +99,7 @@ class   HTTP
     char*                       _response;
     int                         _responseSize;
 
-    HTTP();
+
 
     void            callMethod(std::string method);
     int             checkAllowMethods(std::string method);

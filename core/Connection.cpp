@@ -4,8 +4,6 @@ Connection::Connection(int listen_socket)
 {
 	socklen_t size;
 
-	_request = NULL;
-	_response = NULL;
 	size = sizeof(_client_name);
 	_socket = ::accept(listen_socket, &_client_name, &size);
 	if (_socket == -1)
@@ -125,7 +123,7 @@ void Connection::close()
 	::close(_socket);
 }
 
-Socket *Connection::getSocket()
+httpRequest *Connection::getSocket()
 {
 	return _request;
 }
