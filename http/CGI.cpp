@@ -1,4 +1,4 @@
-#include "HTTP.hpp"
+#include "HttpResponse.hpp"
 #include "CGI.hpp"
 
 bool        HttpResponse::cgi_fd_exist()

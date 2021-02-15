@@ -14,7 +14,7 @@
 #include "core/Connection.hpp"
 #include "HttpServer.hpp"
 
-#include "http/HTTP.hpp"
+#include "http/HttpResponse.hpp"
 #include "http/HttpRequest.hpp"
 #include "http/utils/utils.hpp"
 

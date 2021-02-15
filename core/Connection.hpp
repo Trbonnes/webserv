@@ -13,7 +13,7 @@
 #include "ListenSocket.hpp"
 #include "http/HttpRequest.hpp"
 #include "http/Http.hpp"
-#include "http/HTTP.hpp"
+#include "http/HttpResponse.hpp"
 
 
 // The Connection class represents the interface between the server and the client

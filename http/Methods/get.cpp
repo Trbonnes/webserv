@@ -1,4 +1,4 @@
-#include "../HTTP.hpp"
+#include "../HttpResponse.hpp"
 
 void        HttpResponse::get()
 {

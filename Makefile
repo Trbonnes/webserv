@@ -19,7 +19,7 @@ CORESRC = 	core/Runnable.cpp \
 			core/BufferChain.cpp \
 			core/webserver.cpp
 
-HTTPSRC =	http/HTTP.cpp \
+HTTPSRC =	http/HttpResponse.cpp \
 			http/httpRequestParser.cpp \
 			http/parseHeaders.cpp \
 			http/setHeaders.cpp \
@@ -55,7 +55,7 @@ HEADERS = 	core/Location.hpp \
 			http/utils/utils.hpp \
 			http/statusCodes.hpp \
 			http/LoadController.hpp \
-			http/HTTP.hpp \
+			http/HttpResponse.hpp \
 			http/HttpRequest.hpp \
 			core/BufferChain.hpp \
 			http/CGI.hpp \

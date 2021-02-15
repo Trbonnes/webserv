@@ -1,4 +1,4 @@
-#include "HTTP.hpp"
+#include "HttpResponse.hpp"
 
 const std::string HttpResponse::_base64_chars = 
              "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
