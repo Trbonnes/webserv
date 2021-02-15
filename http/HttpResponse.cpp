@@ -5,7 +5,7 @@ const std::string HttpResponse::_base64_chars =
              "abcdefghijklmnopqrstuvwxyz"
              "0123456789+/";
 
-HttpResponse::HTTP() :
+HttpResponse::HttpResponse() :
 _socket(0),
 _config(),
 _mapCodes(),
@@ -31,7 +31,7 @@ _cgiResponse(""),
 _response(NULL),
 _responseSize(0) {}
 
-HttpResponse::HTTP(httpRequest *socket, ConfigServer *config) :
+HttpResponse::HttpResponse(HttpRequest *socket, ConfigServer *config) :
 _socket(*socket),
 _config(*config),
 _mapCodes(),
@@ -322,7 +322,7 @@ void         HttpResponse::setRoot()
 }
 
 // ** Create the default html page when file is not found and autoindex is on **
-void            HTTP::setAutoindex(void)
+void            HttpResponse::setAutoindex(void)
 {
     std::string             str;
     struct stat             directory;
@@ -389,7 +389,7 @@ void            HTTP::setAutoindex(void)
 }
 
 // ** Check if the autorization mode is on and if the user is authorized to make the request **
-void            HTTP::authorization()
+void            HttpResponse::authorization()
 {
     int     fd;
     int     ret;
@@ -429,13 +429,13 @@ void            HTTP::authorization()
         _wwwAuthenticate.assign("OK");
 }
 
-inline bool   HTTP::is_base64(unsigned char c)
+inline bool   HttpResponse::is_base64(unsigned char c)
 {
   return (isalnum(c) || (c == '+') || (c == '/'));
 }
 
 //** Encode password in base64 **
-std::string   HTTP::base64_encode(unsigned char const* bytes_to_encode, unsigned int in_len)
+std::string   HttpResponse::base64_encode(unsigned char const* bytes_to_encode, unsigned int in_len)
 {
   std::string   ret;
   int           i;
@@ -477,7 +477,7 @@ std::string   HTTP::base64_encode(unsigned char const* bytes_to_encode, unsigned
 }
 
 //** Decode password in base64 **
-std::string   HTTP::base64_decode(std::string const& encoded_string) {
+std::string   HttpResponse::base64_decode(std::string const& encoded_string) {
     int           in_len;
     int           i;
     int           j;
@@ -518,7 +518,7 @@ std::string   HTTP::base64_decode(std::string const& encoded_string) {
     return ret;
 }
 
-void        HTTP::configureErrorFile()
+void        HttpResponse::configureErrorFile()
 {
     int         ret;
     char        buf[1024 + 1];
@@ -558,7 +558,7 @@ void        HTTP::configureErrorFile()
 }
 
 // ** Create the response socket **
-void         HTTP::processResponse()
+void         HttpResponse::processResponse()
 {
     std::string response;
 
@@ -574,7 +574,7 @@ void         HTTP::processResponse()
     setBodyResponse(response);
 }
 
-void     HTTP::setFirstHeadersResponse(std::string &response)
+void     HttpResponse::setFirstHeadersResponse(std::string &response)
 {
     response.append(_config.getHttpVersion());
     response.append(" ");
@@ -595,7 +595,7 @@ void     HTTP::setFirstHeadersResponse(std::string &response)
     }
 }
 
-void            HTTP::setAllowMethodsResponse(std::string &response)
+void            HttpResponse::setAllowMethodsResponse(std::string &response)
 {
         std::vector<std::string>::iterator it;
         std::vector<std::string>::iterator itEnd;
@@ -622,7 +622,7 @@ void            HTTP::setAllowMethodsResponse(std::string &response)
         response.append("\r\n");
 }
 
-void            HTTP::setOtherHeaders(std::string &response)
+void            HttpResponse::setOtherHeaders(std::string &response)
 {
     if (_charset.length() > 0)
         response.append("Charset: ").append(_charset).append("\r\n");
@@ -639,7 +639,7 @@ void            HTTP::setOtherHeaders(std::string &response)
         response.append("WWW-Authenticate: ").append("Basic realm=").append(_config.getAuth_basic(_location)).append("\r\n");
 }
 
-void            HTTP::setResponseSize(std::string &response)
+void            HttpResponse::setResponseSize(std::string &response)
 {
     if (_socket.getMethod().compare("HEAD") && _contentLength >= 0)
         _responseSize = response.length() + _contentLength;
@@ -647,7 +647,7 @@ void            HTTP::setResponseSize(std::string &response)
         _responseSize = response.length();
 }
 
-void            HTTP::setBodyResponse(std::string &response)
+void            HttpResponse::setBodyResponse(std::string &response)
 {
     size_t      find;
     size_t      extension;
@@ -674,12 +674,12 @@ void            HTTP::setBodyResponse(std::string &response)
     }
 }
 
-char*         HTTP::getResponse()
+char*         HttpResponse::getResponse()
 {
     return _response;
 }
 
-int             HTTP::getResponseSize()
+int             HttpResponse::getResponseSize()
 {
     return _responseSize;
 }

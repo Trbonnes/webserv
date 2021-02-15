@@ -16,7 +16,7 @@ HttpWorker::HttpWorker(const HttpWorker &w) : Runnable(w)
 HttpWorker::~HttpWorker() {
 }
 
-int		equalRequest(httpRequest *newSocket, httpRequest *lastSocket)
+int		equalRequest(HttpRequest *newSocket, HttpRequest *lastSocket)
 {
 	if (lastSocket == NULL)
 		return 1;
@@ -81,7 +81,7 @@ void	HttpWorker::handleStreamWrite(Connection *c)
 	{
 		// TO DO kill CGI process ?
 		delete method;
-		throw httpRequest::ConnectionClose();
+		throw HttpRequest::ConnectionClose();
 	}
 	FD_SET(method->get_cgi_out(), &_active_read);
 }
@@ -98,7 +98,7 @@ void	HttpWorker::handleWrite(Connection *c)
 	responseSize = method->getResponseSize();
 	if (write(c->getSock(), response, responseSize) == -1)
 	{
-		throw httpRequest::ConnectionClose();
+		throw HttpRequest::ConnectionClose();
 	}
 	Log::debug("Written\n");
 	Log::debug(response);
@@ -117,12 +117,12 @@ void	HttpWorker::handleRead(Connection *c)
 	Log::debug("About to read\n");
 	HTTP *method;
 
-	httpRequest *newSocket = httpRequestParser(c->getSock());
+	HttpRequest *newSocket = httpRequestParser(c->getSock());
 	c->setSocket(newSocket);
 	ConfigServer *configServer = NULL;
 	configServer = _config->getServerUnit(c->getSocket()->getPort(), c->getSocket()->getHost());
 	if (configServer == NULL)
-			throw httpRequest::ConnectionClose();
+			throw HttpRequest::ConnectionClose();
 	method = new HTTP(c->getSocket(), configServer);
 	c->setMethod(method);
 	if (method->use_cgi())

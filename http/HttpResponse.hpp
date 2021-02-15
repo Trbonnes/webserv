@@ -1,5 +1,5 @@
-#ifndef METHODS_HPP
-# define METHODS_HPP
+#ifndef HTTP_RESPONSE
+# define HTTP_RESPONSE
 
 # include <iostream>
 # include <unistd.h>
@@ -60,7 +60,7 @@ class   HttpResponse
 {
     private:
 
-    httpRequest                      _socket;
+    HttpRequest                 _socket;
     ConfigServer                _config;
     StatusCode                  _mapCodes;
     CGI                         _cgi;
@@ -152,7 +152,7 @@ class   HttpResponse
     int             checkRequestErrors(void);
 
     public:
-    HttpResponse(Socket *socket, ConfigServer *config);
+    HttpResponse(HttpRequest *socket, ConfigServer *config);
     HttpResponse(HttpResponse &copy);
     ~HttpResponse();
 

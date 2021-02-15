@@ -69,10 +69,10 @@ public:
 	int getSock();
 	BufferChain& getWriteChain();
 	BufferChain& getReadChain();
-	httpRequest *getSocket();
+	HttpRequest *getSocket();
 	
 	// Setters
-	void setSocket(httpRequest *s);
+	void setSocket(HttpRequest *s);
 	void clearSocket();
 
 	// Close the connection

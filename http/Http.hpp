@@ -24,10 +24,10 @@ private:
 	Connection& _connection;
 
 	// Headers of the request
-	httpRequest _req;
+	HttpRequest _req;
 
 	// Header of the response
-	httpResponse _rep;
+	HttpResponse _rep;
 
 	// Pointers to socket buffer's chain
 	BufferChain		_stream_read_chain;
@@ -43,6 +43,4 @@ public:
 	~Http();
 
 };
-
-
 #endif // HTTP

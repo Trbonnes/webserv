@@ -123,7 +123,7 @@ void Connection::close()
 	::close(_socket);
 }
 
-httpRequest *Connection::getSocket()
+HttpRequest *Connection::getSocket()
 {
 	return _request;
 }
