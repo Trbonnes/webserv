@@ -6,13 +6,13 @@
 /*   By: yorn <yorn@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/30 15:45:46 by trbonnes          #+#    #+#             */
-/*   Updated: 2021/02/13 15:32:40 by yorn             ###   ########.fr       */
+/*   Updated: 2021/02/15 15:58:32 by yorn             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Socket.hpp"
 
-int		httpRequestParseChunckedBody(std::string request, Socket *socket, size_t pos) {
+int		httpRequestParseChunckedBody(std::string request, httpRequest *socket, size_t pos) {
 	size_t chunkSize;
 	std::string convert;
 	std::string s = request.substr(pos, request.npos);
@@ -86,7 +86,7 @@ int		httpRequestParseChunckedBody(std::string request, Socket *socket, size_t po
 	return 0;
 }
 
-int		httpRequestParseBody(std::string request, Socket *socket) {
+int		httpRequestParseBody(std::string request, httpRequest *socket) {
 	std::string					content;
 	std::string					body = "";
 	size_t						chunkedPos = socket->getTransferEncoding().find("chunked");
@@ -139,7 +139,7 @@ int		httpRequestParseBody(std::string request, Socket *socket) {
 	return 0;
 }
 
-int		httpRequestParseHeaders(std::string request, Socket *socket) {
+int		httpRequestParseHeaders(std::string request, httpRequest *socket) {
 	char const *x[] = {
 		"\nAccept-Charset",
 		"\nAccept-Language",
@@ -154,7 +154,7 @@ int		httpRequestParseHeaders(std::string request, Socket *socket) {
 		"\nUser-Agent",
 		"\nX-Secret"
 	};
-	void (*f[])(Socket*, std::string&, size_t) = {
+	void (*f[])(httpRequest*, std::string&, size_t) = {
 		&ParseAcceptCharset,
 		&ParseAcceptLanguage,
 		&ParseAutorization,
@@ -183,7 +183,7 @@ int		httpRequestParseHeaders(std::string request, Socket *socket) {
 	return 0;
 }
 
-int		httpRequestParseRequestLine(std::string request, Socket *socket) {
+int		httpRequestParseRequestLine(std::string request, httpRequest *socket) {
 	char const *x[] = {
 	"GET",
 	"HEAD",
@@ -233,9 +233,9 @@ int		httpRequestParseRequestLine(std::string request, Socket *socket) {
 #include <sys/stat.h>
 #include <fcntl.h>
 
-Socket	*httpRequestParser(int fd) {
+httpRequest	*httpRequestParser(int fd) {
 
-	Socket *socket;
+	httpRequest *socket;
 	char	c[2];
 	int		ret;
 	std::string request;
@@ -245,12 +245,12 @@ Socket	*httpRequestParser(int fd) {
 		ft_bzero(c, 2);
 		ret = read(fd, c, 2);
 		if (ret == 0)
-			throw Socket::ConnectionClose();
+			throw httpRequest::ConnectionClose();
 		if (ret == -1)
-			throw Socket::BadReadException();
+			throw httpRequest::BadReadException();
 		request.append(c, ret);
 	}
-	socket = new Socket(fd);
+	socket = new httpRequest(fd);
 	httpRequestParseRequestLine(request, socket);
 	httpRequestParseHeaders(request, socket);
 	httpRequestParseBody(request, socket);

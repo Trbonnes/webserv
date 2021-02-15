@@ -6,7 +6,7 @@
 /*   By: yorn <yorn@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/30 18:55:18 by trbonnes          #+#    #+#             */
-/*   Updated: 2021/02/13 15:31:07 by yorn             ###   ########.fr       */
+/*   Updated: 2021/02/15 15:58:29 by yorn             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,27 +90,27 @@ std::vector<std::string> ParseAcceptHeaders(std::string& request, size_t pos) {
 	return v;
 }
 
-void ParseAcceptCharset(Socket *socket, std::string& request, size_t pos) {
+void ParseAcceptCharset(httpRequest *socket, std::string& request, size_t pos) {
 	socket->setAcceptCharset(ParseAcceptHeaders(request, pos));
 }
 
-void ParseAcceptLanguage(Socket *socket, std::string& request, size_t pos) {
+void ParseAcceptLanguage(httpRequest *socket, std::string& request, size_t pos) {
 	socket->setAcceptLanguage(ParseAcceptHeaders(request, pos));
 }
 
-void ParseAutorization(Socket *socket, std::string& request, size_t pos) {
+void ParseAutorization(httpRequest *socket, std::string& request, size_t pos) {
 	socket->setAuthorization(ParseStdHeaders(request, pos));
 }
 
-void ParseContentLength(Socket *socket, std::string& request, size_t pos) {
+void ParseContentLength(httpRequest *socket, std::string& request, size_t pos) {
 	socket->setContentLength(ParseStdHeaders(request, pos));
 }
 
-void ParseContentLocation(Socket *socket, std::string& request, size_t pos) {
+void ParseContentLocation(httpRequest *socket, std::string& request, size_t pos) {
 	socket->setContentLocation(ParseStdHeaders(request, pos));
 }
 
-void ParseContentType(Socket *socket, std::string& request, size_t pos) {
+void ParseContentType(httpRequest *socket, std::string& request, size_t pos) {
 	//std::vector<std::string> v;
 	std::string s = ParseStdHeaders(request, pos);
 
@@ -128,11 +128,11 @@ void ParseContentType(Socket *socket, std::string& request, size_t pos) {
 	socket->setContentType(s);
 }
 
-void ParseDate(Socket *socket, std::string& request, size_t pos) {
+void ParseDate(httpRequest *socket, std::string& request, size_t pos) {
 	socket->setDate(ParseStdHeaders(request, pos));
 }
 
-void ParseHost(Socket *socket, std::string& request, size_t pos) {
+void ParseHost(httpRequest *socket, std::string& request, size_t pos) {
 	std::string host = ParseStdHeaders(request, pos);
 	pos = host.find(":");
 	pos++;
@@ -141,19 +141,19 @@ void ParseHost(Socket *socket, std::string& request, size_t pos) {
 	socket->setHost(host);
 }
 
-void ParseReferer(Socket *socket, std::string& request, size_t pos) {
+void ParseReferer(httpRequest *socket, std::string& request, size_t pos) {
 	socket->setReferer(ParseStdHeaders(request, pos));
 }
 
-void ParseTransferEncoding(Socket *socket, std::string& request, size_t pos) {
+void ParseTransferEncoding(httpRequest *socket, std::string& request, size_t pos) {
 	socket->setTransferEncoding(ParseStdHeaders(request, pos));
 }
 
-void ParseUserAgent(Socket *socket, std::string& request, size_t pos) {
+void ParseUserAgent(httpRequest *socket, std::string& request, size_t pos) {
 	socket->setUserAgent(ParseStdHeaders(request, pos));
 }
 
-void ParseXSecret(Socket *socket, std::string& request, size_t pos) {
+void ParseXSecret(httpRequest *socket, std::string& request, size_t pos) {
 	std::string s;
 	pos++;
 	while (request[pos] && request[pos] != '\n') {

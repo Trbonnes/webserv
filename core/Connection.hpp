@@ -11,7 +11,7 @@
 
 #include "BufferChain.hpp"
 #include "ListenSocket.hpp"
-#include "../HTTP/Socket.hpp"
+#include "../HTTP/HttpRequest.hpp"
 #include "../HTTP/Http.hpp"
 #include "../HTTP/HTTP.hpp"
 
