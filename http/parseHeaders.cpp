@@ -6,11 +6,11 @@
 /*   By: yorn <yorn@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/30 18:55:18 by trbonnes          #+#    #+#             */
-/*   Updated: 2021/02/15 15:58:29 by yorn             ###   ########.fr       */
+/*   Updated: 2021/02/15 16:32:00 by yorn             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "Socket.hpp"
+#include "HttpRequest.hpp"
 
 std::string ParseStdHeaders(std::string& request, size_t pos) {
 	std::string s;

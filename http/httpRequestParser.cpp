@@ -6,11 +6,11 @@
 /*   By: yorn <yorn@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/30 15:45:46 by trbonnes          #+#    #+#             */
-/*   Updated: 2021/02/15 15:58:32 by yorn             ###   ########.fr       */
+/*   Updated: 2021/02/15 16:32:00 by yorn             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "Socket.hpp"
+#include "HttpRequest.hpp"
 
 int		httpRequestParseChunckedBody(std::string request, httpRequest *socket, size_t pos) {
 	size_t chunkSize;
