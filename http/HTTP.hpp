@@ -56,7 +56,7 @@ enum cgi_variables
     NB_METAVARIABLES
 };
 
-class   HTTP
+class   HttpResponse
 {
     private:
 
@@ -152,11 +152,11 @@ class   HTTP
     int             checkRequestErrors(void);
 
     public:
-    HTTP(Socket *socket, ConfigServer *config);
-    HTTP(HTTP &copy);
-    ~HTTP();
+    HttpResponse(Socket *socket, ConfigServer *config);
+    HttpResponse(HttpResponse &copy);
+    ~HttpResponse();
 
-    HTTP            &operator=(HTTP &rhs);
+    HttpResponse            &operator=(HttpResponse &rhs);
 
     // RESPONSE
     void            read_cgi_response();

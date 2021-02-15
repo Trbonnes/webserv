@@ -1,6 +1,6 @@
 #include "../HTTP.hpp"
 
-void    HTTP::del()
+void    HttpResponse::del()
 {
     int ret;
 

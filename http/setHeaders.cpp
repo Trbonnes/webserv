@@ -1,13 +1,13 @@
 #include "HTTP.hpp"
 
 //** absolute location route for the user agent **
-void        HTTP::setContentLocation()
+void        HttpResponse::setContentLocation()
 {
     _contentLocation.assign("http://").append(_socket.getHost()).append("/").append(_route);
 }
 
 //** Copy file into body string **
-void        HTTP::setBody(int fd)
+void        HttpResponse::setBody(int fd)
 {
     int     ret;
 
@@ -17,23 +17,23 @@ void        HTTP::setBody(int fd)
         _statusCode = INTERNAL_SERVER_ERROR;
 }
 
-void        HTTP::setCharset(void)
+void        HttpResponse::setCharset(void)
 {
     // if (_contentType.compare("text/html") == 0)
     _charset = _config.getCharset(_location);
 }
 
-void        HTTP::setServerName()
+void        HttpResponse::setServerName()
 {
     _server = _socket.getHost();
 }
 
-void        HTTP::setContentLength()
+void        HttpResponse::setContentLength()
 {
    _contentLength = _stat.st_size;
 }
 
-void        HTTP::setLastModified()
+void        HttpResponse::setLastModified()
 {
     struct tm *timeinfo;
 
@@ -45,7 +45,7 @@ void        HTTP::setLastModified()
     strftime(_lastModified, 100, "%a %d %b 20%y %OH:%OM:%OS GMT", timeinfo);
 }
 
-void        HTTP::setDate()
+void        HttpResponse::setDate()
 {
     struct timeval  tv;
     struct tm       *timeinfo;
@@ -57,7 +57,7 @@ void        HTTP::setDate()
     }
 }
 
-void        HTTP::setContentType()
+void        HttpResponse::setContentType()
 {
     int                     find;
     int                     length;

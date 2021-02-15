@@ -6,7 +6,7 @@
 /*   By: yorn <yorn@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/09 12:19:51 by trbonnes          #+#    #+#             */
-/*   Updated: 2021/02/15 16:21:09 by yorn             ###   ########.fr       */
+/*   Updated: 2021/02/15 16:27:38 by yorn             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@
 # include <map>
 # include <stdlib.h>
 
-# include "HTTP/utils/utils.hpp"
+# include "http/utils/utils.hpp"
 # include "Compare.hpp"
 # include "Location.hpp"
 

@@ -19,27 +19,27 @@ CORESRC = 	core/Runnable.cpp \
 			core/BufferChain.cpp \
 			core/webserver.cpp
 
-HTTPSRC =	HTTP/HTTP.cpp \
-			HTTP/httpRequestParser.cpp \
-			HTTP/parseHeaders.cpp \
-			HTTP/setHeaders.cpp \
-			HTTP/HttpRequest.cpp \
-			HTTP/LoadController.cpp \
-			HTTP/Methods/del.cpp \
-			HTTP/Methods/get.cpp \
-			HTTP/Methods/put.cpp \
-			HTTP/utils/ft_atoi.cpp \
-			HTTP/utils/ft_bzero.cpp \
-			HTTP/utils/ft_itoa.cpp \
-			HTTP/utils/ft_strcpy.cpp \
-			HTTP/utils/ft_strdup.cpp \
-			HTTP/utils/ft_strlen.cpp \
-			HTTP/utils/get_next_line.cpp \
-			HTTP/utils/ft_strcat.cpp \
-			HTTP/utils/ft_calloc.cpp \
-			HTTP/utils/ft_memcat.cpp \
-			HTTP/utils/ft_realloc.cpp \
-			HTTP/CGI.cpp
+HTTPSRC =	http/HTTP.cpp \
+			http/httpRequestParser.cpp \
+			http/parseHeaders.cpp \
+			http/setHeaders.cpp \
+			http/HttpRequest.cpp \
+			http/LoadController.cpp \
+			http/Methods/del.cpp \
+			http/Methods/get.cpp \
+			http/Methods/put.cpp \
+			http/utils/ft_atoi.cpp \
+			http/utils/ft_bzero.cpp \
+			http/utils/ft_itoa.cpp \
+			http/utils/ft_strcpy.cpp \
+			http/utils/ft_strdup.cpp \
+			http/utils/ft_strlen.cpp \
+			http/utils/get_next_line.cpp \
+			http/utils/ft_strcat.cpp \
+			http/utils/ft_calloc.cpp \
+			http/utils/ft_memcat.cpp \
+			http/utils/ft_realloc.cpp \
+			http/CGI.cpp
 
 
 HEADERS = 	core/Location.hpp \
@@ -52,13 +52,13 @@ HEADERS = 	core/Location.hpp \
 			core/ListenSocket.hpp \
 			core/ConfigServer.hpp \
 			core/HttpServer.hpp \
-			HTTP/utils/utils.hpp \
-			HTTP/statusCodes.hpp \
-			HTTP/LoadController.hpp \
-			HTTP/HTTP.hpp \
-			HTTP/HttpRequest.hpp \
+			http/utils/utils.hpp \
+			http/statusCodes.hpp \
+			http/LoadController.hpp \
+			http/HTTP.hpp \
+			http/HttpRequest.hpp \
 			core/BufferChain.hpp \
-			HTTP/CGI.hpp \
+			http/CGI.hpp \
 			core/Connection.hpp
 
 
@@ -74,9 +74,9 @@ OBJECTSDIR = objs
 OBJECTS = $(addprefix $(OBJECTSDIR)/, $(subst .cpp,.o,$(SRCS)))
 
 OBJECTSDIRS = 	$(OBJECTSDIR)/core \
-				$(OBJECTSDIR)/HTTP/bin-cgi \
-				$(OBJECTSDIR)/HTTP/Methods \
-				$(OBJECTSDIR)/HTTP/utils
+				$(OBJECTSDIR)/http/bin-cgi \
+				$(OBJECTSDIR)/http/Methods \
+				$(OBJECTSDIR)/http/utils
 
 
 $(OBJECTSDIR)/%.o: ./%.cpp $(HEADERS)

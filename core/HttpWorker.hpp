@@ -14,9 +14,9 @@
 #include "core/Connection.hpp"
 #include "HttpServer.hpp"
 
-#include "HTTP/HTTP.hpp"
-#include "HTTP/HttpRequest.hpp"
-#include "HTTP/utils/utils.hpp"
+#include "http/HTTP.hpp"
+#include "http/HttpRequest.hpp"
+#include "http/utils/utils.hpp"
 
 class HttpWorker : public Runnable
 {

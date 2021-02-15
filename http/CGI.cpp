@@ -1,7 +1,7 @@
 #include "HTTP.hpp"
 #include "CGI.hpp"
 
-bool        HTTP::cgi_fd_exist()
+bool        HttpResponse::cgi_fd_exist()
 {
     int     fd;
 
@@ -13,7 +13,7 @@ bool        HTTP::cgi_fd_exist()
 }
 
 //** Check if the method is autorized for the CGI locations **
-int         HTTP::checkCGImethods(std::string method)
+int         HttpResponse::checkCGImethods(std::string method)
 {
     std::vector<std::string>::iterator itBegin;
     std::vector<std::string>::iterator itEnd;
@@ -35,7 +35,7 @@ int         HTTP::checkCGImethods(std::string method)
 }
 
 // ** Define the meta variables for the CGI script **
-void        HTTP::cgi_metaVariables()
+void        HttpResponse::cgi_metaVariables()
 {
     std::string str;
     size_t      query;
@@ -66,7 +66,7 @@ void        HTTP::cgi_metaVariables()
 }
 
 // ** Set the environnement variables in a char** table **
-void        HTTP::setEnv()
+void        HttpResponse::setEnv()
 {
     _cgi_env[REDIRECT_STATUS] = ft_strdup(_cgi._redirect_status.insert(0, "REDIRECT_STATUS=").c_str());
     _cgi_env[AUTH_TYPE] = ft_strdup(_cgi._auth_type.insert(0, "AUTH_TYPE=").c_str());
@@ -92,7 +92,7 @@ void        HTTP::setEnv()
 }
 
 // ** Verify if the extensions correspond to the config file (CGI) ** 
-int         HTTP::is_good_exe(std::string exe)
+int         HttpResponse::is_good_exe(std::string exe)
 {
     std::vector<std::string>::iterator cgi_begin;
     std::vector<std::string>::iterator cgi_end;
@@ -115,7 +115,7 @@ int         HTTP::is_good_exe(std::string exe)
 }
 
 // ** Function for the std::adjacent_find, to find the first two \n \r in CGI response and separate the body from the headers **
-bool        HTTP::mypred(char val1, char val2)
+bool        HttpResponse::mypred(char val1, char val2)
 {
     if (val1 == '\n' && val2 == '\r')
         return true;
@@ -123,7 +123,7 @@ bool        HTTP::mypred(char val1, char val2)
 }
 
 // ** Execute the CGI script and get the body and headers **
-void        HTTP::cgi_exe()
+void        HttpResponse::cgi_exe()
 {
     int         pid;
     int         ret;
@@ -161,7 +161,7 @@ void        HTTP::cgi_exe()
     }
 }
 
-void        HTTP::cgi_parse()
+void        HttpResponse::cgi_parse()
 {
     size_t      find;
 
@@ -177,14 +177,14 @@ void        HTTP::cgi_parse()
 }
 
 
-void            HTTP::prepare_cgi()
+void            HttpResponse::prepare_cgi()
 {
     cgi_metaVariables();
     setEnv();
     cgi_exe();
 }
 
-void            HTTP::read_cgi_response()
+void            HttpResponse::read_cgi_response()
 {
     int ret;
     char        buf[1024];
@@ -212,7 +212,7 @@ void            HTTP::read_cgi_response()
 	processResponse();
 }
 
-int           HTTP::write_cgi_request()
+int           HttpResponse::write_cgi_request()
 {
     int ret;
 
@@ -223,17 +223,17 @@ int           HTTP::write_cgi_request()
     return ret;
 }
 
-int           HTTP::get_cgi_in()
+int           HttpResponse::get_cgi_in()
 {
     return  _cgi_in[SIDE_IN];
 }
 
-int           HTTP::get_cgi_out()
+int           HttpResponse::get_cgi_out()
 {
     return  _cgi_out[SIDE_OUT];
 }
 
-bool          HTTP::use_cgi()
+bool          HttpResponse::use_cgi()
 {
     return _use_cgi;
 }

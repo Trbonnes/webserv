@@ -1,11 +1,11 @@
 #include "HTTP.hpp"
 
-const std::string HTTP::_base64_chars = 
+const std::string HttpResponse::_base64_chars = 
              "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
              "abcdefghijklmnopqrstuvwxyz"
              "0123456789+/";
 
-HTTP::HTTP() :
+HttpResponse::HTTP() :
 _socket(0),
 _config(),
 _mapCodes(),
@@ -31,7 +31,7 @@ _cgiResponse(""),
 _response(NULL),
 _responseSize(0) {}
 
-HTTP::HTTP(httpRequest *socket, ConfigServer *config) :
+HttpResponse::HTTP(httpRequest *socket, ConfigServer *config) :
 _socket(*socket),
 _config(*config),
 _mapCodes(),
@@ -97,7 +97,7 @@ _responseSize(0)
         _statusCode = METHOD_NOT_ALLOWED;
 }
 
-HTTP::HTTP(HTTP &copy)
+HttpResponse::HttpResponse(HttpResponse &copy)
 {
     _socket = copy._socket;
     _config = copy._config;
@@ -121,7 +121,7 @@ HTTP::HTTP(HTTP &copy)
     _responseSize = copy._responseSize;
 }
 
-HTTP::~HTTP()
+HttpResponse::~HttpResponse()
 {
     int     i;
 
@@ -134,7 +134,7 @@ HTTP::~HTTP()
     }
 }
 
-HTTP     &HTTP::operator=(HTTP &rhs)
+HttpResponse     &HttpResponse::operator=(HttpResponse &rhs)
 {
     _socket = rhs._socket;
     _config = rhs._config;
@@ -160,7 +160,7 @@ HTTP     &HTTP::operator=(HTTP &rhs)
 }
 
 //** Call the non CGI methods, GET, HEAD, PUT, DELETE & (POST) / OPTIONS is managed in a different way **  //
-void        HTTP::callMethod(std::string method)
+void        HttpResponse::callMethod(std::string method)
 {
     if (method.compare("GET") == 0 || method.compare("HEAD") == 0)
         get();
@@ -176,7 +176,7 @@ void        HTTP::callMethod(std::string method)
 }
 
 //** Check request errors **
-int         HTTP::checkRequestErrors()
+int         HttpResponse::checkRequestErrors()
 {
     if (_socket.getBody().length() > 0 && _socket.getContentLength().length() == 0 && _socket.getTransferEncoding().length() == 0)
         _statusCode = LENGTH_REQUIRED;
@@ -184,7 +184,7 @@ int         HTTP::checkRequestErrors()
 }
 
 //** Check if the method is authorized for the non CGI locations **
-int         HTTP::checkAllowMethods(std::string method)
+int         HttpResponse::checkAllowMethods(std::string method)
 {
     std::vector<std::string>::iterator itBegin;
     std::vector<std::string>::iterator itEnd;
@@ -206,25 +206,25 @@ int         HTTP::checkAllowMethods(std::string method)
 }
 
 //** Absolute location route for the server **
-void        HTTP::setLocation()
+void        HttpResponse::setLocation()
 {
     _location = _config.getLocation(_uri);
 }
 
 //** Replace URI by the location **
-void        HTTP::replaceURI()
+void        HttpResponse::replaceURI()
 {
     _uri.assign(_config.getRoot(_location));
 }
 
 //** Set stat to know all the details of the requested file **
-void        HTTP::setStat()
+void        HttpResponse::setStat()
 {
     stat(_route.c_str(), &_stat);
 }
 
 //** Open file **
-int         HTTP::openFile()
+int         HttpResponse::openFile()
 {
     int         fd;
     struct stat file;
@@ -240,7 +240,7 @@ int         HTTP::openFile()
 }
 
 // ** Set the root with language and location directory if needed **
-void         HTTP::setRoot()
+void         HttpResponse::setRoot()
 {
     int         fd;
     int         find;

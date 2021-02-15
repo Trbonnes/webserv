@@ -1,6 +1,6 @@
 #include "../HTTP.hpp"
 
-void        HTTP::get()
+void        HttpResponse::get()
 {
     std::string root;
     int         fd;
@@ -29,7 +29,7 @@ void        HTTP::get()
 }
 
 //** Define the language page **
-std::string     HTTP::acceptLanguage()
+std::string     HttpResponse::acceptLanguage()
 {
     std::vector<std::string>::iterator itClientBegin;
     std::vector<std::string>::iterator itClientEnd;

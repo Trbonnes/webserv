@@ -1,6 +1,6 @@
 #include "../HTTP.hpp"
 
-void        HTTP::put()
+void        HttpResponse::put()
 {
     int         fd;
     std::string str;
