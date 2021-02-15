@@ -4,6 +4,9 @@
 
 #include "core/Connection.hpp"
 #include "core/BufferChain.hpp"
+
+
+#include "HttpResponse.hpp"
 // This is the entrypoint of the http module
 // All of the filesystem write/read are handled by this module
 // The connection socket read and write are handled by the Worker itself

@@ -18,6 +18,7 @@ HttpWorker::~HttpWorker() {
 
 void	HttpWorker::handleStreamRead(Connection *c)
 {
+	(void) c;
 	// HTTP* method;
 	// Log::debug("CGI READ\n");
 
@@ -31,6 +32,7 @@ void	HttpWorker::handleStreamRead(Connection *c)
 
 void	HttpWorker::handleStreamWrite(Connection *c)
 {
+	(void) c;
 	// Log::debug("CGI WRITE\n");
 	// HTTP* method = c->getMethod();
 	
@@ -47,6 +49,7 @@ void	HttpWorker::handleStreamWrite(Connection *c)
 
 void	HttpWorker::handleWrite(Connection *c)
 {
+	(void) c;
 	// HTTP* method;
 	// char* response;
 	// size_t responseSize;
@@ -73,6 +76,7 @@ void	HttpWorker::handleWrite(Connection *c)
 
 void	HttpWorker::handleRead(Connection *c)
 {
+	(void) c;
 	// Log::debug("About to read\n");
 	// HTTP *method;
 
@@ -105,7 +109,7 @@ void	HttpWorker::acceptConnection(int s)
 {
 	try
 	{
-		Connection *c = new Connection(s);
+		Connection *c = new Connection(s, &_active_read, &_active_write);
 		_connections.push_front(c);
 		FD_SET(c->getSock(), &_active_read);
 		// std::cerr << "New connection " << c->getSock() << std::endl;
