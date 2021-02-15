@@ -16,13 +16,14 @@ CORESRC = 	core/Runnable.cpp \
 			core/Config.cpp \
 			core/Connection.cpp \
 			core/Signals.cpp \
-			core/webserver.cpp 
+			core/BufferChain.cpp \
+			core/webserver.cpp
 
 HTTPSRC =	HTTP/HTTP.cpp \
 			HTTP/httpRequestParser.cpp \
 			HTTP/parseHeaders.cpp \
 			HTTP/setHeaders.cpp \
-			HTTP/Socket.cpp \
+			HTTP/HttpRequest.cpp \
 			HTTP/LoadController.cpp \
 			HTTP/Methods/del.cpp \
 			HTTP/Methods/get.cpp \
@@ -55,10 +56,13 @@ HEADERS = 	core/Location.hpp \
 			HTTP/statusCodes.hpp \
 			HTTP/LoadController.hpp \
 			HTTP/HTTP.hpp \
-			HTTP/Socket.hpp \
+			HTTP/HttpRequest.hpp \
+			core/BufferChain.hpp \
 			HTTP/CGI.hpp \
 			core/Connection.hpp
 
+
+INCLUDES = -I .
 
 SRCS = $(CORESRC) $(HTTPSRC)
 

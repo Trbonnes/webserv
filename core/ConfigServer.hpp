@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ConfigServer.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
+/*   By: yorn <yorn@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/09 12:19:51 by trbonnes          #+#    #+#             */
-/*   Updated: 2021/01/06 14:19:00 by user42           ###   ########.fr       */
+/*   Updated: 2021/02/15 16:21:09 by yorn             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@
 # include <map>
 # include <stdlib.h>
 
-# include "../HTTP/utils/utils.hpp"
+# include "HTTP/utils/utils.hpp"
 # include "Compare.hpp"
 # include "Location.hpp"
 

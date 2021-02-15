@@ -11,12 +11,12 @@
 #include "Runnable.hpp"
 #include "Config.hpp"
 #include "Log.hpp"
-#include "Connection.hpp"
+#include "core/Connection.hpp"
 #include "HttpServer.hpp"
 
-#include "../HTTP/HTTP.hpp"
-#include "../HTTP/Socket.hpp"
-#include "../HTTP/utils/utils.hpp"
+#include "HTTP/HTTP.hpp"
+#include "HTTP/HttpRequest.hpp"
+#include "HTTP/utils/utils.hpp"
 
 class HttpWorker : public Runnable
 {

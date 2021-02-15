@@ -15,8 +15,8 @@
 # include <stack>
 # include <stdio.h> // REMOVE
 
-# include "Socket.hpp"
-# include "../core/ConfigServer.hpp"
+# include "core/ConfigServer.hpp"
+# include "HttpRequest.hpp"
 # include "utils/utils.hpp"
 # include "statusCodes.hpp"
 # include "CGI.hpp"

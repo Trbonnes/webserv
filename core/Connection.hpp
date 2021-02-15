@@ -11,9 +11,9 @@
 
 #include "BufferChain.hpp"
 #include "ListenSocket.hpp"
-#include "../HTTP/HttpRequest.hpp"
-#include "../HTTP/Http.hpp"
-#include "../HTTP/HTTP.hpp"
+#include "HTTP/HttpRequest.hpp"
+#include "HTTP/Http.hpp"
+#include "HTTP/HTTP.hpp"
 
 
 // The Connection class represents the interface between the server and the client
