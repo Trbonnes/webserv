@@ -24,28 +24,30 @@ Http& Http::operator=(const Http &c)
 }
 
 
-// // This methods is called each time there's a socket read
-// // The bytes have already been loaded into _read_cahin by ths point
-// void Http::handleRead()
-// {
-// 	// first time reading a a freshly accepted connection
-// 	if (_req == NULL)
-// 	{
-// 		if (std::strstr) // TO DO is it autthorized ?
+// This methods is called each time there's a socket read
+// The bytes have already been loaded into _read_cahin by ths point
+void Http::handleRead()
+{
+	// first time reading a a freshly accepted connection
+	if (_req == NULL)
+	{
+		if (ft_strnstr(_read_chain.getFirst().data, "\r\n\r\n", _read_chain.getFirst().size))
+		{
+			std::cout << "End of header" << std::endl;
+		}
+	}
+		_req = new HttpRequest();
+	// if null then headers are not fully received
+	if (_rep == NULL)
+	{
+		//
 
-// 	}
-// 		_req = new HttpRequest();
-// 	// if null then headers are not fully received
-// 	if (_rep == NULL)
-// 	{
-// 		//
-
-// 	}
-// 	else
-// 	{
-// 		// Process headers
-// 	}
-// }
+	}
+	else
+	{
+		// Process headers
+	}
+}
 
 // void Http::handleStreamRead()
 // {

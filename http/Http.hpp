@@ -36,8 +36,8 @@ private:
 	BufferChain		_stream_write_chain;
 
 	// Reference to connection socket buffer chains
-	BufferChain&		_read_chain;
-	BufferChain&		_write_chain;
+	BufferChain&	_read_chain;
+	BufferChain&	_write_chain;
 	
 	// Prevent call to these functions
 	Http();
@@ -48,7 +48,7 @@ public:
 	Http& operator=(const Http&);
 	~Http();
 
-	void handleInput();
+	void handleRead();
 };
 
 #include "core/Connection.hpp"

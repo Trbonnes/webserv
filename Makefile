@@ -29,6 +29,7 @@ CORESRC = 	core/Runnable.cpp \
 			core/utils/ft_calloc.cpp \
 			core/utils/ft_memcat.cpp \
 			core/utils/ft_memcpy.cpp \
+			core/utils/ft_strnstr.cpp \
 			core/utils/ft_realloc.cpp
 
 HTTPSRC =	http/Http.cpp \

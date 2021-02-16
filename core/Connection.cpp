@@ -131,6 +131,7 @@ void Connection::read()
 	{
 	 	throw ConnectionClose();
 	}
+	_module.handleRead();
 }
 
 void Connection::streamWrite()
