@@ -42,36 +42,44 @@ void	BufferChain::copyPushBack(char *tocopy, size_t size)
 	pushBack(n, size);
 }
 
-BufferChain::buffer_t& BufferChain::getFirst()
+BufferChain::buffer_t* BufferChain::getFirst()
 {
-	return _chain.front();
+	if (_chain.empty())
+		return NULL;
+	return &_chain.front();
 }
 
-BufferChain::buffer_t BufferChain::popFirst()
+BufferChain::buffer_t* BufferChain::getLast()
 {
-	buffer_t pair = _chain.front();
+	if (_chain.empty())
+		return NULL;
+	return &_chain.back();
+}
+
+void BufferChain::popFirst()
+{
 	_chain.pop();
-	return pair;
 }
 
 void	BufferChain::flush()
 {
-	buffer_t tmp;
+	buffer_t *tmp;
 
 	while (_chain.size() > 0)
 	{
-		tmp = popFirst();
-		delete[] tmp.data;
+		tmp = getFirst();
+		delete[] tmp->data;
+		popFirst();
 	}
 }
 
 int		BufferChain::writeBufferToFd(BufferChain& chain, FD fd)
 {
 	int ret;
-	BufferChain::buffer_t buff;
+	BufferChain::buffer_t* buff;
 	
-	buff = chain.popFirst();
-	ret = write(fd, buff.data, buff.size);
+	buff = chain.getFirst();
+	ret = write(fd, buff->data, buff->size);
 	if (ret == -1)
 		throw IOError();
 	return ret;

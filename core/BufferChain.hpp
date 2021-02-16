@@ -52,10 +52,13 @@ public:
 	void	copyPushBack(char *, size_t);
 
 	// return first buffer pair;
-	buffer_t& getFirst();
+	buffer_t* getFirst();
+
+	// return last buffer pair;
+	buffer_t* getLast();
 	
-	// pop and returns first buffer pair;
-	buffer_t popFirst();
+	// pop first buffer pair, doesn't free data
+	void popFirst();
 
 	// Destroy and free every buffer in the list
 	void	flush();

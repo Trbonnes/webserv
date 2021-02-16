@@ -31,12 +31,43 @@ void Http::handleRead()
 	// first time reading a a freshly accepted connection
 	if (_req == NULL)
 	{
-		if (ft_strnstr(_read_chain.getFirst().data, "\r\n\r\n", _read_chain.getFirst().size))
+		char* needle;
+		BufferChain::buffer_t* last = _read_chain.getLast();
+		if ((needle = ft_strnstr(last->data, "\r\n\r\n", last->size)))
 		{
-			std::cout << "End of header" << std::endl;
+			std::string request("");
+			// Concatenate headers
+			BufferChain::buffer_t* curr = _read_chain.getFirst();
+			while (curr != last)
+			{
+				request.append(curr->data, curr->size);
+				_read_chain.popFirst();
+				delete[] curr->data;
+				curr = _read_chain.getFirst();
+			}
+			// Concatenate last buffer
+			unsigned int diff = needle - curr->data + 1;
+			if (diff > 0)
+				request.append(curr->data, diff);
+			// check if some body is left
+			if (diff + 4 < curr->size)
+			{
+				_stream_write_chain.copyPushBack(curr->data + diff + 4, curr->size - (diff + 4));
+			}
+			_read_chain.popFirst();
+			delete[] curr->data;
+			// Launch http parsing on newly formed request
+			std::cout << request << std::endl;
+			std::cout << "====================================" << std::endl;
+			if(_stream_write_chain.getFirst())
+			{
+				std::cout << "oooooooooooooooooooooooooooooooooooo" << std::endl;	
+				std::cout << "|" << std::string(_stream_write_chain.getFirst()->data, _stream_write_chain.getFirst()->size)  << "|" << std::endl;
+				std::cout << "oooooooooooooooooooooooooooooooooooo" << std::endl;
+			}
+			// _req = new HttpRequest();
 		}
 	}
-		_req = new HttpRequest();
 	// if null then headers are not fully received
 	if (_rep == NULL)
 	{
