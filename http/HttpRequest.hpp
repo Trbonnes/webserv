@@ -26,9 +26,9 @@
 # include <sys/socket.h>
 # include <errno.h>
 
-# include "utils/utils.hpp"
+# include "core/utils/utils.hpp"
 # include "statusCodes.hpp"
-# include "../core/Log.hpp"
+# include "core/Log.hpp"
 # include "LoadController.hpp"
 
 class   HttpRequest

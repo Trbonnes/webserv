@@ -2,6 +2,7 @@
 # define UTILS_HPP
 
 # include <string.h>
+# include <stdlib.h>
 
 int     get_next_line(int fd, char **line);
 char	*ft_strcpy(char *dest, const char *src);
@@ -14,5 +15,5 @@ char    *ft_strcat(char *dest, const char *src);
 void    *ft_calloc(size_t count, size_t size);
 char    *ft_memcat(char *dest, const char *src, size_t nb);
 char	*ft_realloc(char *src, size_t nb);
-
+void 	*ft_memcpy(void * dst, void const * src, size_t len);
 #endif

@@ -2,9 +2,9 @@
 #define HTTP
 
 
+#include <string>
+
 #include "core/BufferChain.hpp"
-
-
 #include "HttpResponse.hpp"
 // This is the entrypoint of the http module
 // All of the filesystem write/read are handled by this module
@@ -48,6 +48,7 @@ public:
 	Http& operator=(const Http&);
 	~Http();
 
+	void handleInput();
 };
 
 #include "core/Connection.hpp"

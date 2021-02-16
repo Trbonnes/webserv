@@ -5,7 +5,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <queue>
-#include <cstring> 
+#include "utils/utils.hpp" 
 
 // Socket/Stream read write buffer
 // default nginx client buffer size on 64 bit systems 

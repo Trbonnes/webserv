@@ -38,7 +38,7 @@ void	BufferChain::copyPushBack(char *tocopy, size_t size)
 	if (size == 0)
 		return;
 	char* n = new char[size]();
-	std::memcpy(n, tocopy, std::min(size, (size_t)BUFFER_SIZE_LARGE));
+	ft_memcpy(n, tocopy, std::min(size, (size_t)BUFFER_SIZE_LARGE));
 	pushBack(n, size);
 }
 

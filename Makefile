@@ -17,7 +17,19 @@ CORESRC = 	core/Runnable.cpp \
 			core/Connection.cpp \
 			core/Signals.cpp \
 			core/BufferChain.cpp \
-			core/webserver.cpp
+			core/webserver.cpp \
+			core/utils/ft_atoi.cpp \
+			core/utils/ft_bzero.cpp \
+			core/utils/ft_itoa.cpp \
+			core/utils/ft_strcpy.cpp \
+			core/utils/ft_strdup.cpp \
+			core/utils/ft_strlen.cpp \
+			core/utils/get_next_line.cpp \
+			core/utils/ft_strcat.cpp \
+			core/utils/ft_calloc.cpp \
+			core/utils/ft_memcat.cpp \
+			core/utils/ft_memcpy.cpp \
+			core/utils/ft_realloc.cpp
 
 HTTPSRC =	http/Http.cpp \
 			http/HttpResponse.cpp \
@@ -29,17 +41,6 @@ HTTPSRC =	http/Http.cpp \
 			http/Methods/del.cpp \
 			http/Methods/get.cpp \
 			http/Methods/put.cpp \
-			http/utils/ft_atoi.cpp \
-			http/utils/ft_bzero.cpp \
-			http/utils/ft_itoa.cpp \
-			http/utils/ft_strcpy.cpp \
-			http/utils/ft_strdup.cpp \
-			http/utils/ft_strlen.cpp \
-			http/utils/get_next_line.cpp \
-			http/utils/ft_strcat.cpp \
-			http/utils/ft_calloc.cpp \
-			http/utils/ft_memcat.cpp \
-			http/utils/ft_realloc.cpp \
 			http/CGI.cpp
 
 
@@ -53,7 +54,7 @@ HEADERS = 	core/Location.hpp \
 			core/ListenSocket.hpp \
 			core/ConfigServer.hpp \
 			core/HttpServer.hpp \
-			http/utils/utils.hpp \
+			core/utils/utils.hpp \
 			http/statusCodes.hpp \
 			http/LoadController.hpp \
 			http/Http.hpp \
@@ -76,9 +77,9 @@ OBJECTSDIR = objs
 OBJECTS = $(addprefix $(OBJECTSDIR)/, $(subst .cpp,.o,$(SRCS)))
 
 OBJECTSDIRS = 	$(OBJECTSDIR)/core \
+				$(OBJECTSDIR)/core/utils \
 				$(OBJECTSDIR)/http/bin-cgi \
-				$(OBJECTSDIR)/http/Methods \
-				$(OBJECTSDIR)/http/utils
+				$(OBJECTSDIR)/http/Methods
 
 
 $(OBJECTSDIR)/%.o: ./%.cpp $(HEADERS)
