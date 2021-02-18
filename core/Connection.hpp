@@ -11,7 +11,7 @@
 
 #include "BufferChain.hpp"
 #include "ListenSocket.hpp"
-
+#include "Config.hpp"
 // HTTP Module
 #include "http/Http.hpp"
 
@@ -46,14 +46,14 @@ private:
 public:
 
 	// Coplien
-	Connection(int, fd_set* r, fd_set* w);
+	Connection(int, fd_set* r, fd_set* w, Config* c);
 	~Connection();
 
 	// Functions a module will use to sub write/read event to the workers select() fd sets
 	void subWrite();
 	void subRead();
-	void subStreamWrite();
-	void subStreamRead();
+	void subStreamWrite(int);
+	void subStreamRead(int);
 	// unsub
 	void unsubWrite();
 	void unsubRead();

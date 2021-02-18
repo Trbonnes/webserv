@@ -7,6 +7,7 @@ _write_chain(c.getWriteChain())
 {
 	_req = NULL;
 	_rep = NULL;
+	_config = NULL;
 }
 
 Http::Http(const Http &c) :
@@ -28,14 +29,17 @@ Http& Http::operator=(const Http &c)
 // The bytes have already been loaded into _read_cahin by ths point
 void Http::handleRead()
 {
-	// first time reading a a freshly accepted connection
+	// if null then headers are not fully received
 	if (_req == NULL)
 	{
 		char* needle;
 		BufferChain::buffer_t* last = _read_chain.getLast();
+
+		// If the end of headers are reached
 		if ((needle = ft_strnstr(last->data, "\r\n\r\n", last->size)))
 		{
 			std::string request("");
+
 			// Concatenate headers
 			BufferChain::buffer_t* curr = _read_chain.getFirst();
 			while (curr != last)
@@ -56,34 +60,59 @@ void Http::handleRead()
 			}
 			_read_chain.popFirst();
 			delete[] curr->data;
+			
 			// Launch http parsing on newly formed request
-			std::cout << request << std::endl;
-			std::cout << "====================================" << std::endl;
-			if(_stream_write_chain.getFirst())
-			{
-				std::cout << "oooooooooooooooooooooooooooooooooooo" << std::endl;	
-				std::cout << "|" << std::string(_stream_write_chain.getFirst()->data, _stream_write_chain.getFirst()->size)  << "|" << std::endl;
-				std::cout << "oooooooooooooooooooooooooooooooooooo" << std::endl;
-			}
-			// _req = new HttpRequest();
-		}
-	}
-	// if null then headers are not fully received
-	if (_rep == NULL)
-	{
-		//
+			_req = HttpRequest::parseRequest(request);
+			// Instantiate a new response
+			_rep = new HttpResponse(_req, _config->getServerUnit(_req->getPort(), _req->getHost()));
 
-	}
-	else
+			// Adding streams in select fd sets
+			// By this point the Response should have fd's for CGI or a regular file
+			// if stream in
+			// CGI and PUT
+			if (_rep->getStreamIn() != -1)
+			{
+				_connection.subStreamWrite(_rep->getStreamIn());
+			}
+			//if stream out
+			// CGI and GET
+			if (_rep->getStreamOut() != -1)
+			{
+				_connection.subStreamRead(_rep->getStreamOut());
+			}
+		}
+	}else if (_rep != NULL)
 	{
-		// Process headers
+		// Here the headers have been received, but not the entire body
+
+		// If it is chunked, we need to get rid of them
+		if (_req->getTransferEncoding() == "chunked")
+		{
+
+		}
+		// else proceed as usual
+		else
+		{
+
+		}
 	}
 }
 
+// void Http::handleStreamWrite()
+// {
+// 	BufferChain::writeBufferToFd(_stream_write_chain, _in);
+// }
+
 // void Http::handleStreamRead()
 // {
-
+// 	// Load he response into the write fchaine
+// 	BufferChain::writeBufferToFd(_write_chain, _out);
 // }
+
+void	Http::setConfig(Config* c)
+{
+	_config = c;
+}
 
 Http::~Http()
 {

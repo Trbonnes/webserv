@@ -1,6 +1,6 @@
 #include "Connection.hpp"
 
-Connection::Connection(int listen_socket, fd_set* r, fd_set* w) :
+Connection::Connection(int listen_socket, fd_set* r, fd_set* w, Config* config) :
 _active_read(r),
 _active_write(w),
 _module(*this)
@@ -9,6 +9,7 @@ _module(*this)
 
 	_stream_write = -1;
 	_stream_read = -1;
+	_module.setConfig(config);
 	size = sizeof(_client_name);
 	_socket = ::accept(listen_socket, &_client_name, &size);
 	if (_socket == -1)
@@ -25,7 +26,7 @@ Connection::Connection(const Connection& c) :
 _module(const_cast<Connection&>(c))
 {
 	_socket = c._socket;
-	_stream_read = c._stream_read;
+	_stream_read = c._stream_read;	
 	_stream_write = c._stream_write;
 	_client_name = c._client_name;
 	_active_read = c._active_read;
@@ -53,13 +54,15 @@ void Connection::subRead()
 	FD_SET(_socket, _active_read);
 }
 
-void Connection::subStreamWrite()
+void Connection::subStreamWrite(int fd)
 {
+	_stream_write = fd;
 	FD_SET(_stream_write, _active_write);
 }
 
-void Connection::subStreamRead()
+void Connection::subStreamRead(int fd)
 {
+	_stream_read = fd;
 	FD_SET(_stream_read, _active_read);
 }
 
@@ -75,11 +78,13 @@ void Connection::unsubRead()
 
 void Connection::unsubStreamWrite()
 {
+	_stream_write = -1;
 	FD_CLR(_stream_write, _active_write);
 }
 
 void Connection::unsubStreamRead()
 {
+	_stream_read = -1;
 	FD_CLR(_stream_read, _active_read);
 }
 
@@ -118,7 +123,7 @@ void Connection::write()
 void Connection::read()
 {
 	int read;
-
+	
 	try
 	{
 		read = BufferChain::readToBuffer(_read_chain, _socket);
@@ -135,7 +140,16 @@ void Connection::read()
 }
 
 void Connection::streamWrite()
-{}
+{
+	try
+	{
+		_module.handleStreamWrite();
+	}
+	catch(const IOError& e)
+	{
+		throw;
+	}
+}
 
 void Connection::streamRead()
 {}

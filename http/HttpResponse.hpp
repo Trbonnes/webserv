@@ -60,6 +60,7 @@ class   HttpResponse
 {
     private:
 
+    //
     HttpRequest                 _socket;
     ConfigServer                _config;
     StatusCode                  _mapCodes;
@@ -67,6 +68,9 @@ class   HttpResponse
     bool                        _use_cgi;
     int                         _cgi_in[2];
     int                         _cgi_out[2];
+    // File streams
+    int                         _stream_in;
+    int                         _stream_out;
     std::string                 _uri;
     std::string                 _route;
     std::string                 _location;
@@ -75,7 +79,6 @@ class   HttpResponse
     char                        *_cgi_env[NB_METAVARIABLES + 1];
 
     // headers
-
     int                         _statusCode;
     std::vector<std::string>    _allow;
     std::string                 _wwwAuthenticate;
@@ -92,7 +95,6 @@ class   HttpResponse
     std::string                 _transferEncoding;
     
     // body
-
     char*                       _body;
     std::string                 _cgiResponse;
     // char*                       _cgiResponse;
@@ -101,14 +103,16 @@ class   HttpResponse
 
 
 
+    void            prepapreMethod(std::string method);
     void            callMethod(std::string method);
+
     int             checkAllowMethods(std::string method);
     int             checkCGImethods(std::string method);
     void            setConfigURI(void);
-    void            setLocation(void);
     void            replaceURI(void);
 
     // GET
+    void            getInit();
     void            get(void);
     int             openFile(void);
     void            setRoot(void);

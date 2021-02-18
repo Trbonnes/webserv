@@ -5,6 +5,7 @@
 #include <string>
 
 #include "core/BufferChain.hpp"
+#include "core/Config.hpp"
 #include "HttpResponse.hpp"
 // This is the entrypoint of the http module
 // All of the filesystem write/read are handled by this module
@@ -39,6 +40,9 @@ private:
 	BufferChain&	_read_chain;
 	BufferChain&	_write_chain;
 	
+	// the servers configuration
+	Config* _config;
+
 	// Prevent call to these functions
 	Http();
 
@@ -48,7 +52,11 @@ public:
 	Http& operator=(const Http&);
 	~Http();
 
+	// Set the module's configuration
+	void setConfig(Config*);
+
 	void handleRead();
+	void handleStreamWrite();
 };
 
 #include "core/Connection.hpp"

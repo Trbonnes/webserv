@@ -109,7 +109,7 @@ void	HttpWorker::acceptConnection(int s)
 {
 	try
 	{
-		Connection *c = new Connection(s, &_active_read, &_active_write);
+		Connection *c = new Connection(s, &_active_read, &_active_write, _config);
 		_connections.push_front(c);
 		FD_SET(c->getSock(), &_active_read);
 		// std::cerr << "New connection " << c->getSock() << std::endl;

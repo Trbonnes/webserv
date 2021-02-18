@@ -6,36 +6,13 @@
 /*   By: yorn <yorn@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/30 15:10:55 by trbonnes          #+#    #+#             */
-/*   Updated: 2021/02/16 00:25:11 by yorn             ###   ########.fr       */
+/*   Updated: 2021/02/16 16:33:52 by yorn             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "HttpRequest.hpp"
 
 HttpRequest::HttpRequest() :
-_fd(0),
-_method(),
-_requestURI(),
-_httpVersion(),
-_contentLength(),
-_contentLocation(),
-_contentType(),
-_multipartContent(),
-_contentBoundary(),
-_date(),
-_transferEncoding(),
-_acceptCharset(),
-_acceptLanguage(),
-_authorization(),
-_host(),
-_port(),
-_userAgent(),
-_xSecret(),
-_body() {
-}
-
-HttpRequest::HttpRequest(int fd) :
-_fd(fd),
 _method(),
 _requestURI(),
 _httpVersion(),
@@ -58,7 +35,6 @@ _body() {
 
 HttpRequest::HttpRequest(HttpRequest const &copy)
 {
-    _fd = copy._fd;
     _method = copy._method;
     _requestURI = copy._requestURI;
     _httpVersion = copy._httpVersion;
@@ -84,7 +60,6 @@ HttpRequest::~HttpRequest() {
 
 HttpRequest      &HttpRequest::operator=(HttpRequest const &rhs)
 {
-    _fd = rhs._fd;
     _method = rhs._method;
     _requestURI = rhs._requestURI;
     _httpVersion = rhs._httpVersion;
@@ -106,37 +81,32 @@ HttpRequest      &HttpRequest::operator=(HttpRequest const &rhs)
     return *this;
 }
 
-int				HttpRequest::getFd()
-{
-	return _fd;
-}
-
-std::string     HttpRequest::getMethod()
+std::string&     HttpRequest::getMethod()
 {
     return _method;
 }
 
-std::string     HttpRequest::getRequestURI()
+std::string&     HttpRequest::getRequestURI()
 {
     return _requestURI;
 }
 
-std::string     HttpRequest::getHttpVersion()
+std::string&     HttpRequest::getHttpVersion()
 {
     return _httpVersion;
 }
 
-std::string     HttpRequest::getContentLength()
+std::string&     HttpRequest::getContentLength()
 {
     return _contentLength;
 }
 
-std::string     HttpRequest::getContentLocation()
+std::string&     HttpRequest::getContentLocation()
 {
     return _contentLocation;
 }
 
-std::string     HttpRequest::getContentType()
+std::string&     HttpRequest::getContentType()
 {
     return _contentType;
 }
@@ -146,37 +116,37 @@ bool    HttpRequest::getMultipartContent()
     return _multipartContent;
 }
 
-std::string     HttpRequest::getContentBoundary()
+std::string&     HttpRequest::getContentBoundary()
 {
     return _contentBoundary;
 }
 
-std::string     HttpRequest::getDate()
+std::string&     HttpRequest::getDate()
 {
     return _date;
 }
 
-std::string     HttpRequest::getTransferEncoding()
+std::string&     HttpRequest::getTransferEncoding()
 {
     return _transferEncoding;
 }
 
-std::vector<std::string>     &HttpRequest::getAcceptCharset()
+std::vector<std::string>&   HttpRequest::getAcceptCharset()
 {
     return _acceptCharset;
 }
 
-std::vector<std::string>     &HttpRequest::getAcceptLanguage()
+std::vector<std::string>&   HttpRequest::getAcceptLanguage()
 {
     return _acceptLanguage;
 }
 
-std::string     HttpRequest::getAuthorization()
+std::string&     HttpRequest::getAuthorization()
 {
     return _authorization;
 }
 
-std::string     HttpRequest::getHost()
+std::string&    HttpRequest::getHost()
 {
     return _host;
 }
@@ -185,33 +155,28 @@ int				HttpRequest::getPort() {
 	return _port;
 }
 
-std::string     HttpRequest::getUserAgent()
+std::string&     HttpRequest::getUserAgent()
 {
     return _userAgent;
 }
 
-std::string HttpRequest::getReferer()
+std::string& HttpRequest::getReferer()
 {
 	return _referer;
 }
 
-std::string     &HttpRequest::getBody()
+std::string&     HttpRequest::getBody()
 {
     return _body;
 }
 
-std::string     HttpRequest::getRemoteAddr()
+std::string&     HttpRequest::getRemoteAddr()
 {
     return _addr;
 }
 
-std::string		HttpRequest::getXSecret() {
+std::string&		HttpRequest::getXSecret() {
 	return _xSecret;
-}
-
-
-void	HttpRequest::setFd(int fd) {
-	_fd = fd;
 }
 
 void	HttpRequest::setMethod(std::string method) {

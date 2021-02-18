@@ -6,7 +6,7 @@ const std::string HttpResponse::_base64_chars =
              "0123456789+/";
 
 HttpResponse::HttpResponse() :
-_socket(0),
+_socket(),
 _config(),
 _mapCodes(),
 _cgi(),
@@ -70,8 +70,13 @@ _responseSize(0)
     ft_bzero(_cgi_env, sizeof(NB_METAVARIABLES + 1));
     if (checkRequestErrors() != OK)
         return ;
+    
     _uri = _socket.getRequestURI();
-    setLocation();
+    
+    // Absolute location route for the server
+    _location = _config.getLocation(_uri);
+    
+    // Check to see if the request body is too large for the 
     if (_config.getClientBodySize(_location) != -1 && ft_atoi(_socket.getContentLength().c_str()) > _config.getClientBodySize(_location))
     {
         _statusCode = REQUEST_ENTITY_TOO_LARGE;
@@ -87,12 +92,16 @@ _responseSize(0)
         _statusCode = NO_CONTENT;
         return ;
     }
+ 
+
     extension = _route.find_last_of('.');
+    // If it's a CGI request we must fork and prepare the file streas
     if (is_good_exe(str.assign(_route).erase(0, extension + 1)) && checkCGImethods(_socket.getMethod()))
     {
         _use_cgi = true;
         prepare_cgi();
     }
+    // else We must prepare the file streams
     else if (checkAllowMethods(_socket.getMethod()))
         callMethod(_socket.getMethod());
     else
@@ -162,6 +171,20 @@ HttpResponse     &HttpResponse::operator=(HttpResponse &rhs)
     return *this;
 }
 
+
+
+
+//This functions prepares the response object
+void        HttpResponse::handleStreams()
+{
+
+
+}
+
+
+
+
+
 //** Call the non CGI methods, GET, HEAD, PUT, DELETE & (POST) / OPTIONS is managed in a different way **  //
 void        HttpResponse::callMethod(std::string method)
 {
@@ -177,6 +200,23 @@ void        HttpResponse::callMethod(std::string method)
         _body = ft_strdup("OK");
     }
 }
+
+
+void        HttpResponse::callMethod(std::string method)
+{
+    if (method.compare("GET") == 0 || method.compare("HEAD") == 0)
+        get();
+    else if (method.compare("PUT") == 0)
+        put();
+    else if (method.compare("DELETE") == 0)
+        del();
+    else
+    {
+        _contentLength = 2;
+        _body = ft_strdup("OK");
+    }
+}
+
 
 //** Check request errors **
 int         HttpResponse::checkRequestErrors()
@@ -208,11 +248,6 @@ int         HttpResponse::checkAllowMethods(std::string method)
     return (ret);
 }
 
-//** Absolute location route for the server **
-void        HttpResponse::setLocation()
-{
-    _location = _config.getLocation(_uri);
-}
 
 //** Replace URI by the location **
 void        HttpResponse::replaceURI()
@@ -560,22 +595,6 @@ void        HttpResponse::configureErrorFile()
     _body = ft_strdup(body.c_str());
 }
 
-// ** Create the response socket **
-void         HttpResponse::processResponse()
-{
-    std::string response;
-
-    if (_statusCode >= 300)
-        configureErrorFile();
-    setFirstHeadersResponse(response);
-    if (_socket.getMethod().compare("OPTIONS") == 0 || _statusCode == METHOD_NOT_ALLOWED)
-        setAllowMethodsResponse(response);
-    else
-        setOtherHeaders(response);
-    response.append("\r\n");
-    setResponseSize(response);
-    setBodyResponse(response);
-}
 
 void     HttpResponse::setFirstHeadersResponse(std::string &response)
 {
@@ -676,6 +695,25 @@ void            HttpResponse::setBodyResponse(std::string &response)
         _body = NULL;
     }
 }
+
+
+// ** Create the response socket **
+void         HttpResponse::processResponse()
+{
+    std::string response;
+
+    if (_statusCode >= 300)
+        configureErrorFile();
+    setFirstHeadersResponse(response);
+    if (_socket.getMethod().compare("OPTIONS") == 0 || _statusCode == METHOD_NOT_ALLOWED)
+        setAllowMethodsResponse(response);
+    else
+        setOtherHeaders(response);
+    response.append("\r\n");
+    setResponseSize(response);
+    setBodyResponse(response);
+}
+
 
 char*         HttpResponse::getResponse()
 {

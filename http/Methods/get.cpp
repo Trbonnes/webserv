@@ -1,15 +1,21 @@
 #include "../HttpResponse.hpp"
 
+
+
+// First it opens the file, 
+void        HttpResponse::getInit()
+{
+    _stream_out = openFile();
+}
+
 void        HttpResponse::get()
 {
     std::string root;
-    int         fd;
 
-    fd = openFile();
     authorization();
     if (_statusCode == OK)
     {
-        setBody(fd);
+        setBody(_stream_out);
         setLastModified();
         setContentType();
         setCharset();

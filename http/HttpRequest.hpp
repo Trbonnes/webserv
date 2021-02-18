@@ -36,9 +36,6 @@ class   HttpRequest
     private:
 
     // SOCKET
-
-    int                         _fd;
-
     std::string                 _addr;
 
     // REQUEST LINE
@@ -73,35 +70,32 @@ class   HttpRequest
 
     public:
     HttpRequest();
-    HttpRequest(int fd);
     HttpRequest(HttpRequest const &copy);
     ~HttpRequest();
 
-    HttpRequest                      &operator=(HttpRequest const &rhs);
-    int             			getFd();
-    std::string     			getMethod();
-    std::string     			getRequestURI();
-    std::string     			getHttpVersion();
-    std::string	                getContentLength();
-    std::string	                getContentLocation();
-    std::string					getContentType();
+    HttpRequest                 &operator=(HttpRequest const &rhs);
+    std::string&     			getMethod();
+    std::string&     			getRequestURI();
+    std::string&     			getHttpVersion();
+    std::string&	            getContentLength();
+    std::string&	            getContentLocation();
+    std::string&				getContentType();
     bool                        getMultipartContent();
-    std::string                 getContentBoundary();
-    std::string	                getDate();
-    std::string	                getTransferEncoding();
+    std::string&                getContentBoundary();
+    std::string&                getDate();
+    std::string&                getTransferEncoding();
     std::vector<std::string>	&getAcceptCharset();
     std::vector<std::string>	&getAcceptLanguage();
-    std::string	                getAuthorization();
-    std::string	                getHost();
+    std::string&                getAuthorization();
+    std::string&                getHost();
 	int							getPort();
-    std::string	                getUserAgent();
-	std::string	                getReferer();
-    std::string					&getBody();
-    std::string                 getRemoteAddr();
-    std::string                 getXSecret();
+    std::string&                getUserAgent();
+	std::string&                getReferer();
+    std::string&				getBody();
+    std::string&                getRemoteAddr();
+    std::string&                getXSecret();
 
 
-    void	setFd(int fd);
     void	setMethod(std::string method);
     void	setRequestURI(std::string RequestURI);
     void	setHttpVersion(std::string httpVersion);
@@ -122,12 +116,8 @@ class   HttpRequest
     void	setBody(std::string &sBody);
 	void	setXSecret(std::string XSecret);
 
-	class	BadReadException: public std::exception {
-		public:
-			virtual const char* what() const throw() {
-				return strerror(errno);
-			}
-	};
+    static HttpRequest* parseRequest(std::string&);
+
     class   ConnectionClose : public std::exception
 	{
 		public:
@@ -135,7 +125,6 @@ class   HttpRequest
 	};    
 };
 
-HttpRequest	*httpRequestParser(int fd);
 
 void	ParseAcceptCharset(HttpRequest *socket, std::string& request, size_t pos);
 void	ParseAcceptLanguage(HttpRequest *socket, std::string& request, size_t pos);

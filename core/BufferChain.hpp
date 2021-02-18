@@ -40,7 +40,7 @@ private:
 public:
 	// The buffer pair structure
 
-	// Cooplien
+	// Coplien
 	BufferChain();
 	BufferChain(BufferChain&);
 	BufferChain &operator=(BufferChain&);
