@@ -25,6 +25,7 @@ Http& Http::operator=(const Http &c)
 }
 
 
+
 // This methods is called each time there's a socket read
 // The bytes have already been loaded into _read_cahin by ths point
 void Http::handleRead()
@@ -81,10 +82,11 @@ void Http::handleRead()
 				_connection.subStreamRead(_rep->getStreamOut());
 			}
 		}
-	}else if (_rep != NULL)
+	}
+	if (_rep != NULL)
 	{
 		// Here the headers have been received, but not the entire body
-
+		if ()
 		// If it is chunked, we need to get rid of them
 		if (_req->getTransferEncoding() == "chunked")
 		{
@@ -93,7 +95,7 @@ void Http::handleRead()
 		// else proceed as usual
 		else
 		{
-
+			
 		}
 	}
 }

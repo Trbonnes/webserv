@@ -60,7 +60,8 @@ class   HttpResponse
 {
     private:
 
-    //
+
+
     HttpRequest                 _socket;
     ConfigServer                _config;
     StatusCode                  _mapCodes;
