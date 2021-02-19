@@ -18,11 +18,6 @@ class Http
 typedef int FD;
 
 private:
-	// stream in (CGI or filestream)
-	FD _in;
-	// stream out
-	FD _out;
-
 	// reference to the upstream connection
 	Connection& _connection;
 
@@ -57,6 +52,7 @@ public:
 
 	void handleRead();
 	void handleStreamWrite();
+	void handleStreamRead();
 };
 
 #include "core/Connection.hpp"

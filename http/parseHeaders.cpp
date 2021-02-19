@@ -6,7 +6,7 @@
 /*   By: yorn <yorn@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/30 18:55:18 by trbonnes          #+#    #+#             */
-/*   Updated: 2021/02/15 16:35:37 by yorn             ###   ########.fr       */
+/*   Updated: 2021/02/19 19:46:09 by yorn             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,7 +103,7 @@ void ParseAutorization(HttpRequest *socket, std::string& request, size_t pos) {
 }
 
 void ParseContentLength(HttpRequest *socket, std::string& request, size_t pos) {
-	socket->setContentLength(ParseStdHeaders(request, pos));
+	socket->setContentLength(ft_atoi(ParseStdHeaders(request, pos).c_str()));
 }
 
 void ParseContentLocation(HttpRequest *socket, std::string& request, size_t pos) {

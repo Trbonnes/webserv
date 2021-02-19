@@ -65,51 +65,78 @@ void Http::handleRead()
 			// Launch http parsing on newly formed request
 			_req = HttpRequest::parseRequest(request);
 			// Instantiate a new response
-			_rep = new HttpResponse(_req, _config->getServerUnit(_req->getPort(), _req->getHost()));
+			// _rep = new HttpResponse(_req, _config->getServerUnit(_req->getPort(), _req->getHost()));
+
 
 			// Adding streams in select fd sets
 			// By this point the Response should have fd's for CGI or a regular file
 			// if stream in
 			// CGI and PUT
-			if (_rep->getStreamIn() != -1)
-			{
-				_connection.subStreamWrite(_rep->getStreamIn());
-			}
-			//if stream out
-			// CGI and GET
-			if (_rep->getStreamOut() != -1)
-			{
-				_connection.subStreamRead(_rep->getStreamOut());
-			}
+			// if (_rep->getStreamIn() != -1)
+			// {
+			// 	_connection.setStreamWrite(_rep->getStreamIn());
+			// }
+			// //if stream out
+			// // CGI and GET
+			// if (_rep->getStreamOut() != -1)
+			// {
+			// 	_connection.setStreamRead(_rep->getStreamOut());
+			// }
 		}
 	}
-	if (_rep != NULL)
-	{
-		// Here the headers have been received, but not the entire body
-		if ()
-		// If it is chunked, we need to get rid of them
-		if (_req->getTransferEncoding() == "chunked")
-		{
+	// if (_rep != NULL)
+	// {
+	// 	// If all the body has been read, just ignore those packets
+	// 	if (bodysize > _req->getContentLength())
+	// 			return;
 
-		}
-		// else proceed as usual
-		else
-		{
-			
-		}
-	}
+
+	// 	// Here the headers have been received, but not the entire body
+	// 	// If it is chunked, we need to get rid of them
+	// 	if (_req->getTransferEncoding() == "chunked")
+	// 	{
+	// 		HttpRequest::parseChunks(_read_chain, _stream_write_chain);
+	// 	}
+	// 	// else proceed as usual
+	// 	else
+	// 	{
+	// 		HttpRequest::parseBody(_read_chain, _stream_write_chain);
+	// 		// Getting the last body buffer read on this chain
+	// 		BufferChain::buffer_t *buff = _read_chain.getFirst();
+
+	// 		_stream_write_chain.pushBack(buff->data, buff->size);
+	// 		_read_chain.popFirst();
+	// 	}
+
+	// 	// If the body is to be ignored, flush the stream's input buffer
+	// 	if (ignore_body)
+	// 		_stream_write_chain.flush();
+	// 	// else stream the fd
+	// 	else
+	// 		_connection.subStreamWrite();
+	// }
 }
 
-// void Http::handleStreamWrite()
-// {
-// 	BufferChain::writeBufferToFd(_stream_write_chain, _in);
-// }
+void Http::handleStreamRead()
+{
+	// if (BufferChain::readToBuffer(_stream_read_chain, _rep->getStreamOut()) == 0)
+	// {
+	// 	if (_req->getTransferEncoding() == "chunked")
+	// 	{
+	// 		HttpRequest::parseChunks(_read_chain, _stream_write_chain);
+	// 	}
+	// 	else
+	// 	{
 
-// void Http::handleStreamRead()
-// {
-// 	// Load he response into the write fchaine
-// 	BufferChain::writeBufferToFd(_write_chain, _out);
-// }
+	// 	}
+	// }
+}
+
+void Http::handleStreamWrite()
+{
+	// Load he response into the write fchaine
+	// BufferChain::writeBufferToFd(_stream_write, _rep->getStreamIn());
+}
 
 void	Http::setConfig(Config* c)
 {

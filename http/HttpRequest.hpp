@@ -46,7 +46,7 @@ class   HttpRequest
 
     // HEADERS
 
-    std::string	                _contentLength;
+    size_t  	                _contentLength;
     std::string	                _contentLocation;
     std::string   				_contentType;
     bool                        _multipartContent;
@@ -77,8 +77,8 @@ class   HttpRequest
     std::string&     			getMethod();
     std::string&     			getRequestURI();
     std::string&     			getHttpVersion();
-    std::string&	            getContentLength();
-    std::string&	            getContentLocation();
+    int           	            getContentLength();
+    std::string&                getContentLocation();
     std::string&				getContentType();
     bool                        getMultipartContent();
     std::string&                getContentBoundary();
@@ -99,7 +99,7 @@ class   HttpRequest
     void	setMethod(std::string method);
     void	setRequestURI(std::string RequestURI);
     void	setHttpVersion(std::string httpVersion);
-    void	setContentLength(std::string ContentLength);
+    void	setContentLength(int);
     void	setContentLocation(std::string ContentLocation);
     void	setContentType(std::string ContentType);
     void    setMultipartContent(bool multipart);

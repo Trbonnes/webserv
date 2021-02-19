@@ -52,8 +52,10 @@ public:
 	// Functions a module will use to sub write/read event to the workers select() fd sets
 	void subWrite();
 	void subRead();
-	void subStreamWrite(int);
-	void subStreamRead(int);
+	void setStreamWrite(int fd);
+	void subStreamWrite();
+	void setStreamRead(int fd);
+	void subStreamRead();
 	// unsub
 	void unsubWrite();
 	void unsubRead();

@@ -77,7 +77,7 @@ _responseSize(0)
     _location = _config.getLocation(_uri);
     
     // Check to see if the request body is too large for the 
-    if (_config.getClientBodySize(_location) != -1 && ft_atoi(_socket.getContentLength().c_str()) > _config.getClientBodySize(_location))
+    if (_config.getClientBodySize(_location) != -1 && _socket.getContentLength() > _config.getClientBodySize(_location))
     {
         _statusCode = REQUEST_ENTITY_TOO_LARGE;
         return ;
@@ -172,19 +172,6 @@ HttpResponse     &HttpResponse::operator=(HttpResponse &rhs)
 }
 
 
-
-
-//This functions prepares the response object
-void        HttpResponse::handleStreams()
-{
-
-
-}
-
-
-
-
-
 //** Call the non CGI methods, GET, HEAD, PUT, DELETE & (POST) / OPTIONS is managed in a different way **  //
 void        HttpResponse::callMethod(std::string method)
 {
@@ -201,27 +188,10 @@ void        HttpResponse::callMethod(std::string method)
     }
 }
 
-
-void        HttpResponse::callMethod(std::string method)
-{
-    if (method.compare("GET") == 0 || method.compare("HEAD") == 0)
-        get();
-    else if (method.compare("PUT") == 0)
-        put();
-    else if (method.compare("DELETE") == 0)
-        del();
-    else
-    {
-        _contentLength = 2;
-        _body = ft_strdup("OK");
-    }
-}
-
-
 //** Check request errors **
 int         HttpResponse::checkRequestErrors()
 {
-    if (_socket.getBody().length() > 0 && _socket.getContentLength().length() == 0 && _socket.getTransferEncoding().length() == 0)
+    if (_socket.getBody().length() > 0 && _socket.getContentLength() == 0 && _socket.getTransferEncoding().length() == 0)
         _statusCode = LENGTH_REQUIRED;
     return (_statusCode);
 }

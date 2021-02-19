@@ -191,7 +191,7 @@ void            HttpResponse::read_cgi_response()
 
     ft_bzero(buf, 1024);
     std::string().swap(_socket.getBody());
-    LoadController::loadController(ft_atoi(_socket.getContentLength().c_str()) + 100, _cgiResponse);
+    LoadController::loadController(_socket.getContentLength() + 100, _cgiResponse);
     while ((ret = read(_cgi_out[SIDE_OUT], buf, 1024)) > 0) {
         _responseSize += ret;
         buf[ret] = '\0';
@@ -217,7 +217,7 @@ int           HttpResponse::write_cgi_request()
     int ret;
 
     Log::debug("About to write to CGI");
-    ret = write(_cgi_in[SIDE_IN], _socket.getBody().c_str(), ft_atoi(_socket.getContentLength().c_str()));
+    ret = write(_cgi_in[SIDE_IN], _socket.getBody().c_str(), _socket.getContentLength());
     Log::debug("Wrote to CGI");
      _socket.getBody().clear();
     return ret;

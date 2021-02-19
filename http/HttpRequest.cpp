@@ -6,7 +6,7 @@
 /*   By: yorn <yorn@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/30 15:10:55 by trbonnes          #+#    #+#             */
-/*   Updated: 2021/02/16 16:33:52 by yorn             ###   ########.fr       */
+/*   Updated: 2021/02/19 19:44:30 by yorn             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,7 +96,7 @@ std::string&     HttpRequest::getHttpVersion()
     return _httpVersion;
 }
 
-std::string&     HttpRequest::getContentLength()
+int              HttpRequest::getContentLength()
 {
     return _contentLength;
 }
@@ -191,7 +191,7 @@ void	HttpRequest::setHttpVersion(std::string httpVersion) {
 	_httpVersion = httpVersion;
 }
 
-void	HttpRequest::setContentLength(std::string ContentLength) {
+void	HttpRequest::setContentLength(int ContentLength) {
 	_contentLength = ContentLength;
 }
 

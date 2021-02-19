@@ -54,15 +54,23 @@ void Connection::subRead()
 	FD_SET(_socket, _active_read);
 }
 
-void Connection::subStreamWrite(int fd)
+void Connection::setStreamWrite(int fd)
 {
 	_stream_write = fd;
+}
+
+void Connection::subStreamWrite()
+{
 	FD_SET(_stream_write, _active_write);
 }
 
-void Connection::subStreamRead(int fd)
+void Connection::setStreamRead(int fd)
 {
 	_stream_read = fd;
+}
+
+void Connection::subStreamRead()
+{
 	FD_SET(_stream_read, _active_read);
 }
 
@@ -78,13 +86,11 @@ void Connection::unsubRead()
 
 void Connection::unsubStreamWrite()
 {
-	_stream_write = -1;
 	FD_CLR(_stream_write, _active_write);
 }
 
 void Connection::unsubStreamRead()
 {
-	_stream_read = -1;
 	FD_CLR(_stream_read, _active_read);
 }
 
