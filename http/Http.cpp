@@ -64,8 +64,9 @@ void Http::handleRead()
 			
 			// Launch http parsing on newly formed request
 			_req = HttpRequest::parseRequest(request);
+
 			// Instantiate a new response
-			// _rep = new HttpResponse(_req, _config->getServerUnit(_req->getPort(), _req->getHost()));
+			_rep = new HttpResponse(_req, _config->getServerUnit(_req->getPort(), _req->getHost()));
 
 
 			// Adding streams in select fd sets

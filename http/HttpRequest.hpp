@@ -139,5 +139,4 @@ void	ParseTransferEncoding(HttpRequest *socket, std::string& request, size_t pos
 void	ParseUserAgent(HttpRequest *socket, std::string& request, size_t pos);
 void	ParseXSecret(HttpRequest *socket, std::string& request, size_t pos);
 std::string ParseStdHeaders(std::string& request, size_t pos);
-
 #endif

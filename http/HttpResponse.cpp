@@ -67,7 +67,7 @@ _responseSize(0)
     _cgi_in[1] = -1;
     _cgi_out[0] = -1;
     _cgi_out[1] = -1;
-    ft_bzero(_cgi_env, sizeof(NB_METAVARIABLES + 1));
+    ft_bzero(_cgi_env, sizeof(char*) * NB_METAVARIABLES + 1);
     if (checkRequestErrors() != OK)
         return ;
     
