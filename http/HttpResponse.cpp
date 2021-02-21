@@ -25,11 +25,8 @@ _contentLocation(""),
 _contentType(""),
 _charset(""),
 _retryAfter(""),
-_transferEncoding(""),
-_body(NULL),
-_cgiResponse(""),
-_response(NULL),
-_responseSize(0) {
+_transferEncoding("")
+{
     ft_bzero(_cgi_env, sizeof(NB_METAVARIABLES + 1));
 }
 
@@ -54,22 +51,15 @@ _contentLocation(""),
 _contentType(""),
 _charset(""),
 _retryAfter(""),
-_transferEncoding(""),
-_body(NULL),
-_cgiResponse(""),
-_response(NULL),
-_responseSize(0)
+_transferEncoding("")
 {
-    size_t      extension;
-    std::string str;
-
-    _cgi_in[0] = -1;
-    _cgi_in[1] = -1;
-    _cgi_out[0] = -1;
-    _cgi_out[1] = -1;
     ft_bzero(_cgi_env, sizeof(char*) * NB_METAVARIABLES + 1);
-    if (checkRequestErrors() != OK)
-        return ;
+
+    // Check if lenght is given
+    if (_socket.getBody().length() > 0 && _socket.getContentLength() == 0 && _socket.getTransferEncoding().length() == 0)
+    {
+        _statusCode = LENGTH_REQUIRED;
+    }
     
     _uri = _socket.getRequestURI();
     
@@ -92,20 +82,6 @@ _responseSize(0)
         _statusCode = NO_CONTENT;
         return ;
     }
- 
-
-    extension = _route.find_last_of('.');
-    // If it's a CGI request we must fork and prepare the file streas
-    if (is_good_exe(str.assign(_route).erase(0, extension + 1)) && checkCGImethods(_socket.getMethod()))
-    {
-        _use_cgi = true;
-        prepare_cgi();
-    }
-    // else We must prepare the file streams
-    else if (checkAllowMethods(_socket.getMethod()))
-        callMethod(_socket.getMethod());
-    else
-        _statusCode = METHOD_NOT_ALLOWED;
 }
 
 HttpResponse::HttpResponse(HttpResponse &copy)
@@ -164,13 +140,40 @@ HttpResponse     &HttpResponse::operator=(HttpResponse &rhs)
     ft_strcpy(rhs._date, _date);
     _retryAfter = rhs._retryAfter;
     _transferEncoding = rhs._transferEncoding;
-    _body = ft_strdup(rhs._body);
-    _cgiResponse = rhs._cgiResponse;
-    _response = ft_strdup(rhs._response);
-    _responseSize = rhs._responseSize;
     return *this;
 }
 
+void            HttpResponse::openStreams()
+{
+    size_t      extension;
+    std::string str;
+
+    extension = _route.find_last_of('.');
+    // If it's a CGI request we must fork and prepare the file streas
+    if (is_good_exe(str.assign(_route).erase(0, extension + 1)) && checkCGImethods(_socket.getMethod()))
+    {
+        _use_cgi = true;
+        prepare_cgi();
+    }
+    // else We must prepare the file streams
+    else if (checkAllowMethods(_socket.getMethod()))
+    {
+        if (method.compare("GET") == 0 || method.compare("HEAD") == 0)
+            initGet();
+        else if (method.compare("PUT") == 0)
+            initPut();
+        else if (method.compare("DELETE") == 0)
+            del();
+        else
+        {
+            _contentLength = 2;
+            _body = ft_strdup("OK");
+        }
+    }
+        // If else the method is not allowed
+    else
+        _statusCode = METHOD_NOT_ALLOWED;
+}
 
 //** Call the non CGI methods, GET, HEAD, PUT, DELETE & (POST) / OPTIONS is managed in a different way **  //
 void        HttpResponse::callMethod(std::string method)
@@ -188,13 +191,6 @@ void        HttpResponse::callMethod(std::string method)
     }
 }
 
-//** Check request errors **
-int         HttpResponse::checkRequestErrors()
-{
-    if (_socket.getBody().length() > 0 && _socket.getContentLength() == 0 && _socket.getTransferEncoding().length() == 0)
-        _statusCode = LENGTH_REQUIRED;
-    return (_statusCode);
-}
 
 //** Check if the method is authorized for the non CGI locations **
 int         HttpResponse::checkAllowMethods(std::string method)
@@ -218,12 +214,6 @@ int         HttpResponse::checkAllowMethods(std::string method)
     return (ret);
 }
 
-
-//** Replace URI by the location **
-void        HttpResponse::replaceURI()
-{
-    _uri.assign(_config.getRoot(_location));
-}
 
 //** Set stat to know all the details of the requested file **
 void        HttpResponse::setStat()
@@ -268,7 +258,8 @@ void         HttpResponse::setRoot()
     }
     else
     {
-        replaceURI(); 
+        //** Replace URI by the location **
+        _uri.assign(_config.getRoot(_location));
         
         //** Relative path **
         if (_config.getAlias(_location).length() > 0)
@@ -327,73 +318,6 @@ void         HttpResponse::setRoot()
     else
         close(fd);
     return ;
-}
-
-// ** Create the default html page when file is not found and autoindex is on **
-void            HttpResponse::setAutoindex(void)
-{
-    std::string             str;
-    struct stat             directory;
-    DIR                     *dir;
-    struct dirent           *dirent;
-    struct tm               *timeinfo;
-    char                    lastModifications[100];
-    std::stack<std::string> files;
-    std::string             body;
-
-    body.assign("<html>\n<head><title>Index of /</title></head>\n<body>\n<h1>Index of /</h1><hr><pre>\n");
-    dir = opendir(_route.c_str());
-    if (dir == NULL)
-        _statusCode = INTERNAL_SERVER_ERROR;
-    else
-    {
-        while ((dirent = readdir(dir)) != NULL)
-        {
-            stat(str.assign(_uri).append(dirent->d_name).c_str(), &directory);
-            if (str.assign(dirent->d_name).compare(".") == 0)
-                continue ;
-            str.assign("<a href=\"");
-            str.append(dirent->d_name);
-            if (dirent->d_type == DT_DIR)
-                str.append("/");
-            str.append("\">");
-            str.append(dirent->d_name);
-            if (dirent->d_type == DT_DIR)
-                str.append("/");
-            str.append("</a>\t\t\t\t");
-			#ifdef __linux__
-            	timeinfo = localtime(&(directory.st_mtim.tv_sec));
-			#else
-            	timeinfo = localtime(&(directory.st_mtimespec.tv_sec));
-			#endif // TARGET_OS_MAC
-			
-            strftime(lastModifications, 100, "%d-%b-20%y %OH:%OM", timeinfo);
-            str.append(lastModifications);
-            str.append("\t\t");
-            if (dirent->d_type == DT_DIR)
-                str.append("-");
-            else
-            {
-                char *dirSize = ft_itoa(directory.st_size);
-                str.append(dirSize);
-                free(dirSize);
-            }
-            str.append("\n");
-            files.push(str);
-        }
-        while (!files.empty())
-        {
-            body.append(files.top());
-            files.pop();
-        }
-    }
-    closedir(dir);
-    body.append("</pre><hr></body>\n</html>");
-    _contentLength = body.length();
-    _contentType = "text/html";
-    _charset = "utf-8";
-    _body = (char*)ft_calloc(_contentLength + 1, sizeof(char));
-    ft_strcpy(_body, body.c_str());
 }
 
 // ** Check if the autorization mode is on and if the user is authorized to make the request **
@@ -631,42 +555,6 @@ void            HttpResponse::setOtherHeaders(std::string &response)
         response.append("WWW-Authenticate: ").append("Basic realm=").append(_config.getAuth_basic(_location)).append("\r\n");
 }
 
-void            HttpResponse::setResponseSize(std::string &response)
-{
-    if (_socket.getMethod().compare("HEAD") && _contentLength >= 0)
-        _responseSize = response.length() + _contentLength;
-    else
-        _responseSize = response.length();
-}
-
-void            HttpResponse::setBodyResponse(std::string &response)
-{
-    size_t      find;
-    size_t      extension;
-
-    LoadController::waitController(_responseSize + 1);
-    _response = (char*)ft_calloc(_responseSize + 1, sizeof(char));
-    ft_strcpy(_response, response.c_str());
-    extension = _route.find_last_of('.');
-    if (is_good_exe(std::string().assign(_route).erase(0, extension + 1)) && checkCGImethods(_socket.getMethod()))
-    {
-        find = _cgiResponse.find("\r\n\r\n");
-        if (find != _cgiResponse.npos)
-            ft_memcat(_response, _cgiResponse.substr(find + 4, _responseSize).c_str(), _contentLength);
-        _cgiResponse.clear();
-        std::string().swap(_cgiResponse);
-    }
-    else if (_socket.getMethod().compare("HEAD") && _contentLength >= 0)
-        ft_memcat(_response, _body, _contentLength);
-    
-    if (_body != NULL)
-    {
-        free(_body);
-        _body = NULL;
-    }
-}
-
-
 // ** Create the response socket **
 void         HttpResponse::processResponse()
 {
@@ -682,15 +570,4 @@ void         HttpResponse::processResponse()
     response.append("\r\n");
     setResponseSize(response);
     setBodyResponse(response);
-}
-
-
-char*         HttpResponse::getResponse()
-{
-    return _response;
-}
-
-int             HttpResponse::getResponseSize()
-{
-    return _responseSize;
 }

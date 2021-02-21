@@ -6,7 +6,7 @@
 /*   By: yorn <yorn@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/30 15:10:55 by trbonnes          #+#    #+#             */
-/*   Updated: 2021/02/19 19:44:30 by yorn             ###   ########.fr       */
+/*   Updated: 2021/02/19 20:02:33 by yorn             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ HttpRequest::HttpRequest() :
 _method(),
 _requestURI(),
 _httpVersion(),
-_contentLength(),
+_contentLength(-1),
 _contentLocation(),
 _contentType(),
 _multipartContent(),

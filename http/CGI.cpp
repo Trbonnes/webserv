@@ -132,8 +132,6 @@ void        HttpResponse::cgi_exe()
 
     ret = EXIT_SUCCESS;
     ft_bzero(args, sizeof(args));
-    pipe(_cgi_in);
-    pipe(_cgi_out); // TO DO check error
 
     pid = fork();
     if (pid < 0)
@@ -221,16 +219,6 @@ int           HttpResponse::write_cgi_request()
     Log::debug("Wrote to CGI");
      _socket.getBody().clear();
     return ret;
-}
-
-int           HttpResponse::get_cgi_in()
-{
-    return  _cgi_in[SIDE_IN];
-}
-
-int           HttpResponse::get_cgi_out()
-{
-    return  _cgi_out[SIDE_OUT];
 }
 
 bool          HttpResponse::use_cgi()

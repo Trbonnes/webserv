@@ -67,11 +67,12 @@ class   HttpResponse
     StatusCode                  _mapCodes;
     CGI                         _cgi;
     bool                        _use_cgi;
-    int                         _cgi_in[2];
-    int                         _cgi_out[2];
+
     // File streams
     int                         _stream_in;
     int                         _stream_out;
+
+    // Utils
     std::string                 _uri;
     std::string                 _route;
     std::string                 _location;
@@ -83,6 +84,7 @@ class   HttpResponse
     int                         _statusCode;
     std::vector<std::string>    _allow;
     std::string                 _wwwAuthenticate;
+    std::string                 _transferEncoding;
     std::string                 _referer;
     char                        _lastModified[100];
     char                        _date[100];
@@ -95,13 +97,9 @@ class   HttpResponse
     std::string                 _retryAfter;
     std::string                 _transferEncoding;
     
-    // body
-    char*                       _body;
-    std::string                 _cgiResponse;
-    // char*                       _cgiResponse;
-    char*                       _response;
-    int                         _responseSize;
 
+    // The http headers as a string buffer
+    std::string                 _httpHeaders;
 
 
     void            prepapreMethod(std::string method);
@@ -110,14 +108,18 @@ class   HttpResponse
     int             checkAllowMethods(std::string method);
     int             checkCGImethods(std::string method);
     void            setConfigURI(void);
-    void            replaceURI(void);
 
-    // GET
+    
+    void            openStreams();
+    char*           readBody();
+
+
+    // Getters
     void            getInit();
     void            get(void);
-    int             openFile(void);
-    void            setRoot(void);
+    //Setters
     void            setBody(int fd);
+    void            setRoot(void);
     void            setContentType(void);
     std::string     acceptLanguage(void);
     void            setStat(void);
@@ -125,11 +127,12 @@ class   HttpResponse
     void            setServerName(void);
     void            setContentLocation(void);
     void            setCharset(void);
-    void            authorization(void);
     void            setLastModified(void);
     void            setDate(void);
     void            setAutoindex(void);
 
+    void            authorization(void);
+    int             openFile(void);
     // AUTHORIZATION BASE64
     static inline
     bool            is_base64(unsigned char c);
@@ -154,7 +157,6 @@ class   HttpResponse
 
     // ERRORS
     void            configureErrorFile(void);
-    int             checkRequestErrors(void);
 
     public:
     HttpResponse();
@@ -167,8 +169,6 @@ class   HttpResponse
     // RESPONSE
     void            read_cgi_response();
     int             write_cgi_request();
-    int             get_cgi_in();
-    int             get_cgi_out();
     bool            use_cgi();
     void            processResponse();
     char*           getResponse();
