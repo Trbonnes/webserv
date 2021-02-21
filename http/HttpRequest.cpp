@@ -6,7 +6,7 @@
 /*   By: yorn <yorn@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/30 15:10:55 by trbonnes          #+#    #+#             */
-/*   Updated: 2021/02/19 20:02:33 by yorn             ###   ########.fr       */
+/*   Updated: 2021/02/21 19:10:37 by yorn             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,8 @@ _host(),
 _port(),
 _userAgent(),
 _xSecret(),
-_body() {
+_body_received(0)
+{
 }
 
 HttpRequest::HttpRequest(HttpRequest const &copy)
@@ -52,6 +53,7 @@ HttpRequest::HttpRequest(HttpRequest const &copy)
 	_port = copy._port;
     _userAgent = copy._userAgent;
     _body = copy._body;
+    _body_received = copy._body_received;
 	_xSecret = copy._xSecret;
 }
 
@@ -77,6 +79,7 @@ HttpRequest      &HttpRequest::operator=(HttpRequest const &rhs)
 	_port = rhs._port;
     _userAgent = rhs._userAgent;
     _body = rhs._body;
+    _body_received = rhs._body_received;
 	_xSecret = rhs._xSecret;
     return *this;
 }

@@ -30,6 +30,7 @@ Http& Http::operator=(const Http &c)
 // The bytes have already been loaded into _read_cahin by ths point
 void Http::handleRead()
 {
+	Log::debug("handleRead()");
 	// if null then headers are not fully received
 	if (_req == NULL)
 	{
@@ -39,6 +40,7 @@ void Http::handleRead()
 		// If the end of headers are reached
 		if ((needle = ft_strnstr(last->data, "\r\n\r\n", last->size)))
 		{
+			Log::debug("End of headers reached !");
 			std::string request("");
 
 			// Concatenate headers
@@ -46,26 +48,24 @@ void Http::handleRead()
 			while (curr != last)
 			{
 				request.append(curr->data, curr->size);
-				_read_chain.popFirst();
 				delete[] curr->data;
+				_read_chain.popFirst();
 				curr = _read_chain.getFirst();
 			}
 			// Concatenate last buffer
 			unsigned int diff = needle - curr->data + 1;
 			if (diff > 0)
 				request.append(curr->data, diff);
+			// Launch http parsing on newly formed request
+			_req = HttpRequest::parseRequest(request);
 			// check if some body is left
 			if (diff + 4 < curr->size)
 			{
-				_stream_write_chain.copyPushBack(curr->data + diff + 4, curr->size - (diff + 4));
+				_read_chain.copyPushBack(curr->data + diff + 4, curr->size - (diff + 4));
 			}
-			_read_chain.popFirst();
 			delete[] curr->data;
+			_read_chain.popFirst();
 			
-			// Launch http parsing on newly formed request
-			_req = HttpRequest::parseRequest(request);
-			Log::debug(_req->getContentLength());
-
 			// Instantiate a new response
 			_rep = new HttpResponse(_req, _config->getServerUnit(_req->getPort(), _req->getHost()));
 			
@@ -91,55 +91,62 @@ void Http::handleRead()
 			// }
 		}
 	}
-	// if (_rep != NULL)
-	// {
-	// 	// If all the body has been read, just ignore those packets
-	// 	if (bodysize > _req->getContentLength())
+	// if it's not NUll then we have work to do
+	// it's not in an else statement, cause the above if statement will have some body leftovers in the read chain
+	if (_rep != NULL && _read_chain.getFirst() != NULL)
 	{
-		_connection.subWrite();
-		return;
+		Log::debug("Reading body");
+		char *target = NULL;
+		size_t size = 0;
+		bool	end = false;
+		// If it is chunked we need to extract those into a new buffer
+		if (_req->getTransferEncoding() == "chunked")
+		{
+			// Extract the chunks for the curent request
+			// end = HttpRequest::extractChunks(_read_chain, &target, &size);	
+		}
+		else
+		{
+			end = HttpRequest::extractBody(_read_chain, _stream_write_chain, _req);
+		}
+		// if end then all body has been received
+		if (end)
+		{
+			Log::debug("End of read");
+			// unsub read so we pause the read process
+			std::cout << _stream_write_chain;
+			_connection.unsubRead();
+		}
+		if (target)
+			_stream_write_chain.pushBack(target, size);
+		// if (ignore_body)
+		// 	_stream_write_chain.flush();
 	}
-
-
-	// 	// Here the headers have been received, but not the entire body
-	// 	// If it is chunked, we need to get rid of them
-	// 	if (_req->getTransferEncoding() == "chunked")
-	// 	{
-	// 		HttpRequest::parseChunks(_read_chain, _stream_write_chain);
-	// 	}
-	// 	// else proceed as usual
-	// 	else
-	// 	{
-	// 		HttpRequest::parseBody(_read_chain, _stream_write_chain);
-	// 		// Getting the last body buffer read on this chain
-	// 		BufferChain::buffer_t *buff = _read_chain.getFirst();
-
-	// 		_stream_write_chain.pushBack(buff->data, buff->size);
-	// 		_read_chain.popFirst();
-	// 	}
-
-	// 	// If the body is to be ignored, flush the stream's input buffer
-	// 	if (ignore_body)
-	// 		_stream_write_chain.flush();
-	// 	// else stream the fd
-	// 	else
-	// 		_connection.subStreamWrite();
-	// }
 }
 
 void Http::handleStreamRead()
 {
-	// if (BufferChain::readToBuffer(_stream_read_chain, _rep->getStreamOut()) == 0)
-	// {
-	// 	if (_req->getTransferEncoding() == "chunked")
-	// 	{
-	// 		HttpRequest::parseChunks(_read_chain, _stream_write_chain);
-	// 	}
-	// 	else
-	// 	{
+	// char* buff = NULL;
+	// size_t read;
 
-	// 	}
+	// // If read buffer are supposed to get chunked out
+	// if (_rep->getTransferEncoding() == "chunked")
+	// {
+	// 	read = _rep->parseChunk(&buff);
 	// }
+	// else
+	// {
+	// 	read = _rep->parseBody(&buff);
+	// }
+	// // if EOF
+	// if (read == 0)
+	// {
+	// 	_connection.unsubStreamRead();
+	// 	return;
+	// }
+	// _write_chain.pushBack(buff, read);
+	// TO DO can we really have a larger buffer chain than content length ?
+
 }
 
 void Http::handleStreamWrite()

@@ -2,13 +2,11 @@
 
 void        HttpResponse::put()
 {
-    int         fd;
+    int         fd = 0;
     std::string str;
     std::string file;
 
-    file = _uri.substr(_location.substr(0, _location.length() - 1).length(), _uri.length());
-    _route.assign(_config.getPutRoot()).append(file);
-    fd = open(_route.c_str(), O_WRONLY | O_TRUNC);
+    
     if (fd == -1)
     {
         _statusCode = NO_CONTENT; // Should be 201 but the tester expect 204
@@ -16,12 +14,12 @@ void        HttpResponse::put()
         if (fd == -1)
             _statusCode = INTERNAL_SERVER_ERROR;
         else
-            write(fd, _socket.getBody().c_str(), _socket.getContentLength());
+            write(fd, _request->getBody().c_str(), _request->getContentLength());
     }
     else
     {
         _statusCode = NO_CONTENT;
-        write(fd, _socket.getBody().c_str(), _socket.getContentLength());
+        write(fd, _request->getBody().c_str(), _request->getContentLength());
     }
     close(fd);
     setContentLocation();

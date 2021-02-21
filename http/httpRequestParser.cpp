@@ -6,7 +6,7 @@
 /*   By: yorn <yorn@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/30 15:45:46 by trbonnes          #+#    #+#             */
-/*   Updated: 2021/02/19 19:39:56 by yorn             ###   ########.fr       */
+/*   Updated: 2021/02/21 20:24:41 by yorn             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -228,10 +228,6 @@ static int		httpRequestParseRequestLine(std::string request, HttpRequest *socket
 	return 0;
 }
 
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-
 HttpRequest* HttpRequest::parseRequest(std::string &request) {
 
 	HttpRequest *socket;
@@ -242,4 +238,60 @@ HttpRequest* HttpRequest::parseRequest(std::string &request) {
 	// httpRequestParseBody(request, socket);
 	// request.clear();
 	return socket;
+}
+
+
+
+// bool         HttpRequest::extractChunks(BufferChain&, char**, size_t*)
+// {
+
+// }
+
+int      HttpRequest::getBodyReceived()
+{
+	return _body_received;
+}
+
+void     HttpRequest::incBodyReceived(int value)
+{
+	_body_received += value;
+}
+
+bool         HttpRequest::extractBody(BufferChain& read_chain, BufferChain& stream_write_chain, HttpRequest* request)
+{
+	int diff;
+	BufferChain::buffer_t *buff;
+
+	// whle there are buffers to read or break
+	while ((buff = read_chain.getFirst()) != NULL)
+	{
+		Log::debug("loop");
+		// This is how many byte left do we need to read to have the full body
+		diff = request->getContentLength() - request->getBodyReceived();
+		// If the buffer doesn't contains the end of the body
+		if (diff > (int)buff->size)
+		{
+			stream_write_chain.pushBack(buff->data, buff->size);
+			request->incBodyReceived(buff->size);
+			Log::debug("Reading all buffer");
+			Log::debug(diff);
+			Log::debug((int)buff->size);
+			read_chain.popFirst();
+		}
+		// else the buffer contains the last bytes needed
+		else
+		{
+			stream_write_chain.copyPushBack(buff->data, diff);
+			request->incBodyReceived(diff);
+			// TO DO manage leftovers
+			delete[] buff->data;
+			read_chain.popFirst();
+			Log::debug("Reading a part of the buffer	");
+			break;
+		}
+	}
+	// If the body receveived match the content lenght we've read all the body
+	if (request->getBodyReceived() == request->getContentLength())
+		return true;
+	return false;
 }

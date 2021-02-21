@@ -1,13 +1,5 @@
 #include "../HttpResponse.hpp"
 
-
-
-// First it opens the file, 
-void        HttpResponse::getInit()
-{
-    _stream_out = openFile();
-}
-
 void        HttpResponse::get()
 {
     std::string root;
@@ -15,7 +7,7 @@ void        HttpResponse::get()
     authorization();
     if (_statusCode == OK)
     {
-        setBody(_stream_out);
+        // setBody(_stream_out);
         setLastModified();
         setContentType();
         setCharset();
@@ -49,8 +41,8 @@ std::string     HttpResponse::acceptLanguage()
     if (!_config.getLanguage(_location).empty())
     {
         str.assign("/");
-        itClientBegin = _socket.getAcceptLanguage().begin();
-        itClientEnd = _socket.getAcceptLanguage().end();
+        itClientBegin = _request->getAcceptLanguage().begin();
+        itClientEnd = _request->getAcceptLanguage().end();
         itServerEnd = _config.getLanguage(_location).end();
         while (itClientBegin != itClientEnd)
         {
@@ -143,6 +135,6 @@ void            HttpResponse::setAutoindex(void)
     _contentLength = body.length();
     _contentType = "text/html";
     _charset = "utf-8";
-    _body = (char*)ft_calloc(_contentLength + 1, sizeof(char));
-    ft_strcpy(_body, body.c_str());
+    // _body = (char*)ft_calloc(_contentLength + 1, sizeof(char));
+    // ft_strcpy(_body, body.c_str());
 }

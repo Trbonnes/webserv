@@ -1,17 +1,6 @@
 #include "HttpResponse.hpp"
 #include "CGI.hpp"
 
-bool        HttpResponse::cgi_fd_exist()
-{
-    int     fd;
-
-    fd = openFile();
-    close(fd);
-    if (_statusCode == OK)
-        return true;
-    return false;
-}
-
 //** Check if the method is autorized for the CGI locations **
 int         HttpResponse::checkCGImethods(std::string method)
 {
@@ -41,23 +30,23 @@ void        HttpResponse::cgi_metaVariables()
     size_t      query;
 
     _cgi._redirect_status = "200";
-    _cgi._auth_type = _socket.getAuthorization(); 
-    _cgi._content_length = _socket.getContentLength();
-    _cgi._content_type = _socket.getContentType();
+    _cgi._auth_type = _request->getAuthorization(); 
+    _cgi._content_length = _request->getContentLength();
+    _cgi._content_type = _request->getContentType();
     _cgi._gateway_interface = "CGI/1.1";
     query = str.assign(_route).find('?', 0);
-    _cgi._path_info = _socket.getRequestURI();
+    _cgi._path_info = _request->getRequestURI();
     _cgi._path_translated = _route;
     if (query == str.npos)
        _cgi._query_string = str.assign(_route).erase(0, query);
     _cgi._remote_addr = "127.0.0.1";
     _cgi._remote_ident = "login_user";
     _cgi._remote_user = "user";
-    _cgi._request_method = _socket.getMethod();
-    _cgi._request_uri = _socket.getRequestURI();
+    _cgi._request_method = _request->getMethod();
+    _cgi._request_uri = _request->getRequestURI();
     _cgi._script_name = _config.getCGI_root(_location);
-    _cgi._server_name = _socket.getHost();
-    char *tmp = ft_itoa(_socket.getPort());
+    _cgi._server_name = _request->getHost();
+    char *tmp = ft_itoa(_request->getPort());
     _cgi._server_port = tmp;
     free(tmp);
     _cgi._server_protocol = _config.getHttpVersion();
@@ -86,7 +75,7 @@ void        HttpResponse::setEnv()
     _cgi_env[SERVER_PORT] = ft_strdup(_cgi._server_port.insert(0, "SERVER_PORT=").c_str());
     _cgi_env[SERVER_PROTOCOL] = ft_strdup(_cgi._server_protocol.insert(0, "SERVER_PROTOCOL=").c_str());
     _cgi_env[SERVER_SOFTWARE] = ft_strdup(_cgi._server_software.insert(0, "SERVER_SOFTWARE=").c_str());
-    if (_socket.getXSecret().compare(""))
+    if (_request->getXSecret().compare(""))
         _cgi_env[X_SECRET] = ft_strdup("HTTP_X_SECRET_HEADER_FOR_TEST=1");
     _cgi_env[NB_METAVARIABLES] = NULL;
 }
@@ -140,10 +129,10 @@ void        HttpResponse::cgi_exe()
     {
             Log::debug("CGI launched\n");
 
-        close(_cgi_in[SIDE_IN]);
-        close(_cgi_out[SIDE_OUT]);
-        dup2(_cgi_in[SIDE_OUT], STDIN_FILENO);
-        dup2(_cgi_out[SIDE_IN], STDOUT_FILENO);
+        // close(_cgi_in[SIDE_IN]);
+        // close(_cgi_out[SIDE_OUT]);
+        // dup2(_cgi_in[SIDE_OUT], STDIN_FILENO);
+        // dup2(_cgi_out[SIDE_IN], STDOUT_FILENO);
         args[0] = ft_strdup(_config.getCGI_root(_location).c_str());
         if ((ret = execve(args[0], args, _cgi_env)) == -1)
         {
@@ -154,24 +143,24 @@ void        HttpResponse::cgi_exe()
     }
     else
     {
-        close(_cgi_in[SIDE_OUT]);
-        close(_cgi_out[SIDE_IN]);
+        // close(_cgi_in[SIDE_OUT]);
+        // close(_cgi_out[SIDE_IN]);
     }
 }
 
 void        HttpResponse::cgi_parse()
 {
-    size_t      find;
+    // size_t      find;
 
-    find = _cgiResponse.find("\r\n\r\n");
-    if (find != _cgiResponse.npos)
-        _contentLength = _responseSize - find - 4;
-    find = _cgiResponse.find("Status: ");
-    if (find != _cgiResponse.npos)
-        _statusCode = ft_atoi(_cgiResponse.substr(find + ft_strlen("Status: "), find + ft_strlen("Status: ") + 3).c_str());
-    find = _cgiResponse.find("Content-Type: ");
-    if (find != _cgiResponse.npos)
-        _contentType = _cgiResponse.substr(find + ft_strlen("Content-Type: "), _cgiResponse.find("\r\n", find) - find - ft_strlen("Content-Type: "));
+    // find = _cgiResponse.find("\r\n\r\n");
+    // if (find != _cgiResponse.npos)
+        // _contentLength = _responseSize - find - 4;
+    // find = _cgiResponse.find("Status: ");
+    // if (find != _cgiResponse.npos)
+    //     _statusCode = ft_atoi(_cgiResponse.substr(find + ft_strlen("Status: "), find + ft_strlen("Status: ") + 3).c_str());
+    // find = _cgiResponse.find("Content-Type: ");
+    // if (find != _cgiResponse.npos)
+    //     _contentType = _cgiResponse.substr(find + ft_strlen("Content-Type: "), _cgiResponse.find("\r\n", find) - find - ft_strlen("Content-Type: "));
 }
 
 
@@ -184,23 +173,23 @@ void            HttpResponse::prepare_cgi()
 
 void            HttpResponse::read_cgi_response()
 {
-    int ret;
+    int ret = 0;
     char        buf[1024];
 
     ft_bzero(buf, 1024);
-    std::string().swap(_socket.getBody());
-    LoadController::loadController(_socket.getContentLength() + 100, _cgiResponse);
-    while ((ret = read(_cgi_out[SIDE_OUT], buf, 1024)) > 0) {
-        _responseSize += ret;
-        buf[ret] = '\0';
-        _cgiResponse.append(buf);
-    }
+    std::string().swap(_request->getBody());
+    // LoadController::loadController(_request->getContentLength() + 100, _cgiResponse);
+    // while ((ret = read(_cgi_out[SIDE_OUT], buf, 1024)) > 0) {
+    //     // _responseSize += ret;
+    //     buf[ret] = '\0';
+    //     _cgiResponse.append(buf);
+    // }
 
      if (ret == -1)
         _statusCode = BAD_GATEWAY;
 
-    close(_cgi_in[SIDE_IN]);
-    close(_cgi_out[SIDE_OUT]);
+    // close(_cgi_in[SIDE_IN]);
+    // close(_cgi_out[SIDE_OUT]);
     // if (WIFEXITED(status))
     //     ret = WEXITSTATUS(status);
     // if (ret != EXIT_SUCCESS)
@@ -212,12 +201,12 @@ void            HttpResponse::read_cgi_response()
 
 int           HttpResponse::write_cgi_request()
 {
-    int ret;
+    int ret = 0;
 
     Log::debug("About to write to CGI");
-    ret = write(_cgi_in[SIDE_IN], _socket.getBody().c_str(), _socket.getContentLength());
+    // ret = write(_cgi_in[SIDE_IN], _request->getBody().c_str(), _request->getContentLength());
     Log::debug("Wrote to CGI");
-     _socket.getBody().clear();
+     _request->getBody().clear();
     return ret;
 }
 

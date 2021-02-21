@@ -4,15 +4,16 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <stdlib.h>
-#include <queue>
-#include "utils/utils.hpp" 
+#include <list>
+#include <iostream>
+#include "utils/utils.hpp"
 
 // Socket/Stream read write buffer
 // default nginx client buffer size on 64 bit systems 
 // It should be enough to hold most Http request headers, but we got to implement the case where it is too small
 #define BUFFER_SIZE_MEDIUM 16384
-#define BUFFER_SIZE_LARGE 1024000
-// #define BUFFER_SIZE_LARGE 10 // TO DO don't forget to remove
+// #define BUFFER_SIZE_LARGE 1024000
+#define BUFFER_SIZE_LARGE 10 // TO DO don't forget to remove
 
 
 // Buffer used in socket and filesystem read
@@ -26,19 +27,21 @@ typedef int FD;
 class BufferChain
 {
 public:
+	// The buffer pair structure
 	typedef struct	buffer_s // TO DO should put this in private ?
 	{
 		char *data;
 		size_t size;
 	}				buffer_t;
 
+	typedef std::list<buffer_t>::iterator iterator;
+ 
 private:
 
 	// The actual buffer list
-	std::queue<buffer_t> _chain;
+	std::list<buffer_t> _chain;
 
 public:
-	// The buffer pair structure
 
 	// Coplien
 	BufferChain();
@@ -64,12 +67,19 @@ public:
 	void	flush();
 	static int	writeBufferToFd(BufferChain&, FD);
 	static int	readToBuffer(BufferChain&, FD);
+
+	iterator begin();
+	iterator end();
+	size_t size();
 };
 
 class	IOError: public std::exception {
 	public:
 		virtual const char* what() const throw();
 };
+
+
+std::ostream&	operator<<(std::ostream&, BufferChain&);
 
 // Non-class members to write and read directly to/from a BufferChain
 #endif // BUFFER_CHAIN

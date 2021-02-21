@@ -3,18 +3,19 @@
 //** absolute location route for the user agent **
 void        HttpResponse::setContentLocation()
 {
-    _contentLocation.assign("http://").append(_socket.getHost()).append("/").append(_route);
+    _contentLocation.assign("http://").append(_request->getHost()).append("/").append(_route);
 }
 
 //** Copy file into body string **
 void        HttpResponse::setBody(int fd)
 {
-    int     ret;
+    (void) fd;
+    // int     ret;
 
-    _body = (char*)ft_calloc(_stat.st_size, sizeof(char));
-    ret = read(fd, _body, _stat.st_size);
-    if (ret == -1)
-        _statusCode = INTERNAL_SERVER_ERROR;
+    // // _body = (char*)ft_calloc(_stat.st_size, sizeof(char));
+    // // ret = read(fd, _body, _stat.st_size);
+    // if (ret == -1)
+    //     _statusCode = INTERNAL_SERVER_ERROR;
 }
 
 void        HttpResponse::setCharset(void)
@@ -25,7 +26,7 @@ void        HttpResponse::setCharset(void)
 
 void        HttpResponse::setServerName()
 {
-    _server = _socket.getHost();
+    _server = _request->getHost();
 }
 
 void        HttpResponse::setContentLength()

@@ -62,15 +62,15 @@ class   HttpResponse
 
 
 
-    HttpRequest                 _socket;
+    HttpRequest*                _request;
     ConfigServer                _config;
     StatusCode                  _mapCodes;
     CGI                         _cgi;
     bool                        _use_cgi;
 
     // File streams
-    int                         _stream_in;
-    int                         _stream_out;
+    int                         _stream_write;
+    int                         _stream_read;
 
     // Utils
     std::string                 _uri;
@@ -84,7 +84,6 @@ class   HttpResponse
     int                         _statusCode;
     std::vector<std::string>    _allow;
     std::string                 _wwwAuthenticate;
-    std::string                 _transferEncoding;
     std::string                 _referer;
     char                        _lastModified[100];
     char                        _date[100];
@@ -114,10 +113,8 @@ class   HttpResponse
     char*           readBody();
 
 
-    // Getters
-    void            getInit();
-    void            get(void);
-    //Setters
+
+    // Setters
     void            setBody(int fd);
     void            setRoot(void);
     void            setContentType(void);
@@ -141,7 +138,6 @@ class   HttpResponse
 
     // CGI
     void            prepare_cgi();
-    bool            cgi_fd_exist();
     void            cgi_metaVariables();
     void            cgi_exe();
     void            cgi_parse();
@@ -149,6 +145,9 @@ class   HttpResponse
     int             is_good_exe(std::string exe);
     static bool     mypred(char val1, char val2);
 
+    //GET
+    void            get(void);
+    
     // PUT
     void            put(void);
     
@@ -166,18 +165,17 @@ class   HttpResponse
 
     HttpResponse            &operator=(HttpResponse &rhs);
 
+    //Getters
+    std::string&    getTransferEncoding();
+
     // RESPONSE
     void            read_cgi_response();
     int             write_cgi_request();
     bool            use_cgi();
     void            processResponse();
-    char*           getResponse();
     void            setFirstHeadersResponse(std::string &response);
     void            setAllowMethodsResponse(std::string &response);
     void            setOtherHeaders(std::string &response);
-    void            setResponseSize(std::string &response);
-    void            setBodyResponse(std::string &response);
-    int             getResponseSize();
 };
 
 #endif

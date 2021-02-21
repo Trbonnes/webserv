@@ -30,7 +30,7 @@ void	BufferChain::pushBack(char* toadd, size_t size)
 	buffer_t pair;
 	pair.data = toadd;
 	pair.size = size;
-	_chain.push(pair);
+	_chain.push_back(pair);
 }
 
 void	BufferChain::copyPushBack(char *tocopy, size_t size)
@@ -58,7 +58,22 @@ BufferChain::buffer_t* BufferChain::getLast()
 
 void BufferChain::popFirst()
 {
-	_chain.pop();
+	_chain.pop_front();
+}
+
+BufferChain::iterator BufferChain::begin()
+{
+	return _chain.begin();
+}
+
+BufferChain::iterator BufferChain::end()
+{
+	return _chain.end();
+}
+
+size_t BufferChain::size()
+{
+	return _chain.size();
 }
 
 void	BufferChain::flush()
@@ -100,4 +115,22 @@ int		BufferChain::readToBuffer(BufferChain& chain, FD fd)
 const char* IOError::what() const throw()
 {
 	return "An input or output eror has occurred";
+}
+
+std::ostream&	operator<<(std::ostream& out, BufferChain& chain)
+{
+	BufferChain::iterator it = chain.begin();
+
+	out << "BufferChain: .size=" << chain.size() << std::endl;
+	while (it != chain.end())
+	{
+		out << "|";
+		for (size_t i = 0; i < it->size; i++)
+			out << it->data[i]; // Not optimized but hey it's the easiest given the subject restricion on <cstring>
+		// out.width(it->size);
+		out << "| ";
+		it++;
+	}
+	out << std::endl;
+	return out;
 }

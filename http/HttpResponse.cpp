@@ -6,7 +6,7 @@ const std::string HttpResponse::_base64_chars =
              "0123456789+/";
 
 HttpResponse::HttpResponse() :
-_socket(),
+_request(NULL),
 _config(),
 _mapCodes(),
 _cgi(),
@@ -30,8 +30,8 @@ _transferEncoding("")
     ft_bzero(_cgi_env, sizeof(NB_METAVARIABLES + 1));
 }
 
-HttpResponse::HttpResponse(HttpRequest *socket, ConfigServer *config) :
-_socket(*socket),
+HttpResponse::HttpResponse(HttpRequest *req, ConfigServer *config) :
+_request(req),
 _config(*config),
 _mapCodes(),
 _cgi(),
@@ -54,39 +54,45 @@ _retryAfter(""),
 _transferEncoding("")
 {
     ft_bzero(_cgi_env, sizeof(char*) * NB_METAVARIABLES + 1);
+    
+    // Stogin the request for later use
+    _request = req;
+    _stream_read = -1;
+    _stream_write = -1;
 
     // Check if lenght is given
-    if (_socket.getBody().length() > 0 && _socket.getContentLength() == 0 && _socket.getTransferEncoding().length() == 0)
+    if (_request->getBody().length() > 0 && _request->getContentLength() == 0 && _request->getTransferEncoding().length() == 0)
     {
         _statusCode = LENGTH_REQUIRED;
     }
     
-    _uri = _socket.getRequestURI();
+    _uri = _request->getRequestURI();
     
     // Absolute location route for the server
     _location = _config.getLocation(_uri);
     
     // Check to see if the request body is too large for the 
-    if (_config.getClientBodySize(_location) != -1 && _socket.getContentLength() > _config.getClientBodySize(_location))
+    if (_config.getClientBodySize(_location) != -1 && _request->getContentLength() > _config.getClientBodySize(_location))
     {
         _statusCode = REQUEST_ENTITY_TOO_LARGE;
         return ;
     }
-    if (_socket.getMethod().compare("PUT"))
+    if (_request->getMethod().compare("PUT"))
     {
         setRoot();
         setStat();
     }
-    if (_socket.getMethod().compare("OPTIONS") == 0)
+    if (_request->getMethod().compare("OPTIONS") == 0)
     {
         _statusCode = NO_CONTENT;
         return ;
     }
+    openStreams();
 }
 
 HttpResponse::HttpResponse(HttpResponse &copy)
 {
-    _socket = copy._socket;
+    _request = copy._request;
     _config = copy._config;
     _stat = copy._stat;
     _allow = copy._allow;
@@ -102,10 +108,6 @@ HttpResponse::HttpResponse(HttpResponse &copy)
     ft_strcpy(copy._date, _date);
     _retryAfter = copy._retryAfter;
     _transferEncoding = copy._transferEncoding;
-    _body = ft_strdup(copy._body);
-    _cgiResponse = copy._cgiResponse;
-    _response = ft_strdup(copy._response);
-    _responseSize = copy._responseSize;
 }
 
 HttpResponse::~HttpResponse()
@@ -124,7 +126,7 @@ HttpResponse::~HttpResponse()
 
 HttpResponse     &HttpResponse::operator=(HttpResponse &rhs)
 {
-    _socket = rhs._socket;
+    _request = rhs._request;
     _config = rhs._config;
     _stat = rhs._stat;
     _allow = rhs._allow;
@@ -143,31 +145,62 @@ HttpResponse     &HttpResponse::operator=(HttpResponse &rhs)
     return *this;
 }
 
+
+// This method opens the read/write streams needed to pursue the request 
 void            HttpResponse::openStreams()
 {
     size_t      extension;
     std::string str;
 
     extension = _route.find_last_of('.');
-    // If it's a CGI request we must fork and prepare the file streas
-    if (is_good_exe(str.assign(_route).erase(0, extension + 1)) && checkCGImethods(_socket.getMethod()))
+    // If it's a CGI request we must fork and prepare the stream in and out
+    if (is_good_exe(str.assign(_route).erase(0, extension + 1)) && checkCGImethods(_request->getMethod()))
     {
         _use_cgi = true;
         prepare_cgi();
+        return;
     }
-    // else We must prepare the file streams
-    else if (checkAllowMethods(_socket.getMethod()))
+
+    // If it's not CGI we got to open read streams or write streams
+    if (checkAllowMethods(_request->getMethod()))
     {
+        
+        std::string& method = _request->getMethod();
+        
+        // If GET or HEAD we must open the stream in
         if (method.compare("GET") == 0 || method.compare("HEAD") == 0)
-            initGet();
+        {
+            int         fd;
+            struct stat file;
+
+            fd = -1;
+            ft_bzero(&file, sizeof(file));
+            stat(_route.c_str(), &file);
+            if ((S_ISREG(file.st_mode) && (fd = open(_route.c_str(), O_RDONLY)) != -1))
+                _statusCode = OK;
+            else
+                _statusCode = NOT_FOUND;
+            _stream_read = fd;
+        }
+        
+        // If PUT then open a stream out
         else if (method.compare("PUT") == 0)
-            initPut();
-        else if (method.compare("DELETE") == 0)
-            del();
+        {
+            // Getting path root and appending the file's name
+            std::string file = _uri.substr(_location.substr(0, _location.length() - 1).length(), _uri.length());
+            _route.assign(_config.getPutRoot()).append(file);
+            
+            // opening the ouputStream
+            _stream_write = open(_route.c_str(), O_WRONLY | O_TRUNC);
+            if (_stream_write == -1)
+                _statusCode = FORBIDDEN; // TO DO is this the right code to use ? shouldn't it depend on errno ?
+        }
+        // Else we're doomed
         else
         {
+            // Run while you can
             _contentLength = 2;
-            _body = ft_strdup("OK");
+            // _body = ft_strdup("OK");
         }
     }
         // If else the method is not allowed
@@ -187,7 +220,7 @@ void        HttpResponse::callMethod(std::string method)
     else
     {
         _contentLength = 2;
-        _body = ft_strdup("OK");
+        // _body = ft_strdup("OK");
     }
 }
 
@@ -221,22 +254,6 @@ void        HttpResponse::setStat()
     stat(_route.c_str(), &_stat);
 }
 
-//** Open file **
-int         HttpResponse::openFile()
-{
-    int         fd;
-    struct stat file;
-
-    fd = -1;
-    ft_bzero(&file, sizeof(file));
-    stat(_route.c_str(), &file);
-    if ((S_ISREG(file.st_mode) && (fd = open(_route.c_str(), O_RDONLY)) != -1))
-        _statusCode = OK;
-    else
-        _statusCode = NOT_FOUND;
-    return fd;
-}
-
 // ** Set the root with language and location directory if needed **
 void         HttpResponse::setRoot()
 {
@@ -251,7 +268,7 @@ void         HttpResponse::setRoot()
     if (_uri.compare(0, 4, "http") == 0)
     {
         //** Absolute path **
-        find = _route.append(_socket.getRequestURI()).find(_socket.getHost());
+        find = _route.append(_request->getRequestURI()).find(_request->getHost());
         _route.erase(0, find + _config.getServerName()[0].length());
         _route.insert(0, _config.getRoot(_location));
         _route.insert(_config.getRoot(_location).length(), acceptLanguage());
@@ -267,13 +284,13 @@ void         HttpResponse::setRoot()
         else
         {
             _route.assign(_config.getRoot(_location));
-            _route.append(_socket.getRequestURI());
+            _route.append(_request->getRequestURI());
         }
         stat(_route.c_str(), &file);
 
         // ** If file exist or put request, return **
-        if (((S_ISREG(file.st_mode) && (fd = open(_route.c_str(), O_RDONLY)) != -1)) || _socket.getMethod().compare("PUT") == 0
-            || (((file.st_mode & S_IFMT) == S_IFDIR) && _socket.getMethod().compare("DELETE") == 0))
+        if (((S_ISREG(file.st_mode) && (fd = open(_route.c_str(), O_RDONLY)) != -1)) || _request->getMethod().compare("PUT") == 0
+            || (((file.st_mode & S_IFMT) == S_IFDIR) && _request->getMethod().compare("DELETE") == 0))
         {
             close(fd);
             return ;
@@ -284,12 +301,12 @@ void         HttpResponse::setRoot()
         if (_config.getAlias(_location).length() > 0)
             _route.assign(_config.getAlias(_location)).append("/");
         _route.append(acceptLanguage());
-        _route.append(str.assign(_socket.getRequestURI()).erase(0, _location.length()));
+        _route.append(str.assign(_request->getRequestURI()).erase(0, _location.length()));
         
         stat(_route.c_str(), &file);
         // ** If file exist or delete request, return **
         if ((((file.st_mode & S_IFMT) == S_IFREG && (fd = open(_route.c_str(), O_RDONLY)) != -1))
-        || _socket.getMethod().compare("DELETE") == 0)
+        || _request->getMethod().compare("DELETE") == 0)
         {
             close(fd);
             return ;
@@ -314,7 +331,7 @@ void         HttpResponse::setRoot()
         _route.assign(str);
     }
     if ((fd = open(_route.c_str(), O_RDONLY)) == -1)
-        _route = _socket.getRequestURI();
+        _route = _request->getRequestURI();
     else
         close(fd);
     return ;
@@ -330,7 +347,7 @@ void            HttpResponse::authorization()
 
     if (_config.getAuth_basic(_location).compare("") != 0)
     {
-        if (_socket.getAuthorization().compare("") == 0)
+        if (_request->getAuthorization().compare("") == 0)
             _statusCode = UNAUTHORIZED;
         else
         {
@@ -338,8 +355,8 @@ void            HttpResponse::authorization()
             {
                 while ((ret = get_next_line(fd, &line)) > 0)
                 {
-                    length = _socket.getAuthorization().length();
-                    if (base64_decode(_socket.getAuthorization().substr(6, length)).compare(line) == 0)
+                    length = _request->getAuthorization().length();
+                    if (base64_decode(_request->getAuthorization().substr(6, length)).compare(line) == 0)
                     {
                         _wwwAuthenticate.assign("OK");
                         break ;
@@ -347,7 +364,7 @@ void            HttpResponse::authorization()
                     free(line);
                     line = NULL;
                 }
-                if (base64_decode(_socket.getAuthorization().substr(6, length)).compare(line) == 0)
+                if (base64_decode(_request->getAuthorization().substr(6, length)).compare(line) == 0)
                     _wwwAuthenticate.assign("OK");
                 if (_wwwAuthenticate.compare("OK") != 0)
                     _statusCode = UNAUTHORIZED;
@@ -486,7 +503,7 @@ void        HttpResponse::configureErrorFile()
         setContentLength();
         setDate();
     }
-    _body = ft_strdup(body.c_str());
+    // _body = ft_strdup(body.c_str());
 }
 
 
@@ -548,7 +565,7 @@ void            HttpResponse::setOtherHeaders(std::string &response)
             response.append("Last-Modified: ").append(_lastModified).append("\r\n");
         if (_contentLocation.length() > 0)
             response.append("Content-Location: ").append(_contentLocation).append("\r\n");
-        if (_contentLanguage.length() > 0 && _socket.getMethod().compare("PUT") && _socket.getMethod().compare("DELETE"))
+        if (_contentLanguage.length() > 0 && _request->getMethod().compare("PUT") && _request->getMethod().compare("DELETE"))
             response.append("Content-Language: ").append(_contentLanguage).append("\r\n");
     }
     else if (_statusCode == UNAUTHORIZED)
@@ -563,11 +580,14 @@ void         HttpResponse::processResponse()
     if (_statusCode >= 300)
         configureErrorFile();
     setFirstHeadersResponse(response);
-    if (_socket.getMethod().compare("OPTIONS") == 0 || _statusCode == METHOD_NOT_ALLOWED)
+    if (_request->getMethod().compare("OPTIONS") == 0 || _statusCode == METHOD_NOT_ALLOWED)
         setAllowMethodsResponse(response);
     else
         setOtherHeaders(response);
     response.append("\r\n");
-    setResponseSize(response);
-    setBodyResponse(response);
+}
+
+std::string&    HttpResponse::getTransferEncoding()
+{
+    return _transferEncoding;
 }

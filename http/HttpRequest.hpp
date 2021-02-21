@@ -27,6 +27,7 @@
 # include <errno.h>
 
 # include "core/utils/utils.hpp"
+# include "core/BufferChain.hpp"
 # include "statusCodes.hpp"
 # include "core/Log.hpp"
 # include "LoadController.hpp"
@@ -116,7 +117,15 @@ class   HttpRequest
     void	setBody(std::string &sBody);
 	void	setXSecret(std::string XSecret);
 
+
+    // Parsing and extracting
+    int      _body_received;
+    int      getBodyReceived();
+    void     incBodyReceived(int);
+    
     static HttpRequest* parseRequest(std::string&);
+    static bool         extractChunks(BufferChain&, BufferChain&, HttpRequest*);
+    static bool         extractBody(BufferChain&, BufferChain&, HttpRequest*);
 
     class   ConnectionClose : public std::exception
 	{
