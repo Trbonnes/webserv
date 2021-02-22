@@ -6,7 +6,7 @@
 /*   By: yorn <yorn@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/30 15:45:46 by trbonnes          #+#    #+#             */
-/*   Updated: 2021/02/22 14:11:56 by yorn             ###   ########.fr       */
+/*   Updated: 2021/02/22 16:33:15 by yorn             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -115,56 +115,133 @@ HttpRequest* HttpRequest::parseRequest(std::string &request) {
 }
 
 
+static void cutLeftovers(BufferChain& chain, std::string* curr, size_t hexStart)
+{
+	std::string* leftovers;
+	if (hexStart > 0)
+	{
+		leftovers = new std::string(*curr, hexStart);
+		if (leftovers->size() == 0)
+			delete leftovers;
+		else
+			chain.pushFront(leftovers);
+		delete curr;
+	}
+	else
+	{
+		chain.pushFront(curr);
+	}
+}
+
+// TO DO might optimize this
+static void appendNext(BufferChain& chain, std::string* curr)
+{
+	std::string *first;
+
+	first = chain.getFirst();
+	curr->append(*first);
+	delete first;
+	chain.popFirst();
+	chain.pushFront(curr);
+}
+
+static int appendChunk(BufferChain& chain, std::string* dst, size_t *offset)
+{
+	size_t hexStart = *offset;
+	size_t endLen;
+
+	// popping the current buffer cause it's gonna be split
+	std::string *buff = chain.getFirst();
+	chain.popFirst();
+
+	endLen = buff->find("\r\n", hexStart);
+	// No symbol found
+	if (endLen == buff->npos)
+	{
+		// if the next buffer is not available, cut the current one
+		if (chain.getFirst() == NULL)
+		{
+			cutLeftovers(chain, buff, hexStart);
+			*offset = 0;
+			return 0;
+		}
+		// if the next buffer is available append it to the actual buffer
+		else
+		{
+			appendNext(chain, buff);
+			*offset = 0;
+			return 1;
+		}
+	}
+	// If this is true the lenght string is non existent
+	if (hexStart == endLen)
+		return -1;
+	std::string strLen(*buff, hexStart, endLen);
+	size_t bodyLen;
+	char* endptr;
+	bodyLen = std::strtol(strLen.c_str(), &endptr, 16);
+	// if it's not all in base 16
+	if ((unsigned long)(endptr - strLen.c_str()) != endLen - hexStart)
+		return -1;
+	// if all the body isn't in the chunk
+	size_t bodyStart = endLen + 2;
+	size_t bodyEnd = bodyStart + bodyLen + 2;
+	if (bodyEnd > buff->size())
+	{
+		// if the next buffer is not available, cut the current one
+		if (chain.getFirst() == NULL)
+		{
+			cutLeftovers(chain, buff, hexStart);
+			*offset = 0;
+			return 0;
+		}
+		// if the next buffer is available append it to the actual buffer
+		else
+		{
+			appendNext(chain, buff);
+			*offset = 0;
+			return 1;
+		}
+	}
+	if (bodyLen == 0)
+	{
+		cutLeftovers(chain, buff, bodyEnd);
+		return 2;
+	}
+	
+	dst->append(*buff, bodyStart, bodyLen);
+	*offset = bodyEnd;
+	chain.pushFront(buff);
+	return (1);
+}
 
 // Extract chunks into a regular body
-bool         HttpRequest::extractChunks(BufferChain& read_chain, BufferChain& stream_write_chain, HttpRequest* request)
+bool         HttpRequest::extractChunks(BufferChain& read_chain, BufferChain& stream_write_chain)
 { // TO DO optimizations
 
-	std::string* buff = new std::string("");
-	std::string* curr;
-	size_t	 	 bodylen;
-	size_t startLen = 0;
-	size_t endLen;
-	size_t startBody;
-	size_t len;
-	
-	while ((curr = read_chain.getFirst()) != NULL)
+	size_t offset = 0;
+	int r;
+	std::string* newBuffer = new std::string("");
+
+	offset = 0;
+	while ((r = appendChunk(read_chain, newBuffer, &offset)) == 1)
 	{
-
-		// Find an end for chunk sizze
-		end = curr->find("\r\n");
-		// if no match
-		if (end == buff->npos)
-		{
-			// return false if last buffer, and wait for the next read
-			if (curr == read_chain.getLast())
-				return false;
-			// esle concatenate with the next and relaunch the loop
-			else
-			{
-				read_chain.popFirst();
-				curr->append(*read_chain.getFirst());
-				delete read_chain.getFirst();
-				read_chain.popFirst();
-				// we're pushing it on the front so the loop takes it
-				read_chain.pushFront(curr);
-				continue;
-			}
-		}
-		
-
-		size_t numberEnd;
-		std::string tmp = buff->substr(startLen, buff->size - endLen);
-		bodylen = std::stoul(tmp, &numberEnd, 16);
-		// if the number doesn't span all the string
-		if (tmp.size() == 0 || startLen + numberEnd != endLen)
-			throw HttpRequest::MalformedChunk();
-		if (bodylen == 0)
-		{
-
-		}
-
+		std::cout << "|" << *newBuffer <<  "|" << std::endl;
+		// std::cout << "|" << *read_chain.getFirst() <<  "|" << std::endl;
+		continue;
 	}
+	// if -1 error
+	if (r == -1)
+		throw HttpRequest::MalformedChunk();
+
+	// If there's something to write do it. else rease the buffer
+	if (newBuffer->size() > 0)
+		stream_write_chain.pushBack(newBuffer);
+	else 
+		delete newBuffer;
+	// if 0 need more to read
+	if (r == 2)
+		return true;
 	return false;
 }
 

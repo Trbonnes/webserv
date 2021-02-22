@@ -105,22 +105,26 @@ void Http::handleRead()
 	if (_rep != NULL && _read_chain.getFirst() != NULL)
 	{
 		Log::debug("Reading body");
+		Log::debug(_req->getTransferEncoding());
 		bool	end = false;
+		
+		// std::cout << "Transfer encoding:"  << std::endl;
+		// std::cout << "|" << _req->getTransferEncoding() << "|" << std::endl;
+		// std::cout << "|" << "chunked" << "|" << std::endl;
+		// std::cout << "|" << (_req->getTransferEncoding() == "chunked") << "|" << std::endl;
+		// std::cout << "|" << (_req->getTransferEncoding().compare("chunked")) << "|" << std::endl;
 		// If it is chunked we need to extract those into a new buffer
-		if (_req->getTransferEncoding() == "chunked")
+		if (_req->getTransferEncoding() == "chunked\r")
 		{
 			try
 			{
-				/* code */
+				end = HttpRequest::extractChunks(_read_chain, _stream_write_chain);
 			}
 			catch(const std::exception& e)
 			{
 				std::cerr << e.what() << '\n';
 				// TO DO set error bad request in response status
 			}
-			
-			// Extract the chunks for the curent request
-			// end = HttpRequest::extractChunks(_read_chain, &target, &size);	
 		}
 		else
 		{
@@ -131,9 +135,9 @@ void Http::handleRead()
 		{
 			Log::debug("End of read");
 			// unsub read so we pause the read process
-			std::cout << _stream_write_chain;
 			_connection.unsubRead();
 		}
+		std::cout << _stream_write_chain;
 	}
 }
 

@@ -30,7 +30,6 @@
 # include "core/BufferChain.hpp"
 # include "statusCodes.hpp"
 # include "core/Log.hpp"
-# include "LoadController.hpp"
 
 class   HttpRequest
 {
@@ -124,7 +123,7 @@ class   HttpRequest
     void     incBodyReceived(int);
     
     static HttpRequest* parseRequest(std::string&);
-    static bool         extractChunks(BufferChain&, BufferChain&, HttpRequest*);
+    static bool         extractChunks(BufferChain&, BufferChain&);
     static bool         extractBody(BufferChain&, BufferChain&, HttpRequest*);
 
     class   ConnectionClose : public std::exception

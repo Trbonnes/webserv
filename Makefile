@@ -38,7 +38,6 @@ HTTPSRC =	http/Http.cpp \
 			http/httpRequestParser.cpp \
 			http/parseHeaders.cpp \
 			http/setHeaders.cpp \
-			http/LoadController.cpp \
 			http/Methods/del.cpp \
 			http/Methods/get.cpp \
 			http/Methods/put.cpp \
@@ -57,7 +56,6 @@ HEADERS = 	core/Location.hpp \
 			core/HttpServer.hpp \
 			core/utils/utils.hpp \
 			http/statusCodes.hpp \
-			http/LoadController.hpp \
 			http/Http.hpp \
 			http/HttpResponse.hpp \
 			http/HttpRequest.hpp \

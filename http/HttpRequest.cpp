@@ -6,7 +6,7 @@
 /*   By: yorn <yorn@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/30 15:10:55 by trbonnes          #+#    #+#             */
-/*   Updated: 2021/02/21 19:10:37 by yorn             ###   ########.fr       */
+/*   Updated: 2021/02/22 16:02:09 by yorn             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -263,4 +263,9 @@ void	HttpRequest::setXSecret(std::string XSecret) {
 const char * HttpRequest::ConnectionClose::what () const throw ()
 {
 	return "Connection has been closed";
+}
+
+const char * HttpRequest::MalformedChunk::what () const throw ()
+{
+	return "A chunk has been malformed";
 }
