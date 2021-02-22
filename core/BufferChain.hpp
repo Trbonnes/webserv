@@ -22,24 +22,17 @@ extern char g_read_large[BUFFER_SIZE_LARGE];
 
 // This typedef makes fd manipulation a little bit more clear (thanks to @cchudant for this)
 typedef int FD;
-// This class holds a list of char buffers
-// They can vary in size
+
+// Previously this class used to store the buffer in a struc with a char* and a size_t for the size
+// But since the cstring library is prohibited it uses string for manipulation
 class BufferChain
 {
 public:
-	// The buffer pair structure
-	typedef struct	buffer_s // TO DO should put this in private ?
-	{
-		char *data;
-		size_t size;
-	}				buffer_t;
-
-	typedef std::list<buffer_t>::iterator iterator;
- 
+	typedef std::list<std::string*>::iterator iterator;
 private:
 
 	// The actual buffer list
-	std::list<buffer_t> _chain;
+	std::list<std::string*> _chain;
 
 public:
 
@@ -50,15 +43,13 @@ public:
 	~BufferChain();
 
 	// Adds a buffer to the list
-	void	pushBack(char *, size_t);
-	// Copy into a new buffer that is added to the list
-	void	copyPushBack(char *, size_t);
+	void	pushBack(std::string*);
 
 	// return first buffer pair;
-	buffer_t* getFirst();
+	std::string* getFirst();
 
 	// return last buffer pair;
-	buffer_t* getLast();
+	std::string* getLast();
 	
 	// pop first buffer pair, doesn't free data
 	void popFirst();

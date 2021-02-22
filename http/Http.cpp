@@ -34,41 +34,50 @@ void Http::handleRead()
 	// if null then headers are not fully received
 	if (_req == NULL)
 	{
-		char* needle;
-		BufferChain::buffer_t* last = _read_chain.getLast();
+		std::string* last = _read_chain.getLast();
 
+		size_t needle;
 		// If the end of headers are reached
-		if ((needle = ft_strnstr(last->data, "\r\n\r\n", last->size)))
+		if ((needle = last->find("\r\n\r\n")) != last->npos)
 		{
 			Log::debug("End of headers reached !");
-			std::string request("");
 
-			// Concatenate headers
-			BufferChain::buffer_t* curr = _read_chain.getFirst();
-			while (curr != last)
+			size_t space = 0;
+
+			// Calculating space to reserve
+			for (BufferChain::iterator it = _read_chain.begin(); *it != last; it++)
+				space += (*it)->size();
+			space += needle;
+			
+			// reserveing the space
+			std::string request("");
+			request.reserve(space);
+			
+			// appending the data
+			std::string* buff;
+			while ((buff = _read_chain.getFirst()) != last)
 			{
-				request.append(curr->data, curr->size);
-				delete[] curr->data;
+				request.append(*buff);
+				delete buff;
 				_read_chain.popFirst();
-				curr = _read_chain.getFirst();
 			}
-			// Concatenate last buffer
-			unsigned int diff = needle - curr->data + 1;
-			if (diff > 0)
-				request.append(curr->data, diff);
-			// Launch http parsing on newly formed request
-			_req = HttpRequest::parseRequest(request);
-			// check if some body is left
-			if (diff + 4 < curr->size)
+			request.append(*buff, needle);
+			
+			// If there's leftovers, append them to the read chain to be processed as body or else
+			size_t offset = needle + 4;
+			if (offset < buff->size())
 			{
-				_read_chain.copyPushBack(curr->data + diff + 4, curr->size - (diff + 4));
+				std::string* leftovers = new std::string(buff->c_str(), offset, buff->size() - offset);
+				_read_chain.pushBack(leftovers);
 			}
-			delete[] curr->data;
+			// then delete the current buffer
+			delete buff;
 			_read_chain.popFirst();
-			
-			// Instantiate a new response
+
+			// Instantiate new request
+			_req = HttpRequest::parseRequest(request);
+			// Instantiate a new response from that request
 			_rep = new HttpResponse(_req, _config->getServerUnit(_req->getPort(), _req->getHost()));
-			
 
 			// if (_rep->use_cgi() || _req->getTransferEncoding() == "chunked" || FIchier trop lourd)
 			// {

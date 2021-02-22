@@ -23,37 +23,23 @@ BufferChain::~BufferChain()
 	flush();
 }
 
-void	BufferChain::pushBack(char* toadd, size_t size)
+void	BufferChain::pushBack(std::string* toadd)
 {
-	if (size == 0)
-		return;
-	buffer_t pair;
-	pair.data = toadd;
-	pair.size = size;
-	_chain.push_back(pair);
+	_chain.push_back(toadd);
 }
 
-void	BufferChain::copyPushBack(char *tocopy, size_t size)
-{
-	if (size == 0)
-		return;
-	char* n = new char[size]();
-	ft_memcpy(n, tocopy, std::min(size, (size_t)BUFFER_SIZE_LARGE));
-	pushBack(n, size);
-}
-
-BufferChain::buffer_t* BufferChain::getFirst()
+std::string* BufferChain::getFirst()
 {
 	if (_chain.empty())
 		return NULL;
-	return &_chain.front();
+	return _chain.front();
 }
 
-BufferChain::buffer_t* BufferChain::getLast()
+std::string* BufferChain::getLast()
 {
 	if (_chain.empty())
 		return NULL;
-	return &_chain.back();
+	return _chain.back();
 }
 
 void BufferChain::popFirst()
@@ -78,12 +64,11 @@ size_t BufferChain::size()
 
 void	BufferChain::flush()
 {
-	buffer_t *tmp;
-
+	std::string* tmp;
 	while (_chain.size() > 0)
 	{
 		tmp = getFirst();
-		delete[] tmp->data;
+		delete tmp;
 		popFirst();
 	}
 }
@@ -91,10 +76,10 @@ void	BufferChain::flush()
 int		BufferChain::writeBufferToFd(BufferChain& chain, FD fd)
 {
 	int ret;
-	BufferChain::buffer_t* buff;
+	std::string* buff;
 	
 	buff = chain.getFirst();
-	ret = write(fd, buff->data, buff->size);
+	ret = write(fd, buff->c_str(), buff->size());
 	if (ret == -1)
 		throw IOError();
 	return ret;
@@ -108,7 +93,10 @@ int		BufferChain::readToBuffer(BufferChain& chain, FD fd)
 	if (ret == -1)
 		throw IOError();
 	if (ret > 0)
-		chain.copyPushBack(g_read_large, ret);
+	{
+		std::string* n = new std::string(g_read_large, ret);
+		chain.pushBack(n);
+	}
 	return ret;
 }
 
@@ -125,9 +113,7 @@ std::ostream&	operator<<(std::ostream& out, BufferChain& chain)
 	while (it != chain.end())
 	{
 		out << "|";
-		for (size_t i = 0; i < it->size; i++)
-			out << it->data[i]; // Not optimized but hey it's the easiest given the subject restricion on <cstring>
-		// out.width(it->size);
+		out << **it;
 		out << "| ";
 		it++;
 	}

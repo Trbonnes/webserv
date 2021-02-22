@@ -6,7 +6,7 @@
 /*   By: yorn <yorn@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/30 15:45:46 by trbonnes          #+#    #+#             */
-/*   Updated: 2021/02/21 20:24:41 by yorn             ###   ########.fr       */
+/*   Updated: 2021/02/22 01:37:33 by yorn             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -260,7 +260,7 @@ void     HttpRequest::incBodyReceived(int value)
 bool         HttpRequest::extractBody(BufferChain& read_chain, BufferChain& stream_write_chain, HttpRequest* request)
 {
 	int diff;
-	BufferChain::buffer_t *buff;
+	std::string *buff;
 
 	// whle there are buffers to read or break
 	while ((buff = read_chain.getFirst()) != NULL)
@@ -269,24 +269,31 @@ bool         HttpRequest::extractBody(BufferChain& read_chain, BufferChain& stre
 		// This is how many byte left do we need to read to have the full body
 		diff = request->getContentLength() - request->getBodyReceived();
 		// If the buffer doesn't contains the end of the body
-		if (diff > (int)buff->size)
+		if (diff > (int)buff->size())
 		{
-			stream_write_chain.pushBack(buff->data, buff->size);
-			request->incBodyReceived(buff->size);
 			Log::debug("Reading all buffer");
-			Log::debug(diff);
-			Log::debug((int)buff->size);
+			stream_write_chain.pushBack(buff);
+			request->incBodyReceived(buff->size());
 			read_chain.popFirst();
 		}
 		// else the buffer contains the last bytes needed
 		else
 		{
-			stream_write_chain.copyPushBack(buff->data, diff);
+			Log::debug("Reading a part of the buffer");
+			// copying the last part of the body into a buffer
+			std::string* n = new std::string(buff->c_str(), diff);
+			stream_write_chain.pushBack(n);
 			request->incBodyReceived(diff);
-			// TO DO manage leftovers
-			delete[] buff->data;
+
+			// if there's still some bytes left, append them to the read chain for later read
+			if (diff < buff->size())
+			{
+				std::string* leftovers = new std::string(buff->c_str(), diff, buff->size() - diff);
+				read_chain.pushBack(leftovers);
+			}
+			// Delete and remove the last buffer since it's been splitted
+			delete buff;
 			read_chain.popFirst();
-			Log::debug("Reading a part of the buffer	");
 			break;
 		}
 	}
