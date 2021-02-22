@@ -32,11 +32,6 @@ private:
 	fd_set 					_active_write;
 
 	void	acceptConnection(int sock);
-	void	handleRead(Connection *c);
-	void	handleReadCGI(Connection *c);
-	void	handleWrite(Connection *c);
-	void	handleStreamRead(Connection *c);
-	void	handleStreamWrite(Connection *c);
 	void	closeConnections();
 };
 #endif // HTTPWORKER

@@ -79,11 +79,6 @@ void Http::handleRead()
 			// Instantiate a new response from that request
 			_rep = new HttpResponse(_req, _config->getServerUnit(_req->getPort(), _req->getHost()));
 
-			// if (_rep->use_cgi() || _req->getTransferEncoding() == "chunked" || FIchier trop lourd)
-			// {
-			// 	_rep.set
-			// }
-
 			// Adding streams in select fd sets
 			// By this point the Response should have fd's for CGI or a regular file
 			// if stream in

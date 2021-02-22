@@ -114,18 +114,6 @@ int	Connection::isStreamReadReady(fd_set* set)
 	return _stream_read != -1 && FD_ISSET(_stream_read, set);
 }
 
-void Connection::write()
-{
-	try
-	{
-		BufferChain::writeBufferToFd(_write_chain, _socket);
-	}
-	catch(const IOError& e)
-	{
-		throw;
-	}
-}
-
 void Connection::read()
 {
 	int read;
@@ -143,6 +131,24 @@ void Connection::read()
 	 	throw ConnectionClose();
 	}
 	_module.handleRead();
+}
+
+void Connection::write()
+{
+	int written;
+	
+	try
+	{
+		written = BufferChain::writeBufferToFd(_write_chain, _socket);
+	}
+	catch(const IOError& e)
+	{
+		throw;
+	}
+	if (written == 0)
+	{
+	 	throw ConnectionClose();
+	}
 }
 
 void Connection::streamWrite()

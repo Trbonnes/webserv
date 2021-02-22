@@ -16,95 +16,6 @@ HttpWorker::HttpWorker(const HttpWorker &w) : Runnable(w)
 HttpWorker::~HttpWorker() {
 }
 
-void	HttpWorker::handleStreamRead(Connection *c)
-{
-	(void) c;
-	// HTTP* method;
-	// Log::debug("CGI READ\n");
-
-	// method = c->getMethod();
-	// FD_CLR(method->get_cgi_out(), &_active_read);
-	// method->read_cgi_response();
-	// method->processResponse();
-	// // Log::debug(method->getResponse());
-	// FD_SET(c->getSock(), &_active_write);
-}
-
-void	HttpWorker::handleStreamWrite(Connection *c)
-{
-	(void) c;
-	// Log::debug("CGI WRITE\n");
-	// HTTP* method = c->getMethod();
-	
-	// // Remove cgi_in from 
-	// FD_CLR(method->get_cgi_in(), &_active_write);
-    // if (c->getMethod()->write_cgi_request() == -1)
-	// {
-	// 	// TO DO kill CGI process ?
-	// 	delete method;
-	// 	throw HttpRequest::ConnectionClose();
-	// }
-	// FD_SET(method->get_cgi_out(), &_active_read);
-}
-
-void	HttpWorker::handleWrite(Connection *c)
-{
-	(void) c;
-	// HTTP* method;
-	// char* response;
-	// size_t responseSize;
-
-	// Log::debug("About to write\n");
-	// method = c->getMethod();
-	// response = method->getResponse();
-	// responseSize = method->getResponseSize();
-	// if (write(c->getSock(), response, responseSize) == -1)
-	// {
-	// 	throw HttpRequest::ConnectionClose();
-	// }
-	// Log::debug("Written\n");
-	// Log::debug(response);
-	// c->clearSocket();
-	// delete method;
-	// free(response);
-	// c->setMethod(NULL);
-	// FD_SET(c->getSock(), &_active_read);
-	// FD_CLR(c->getSock(), &_active_write);
-}
-
-
-
-void	HttpWorker::handleRead(Connection *c)
-{
-	(void) c;
-	// Log::debug("About to read\n");
-	// HTTP *method;
-
-	// HttpRequest *newSocket = httpRequestParser(c->getSock());
-	// c->setSocket(newSocket);
-	// ConfigServer *configServer = NULL;
-	// configServer = _config->getServerUnit(c->getSocket()->getPort(), c->getSocket()->getHost());
-	// if (configServer == NULL)
-	// 		throw HttpRequest::ConnectionClose();
-	// method = new HTTP(c->getSocket(), configServer);
-	// c->setMethod(method);
-	// if (method->use_cgi())
-	// {
-	// 	Log::debug("Method uses CGI\n");
-	// 	// add cgi in to write set
-	// 	FD_SET(method->get_cgi_in(), &_active_write);
-	// }
-	// // if not cgi, directly add cgi to write
-	// else
-	// {
-	// 	method->processResponse();
-	// 	Log::debug("Get sock to write\n");
-	// 	FD_SET(c->getSock(), &_active_write);
-	// }
-	// // Remove socket from read set
-	// FD_CLR(c->getSock(), &_active_read);
-}
-
 void	HttpWorker::acceptConnection(int s)
 {
 	try
@@ -164,13 +75,12 @@ void	HttpWorker::run()
 			{
 				if (c->isReadReady(&read_fs))
 					c->read();
-				// // Write ready on active connection
-				// else if (FD_ISSET(c->getSock(), &write_fs))
-				// 	handleWrite(c);
-				// else if (c->getMethod() && c->getMethod()->get_cgi_out() != -1 && FD_ISSET(c->getMethod()->get_cgi_out(), &read_fs))
-				// 	handleStreamRead(c);
-				// else if (c->getMethod() && c->getMethod()->get_cgi_in() != -1 && FD_ISSET(c->getMethod()->get_cgi_in(), &write_fs))
-				// 	handleStreamWrite(c);
+				else if (c->isWriteReady(&write_fs))
+					c->write();
+				else if (c->isStreamReadReady(&read_fs))
+					c->streamRead();
+				else if (c->isStreamWriteReady(&write_fs))
+					c->streamWrite();
 			}
 			catch(const std::exception& e)
 			{
