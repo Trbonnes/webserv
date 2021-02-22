@@ -105,8 +105,6 @@ void Http::handleRead()
 	if (_rep != NULL && _read_chain.getFirst() != NULL)
 	{
 		Log::debug("Reading body");
-		char *target = NULL;
-		size_t size = 0;
 		bool	end = false;
 		// If it is chunked we need to extract those into a new buffer
 		if (_req->getTransferEncoding() == "chunked")
@@ -126,10 +124,6 @@ void Http::handleRead()
 			std::cout << _stream_write_chain;
 			_connection.unsubRead();
 		}
-		if (target)
-			_stream_write_chain.pushBack(target, size);
-		// if (ignore_body)
-		// 	_stream_write_chain.flush();
 	}
 }
 

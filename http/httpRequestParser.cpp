@@ -6,7 +6,7 @@
 /*   By: yorn <yorn@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/30 15:45:46 by trbonnes          #+#    #+#             */
-/*   Updated: 2021/02/22 01:37:33 by yorn             ###   ########.fr       */
+/*   Updated: 2021/02/22 01:39:05 by yorn             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -286,7 +286,7 @@ bool         HttpRequest::extractBody(BufferChain& read_chain, BufferChain& stre
 			request->incBodyReceived(diff);
 
 			// if there's still some bytes left, append them to the read chain for later read
-			if (diff < buff->size())
+			if (diff < (int)buff->size())
 			{
 				std::string* leftovers = new std::string(buff->c_str(), diff, buff->size() - diff);
 				read_chain.pushBack(leftovers);
