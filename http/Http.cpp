@@ -109,6 +109,16 @@ void Http::handleRead()
 		// If it is chunked we need to extract those into a new buffer
 		if (_req->getTransferEncoding() == "chunked")
 		{
+			try
+			{
+				/* code */
+			}
+			catch(const std::exception& e)
+			{
+				std::cerr << e.what() << '\n';
+				// TO DO set error bad request in response status
+			}
+			
 			// Extract the chunks for the curent request
 			// end = HttpRequest::extractChunks(_read_chain, &target, &size);	
 		}

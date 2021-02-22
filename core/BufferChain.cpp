@@ -28,6 +28,11 @@ void	BufferChain::pushBack(std::string* toadd)
 	_chain.push_back(toadd);
 }
 
+void	BufferChain::pushFront(std::string* toadd)
+{
+	_chain.push_front(toadd);
+}
+
 std::string* BufferChain::getFirst()
 {
 	if (_chain.empty())

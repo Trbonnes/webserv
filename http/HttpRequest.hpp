@@ -131,6 +131,11 @@ class   HttpRequest
 	{
 		public:
 			const char * what () const throw ();
+	};   
+    class   MalformedChunk : public std::exception
+	{
+		public:
+			const char * what () const throw ();
 	};    
 };
 

@@ -6,137 +6,11 @@
 /*   By: yorn <yorn@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/30 15:45:46 by trbonnes          #+#    #+#             */
-/*   Updated: 2021/02/22 01:39:05 by yorn             ###   ########.fr       */
+/*   Updated: 2021/02/22 14:11:56 by yorn             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "HttpRequest.hpp"
-
-// static int		httpRequestParseChunkedBody(std::string request, HttpRequest *socket, size_t pos) {
-// 	size_t chunkSize;
-// 	std::string convert;
-// 	std::string s = request.substr(pos, request.npos);
-// 	std::string body;
-// 	int	fd_read = socket->getFd();
-// 	// Log::debug("\033[0;32mCHUNCKED");
-
-// 	LoadController::loadController(10000000, body);
-// 	try {
-// 		char	c[READ];
-// 		int		ret;
-		
-// 		while ((pos = s.find("\r\n")) == s.npos) {
-// 			ft_bzero(c, READ);
-// 			ret = read(fd_read, c, 1);
-// 			s.append(c, ret);
-// 		}
-// 		pos = 0;
-// 		while (s[pos] && s[pos] != '\r') {
-// 			convert.append(s.substr(pos, 1));
-// 			pos++;
-// 		}
-// 		chunkSize = strtol(convert.c_str(), NULL, 16);
-// 		// Log::debug("chunck Size: ");
-// 		// Log::debug(chunkSize);
-// 		while (chunkSize > 0) {
-// 			// Log::debug("new chunk");
-// 			char *tmp = ft_itoa(atol(socket->getContentLength().c_str()) + chunkSize);
-// 			socket->setContentLength(tmp);
-// 			free(tmp);
-// 			s.clear();
-// 			convert.clear();
-// 			for (int i = 0; i < (int)chunkSize; i += ret) {
-// 				if (chunkSize - i > READ) {
-// 					ft_bzero(c, READ);
-// 					ret = read(fd_read, c, READ);
-// 					body.append(c, ret);
-// 				}
-// 				else {
-// 					ft_bzero(c, READ);
-// 					ret = read(fd_read, c, chunkSize - i);
-// 					body.append(c, ret);
-// 				}
-// 			}
-// 			ft_bzero(c, 8192);
-// 			ret = read(fd_read, c, 2);
-// 			while ((pos = s.find("\r\n")) == s.npos) {
-// 				ft_bzero(c, 2);
-// 				ret = read(fd_read, c, 1);
-// 				s.append(c, ret);
-// 			}
-// 			pos = 0;
-// 			while (s[pos] && s[pos] != '\r') {
-// 				convert.append(s.substr(pos, 1));
-// 				pos++;
-// 			}
-// 			chunkSize = strtol(convert.c_str(), NULL, 16);
-// 			// Log::debug("chunck Size: ");
-// 			// Log::debug(chunkSize);
-// 		}
-// 		// Log::debug("All chunk read");
-// 		socket->setBody(body);
-// 		// Log::debug("\033[0;32mchuncked content length: ");
-// 		// Log::debug(socket->getContentLength().c_str());
-// 		// body.clear();
-// 	}
-// 	catch (std::exception &e) {
-// 		std::cerr << "Exception1: " << e.what() << std::endl;
-// 	}
-// 	return 0;
-// }
-
-// static int		httpRequestParseBody(std::string request, HttpRequest *socket) {
-// 	std::string					content;
-// 	std::string					body = "";
-// 	size_t						chunkedPos = socket->getTransferEncoding().find("chunked");
-// 	size_t						ret;
-
-// 	// Log::debug(request.c_str());
-
-// 	if (!socket->getContentLength().size() && chunkedPos == std::string::npos){
-// 		socket->setBody(body);
-// 		return 0;
-// 	}
-	
-// 	size_t pos = request.find("\r\n\r\n");
-// 	if (pos == request.npos) {
-// 		pos = request.find("\n\n");
-// 		pos += 2;
-// 	}
-// 	else 
-// 		pos += 4;
-// 	if (pos >= request.npos) {
-// 		socket->setBody(body);
-// 		return 0;
-// 	}
-// 	if (chunkedPos != std::string::npos)
-// 		return httpRequestParseChunkedBody(request, socket, pos);
-
-// 	try {
-// 		body = request.substr(pos, request.npos);
-// 		size_t	contentLength = atol(socket->getContentLength().c_str());
-// 		if (body.size() >= contentLength)
-// 			socket->setBody(body);
-// 		else {
-// 			char	c[8192];
-			
-// 			//Log::debug("\033[0;32mRead if body missing");
-// 			while (body.size() < contentLength) {
-// 				ft_bzero(c, 8192);
-// 				ret = read(socket->getFd(), c, 8192);
-// 				body.append(c, ret);
-// 			}
-// 			if (body.size() > contentLength)
-// 				body.erase(contentLength, body.npos);
-// 			socket->setBody(body);
-// 		}
-// 	}
-// 	catch (std::exception &e) {
-// 		std::cerr << "Exception2: " << e.what() << std::endl;
-// 	}
-	
-// 	return 0;
-// }
 
 static int		httpRequestParseHeaders(std::string request, HttpRequest *socket) {
 	char const *x[] = {
@@ -242,10 +116,57 @@ HttpRequest* HttpRequest::parseRequest(std::string &request) {
 
 
 
-// bool         HttpRequest::extractChunks(BufferChain&, char**, size_t*)
-// {
+// Extract chunks into a regular body
+bool         HttpRequest::extractChunks(BufferChain& read_chain, BufferChain& stream_write_chain, HttpRequest* request)
+{ // TO DO optimizations
 
-// }
+	std::string* buff = new std::string("");
+	std::string* curr;
+	size_t	 	 bodylen;
+	size_t startLen = 0;
+	size_t endLen;
+	size_t startBody;
+	size_t len;
+	
+	while ((curr = read_chain.getFirst()) != NULL)
+	{
+
+		// Find an end for chunk sizze
+		end = curr->find("\r\n");
+		// if no match
+		if (end == buff->npos)
+		{
+			// return false if last buffer, and wait for the next read
+			if (curr == read_chain.getLast())
+				return false;
+			// esle concatenate with the next and relaunch the loop
+			else
+			{
+				read_chain.popFirst();
+				curr->append(*read_chain.getFirst());
+				delete read_chain.getFirst();
+				read_chain.popFirst();
+				// we're pushing it on the front so the loop takes it
+				read_chain.pushFront(curr);
+				continue;
+			}
+		}
+		
+
+		size_t numberEnd;
+		std::string tmp = buff->substr(startLen, buff->size - endLen);
+		bodylen = std::stoul(tmp, &numberEnd, 16);
+		// if the number doesn't span all the string
+		if (tmp.size() == 0 || startLen + numberEnd != endLen)
+			throw HttpRequest::MalformedChunk();
+		if (bodylen == 0)
+		{
+
+		}
+
+	}
+	return false;
+}
 
 int      HttpRequest::getBodyReceived()
 {
@@ -257,6 +178,7 @@ void     HttpRequest::incBodyReceived(int value)
 	_body_received += value;
 }
 
+// Extract regular body
 bool         HttpRequest::extractBody(BufferChain& read_chain, BufferChain& stream_write_chain, HttpRequest* request)
 {
 	int diff;
@@ -289,7 +211,7 @@ bool         HttpRequest::extractBody(BufferChain& read_chain, BufferChain& stre
 			if (diff < (int)buff->size())
 			{
 				std::string* leftovers = new std::string(buff->c_str(), diff, buff->size() - diff);
-				read_chain.pushBack(leftovers);
+				read_chain.pushFront(leftovers);
 			}
 			// Delete and remove the last buffer since it's been splitted
 			delete buff;

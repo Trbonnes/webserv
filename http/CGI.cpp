@@ -178,7 +178,6 @@ void            HttpResponse::read_cgi_response()
 
     ft_bzero(buf, 1024);
     std::string().swap(_request->getBody());
-    // LoadController::loadController(_request->getContentLength() + 100, _cgiResponse);
     // while ((ret = read(_cgi_out[SIDE_OUT], buf, 1024)) > 0) {
     //     // _responseSize += ret;
     //     buf[ret] = '\0';

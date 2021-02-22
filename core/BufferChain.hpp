@@ -44,6 +44,7 @@ public:
 
 	// Adds a buffer to the list
 	void	pushBack(std::string*);
+	void	pushFront(std::string*);
 
 	// return first buffer pair;
 	std::string* getFirst();
