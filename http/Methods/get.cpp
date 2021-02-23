@@ -1,31 +1,5 @@
 #include "../HttpResponse.hpp"
 
-void        HttpResponse::get()
-{
-    std::string root;
-
-    authorization();
-    if (_statusCode == OK)
-    {
-        // setBody(_stream_out);
-        setLastModified();
-        setContentType();
-        setCharset();
-        setContentLength();
-        setServerName();
-        setContentLocation();
-        setDate();
-    }
-    else if (_statusCode != UNAUTHORIZED && _config.getAutoindex(_location) == true)
-    {
-        setAutoindex();
-        setDate();
-        _contentLanguage = "";
-        _statusCode = OK;
-    }
-    return ;
-}
-
 //** Define the language page **
 std::string     HttpResponse::acceptLanguage()
 {
@@ -135,6 +109,6 @@ void            HttpResponse::setAutoindex(void)
     _contentLength = body.length();
     _contentType = "text/html";
     _charset = "utf-8";
-    // _body = (char*)ft_calloc(_contentLength + 1, sizeof(char));
-    // ft_strcpy(_body, body.c_str());
+    _body = (char*)ft_calloc(_contentLength + 1, sizeof(char));
+    ft_strcpy(_body, body.c_str());
 }

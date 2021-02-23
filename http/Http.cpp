@@ -78,21 +78,30 @@ void Http::handleRead()
 			_req = HttpRequest::parseRequest(request);
 			// Instantiate a new response from that request
 			_rep = new HttpResponse(_req, _config->getServerUnit(_req->getPort(), _req->getHost()));
+			
+			// Getting the headers and eventually the full response
+			buff = _rep->process();
+			_write_chain.pushBack(buff);
+			// If all are minus one then there's nothing to read / write, the request is done
+			if (_rep->getStreamIn() == -1 && _rep->getStreamIn() == -1)
+			{
+				_connection.subWrite();
+			}
 
 			// Adding streams in select fd sets
 			// By this point the Response should have fd's for CGI or a regular file
 			// if stream in
 			// CGI and PUT
-			// if (_rep->getStreamIn() != -1)
-			// {
-			// 	_connection.setStreamWrite(_rep->getStreamIn());
-			// }
-			// //if stream out
-			// // CGI and GET
-			// if (_rep->getStreamOut() != -1)
-			// {
-			// 	_connection.setStreamRead(_rep->getStreamOut());
-			// }
+			if (_rep->getStreamIn() != -1)
+			{
+				_connection.setStreamWrite(_rep->getStreamIn());
+			}
+			//if stream out
+			// CGI and GET
+			if (_rep->getStreamOut() != -1)
+			{
+				_connection.setStreamRead(_rep->getStreamOut());
+			}
 		}
 	}
 	// if it's not NUll then we have work to do
@@ -138,6 +147,26 @@ void Http::handleRead()
 
 void Http::handleStreamRead()
 {
+	if (_rep->getTransferEncoding() == "chunked")
+	{
+		// HttpResponse::
+	}
+	// Regular body, no formatting required
+	else
+	{
+		try
+		{
+			BufferChain::readToBuffer(_write_chain, _rep->getStreamIn());
+		}
+		catch(const std::exception& e)
+		{
+			throw;
+		}
+	}
+}
+
+void Http::handleStreamWrite()
+{
 	// char* buff = NULL;
 	// size_t read;
 
@@ -158,13 +187,6 @@ void Http::handleStreamRead()
 	// }
 	// _write_chain.pushBack(buff, read);
 	// TO DO can we really have a larger buffer chain than content length ?
-
-}
-
-void Http::handleStreamWrite()
-{
-	// Load he response into the write fchaine
-	// BufferChain::writeBufferToFd(_stream_write, _rep->getStreamIn());
 }
 
 void	Http::setConfig(Config* c)

@@ -135,19 +135,18 @@ void Connection::read()
 
 void Connection::write()
 {
-	int written;
-	
 	try
 	{
-		written = BufferChain::writeBufferToFd(_write_chain, _socket);
+		BufferChain::writeBufferToFd(_write_chain, _socket);
+		std::string* buff = _write_chain.getFirst();
+		delete buff;
+		_write_chain.popFirst();
+		if (_write_chain.getFirst() == NULL)
+			unsubWrite();
 	}
 	catch(const IOError& e)
 	{
 		throw;
-	}
-	if (written == 0)
-	{
-	 	throw ConnectionClose();
 	}
 }
 
@@ -164,7 +163,23 @@ void Connection::streamWrite()
 }
 
 void Connection::streamRead()
-{}
+{
+	int read;
+	
+	try
+	{
+		read = BufferChain::readToBuffer(_read_chain, _socket);
+	}
+	catch(const IOError& e)
+	{
+		throw;
+	}
+	if (read == 0)
+	{
+	 	throw ConnectionClose();
+	}
+	_module.handleRead();
+}
 
 
 BufferChain& Connection::getWriteChain()

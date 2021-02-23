@@ -6,18 +6,6 @@ void        HttpResponse::setContentLocation()
     _contentLocation.assign("http://").append(_request->getHost()).append("/").append(_route);
 }
 
-//** Copy file into body string **
-void        HttpResponse::setBody(int fd)
-{
-    (void) fd;
-    // int     ret;
-
-    // // _body = (char*)ft_calloc(_stat.st_size, sizeof(char));
-    // // ret = read(fd, _body, _stat.st_size);
-    // if (ret == -1)
-    //     _statusCode = INTERNAL_SERVER_ERROR;
-}
-
 void        HttpResponse::setCharset(void)
 {
     // if (_contentType.compare("text/html") == 0)

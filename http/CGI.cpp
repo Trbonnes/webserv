@@ -195,7 +195,7 @@ void            HttpResponse::read_cgi_response()
     //     _statusCode = BAD_GATEWAY;
     cgi_parse();
     setDate();
-	processResponse();
+	// processResponse();
 }
 
 int           HttpResponse::write_cgi_request()

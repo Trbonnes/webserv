@@ -60,7 +60,6 @@ class   HttpResponse
     private:
 
 
-
     HttpRequest*                _request;
     ConfigServer                _config;
     StatusCode                  _mapCodes;
@@ -70,6 +69,9 @@ class   HttpResponse
     // File streams
     int                         _stream_write;
     int                         _stream_read;
+    
+    // The response buffer that's used to store data
+    std::string*                _response;
 
     // Utils
     std::string                 _uri;
@@ -126,6 +128,7 @@ class   HttpResponse
     void            setLastModified(void);
     void            setDate(void);
     void            setAutoindex(void);
+    
 
     void            authorization(void);
     int             openFile(void);
@@ -144,9 +147,7 @@ class   HttpResponse
     int             is_good_exe(std::string exe);
     static bool     mypred(char val1, char val2);
 
-    //GET
-    void            get(void);
-    
+
     // PUT
     void            put(void);
     
@@ -164,14 +165,18 @@ class   HttpResponse
 
     HttpResponse            &operator=(HttpResponse &rhs);
 
+
     //Getters
     std::string&    getTransferEncoding();
+    int             getStreamIn();
+    int             getStreamOut();
+
 
     // RESPONSE
     void            read_cgi_response();
     int             write_cgi_request();
     bool            use_cgi();
-    void            processResponse();
+    std::string*    process();
     void            setFirstHeadersResponse(std::string &response);
     void            setAllowMethodsResponse(std::string &response);
     void            setOtherHeaders(std::string &response);

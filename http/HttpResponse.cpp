@@ -55,38 +55,25 @@ _transferEncoding("")
 {
     ft_bzero(_cgi_env, sizeof(char*) * NB_METAVARIABLES + 1);
     
-    // Stogin the request for later use
+    _response = new std::string();
+    // Storing the request for later use
     _request = req;
+    // intiliazing streams to -1
     _stream_read = -1;
     _stream_write = -1;
-
-    // Check if lenght is given
-    if (_request->getBody().length() > 0 && _request->getContentLength() == 0 && _request->getTransferEncoding().length() == 0)
-    {
-        _statusCode = LENGTH_REQUIRED;
-    }
-    
     _uri = _request->getRequestURI();
-    
     // Absolute location route for the server
     _location = _config.getLocation(_uri);
-    
+
+    // Check if length is given
+    if (_request->getBody().length() > 0 && _request->getContentLength() == 0 && _request->getTransferEncoding().length() == 0)
+        _statusCode = LENGTH_REQUIRED;
     // Check to see if the request body is too large for the 
-    if (_config.getClientBodySize(_location) != -1 && _request->getContentLength() > _config.getClientBodySize(_location))
-    {
+    else if (_config.getClientBodySize(_location) != -1 && _request->getContentLength() > _config.getClientBodySize(_location))
         _statusCode = REQUEST_ENTITY_TOO_LARGE;
-        return ;
-    }
-    if (_request->getMethod().compare("PUT"))
-    {
-        setRoot();
-        setStat();
-    }
     if (_request->getMethod().compare("OPTIONS") == 0)
-    {
         _statusCode = NO_CONTENT;
-        return ;
-    }
+    if (_statusCode == OK)
     openStreams();
 }
 
@@ -156,6 +143,7 @@ void            HttpResponse::openStreams()
     // If it's a CGI request we must fork and prepare the stream in and out
     if (is_good_exe(str.assign(_route).erase(0, extension + 1)) && checkCGImethods(_request->getMethod()))
     {
+        _transferEncoding.assign("chunked");
         _use_cgi = true;
         prepare_cgi();
         return;
@@ -164,7 +152,6 @@ void            HttpResponse::openStreams()
     // If it's not CGI we got to open read streams or write streams
     if (checkAllowMethods(_request->getMethod()))
     {
-        
         std::string& method = _request->getMethod();
         
         // If GET or HEAD we must open the stream in
@@ -176,54 +163,65 @@ void            HttpResponse::openStreams()
             fd = -1;
             ft_bzero(&file, sizeof(file));
             stat(_route.c_str(), &file);
+            
+            // Check if file exist
             if ((S_ISREG(file.st_mode) && (fd = open(_route.c_str(), O_RDONLY)) != -1))
                 _statusCode = OK;
             else
                 _statusCode = NOT_FOUND;
-            _stream_read = fd;
+
+            // Check if authorized
+            authorization();
+            // if everything is OK, set ehaders 
+            if (_statusCode == OK)
+            {
+                setLastModified();
+                setContentType();
+                setCharset();
+                setContentLength();
+                setServerName();
+                setContentLocation();
+                setDate();
+                _stream_read = fd;
+            }
+            else if (_statusCode != UNAUTHORIZED && _config.getAutoindex(_location) == true)
+            {
+                setAutoindex();
+                setDate();
+                _contentLanguage = "";
+                _statusCode = OK;
+            }
         }
-        
         // If PUT then open a stream out
         else if (method.compare("PUT") == 0)
         {
+            setRoot();
+            setStat();
             // Getting path root and appending the file's name
             std::string file = _uri.substr(_location.substr(0, _location.length() - 1).length(), _uri.length());
             _route.assign(_config.getPutRoot()).append(file);
             
             // opening the ouputStream
+            // trying to open this existing file with O_TRUNCK to erase content while writing
             _stream_write = open(_route.c_str(), O_WRONLY | O_TRUNC);
+            // if -1 then it doesn't exist
             if (_stream_write == -1)
-                _statusCode = FORBIDDEN; // TO DO is this the right code to use ? shouldn't it depend on errno ?
-        }
-        // Else we're doomed
-        else
-        {
-            // Run while you can
-            _contentLength = 2;
-            // _body = ft_strdup("OK");
+            {
+                _statusCode = NO_CONTENT; // Should be 201 but the tester expect 204
+                // Trying to create the file then
+                _stream_write = open(_route.c_str(), O_CREAT | O_WRONLY, S_IRUSR | S_IWUSR);
+                if (_stream_write == -1)
+                    _statusCode = INTERNAL_SERVER_ERROR;
+            }
+            else
+                _statusCode = NO_CONTENT;
+            setContentLocation();
         }
     }
-        // If else the method is not allowed
+    // If else the method is not allowed
     else
         _statusCode = METHOD_NOT_ALLOWED;
 }
-
-//** Call the non CGI methods, GET, HEAD, PUT, DELETE & (POST) / OPTIONS is managed in a different way **  //
-void        HttpResponse::callMethod(std::string method)
-{
-    if (method.compare("GET") == 0 || method.compare("HEAD") == 0)
-        get();
-    else if (method.compare("PUT") == 0)
-        put();
-    else if (method.compare("DELETE") == 0)
-        del();
-    else
-    {
-        _contentLength = 2;
-        // _body = ft_strdup("OK");
-    }
-}
-
 
 //** Check if the method is authorized for the non CGI locations **
 int         HttpResponse::checkAllowMethods(std::string method)
@@ -472,28 +470,28 @@ void        HttpResponse::configureErrorFile()
     int         ret;
     char        buf[1024 + 1];
     int         fd;
-    std::string body;
 
     _route = _config.getHTMLErrorPage(_statusCode);
     fd = open(_route.c_str(), O_RDONLY);
     if (fd == -1)
     {
-        body.assign("<!DOCTYPE html>\n<html>\n<body>\n\n<h1>");
+        _response->append("<!DOCTYPE html>\n<html>\n<body>\n\n<h1>");
         char *tmp = ft_itoa(_statusCode);
-        body.append(tmp).append(" ").append(_mapCodes.codes[_statusCode]);
+        _response->append(tmp).append(" ").append(_mapCodes.codes[_statusCode]);
         free(tmp);
-        body.append("</h1>\n\n</body>\n</html>\n");
+        _response->append("</h1>\n\n</body>\n</html>\n");
         _contentType = "text/html";
         _charset = "utf-8";
-        _contentLength = body.length();
+        _contentLength = _response->length();
     }
     else
     {
-        body.clear();
+        // TO DO need to put this in stream
+        _response->clear();
         while ((ret = read(fd, buf, 1024)) > 0)
         {
             buf[ret] = '\0';
-            body.append(buf);
+            _response->append(buf);
         }
         if (ret == -1)
             _statusCode = INTERNAL_SERVER_ERROR;
@@ -503,7 +501,6 @@ void        HttpResponse::configureErrorFile()
         setContentLength();
         setDate();
     }
-    // _body = ft_strdup(body.c_str());
 }
 
 
@@ -567,27 +564,44 @@ void            HttpResponse::setOtherHeaders(std::string &response)
             response.append("Content-Location: ").append(_contentLocation).append("\r\n");
         if (_contentLanguage.length() > 0 && _request->getMethod().compare("PUT") && _request->getMethod().compare("DELETE"))
             response.append("Content-Language: ").append(_contentLanguage).append("\r\n");
+        if (_transferEncoding.length() > 0)
+            response.append("Tranfer-Encoding: ").append(_transferEncoding);
     }
     else if (_statusCode == UNAUTHORIZED)
         response.append("WWW-Authenticate: ").append("Basic realm=").append(_config.getAuth_basic(_location)).append("\r\n");
 }
 
 // ** Create the response socket **
-void         HttpResponse::processResponse()
+std::string*         HttpResponse::process()
 {
-    std::string response;
-
+    // new buffer
+    // If method is delete then just go and procces the request
+    if (_request->getMethod().compare("DELETE") == 0)
+    {
+        del();
+    }
     if (_statusCode >= 300)
         configureErrorFile();
-    setFirstHeadersResponse(response);
+    setFirstHeadersResponse(*_response);
     if (_request->getMethod().compare("OPTIONS") == 0 || _statusCode == METHOD_NOT_ALLOWED)
-        setAllowMethodsResponse(response);
+        setAllowMethodsResponse(*_response);
     else
-        setOtherHeaders(response);
-    response.append("\r\n");
+        setOtherHeaders(*_response);
+    _response->append("\r\n");
+    return _response;
 }
 
 std::string&    HttpResponse::getTransferEncoding()
 {
     return _transferEncoding;
+}
+
+int             HttpResponse::getStreamIn()
+{
+    return _stream_write;
+}
+
+int             HttpResponse::getStreamOut()
+{
+    return _stream_read;
 }

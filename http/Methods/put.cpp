@@ -7,6 +7,7 @@ void        HttpResponse::put()
     std::string file;
 
     
+    fd = open(_route.c_str(), O_WRONLY | O_TRUNC);
     if (fd == -1)
     {
         _statusCode = NO_CONTENT; // Should be 201 but the tester expect 204
