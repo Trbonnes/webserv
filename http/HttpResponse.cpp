@@ -55,7 +55,6 @@ _transferEncoding("")
 {
     ft_bzero(_cgi_env, sizeof(char*) * NB_METAVARIABLES + 1);
     
-    _response = new std::string();
     // Storing the request for later use
     _request = req;
     // intiliazing streams to -1
@@ -186,7 +185,6 @@ void            HttpResponse::openStreams()
             }
             else if (_statusCode != UNAUTHORIZED && _config.getAutoindex(_location) == true)
             {
-                setAutoindex();
                 setDate();
                 _contentLanguage = "";
                 _statusCode = OK;
@@ -465,7 +463,7 @@ std::string   HttpResponse::base64_decode(std::string const& encoded_string) {
     return ret;
 }
 
-void        HttpResponse::configureErrorFile()
+void        HttpResponse::configureErrorFile(std::string& response)
 {
     int         ret;
     char        buf[1024 + 1];
@@ -475,23 +473,23 @@ void        HttpResponse::configureErrorFile()
     fd = open(_route.c_str(), O_RDONLY);
     if (fd == -1)
     {
-        _response->append("<!DOCTYPE html>\n<html>\n<body>\n\n<h1>");
+        response.append("<!DOCTYPE html>\n<html>\n<body>\n\n<h1>");
         char *tmp = ft_itoa(_statusCode);
-        _response->append(tmp).append(" ").append(_mapCodes.codes[_statusCode]);
+        response.append(tmp).append(" ").append(_mapCodes.codes[_statusCode]);
         free(tmp);
-        _response->append("</h1>\n\n</body>\n</html>\n");
+        response.append("</h1>\n\n</body>\n</html>\n");
         _contentType = "text/html";
         _charset = "utf-8";
-        _contentLength = _response->length();
+        _contentLength = response.length();
     }
     else
     {
         // TO DO need to put this in stream
-        _response->clear();
+        response.clear();
         while ((ret = read(fd, buf, 1024)) > 0)
         {
             buf[ret] = '\0';
-            _response->append(buf);
+            response.append(buf);
         }
         if (ret == -1)
             _statusCode = INTERNAL_SERVER_ERROR;
@@ -571,24 +569,51 @@ void            HttpResponse::setOtherHeaders(std::string &response)
         response.append("WWW-Authenticate: ").append("Basic realm=").append(_config.getAuth_basic(_location)).append("\r\n");
 }
 
-// ** Create the response socket **
+
+// This method will return the headers with a body if the request is ending
 std::string*         HttpResponse::process()
 {
     // new buffer
+    std::string headers = std::string("");
+    std::string body = std::string("");
+
+
+    // Request processing
     // If method is delete then just go and procces the request
     if (_request->getMethod().compare("DELETE") == 0)
-    {
         del();
-    }
+
+    // Body processing
+    // spcieal autoindex case
+    // If prevous error
     if (_statusCode >= 300)
-        configureErrorFile();
-    setFirstHeadersResponse(*_response);
+        configureErrorFile(body);
+    else if (_request->getMethod().compare("GET") == 0 || _request->getMethod().compare("HEAD") == 0)
+        if (_statusCode != UNAUTHORIZED && _config.getAutoindex(_location) == true)
+        {
+            setAutoindex(body);
+            _contentLength = body.length();
+            _contentType = "text/html";
+            _charset = "utf-8";
+        }
+
+    // Headers processing
+    // set headers
+    setFirstHeadersResponse(headers);
     if (_request->getMethod().compare("OPTIONS") == 0 || _statusCode == METHOD_NOT_ALLOWED)
-        setAllowMethodsResponse(*_response);
+        setAllowMethodsResponse(headers);
     else
-        setOtherHeaders(*_response);
-    _response->append("\r\n");
-    return _response;
+        setOtherHeaders(headers);
+    // end of headers
+    headers.append("\r\n");
+    
+
+    std::string* response = new std::string();
+    response->append(headers);
+    if (body.length() > 0)
+        response->append(body);
+        
+    return response;
 }
 
 std::string&    HttpResponse::getTransferEncoding()

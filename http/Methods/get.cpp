@@ -47,7 +47,7 @@ std::string     HttpResponse::acceptLanguage()
 
 
 // ** Create the default html page when file is not found and autoindex is on **
-void            HttpResponse::setAutoindex(void)
+void            HttpResponse::setAutoindex(std::string& response)
 {
     std::string             str;
     struct stat             directory;
@@ -56,9 +56,10 @@ void            HttpResponse::setAutoindex(void)
     struct tm               *timeinfo;
     char                    lastModifications[100];
     std::stack<std::string> files;
-    std::string             body;
 
-    body.assign("<html>\n<head><title>Index of /</title></head>\n<body>\n<h1>Index of /</h1><hr><pre>\n");
+
+    response.append("<html>\n<head><title>Index of /</title></head>\n<body>\n<h1>Index of /</h1><hr><pre>\n");
+    std::cout << "MOTHERFUCKAAAAAAAAAAAAAAAAAAAAAA " << "|" << _route << "|" << std::endl;
     dir = opendir(_route.c_str());
     if (dir == NULL)
         _statusCode = INTERNAL_SERVER_ERROR;
@@ -100,15 +101,10 @@ void            HttpResponse::setAutoindex(void)
         }
         while (!files.empty())
         {
-            body.append(files.top());
+            response.append(files.top());
             files.pop();
         }
     }
     closedir(dir);
-    body.append("</pre><hr></body>\n</html>");
-    _contentLength = body.length();
-    _contentType = "text/html";
-    _charset = "utf-8";
-    _body = (char*)ft_calloc(_contentLength + 1, sizeof(char));
-    ft_strcpy(_body, body.c_str());
+    response.append("</pre><hr></body>\n</html>");
 }

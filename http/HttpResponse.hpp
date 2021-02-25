@@ -70,8 +70,6 @@ class   HttpResponse
     int                         _stream_write;
     int                         _stream_read;
     
-    // The response buffer that's used to store data
-    std::string*                _response;
 
     // Utils
     std::string                 _uri;
@@ -97,9 +95,6 @@ class   HttpResponse
     std::string                 _retryAfter;
     std::string                 _transferEncoding;
     
-
-    // The http headers as a string buffer
-    std::string                 _httpHeaders;
 
 
     void            prepapreMethod(std::string method);
@@ -127,7 +122,7 @@ class   HttpResponse
     void            setCharset(void);
     void            setLastModified(void);
     void            setDate(void);
-    void            setAutoindex(void);
+    void            setAutoindex(std::string&);
     
 
     void            authorization(void);
@@ -155,7 +150,7 @@ class   HttpResponse
     void            del(void);
 
     // ERRORS
-    void            configureErrorFile(void);
+    void            configureErrorFile(std::string&);
 
     public:
     HttpResponse();

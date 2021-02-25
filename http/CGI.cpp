@@ -148,54 +148,11 @@ void        HttpResponse::cgi_exe()
     }
 }
 
-void        HttpResponse::cgi_parse()
-{
-    // size_t      find;
-
-    // find = _cgiResponse.find("\r\n\r\n");
-    // if (find != _cgiResponse.npos)
-        // _contentLength = _responseSize - find - 4;
-    // find = _cgiResponse.find("Status: ");
-    // if (find != _cgiResponse.npos)
-    //     _statusCode = ft_atoi(_cgiResponse.substr(find + ft_strlen("Status: "), find + ft_strlen("Status: ") + 3).c_str());
-    // find = _cgiResponse.find("Content-Type: ");
-    // if (find != _cgiResponse.npos)
-    //     _contentType = _cgiResponse.substr(find + ft_strlen("Content-Type: "), _cgiResponse.find("\r\n", find) - find - ft_strlen("Content-Type: "));
-}
-
-
 void            HttpResponse::prepare_cgi()
 {
     cgi_metaVariables();
     setEnv();
     cgi_exe();
-}
-
-void            HttpResponse::read_cgi_response()
-{
-    int ret = 0;
-    char        buf[1024];
-
-    ft_bzero(buf, 1024);
-    std::string().swap(_request->getBody());
-    // while ((ret = read(_cgi_out[SIDE_OUT], buf, 1024)) > 0) {
-    //     // _responseSize += ret;
-    //     buf[ret] = '\0';
-    //     _cgiResponse.append(buf);
-    // }
-
-     if (ret == -1)
-        _statusCode = BAD_GATEWAY;
-
-    // close(_cgi_in[SIDE_IN]);
-    // close(_cgi_out[SIDE_OUT]);
-    // if (WIFEXITED(status))
-    //     ret = WEXITSTATUS(status);
-    // if (ret != EXIT_SUCCESS)
-    //     _statusCode = BAD_GATEWAY;
-    cgi_parse();
-    setDate();
-	// processResponse();
 }
 
 int           HttpResponse::write_cgi_request()
