@@ -6,15 +6,15 @@
 /*   By: yorn <yorn@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/09 15:13:35 by trbonnes          #+#    #+#             */
-/*   Updated: 2021/02/15 16:27:38 by yorn             ###   ########.fr       */
+/*   Updated: 2021/02/25 18:03:23 by yorn             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ConfigServer.hpp"
 
 ConfigServer::ConfigServer() :
-_httpVersion("http/1.1"),
-_serverSoftware("Server/2.0"),
+_httpVersion("HTTP/1.1"),
+_serverSoftware("Webserv/2.0"),
 _putRoot("data/"),
 _defaultClientBodySize(-1),
 _defaultAutoindex(-1)
