@@ -6,7 +6,7 @@ _read_chain(c.getReadChain()),
 _write_chain(c.getWriteChain())
 {
 	_req = NULL;
-	_rep = NULL;
+	_resp = NULL;
 	_config = NULL;
 }
 
@@ -77,36 +77,45 @@ void Http::handleRead()
 			// Instantiate new request
 			_req = HttpRequest::parseRequest(request);
 			// Instantiate a new response from that request
-			_rep = new HttpResponse(_req, _config->getServerUnit(_req->getPort(), _req->getHost()));
+			_resp = new HttpResponse(_req, _config->getServerUnit(_req->getPort(), _req->getHost()));
 			
+
+
+
+			// Getting headers of response
+			buff = _resp->getHeaders();
+			Log::debug(*buff);
+			_connection.subWrite();
 			// Getting the headers and eventually the full response
-			buff = _rep->process();
 			_write_chain.pushBack(buff);
 			// If all are minus one then there's nothing to read / write, the request is done
-			if (_rep->getStreamIn() == -1 && _rep->getStreamIn() == -1)
+			if (_resp->getStreamIn() == -1 && _resp->getStreamIn() == -1)
 			{
-				_connection.subWrite();
+				buff = _resp->getBody();
+				if (buff)
+					_write_chain.pushBack(buff);
+				return;
 			}
 
 			// Adding streams in select fd sets
 			// By this point the Response should have fd's for CGI or a regular file
 			// if stream in
 			// CGI and PUT
-			if (_rep->getStreamIn() != -1)
+			if (_resp->getStreamIn() != -1)
 			{
-				_connection.setStreamWrite(_rep->getStreamIn());
+				_connection.setStreamWrite(_resp->getStreamIn());
 			}
 			//if stream out
 			// CGI and GET
-			if (_rep->getStreamOut() != -1)
+			if (_resp->getStreamOut() != -1)
 			{
-				_connection.setStreamRead(_rep->getStreamOut());
+				_connection.setStreamRead(_resp->getStreamOut());
 			}
 		}
 	}
 	// if it's not NUll then we have work to do
 	// it's not in an else statement, cause the above if statement will have some body leftovers in the read chain
-	if (_rep != NULL && _read_chain.getFirst() != NULL)
+	if (_resp != NULL && _read_chain.getFirst() != NULL)
 	{
 		Log::debug("Reading body");
 		Log::debug(_req->getTransferEncoding());
@@ -147,7 +156,7 @@ void Http::handleRead()
 
 void Http::handleStreamRead()
 {
-	if (_rep->getTransferEncoding() == "chunked")
+	if (_resp->getTransferEncoding() == "chunked")
 	{
 		// HttpResponse::
 	}
@@ -156,7 +165,7 @@ void Http::handleStreamRead()
 	{
 		try
 		{
-			BufferChain::readToBuffer(_write_chain, _rep->getStreamIn());
+			BufferChain::readToBuffer(_write_chain, _resp->getStreamIn());
 		}
 		catch(const std::exception& e)
 		{
@@ -198,6 +207,6 @@ Http::~Http()
 {
 	if (_req)
 		delete _req;
-	if (_rep)
-		delete _rep;
+	if (_resp)
+		delete _resp;
 }

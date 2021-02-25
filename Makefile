@@ -38,9 +38,6 @@ HTTPSRC =	http/Http.cpp \
 			http/httpRequestParser.cpp \
 			http/parseHeaders.cpp \
 			http/setHeaders.cpp \
-			http/Methods/del.cpp \
-			http/Methods/get.cpp \
-			http/Methods/put.cpp \
 			http/CGI.cpp
 
 

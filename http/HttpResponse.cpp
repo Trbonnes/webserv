@@ -12,7 +12,6 @@ _mapCodes(),
 _cgi(),
 _use_cgi(false),
 _location(""),
-_stat(),
 _allow(0),
 _wwwAuthenticate(""),
 _referer(""),
@@ -27,7 +26,6 @@ _charset(""),
 _retryAfter(""),
 _transferEncoding("")
 {
-    ft_bzero(_cgi_env, sizeof(NB_METAVARIABLES + 1));
 }
 
 HttpResponse::HttpResponse(HttpRequest *req, ConfigServer *config) :
@@ -36,8 +34,9 @@ _config(*config),
 _mapCodes(),
 _cgi(),
 _use_cgi(false),
+_stream_write(-1),
+_stream_read(-1),
 _location(""),
-_stat(),
 _statusCode(OK),
 _allow(0),
 _wwwAuthenticate(""),
@@ -53,34 +52,16 @@ _charset(""),
 _retryAfter(""),
 _transferEncoding("")
 {
-    ft_bzero(_cgi_env, sizeof(char*) * NB_METAVARIABLES + 1);
-    
-    // Storing the request for later use
-    _request = req;
-    // intiliazing streams to -1
-    _stream_read = -1;
-    _stream_write = -1;
-    _uri = _request->getRequestURI();
-    // Absolute location route for the server
-    _location = _config.getLocation(_uri);
-
-    // Check if length is given
-    if (_request->getBody().length() > 0 && _request->getContentLength() == 0 && _request->getTransferEncoding().length() == 0)
-        _statusCode = LENGTH_REQUIRED;
-    // Check to see if the request body is too large for the 
-    else if (_config.getClientBodySize(_location) != -1 && _request->getContentLength() > _config.getClientBodySize(_location))
-        _statusCode = REQUEST_ENTITY_TOO_LARGE;
-    if (_request->getMethod().compare("OPTIONS") == 0)
-        _statusCode = NO_CONTENT;
-    if (_statusCode == OK)
-    openStreams();
+    _body = NULL;
+    _headers = NULL;
+    ft_bzero(_cgi_env, sizeof(NB_METAVARIABLES + 1));
+    init(); // TO DO should i just copy the code of init in here ? 
 }
 
 HttpResponse::HttpResponse(HttpResponse &copy)
 {
     _request = copy._request;
     _config = copy._config;
-    _stat = copy._stat;
     _allow = copy._allow;
     _wwwAuthenticate = copy._wwwAuthenticate;
     _referer = copy._referer;
@@ -114,7 +95,6 @@ HttpResponse     &HttpResponse::operator=(HttpResponse &rhs)
 {
     _request = rhs._request;
     _config = rhs._config;
-    _stat = rhs._stat;
     _allow = rhs._allow;
     _wwwAuthenticate = rhs._wwwAuthenticate;
     _referer = rhs._referer;
@@ -131,94 +111,213 @@ HttpResponse     &HttpResponse::operator=(HttpResponse &rhs)
     return *this;
 }
 
+// Set the response to upload a file
+void            HttpResponse::get(bool include_body = false)
+{
+    int         fd;
+    struct stat file;
+
+    // Try to get stat of route
+    // if it returns anything other than 0, assume it's not found
+    if (stat(_route.c_str(), &file))
+    {
+        _statusCode = NOT_FOUND;
+        return;
+    }
+
+    // if it's a directory try to autoindex
+    if (S_ISDIR(file.st_mode))
+    {
+        if (_config.getAutoindex(_location) == true)
+            autoIndex();
+        else
+            _statusCode = UNAUTHORIZED; // TO DO not sure about that
+        return;
+    }
+
+    // Else it's a regular file
+    // Check if file exist
+    if ((fd = open(_route.c_str(), O_RDONLY)) != -1)
+    {
+        setLastModified(&file);
+        setContentType();
+        setCharset();
+        _contentLength = file.st_size;
+        setServerName();
+        setContentLocation();
+        if (include_body)
+            _stream_read = fd;
+        else
+            close(fd);
+    }
+    else 
+        _statusCode = INTERNAL_SERVER_ERROR;
+}
+
+void            HttpResponse::del()
+{
+    struct stat file;
+
+    // Try to get stat of route
+    // if it returns anything other than 0, assume it's not found
+    if (stat(_route.c_str(), &file))
+    {
+        _statusCode = NOT_FOUND;
+        return;
+    }
+
+    int ret = -1;
+    //try to unlink file
+    if ((file.st_mode & S_IFMT) == S_IFREG)
+        ret = unlink(_route.c_str());
+    // try to rm dir
+    else if (((file.st_mode & S_IFMT) == S_IFDIR))
+        ret = rmdir(_route.c_str());
+    // if one of those fails no content
+    if (ret == -1)
+        _statusCode = NO_CONTENT;
+}
+
+// Use to download file
+void            HttpResponse::put()
+{
+    setRoot();
+
+    struct stat stats;
+    stat(_route.c_str(), &stats);
+
+    // Getting path root and appending the file's name
+    std::string file = _uri.substr(_location.substr(0, _location.length() - 1).length(), _uri.length());
+    _route.assign(_config.getPutRoot()).append(file);
+    
+    // opening the ouputStream
+    // trying to open this existing file with O_TRUNCK to erase content while writing
+    _stream_write = open(_route.c_str(), O_WRONLY | O_TRUNC);
+    // if -1 then it doesn't exist
+    if (_stream_write == -1)
+    {
+        _statusCode = NO_CONTENT; // Should be 201 but the tester expect 204
+        // Trying to create the file then
+        _stream_write = open(_route.c_str(), O_CREAT | O_WRONLY, S_IRUSR | S_IWUSR);
+        if (_stream_write == -1)
+            _statusCode = INTERNAL_SERVER_ERROR;
+    }
+    else
+        _statusCode = NO_CONTENT;
+    setContentLocation();
+}
+
+void            HttpResponse::options()
+{
+    // TO DO
+}
+
+void            HttpResponse::cgi()
+{
+        _transferEncoding.assign("chunked");
+        _use_cgi = true;
+
+        // If it's a head request, just stop there
+        // TO DO is this right ?
+        if (_request->getMethod().compare("HEAD") != 0) // TO DO string comparison is so gross
+        {
+            cgi_metaVariables();
+            setEnv();
+            cgi_exe();
+        }
+}
+
+void        HttpResponse::error()
+{
+    int         fd;
+
+    _route = _config.getHTMLErrorPage(_statusCode);
+    fd = open(_route.c_str(), O_RDONLY);
+    if (fd == -1)
+    {
+        _body = new std::string();
+        _body->append("<!DOCTYPE html>\n<html>\n<body>\n\n<h1>");
+        char *tmp = ft_itoa(_statusCode);
+        _body->append(tmp).append(" ").append(_mapCodes.codes[_statusCode]);
+        free(tmp);
+        _body->append("</h1>\n\n</body>\n</html>\n");
+        _contentType = "text/html";
+        _charset = "utf-8";
+        _contentLength = _body->length();
+    }
+    else
+    {
+        close(fd);
+        get();
+    }
+}
 
 // This method opens the read/write streams needed to pursue the request 
-void            HttpResponse::openStreams()
+void            HttpResponse::init()
 {
+    _statusCode = OK;
+    ft_bzero(_cgi_env, sizeof(char*) * NB_METAVARIABLES + 1);
+    _uri = _request->getRequestURI();
+    // Absolute location route for the server
+    _location = _config.getLocation(_uri);
+    // Check if length is given
+    if (_request->getBody().length() > 0 && _request->getContentLength() == 0 && _request->getTransferEncoding().length() == 0)
+        _statusCode = LENGTH_REQUIRED;
+    // Check to see if the request body is too large for the 
+    else if (_config.getClientBodySize(_location) != -1 && _request->getContentLength() > _config.getClientBodySize(_location))
+        _statusCode = REQUEST_ENTITY_TOO_LARGE;
+    if (_request->getMethod().compare("OPTIONS") == 0)
+        _statusCode = NO_CONTENT;
+    
+    // In all cases we set the date
+    setDate();
+    // TO DO set server
+
     size_t      extension;
     std::string str;
 
     extension = _route.find_last_of('.');
     // If it's a CGI request we must fork and prepare the stream in and out
     if (is_good_exe(str.assign(_route).erase(0, extension + 1)) && checkCGImethods(_request->getMethod()))
-    {
-        _transferEncoding.assign("chunked");
-        _use_cgi = true;
-        prepare_cgi();
-        return;
-    }
-
+        cgi();
     // If it's not CGI we got to open read streams or write streams
-    if (checkAllowMethods(_request->getMethod()))
+    else if (checkAllowMethods(_request->getMethod()))
     {
         std::string& method = _request->getMethod();
         
-        // If GET or HEAD we must open the stream in
-        if (method.compare("GET") == 0 || method.compare("HEAD") == 0)
-        {
-            int         fd;
-            struct stat file;
 
-            fd = -1;
-            ft_bzero(&file, sizeof(file));
-            stat(_route.c_str(), &file);
-            
-            // Check if file exist
-            if ((S_ISREG(file.st_mode) && (fd = open(_route.c_str(), O_RDONLY)) != -1))
-                _statusCode = OK;
-            else
-                _statusCode = NOT_FOUND;
+        // TO DO check if if authorized in a return boolean way
+        authorization();
 
-            // Check if authorized
-            authorization();
-            // if everything is OK, set ehaders 
-            if (_statusCode == OK)
-            {
-                setLastModified();
-                setContentType();
-                setCharset();
-                setContentLength();
-                setServerName();
-                setContentLocation();
-                setDate();
-                _stream_read = fd;
-            }
-            else if (_statusCode != UNAUTHORIZED && _config.getAutoindex(_location) == true)
-            {
-                setDate();
-                _contentLanguage = "";
-                _statusCode = OK;
-            }
-        }
-        // If PUT then open a stream out
+        if (method.compare("GET") == 0)
+            get();
+        else if (method.compare("HEAD") == 0)
+            get(false); // the fasle here means to not include the body in the response
         else if (method.compare("PUT") == 0)
-        {
-            setRoot();
-            setStat();
-            // Getting path root and appending the file's name
-            std::string file = _uri.substr(_location.substr(0, _location.length() - 1).length(), _uri.length());
-            _route.assign(_config.getPutRoot()).append(file);
-            
-            // opening the ouputStream
-            // trying to open this existing file with O_TRUNCK to erase content while writing
-            _stream_write = open(_route.c_str(), O_WRONLY | O_TRUNC);
-            // if -1 then it doesn't exist
-            if (_stream_write == -1)
-            {
-                _statusCode = NO_CONTENT; // Should be 201 but the tester expect 204
-                // Trying to create the file then
-                _stream_write = open(_route.c_str(), O_CREAT | O_WRONLY, S_IRUSR | S_IWUSR);
-                if (_stream_write == -1)
-                    _statusCode = INTERNAL_SERVER_ERROR;
-            }
-            else
-                _statusCode = NO_CONTENT;
-            setContentLocation();
-        }
+            put();
+        else if (method.compare("DELETE") == 0)
+            del();
+        else if (method.compare("OPTIONS") == 0)
+            options();
     }
     // If else the method is not allowed
     else
         _statusCode = METHOD_NOT_ALLOWED;
+
+    // At the end. check if no error was met
+    if (_statusCode >= 300)
+        error();
+
+    _headers = new std::string();
+    // Headers processing
+    // set headers
+    setFirstHeadersResponse(*_headers);
+    if (_request->getMethod().compare("OPTIONS") == 0 || _statusCode == METHOD_NOT_ALLOWED)
+        setAllowMethodsResponse(*_headers);
+    else
+        setOtherHeaders(*_headers);
+    // end of headers
+    _headers->append("\r\n");
 }
 
 //** Check if the method is authorized for the non CGI locations **
@@ -241,13 +340,6 @@ int         HttpResponse::checkAllowMethods(std::string method)
     if (!ret)
       _statusCode = METHOD_NOT_ALLOWED;
     return (ret);
-}
-
-
-//** Set stat to know all the details of the requested file **
-void        HttpResponse::setStat()
-{
-    stat(_route.c_str(), &_stat);
 }
 
 // ** Set the root with language and location directory if needed **
@@ -463,44 +555,6 @@ std::string   HttpResponse::base64_decode(std::string const& encoded_string) {
     return ret;
 }
 
-void        HttpResponse::configureErrorFile(std::string& response)
-{
-    int         ret;
-    char        buf[1024 + 1];
-    int         fd;
-
-    _route = _config.getHTMLErrorPage(_statusCode);
-    fd = open(_route.c_str(), O_RDONLY);
-    if (fd == -1)
-    {
-        response.append("<!DOCTYPE html>\n<html>\n<body>\n\n<h1>");
-        char *tmp = ft_itoa(_statusCode);
-        response.append(tmp).append(" ").append(_mapCodes.codes[_statusCode]);
-        free(tmp);
-        response.append("</h1>\n\n</body>\n</html>\n");
-        _contentType = "text/html";
-        _charset = "utf-8";
-        _contentLength = response.length();
-    }
-    else
-    {
-        // TO DO need to put this in stream
-        response.clear();
-        while ((ret = read(fd, buf, 1024)) > 0)
-        {
-            buf[ret] = '\0';
-            response.append(buf);
-        }
-        if (ret == -1)
-            _statusCode = INTERNAL_SERVER_ERROR;
-        close(fd);
-        setStat();
-        setContentType();
-        setContentLength();
-        setDate();
-    }
-}
-
 
 void     HttpResponse::setFirstHeadersResponse(std::string &response)
 {
@@ -569,53 +623,6 @@ void            HttpResponse::setOtherHeaders(std::string &response)
         response.append("WWW-Authenticate: ").append("Basic realm=").append(_config.getAuth_basic(_location)).append("\r\n");
 }
 
-
-// This method will return the headers with a body if the request is ending
-std::string*         HttpResponse::process()
-{
-    // new buffer
-    std::string headers = std::string("");
-    std::string body = std::string("");
-
-
-    // Request processing
-    // If method is delete then just go and procces the request
-    if (_request->getMethod().compare("DELETE") == 0)
-        del();
-
-    // Body processing
-    // spcieal autoindex case
-    // If prevous error
-    if (_statusCode >= 300)
-        configureErrorFile(body);
-    else if (_request->getMethod().compare("GET") == 0 || _request->getMethod().compare("HEAD") == 0)
-        if (_statusCode != UNAUTHORIZED && _config.getAutoindex(_location) == true)
-        {
-            setAutoindex(body);
-            _contentLength = body.length();
-            _contentType = "text/html";
-            _charset = "utf-8";
-        }
-
-    // Headers processing
-    // set headers
-    setFirstHeadersResponse(headers);
-    if (_request->getMethod().compare("OPTIONS") == 0 || _statusCode == METHOD_NOT_ALLOWED)
-        setAllowMethodsResponse(headers);
-    else
-        setOtherHeaders(headers);
-    // end of headers
-    headers.append("\r\n");
-    
-
-    std::string* response = new std::string();
-    response->append(headers);
-    if (body.length() > 0)
-        response->append(body);
-        
-    return response;
-}
-
 std::string&    HttpResponse::getTransferEncoding()
 {
     return _transferEncoding;
@@ -629,4 +636,126 @@ int             HttpResponse::getStreamIn()
 int             HttpResponse::getStreamOut()
 {
     return _stream_read;
+}
+
+std::string*    HttpResponse::getHeaders()
+{
+    return _headers;
+}
+
+std::string*    HttpResponse::getBody()
+{
+    return _body;
+}
+
+std::string     HttpResponse::acceptLanguage()
+{
+    std::vector<std::string>::iterator itClientBegin;
+    std::vector<std::string>::iterator itClientEnd;
+    std::vector<std::string>::iterator itServer;
+    std::vector<std::string>::iterator itServerEnd;
+    std::string str;
+    std::string trydir;
+    struct stat dir;
+    int r;
+
+    if (!_config.getLanguage(_location).empty())
+    {
+        str.assign("/");
+        itClientBegin = _request->getAcceptLanguage().begin();
+        itClientEnd = _request->getAcceptLanguage().end();
+        itServerEnd = _config.getLanguage(_location).end();
+        while (itClientBegin != itClientEnd)
+        {
+            itServer = std::find(_config.getLanguage(_location).begin(), _config.getLanguage(_location).end(), *itClientBegin);
+            if (itServer != itServerEnd)
+            {
+                _contentLanguage = *itServer;
+                str.assign(*itServer);
+                str.append("/");
+                r = stat(trydir.assign(_route).append(str).c_str(), &dir);
+                if (r != -1 && (dir.st_mode & S_IFMT) == S_IFDIR)
+                    return (str);
+                else
+                    _contentLanguage.assign("");
+            }
+            itClientBegin++;
+        }
+        _contentLanguage = *(_config.getLanguage(_location).begin());
+        str.append(*(_config.getLanguage(_uri).begin()));
+        r = stat(trydir.assign(_route).append(str).c_str(), &dir);
+        if (r != -1 && (dir.st_mode & S_IFMT) == S_IFDIR)
+            return (str);
+        else
+            return (_contentLanguage.assign(""));
+    }
+    return ("");
+}
+
+
+// ** Create the default html page when file is not found and autoindex is on **
+void            HttpResponse::autoIndex()
+{
+    std::string             str;
+    struct stat             directory;
+    DIR                     *dir;
+    struct dirent           *dirent;
+    struct tm               *timeinfo;
+    char                    lastModifications[100];
+    std::stack<std::string> files;
+
+    dir = opendir(_route.c_str());
+    // if there's an se terror to internal server error
+    if (dir == NULL)
+        _statusCode = INTERNAL_SERVER_ERROR;
+    // else create the autoindex body
+    else
+    {
+        _body = new std::string();
+        _body->append("<html>\n<head><title>Index of /</title></head>\n<body>\n<h1>Index of /</h1><hr><pre>\n");
+        while ((dirent = readdir(dir)) != NULL)
+        {
+            stat(str.assign(_uri).append(dirent->d_name).c_str(), &directory);
+            if (str.assign(dirent->d_name).compare(".") == 0)
+                continue ;
+            str.assign("<a href=\"");
+            str.append(dirent->d_name);
+            if (dirent->d_type == DT_DIR)
+                str.append("/");
+            str.append("\">");
+            str.append(dirent->d_name);
+            if (dirent->d_type == DT_DIR)
+                str.append("/");
+            str.append("</a>\t\t\t\t");
+			#ifdef __linux__
+            	timeinfo = localtime(&(directory.st_mtim.tv_sec));
+			#else
+            	timeinfo = localtime(&(directory.st_mtimespec.tv_sec));
+			#endif // TARGET_OS_MAC
+			
+            strftime(lastModifications, 100, "%d-%b-20%y %OH:%OM", timeinfo);
+            str.append(lastModifications);
+            str.append("\t\t");
+            if (dirent->d_type == DT_DIR)
+                str.append("-");
+            else
+            {
+                char *dirSize = ft_itoa(directory.st_size);
+                str.append(dirSize);
+                free(dirSize);
+            }
+            str.append("\n");
+            files.push(str);
+        }
+        while (!files.empty())
+        {
+            _body->append(files.top());
+            files.pop();
+        }
+        _contentLength = _body->length();
+        _contentType = "text/html";
+        _charset = "utf-8";
+        closedir(dir);
+        _body->append("</pre><hr></body>\n</html>");
+    }
 }

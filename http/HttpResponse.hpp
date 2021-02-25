@@ -75,7 +75,6 @@ class   HttpResponse
     std::string                 _uri;
     std::string                 _route;
     std::string                 _location;
-    struct stat                 _stat;
     static const std::string    _base64_chars;
     char                        *_cgi_env[NB_METAVARIABLES + 1];
 
@@ -94,7 +93,10 @@ class   HttpResponse
     std::string                 _charset;
     std::string                 _retryAfter;
     std::string                 _transferEncoding;
-    
+
+
+    std::string*                _headers;
+    std::string*                _body;
 
 
     void            prepapreMethod(std::string method);
@@ -104,10 +106,17 @@ class   HttpResponse
     int             checkCGImethods(std::string method);
     void            setConfigURI(void);
 
-    
-    void            openStreams();
-    char*           readBody();
+    void            init();
+    void            get(bool);
+    void            del();
+    void            put();
+    void            head();
+    void            options();
+    void            cgi();
+    void            error();
 
+
+    void            autoIndex();
 
 
     // Setters
@@ -115,14 +124,11 @@ class   HttpResponse
     void            setRoot(void);
     void            setContentType(void);
     std::string     acceptLanguage(void);
-    void            setStat(void);
-    void            setContentLength(void);
     void            setServerName(void);
     void            setContentLocation(void);
     void            setCharset(void);
-    void            setLastModified(void);
+    void            setLastModified(struct stat*);
     void            setDate(void);
-    void            setAutoindex(std::string&);
     
 
     void            authorization(void);
@@ -134,20 +140,12 @@ class   HttpResponse
     std::string     base64_encode(unsigned char const* bytes_to_encode, unsigned int in_len);
 
     // CGI
-    void            prepare_cgi();
     void            cgi_metaVariables();
     void            cgi_exe();
     void            cgi_parse();
     void            setEnv();
     int             is_good_exe(std::string exe);
     static bool     mypred(char val1, char val2);
-
-
-    // PUT
-    void            put(void);
-    
-    // DELETE
-    void            del(void);
 
     // ERRORS
     void            configureErrorFile(std::string&);
@@ -170,8 +168,9 @@ class   HttpResponse
     // RESPONSE
     void            read_cgi_response();
     int             write_cgi_request();
+    std::string*    getHeaders();
+    std::string*    getBody();
     bool            use_cgi();
-    std::string*    process();
     void            setFirstHeadersResponse(std::string &response);
     void            setAllowMethodsResponse(std::string &response);
     void            setOtherHeaders(std::string &response);

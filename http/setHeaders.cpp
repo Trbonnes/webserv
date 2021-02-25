@@ -17,17 +17,12 @@ void        HttpResponse::setServerName()
     _server = _request->getHost();
 }
 
-void        HttpResponse::setContentLength()
-{
-   _contentLength = _stat.st_size;
-}
-
-void        HttpResponse::setLastModified()
+void        HttpResponse::setLastModified(struct stat* file)
 {
     struct tm *timeinfo;
 
 	#ifdef __linux__
-    		timeinfo = localtime(&(_stat.st_mtim.tv_sec));
+    		timeinfo = localtime(&(file->st_mtim.tv_sec));
 	#else
             timeinfo = localtime(&(_stat.st_mtimespec.tv_sec)); // st_mtimespec.tv_sec = macos ; st_mtim = linux
 	#endif // TARGET_OS_MAC

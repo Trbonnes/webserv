@@ -148,13 +148,6 @@ void        HttpResponse::cgi_exe()
     }
 }
 
-void            HttpResponse::prepare_cgi()
-{
-    cgi_metaVariables();
-    setEnv();
-    cgi_exe();
-}
-
 int           HttpResponse::write_cgi_request()
 {
     int ret = 0;
