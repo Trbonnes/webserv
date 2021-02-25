@@ -84,8 +84,13 @@ int		BufferChain::writeBufferToFd(BufferChain& chain, FD fd)
 	std::string* buff;
 	
 	buff = chain.getFirst();
+	std::cout << "SIZE: " << buff->size() << std::endl;
+	std::cout << "================================================" << std::endl;
+	std::cout << *buff << std::endl;
+	std::cout << "================================================" << std::endl;
 	ret = write(fd, buff->c_str(), buff->size());
-	if (ret == -1)
+	std::cout << "WRITTEN: " << ret << std::endl;
+	if (ret == -1) // TO DO check if write fails to write all bytes
 		throw IOError();
 	return ret;
 }

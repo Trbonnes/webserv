@@ -322,7 +322,7 @@ void            HttpResponse::init()
     else
         setOtherHeaders(*_headers);
     // end of headers
-    _headers->append("\r\n\r\n");
+    _headers->append("\r\n");
 }
 
 //** Check if the method is authorized for the non CGI locations **
