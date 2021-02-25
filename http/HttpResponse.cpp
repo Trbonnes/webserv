@@ -121,6 +121,8 @@ void            HttpResponse::get(bool include_body = false)
     // if it returns anything other than 0, assume it's not found
     if (stat(_route.c_str(), &file))
     {
+        Log::debug(_route.c_str());
+        Log::debug("STat error GET");
         _statusCode = NOT_FOUND;
         return;
     }
@@ -163,6 +165,8 @@ void            HttpResponse::del()
     if (stat(_route.c_str(), &file))
     {
         _statusCode = NOT_FOUND;
+        Log::debug("STat error DEL");
+
         return;
     }
 
@@ -181,8 +185,6 @@ void            HttpResponse::del()
 // Use to download file
 void            HttpResponse::put()
 {
-    setRoot();
-
     struct stat stats;
     stat(_route.c_str(), &stats);
 
@@ -235,6 +237,7 @@ void        HttpResponse::error()
     fd = open(_route.c_str(), O_RDONLY);
     if (fd == -1)
     {
+        std::cout << "NOW DOING STUFF" << std::endl;
         _body = new std::string();
         _body->append("<!DOCTYPE html>\n<html>\n<body>\n\n<h1>");
         char *tmp = ft_itoa(_statusCode);
@@ -271,6 +274,8 @@ void            HttpResponse::init()
     
     // In all cases we set the date
     setDate();
+    // set the route of the ressource
+    setRoute();
     // TO DO set server
 
     size_t      extension;
@@ -317,7 +322,7 @@ void            HttpResponse::init()
     else
         setOtherHeaders(*_headers);
     // end of headers
-    _headers->append("\r\n");
+    _headers->append("\r\n\r\n");
 }
 
 //** Check if the method is authorized for the non CGI locations **
@@ -343,7 +348,7 @@ int         HttpResponse::checkAllowMethods(std::string method)
 }
 
 // ** Set the root with language and location directory if needed **
-void         HttpResponse::setRoot()
+void         HttpResponse::setRoute()
 {
     int         fd;
     int         find;

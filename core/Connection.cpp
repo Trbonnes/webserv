@@ -137,12 +137,16 @@ void Connection::write()
 {
 	try
 	{
+		std::cout << "WRITING" << std::endl;
 		BufferChain::writeBufferToFd(_write_chain, _socket);
 		std::string* buff = _write_chain.getFirst();
 		delete buff;
 		_write_chain.popFirst();
 		if (_write_chain.getFirst() == NULL)
+		{
+			std::cout << "Unsubbing socket" << std::endl;
 			unsubWrite();
+		}
 	}
 	catch(const IOError& e)
 	{

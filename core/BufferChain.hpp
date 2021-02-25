@@ -12,8 +12,8 @@
 // default nginx client buffer size on 64 bit systems 
 // It should be enough to hold most Http request headers, but we got to implement the case where it is too small
 #define BUFFER_SIZE_MEDIUM 16384
-// #define BUFFER_SIZE_LARGE 1024000
-#define BUFFER_SIZE_LARGE 10 // TO DO don't forget to remove
+#define BUFFER_SIZE_LARGE 1024000
+// #define BUFFER_SIZE_LARGE 10 // TO DO don't forget to remove
 
 
 // Buffer used in socket and filesystem read

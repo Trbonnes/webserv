@@ -121,7 +121,7 @@ class   HttpResponse
 
     // Setters
     void            setBody(int fd);
-    void            setRoot(void);
+    void            setRoute(void);
     void            setContentType(void);
     std::string     acceptLanguage(void);
     void            setServerName(void);

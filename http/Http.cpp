@@ -35,52 +35,56 @@ void Http::handleRead()
 	if (_req == NULL)
 	{
 		std::string* last = _read_chain.getLast();
-
+		std::string* buff;
 		size_t needle;
 		// If the end of headers are reached
-		if ((needle = last->find("\r\n\r\n")) != last->npos)
+		if ((needle = last->find("\r\n\r\n")) != last->npos) // TO DO might have to hcange this for small buffers
 		{
 			Log::debug("End of headers reached !");
-
 			size_t space = 0;
 
-			// Calculating space to reserve
-			for (BufferChain::iterator it = _read_chain.begin(); *it != last; it++)
-				space += (*it)->size();
-			space += needle;
-			
-			// reserveing the space
 			std::string request("");
-			request.reserve(space);
-			
-			// appending the data
-			std::string* buff;
-			while ((buff = _read_chain.getFirst()) != last)
+			if (_read_chain.size() > 1) // TO DO ugly
 			{
+				// Calculating space to reserve
+				for (BufferChain::iterator it = _read_chain.begin(); *it != last; it++)
+					space += (*it)->size();
+				space += needle;	
+				// reserveing the space
+				request.reserve(space);
+				
+				// appending the data
+				while ((buff = _read_chain.getFirst()) != last)
+				{
+					request.append(*buff);
+					delete buff;
+					_read_chain.popFirst();
+				}
+				request.append(*buff, needle);
+				
+				// If there's leftovers, append them to the read chain to be processed as body or else
+				size_t offset = needle + 4;
+				if (offset < buff->size())
+				{
+					std::string* leftovers = new std::string(buff->c_str(), offset, buff->size() - offset);
+					_read_chain.pushBack(leftovers);
+				}
+				// then delete the current buffer
+				delete buff;
+				_read_chain.popFirst();
+			}
+			else
+			{
+				buff = _read_chain.getFirst();
 				request.append(*buff);
 				delete buff;
 				_read_chain.popFirst();
 			}
-			request.append(*buff, needle);
-			
-			// If there's leftovers, append them to the read chain to be processed as body or else
-			size_t offset = needle + 4;
-			if (offset < buff->size())
-			{
-				std::string* leftovers = new std::string(buff->c_str(), offset, buff->size() - offset);
-				_read_chain.pushBack(leftovers);
-			}
-			// then delete the current buffer
-			delete buff;
-			_read_chain.popFirst();
 
 			// Instantiate new request
 			_req = HttpRequest::parseRequest(request);
 			// Instantiate a new response from that request
 			_resp = new HttpResponse(_req, _config->getServerUnit(_req->getPort(), _req->getHost()));
-			
-
-
 
 			// Getting headers of response
 			buff = _resp->getHeaders();
@@ -92,8 +96,10 @@ void Http::handleRead()
 			if (_resp->getStreamIn() == -1 && _resp->getStreamIn() == -1)
 			{
 				buff = _resp->getBody();
+				std::cout << "buff: |" << *buff << "|" <<  std::endl;
 				if (buff)
 					_write_chain.pushBack(buff);
+				std::cout << "SIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIZE: " << _write_chain.size() << std::endl;
 				return;
 			}
 
