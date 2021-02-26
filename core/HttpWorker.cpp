@@ -52,6 +52,7 @@ void	HttpWorker::run()
 		read_fs = _active_read;
 		write_fs = _active_write;
 				// Log::debug("Looping");
+		Log::debug("Select wait");
 		if (select(FD_SETSIZE, &read_fs, &write_fs, NULL, NULL) == -1)
 		{
 			if (g_server->getStatus() == HttpServer::STOPPING)
@@ -59,6 +60,7 @@ void	HttpWorker::run()
 			else
 				std::cerr << "Select error: " << strerror(errno) << std::endl;
 		}
+		Log::debug("Select event");
 
 		if (g_server->getStatus() == HttpServer::STOPPING)
 				break;
@@ -66,7 +68,7 @@ void	HttpWorker::run()
 		for (il = _listen_socket.begin(); il != _listen_socket.end(); il++)
 			if (FD_ISSET(il->getSock(), &read_fs))
 				acceptConnection(il->getSock());
-
+		Log::debug("New connections gone through");
 		ic = _connections.begin();
 		while (ic != _connections.end())
 		{
@@ -84,6 +86,7 @@ void	HttpWorker::run()
 			}
 			catch(const std::exception& e)
 			{
+				Log::debug("Connection close");
 				ic = _connections.erase(ic);
 				delete c;
 				continue;

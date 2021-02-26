@@ -116,6 +116,7 @@ int	Connection::isStreamReadReady(fd_set* set)
 
 void Connection::read()
 {
+	Log::debug("Conenction::read");
 	int read;
 	
 	try
@@ -135,9 +136,9 @@ void Connection::read()
 
 void Connection::write()
 {
+	Log::debug("Connection::write");
 	try
 	{
-		std::cout << "WRITING" << std::endl;
 		BufferChain::writeBufferToFd(_write_chain, _socket);
 		std::string* buff = _write_chain.getFirst();
 		delete buff;
@@ -156,33 +157,28 @@ void Connection::write()
 
 void Connection::streamWrite()
 {
+	Log::debug("Connection::streamWrite");
 	try
 	{
 		_module.handleStreamWrite();
 	}
 	catch(const IOError& e)
 	{
-		throw;
+		throw ConnectionClose();
 	}
 }
 
 void Connection::streamRead()
 {
-	int read;
-	
+	Log::debug("Connection::streamRead");
 	try
 	{
-		read = BufferChain::readToBuffer(_read_chain, _socket);
+		_module.handleStreamRead();
 	}
 	catch(const IOError& e)
 	{
-		throw;
-	}
-	if (read == 0)
-	{
 	 	throw ConnectionClose();
 	}
-	_module.handleRead();
 }
 
 

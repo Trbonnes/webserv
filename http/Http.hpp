@@ -38,6 +38,7 @@ private:
 	// the servers configuration
 	Config* _config;
 
+	std::string		_requestBuffer;
 	// Prevent call to these functions
 	Http();
 

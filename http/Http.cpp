@@ -34,53 +34,23 @@ void Http::handleRead()
 	// if null then headers are not fully received
 	if (_req == NULL)
 	{
-		std::string* last = _read_chain.getLast();
-		std::string* buff;
-		size_t needle;
+		std::string* buff = _read_chain.getFirst(); // TO DO might do a strrchr on bfufer chain to avoid multiple allocation
+		_requestBuffer.append(*buff);
+		delete buff;
+		_read_chain.popFirst();
+		
+		size_t pos;
 		// If the end of headers are reached
-		if ((needle = last->find("\r\n\r\n")) != last->npos) // TO DO might have to hcange this for small buffers
+		if ((pos = _requestBuffer.find("\r\n\r\n")) != _requestBuffer.npos) // TO DO might have to hcange this for small buffers
 		{
-			Log::debug("End of headers reached !");
-			size_t space = 0;
-
-			std::string request("");
-			if (_read_chain.size() > 1) // TO DO ugly
+			std::string request;
+			request.append(_requestBuffer, 0, pos + 1); // TO DO realloc good ?
+			if (pos < _requestBuffer.size() - 5)
 			{
-				// Calculating space to reserve
-				for (BufferChain::iterator it = _read_chain.begin(); *it != last; it++)
-					space += (*it)->size();
-				space += needle;	
-				// reserveing the space
-				request.reserve(space);
-				
-				// appending the data
-				while ((buff = _read_chain.getFirst()) != last)
-				{
-					request.append(*buff);
-					delete buff;
-					_read_chain.popFirst();
-				}
-				request.append(*buff, needle);
-				
-				// If there's leftovers, append them to the read chain to be processed as body or else
-				size_t offset = needle + 4;
-				if (offset < buff->size())
-				{
-					std::string* leftovers = new std::string(buff->c_str(), offset, buff->size() - offset);
-					_read_chain.pushBack(leftovers);
-				}
-				// then delete the current buffer
-				delete buff;
-				_read_chain.popFirst();
+				std::string* leftovers = new std::string(_requestBuffer, pos + 4, _requestBuffer.size() - pos - 5);
+				_read_chain.pushFront(leftovers);
 			}
-			else
-			{
-				buff = _read_chain.getFirst();
-				request.append(*buff);
-				delete buff;
-				_read_chain.popFirst();
-			}
-
+			_requestBuffer.clear();
 			// Instantiate new request
 			_req = HttpRequest::parseRequest(request);
 			// Instantiate a new response from that request
@@ -88,34 +58,36 @@ void Http::handleRead()
 
 			// Getting headers of response
 			buff = _resp->getHeaders();
-			Log::debug(*buff);
 			_connection.subWrite();
+			_connection.unsubRead();
 			// Getting the headers and eventually the full response
 			_write_chain.pushBack(buff);
 			// If all are minus one then there's nothing to read / write, the request is done
-			if (_resp->getStreamIn() == -1 && _resp->getStreamIn() == -1)
+
+			if (_resp->getStreamRead() == -1 && _resp->getStreamWrite() == -1)
 			{
 				buff = _resp->getBody();
-				std::cout << "buff: |" << *buff << "|" <<  std::endl;
 				if (buff)
 					_write_chain.pushBack(buff);
-				std::cout << "SIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIZE: " << _write_chain.size() << std::endl;
 				return;
 			}
+
 
 			// Adding streams in select fd sets
 			// By this point the Response should have fd's for CGI or a regular file
 			// if stream in
 			// CGI and PUT
-			if (_resp->getStreamIn() != -1)
+			if (_resp->getStreamWrite() != -1)
 			{
-				_connection.setStreamWrite(_resp->getStreamIn());
+				_connection.setStreamWrite(_resp->getStreamWrite());
+				_connection.subStreamWrite();	
 			}
 			//if stream out
 			// CGI and GET
-			if (_resp->getStreamOut() != -1)
+			if (_resp->getStreamRead() != -1)
 			{
-				_connection.setStreamRead(_resp->getStreamOut());
+				_connection.setStreamRead(_resp->getStreamRead());
+				_connection.subStreamRead();
 			}
 		}
 	}
@@ -126,13 +98,7 @@ void Http::handleRead()
 		Log::debug("Reading body");
 		Log::debug(_req->getTransferEncoding());
 		bool	end = false;
-		
-		// std::cout << "Transfer encoding:"  << std::endl;
-		// std::cout << "|" << _req->getTransferEncoding() << "|" << std::endl;
-		// std::cout << "|" << "chunked" << "|" << std::endl;
-		// std::cout << "|" << (_req->getTransferEncoding() == "chunked") << "|" << std::endl;
-		// std::cout << "|" << (_req->getTransferEncoding().compare("chunked")) << "|" << std::endl;
-		// If it is chunked we need to extract those into a new buffer
+
 		if (_req->getTransferEncoding() == "chunked\r")
 		{
 			try
@@ -162,6 +128,8 @@ void Http::handleRead()
 
 void Http::handleStreamRead()
 {
+	int ret = -1;
+	Log::debug("handleStreamRead()");
 	if (_resp->getTransferEncoding() == "chunked")
 	{
 		// HttpResponse::
@@ -171,13 +139,17 @@ void Http::handleStreamRead()
 	{
 		try
 		{
-			BufferChain::readToBuffer(_write_chain, _resp->getStreamIn());
+			ret = BufferChain::readToBuffer(_write_chain, _resp->getStreamRead());
+			if (ret == 0)
+				_connection.unsubStreamRead();
 		}
 		catch(const std::exception& e)
 		{
 			throw;
 		}
 	}
+	if (_write_chain.getFirst())
+		_connection.subWrite();
 }
 
 void Http::handleStreamWrite()

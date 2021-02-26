@@ -98,7 +98,7 @@ int		BufferChain::writeBufferToFd(BufferChain& chain, FD fd)
 int		BufferChain::readToBuffer(BufferChain& chain, FD fd)
 {
 	int ret;
-	
+
 	ret = read(fd, g_read_large, BUFFER_SIZE_LARGE); // TO DO keep this size ?
 	if (ret == -1)
 		throw IOError();

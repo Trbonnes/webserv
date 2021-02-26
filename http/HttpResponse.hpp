@@ -110,6 +110,7 @@ class   HttpResponse
     void            get(bool);
     void            del();
     void            put();
+    void            post();
     void            head();
     void            options();
     void            cgi();
@@ -161,8 +162,8 @@ class   HttpResponse
 
     //Getters
     std::string&    getTransferEncoding();
-    int             getStreamIn();
-    int             getStreamOut();
+    int             getStreamWrite();
+    int             getStreamRead();
 
 
     // RESPONSE
