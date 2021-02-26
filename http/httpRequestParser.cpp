@@ -6,7 +6,7 @@
 /*   By: yorn <yorn@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/30 15:45:46 by trbonnes          #+#    #+#             */
-/*   Updated: 2021/02/22 16:33:15 by yorn             ###   ########.fr       */
+/*   Updated: 2021/02/26 18:29:52 by yorn             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -120,12 +120,19 @@ static void cutLeftovers(BufferChain& chain, std::string* curr, size_t hexStart)
 	std::string* leftovers;
 	if (hexStart > 0)
 	{
-		leftovers = new std::string(*curr, hexStart);
-		if (leftovers->size() == 0)
-			delete leftovers;
+		if (hexStart >= curr->size())
+		{
+			delete curr;
+		}
 		else
-			chain.pushFront(leftovers);
-		delete curr;
+		{
+			leftovers = new std::string(*curr, hexStart);
+			if (leftovers->size() == 0)
+				delete leftovers;
+			else
+				chain.pushFront(leftovers);
+			delete curr;
+		}
 	}
 	else
 	{
@@ -148,15 +155,15 @@ static void appendNext(BufferChain& chain, std::string* curr)
 static int appendChunk(BufferChain& chain, std::string* dst, size_t *offset)
 {
 	size_t hexStart = *offset;
-	size_t endLen;
+	size_t hexEnd;
 
 	// popping the current buffer cause it's gonna be split
 	std::string *buff = chain.getFirst();
 	chain.popFirst();
 
-	endLen = buff->find("\r\n", hexStart);
+	hexEnd = buff->find("\r\n", hexStart);
 	// No symbol found
-	if (endLen == buff->npos)
+	if (hexEnd == buff->npos)
 	{
 		// if the next buffer is not available, cut the current one
 		if (chain.getFirst() == NULL)
@@ -173,20 +180,22 @@ static int appendChunk(BufferChain& chain, std::string* dst, size_t *offset)
 			return 1;
 		}
 	}
-	// If this is true the lenght string is non existent
-	if (hexStart == endLen)
+	// If this is true the length string is non existent
+	if (hexStart == hexEnd)
 		return -1;
-	std::string strLen(*buff, hexStart, endLen);
+	
+	std::string hexLen(*buff, hexStart, hexEnd);
 	size_t bodyLen;
 	char* endptr;
-	bodyLen = std::strtol(strLen.c_str(), &endptr, 16);
-	// if it's not all in base 16
-	if ((unsigned long)(endptr - strLen.c_str()) != endLen - hexStart)
+	bodyLen = std::strtol(hexLen.c_str(), &endptr, 16);
+	std::cout << "bodyLen : " << bodyLen << std::endl;
+	// if it's not all in basse 16
+	if ((unsigned long)(endptr - hexLen.c_str()) != hexEnd - hexStart)
 		return -1;
+	size_t bodyStart = hexEnd + 2;
+	size_t bodyEnd = bodyStart + bodyLen;
 	// if all the body isn't in the chunk
-	size_t bodyStart = endLen + 2;
-	size_t bodyEnd = bodyStart + bodyLen + 2;
-	if (bodyEnd > buff->size())
+	if (bodyEnd >= buff->size())
 	{
 		// if the next buffer is not available, cut the current one
 		if (chain.getFirst() == NULL)
@@ -205,12 +214,12 @@ static int appendChunk(BufferChain& chain, std::string* dst, size_t *offset)
 	}
 	if (bodyLen == 0)
 	{
-		cutLeftovers(chain, buff, bodyEnd);
+		std::cout << "0 body len ma foi"<< std::endl;
+		cutLeftovers(chain, buff, bodyEnd + 2); // + 2 to avoid the \r\n
 		return 2;
 	}
-	
 	dst->append(*buff, bodyStart, bodyLen);
-	*offset = bodyEnd;
+	*offset = bodyEnd + 2;
 	chain.pushFront(buff);
 	return (1);
 }
@@ -230,6 +239,7 @@ bool         HttpRequest::extractChunks(BufferChain& read_chain, BufferChain& st
 		// std::cout << "|" << *read_chain.getFirst() <<  "|" << std::endl;
 		continue;
 	}
+	std::cout << "Value of r: " << r << std::endl;
 	// if -1 error
 	if (r == -1)
 		throw HttpRequest::MalformedChunk();

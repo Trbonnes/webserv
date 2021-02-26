@@ -42,6 +42,19 @@ private:
 	// Prevent call to these functions
 	Http();
 
+
+	typedef enum e_status
+	{
+		WAITING_HEADERS,
+		WAITING_BODY,
+		// WAITING_STREAM_WRITE,
+		// WAITING_STREAM_READ,
+		// INACTIVE,
+		DONE
+	} status_t;
+
+	status_t _status_socket;
+	status_t _status_stream;
 public:
 	Http(Connection &c);
 	Http(const Http&);
@@ -54,6 +67,14 @@ public:
 	void handleRead();
 	void handleStreamWrite();
 	void handleStreamRead();
+
+	void handleNewRequest();
+	void handleBodyRead();
+
+	// destroy the HttpRequest object
+	void	destroyRequest();
+	void	destroyResponse();
+
 };
 
 #include "core/Connection.hpp"

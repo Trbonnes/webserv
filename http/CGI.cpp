@@ -148,17 +148,6 @@ void        HttpResponse::cgi_exe()
     }
 }
 
-int           HttpResponse::write_cgi_request()
-{
-    int ret = 0;
-
-    Log::debug("About to write to CGI");
-    // ret = write(_cgi_in[SIDE_IN], _request->getBody().c_str(), _request->getContentLength());
-    Log::debug("Wrote to CGI");
-     _request->getBody().clear();
-    return ret;
-}
-
 bool          HttpResponse::use_cgi()
 {
     return _use_cgi;

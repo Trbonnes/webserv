@@ -21,40 +21,6 @@
 # include "statusCodes.hpp"
 # include "CGI.hpp"
 
-# define SIDE_OUT 0
-# define SIDE_IN 1
-
-enum methods
-{
-    GET,
-    HEAD,
-    NB_METHODS
-};
-
-enum cgi_variables
-{
-    REDIRECT_STATUS,
-    AUTH_TYPE,
-    CONTENT_LENGTH,
-    CONTENT_TYPE,
-    GATEWAY_INTERFACE,
-    PATH_INFO,
-    PATH_TRANSLATED,
-    QUERY_STRING,
-    REMOTE_ADDR,
-    REMOTE_IDENT,
-    REMOTE_USER,
-    REQUEST_METHOD,
-    REQUEST_URI,
-    SCRIPT_NAME,
-    SERVER_NAME,
-    SERVER_PORT,
-    SERVER_PROTOCOL,
-    SERVER_SOFTWARE,
-    X_SECRET,
-    NB_METAVARIABLES
-};
-
 class   HttpResponse
 {
     private:
@@ -65,6 +31,9 @@ class   HttpResponse
     StatusCode                  _mapCodes;
     CGI                         _cgi;
     bool                        _use_cgi;
+    bool                        _is_done;
+    bool                        _ignore_body;
+
 
     // File streams
     int                         _stream_write;
@@ -121,7 +90,6 @@ class   HttpResponse
 
 
     // Setters
-    void            setBody(int fd);
     void            setRoute(void);
     void            setContentType(void);
     std::string     acceptLanguage(void);
@@ -166,9 +134,6 @@ class   HttpResponse
     int             getStreamRead();
 
 
-    // RESPONSE
-    void            read_cgi_response();
-    int             write_cgi_request();
     std::string*    getHeaders();
     std::string*    getBody();
     bool            use_cgi();

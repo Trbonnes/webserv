@@ -8,6 +8,7 @@ _write_chain(c.getWriteChain())
 	_req = NULL;
 	_resp = NULL;
 	_config = NULL;
+	_status_socket = WAITING_HEADERS;
 }
 
 Http::Http(const Http &c) :
@@ -24,25 +25,20 @@ Http& Http::operator=(const Http &c)
 	return *this;
 }
 
-
-
-// This methods is called each time there's a socket read
-// The bytes have already been loaded into _read_cahin by ths point
-void Http::handleRead()
+void Http::handleNewRequest()
 {
-	Log::debug("handleRead()");
-	// if null then headers are not fully received
-	if (_req == NULL)
-	{
 		std::string* buff = _read_chain.getFirst(); // TO DO might do a strrchr on bfufer chain to avoid multiple allocation
 		_requestBuffer.append(*buff);
 		delete buff;
 		_read_chain.popFirst();
 		
+
 		size_t pos;
+		std::cout << _requestBuffer << std::endl;
 		// If the end of headers are reached
 		if ((pos = _requestBuffer.find("\r\n\r\n")) != _requestBuffer.npos) // TO DO might have to hcange this for small buffers
 		{
+			std::cout << "New request " << std::endl;
 			std::string request;
 			request.append(_requestBuffer, 0, pos + 1); // TO DO realloc good ?
 			if (pos < _requestBuffer.size() - 5)
@@ -56,23 +52,25 @@ void Http::handleRead()
 			// Instantiate a new response from that request
 			_resp = new HttpResponse(_req, _config->getServerUnit(_req->getPort(), _req->getHost()));
 
+			// Subbing
+			_connection.subWrite();
+
 			// Getting headers of response
 			buff = _resp->getHeaders();
-			_connection.subWrite();
-			_connection.unsubRead();
 			// Getting the headers and eventually the full response
 			_write_chain.pushBack(buff);
-			// If all are minus one then there's nothing to read / write, the request is done
-
-			if (_resp->getStreamRead() == -1 && _resp->getStreamWrite() == -1)
+			// If body is true append body
+			buff = _resp->getBody();
+			if (buff)
+				_write_chain.pushBack(buff);
+			
+			if (_req->getContentLength() > 0 || _req->getTransferEncoding() == "chunked\r") // TO DO why ?
 			{
-				buff = _resp->getBody();
-				if (buff)
-					_write_chain.pushBack(buff);
-				return;
+				std::cout << "We gotta wait some body" << std::endl;
+				_status_socket = WAITING_BODY;
 			}
-
-
+			else
+				_status_socket = DONE;
 			// Adding streams in select fd sets
 			// By this point the Response should have fd's for CGI or a regular file
 			// if stream in
@@ -90,39 +88,57 @@ void Http::handleRead()
 				_connection.subStreamRead();
 			}
 		}
-	}
-	// if it's not NUll then we have work to do
-	// it's not in an else statement, cause the above if statement will have some body leftovers in the read chain
-	if (_resp != NULL && _read_chain.getFirst() != NULL)
-	{
-		Log::debug("Reading body");
-		Log::debug(_req->getTransferEncoding());
-		bool	end = false;
+}
 
-		if (_req->getTransferEncoding() == "chunked\r")
+void Http::handleBodyRead()
+{
+	bool	end = false;
+
+	if (_req->getTransferEncoding() == "chunked\r") // TO DO why the f do i have to add \r
+	{
+		try
 		{
-			try
-			{
-				end = HttpRequest::extractChunks(_read_chain, _stream_write_chain);
-			}
-			catch(const std::exception& e)
-			{
-				std::cerr << e.what() << '\n';
-				// TO DO set error bad request in response status
-			}
+			end = HttpRequest::extractChunks(_read_chain, _stream_write_chain); // TO DO is it ugly ? II think so
+			std::cout << end << std::endl;
 		}
-		else
+		catch(const std::exception& e)
 		{
-			end = HttpRequest::extractBody(_read_chain, _stream_write_chain, _req);
+			std::cerr << e.what() << '\n';
+			// TO DO set error bad request in response status
 		}
-		// if end then all body has been received
-		if (end)
-		{
-			Log::debug("End of read");
-			// unsub read so we pause the read process
-			_connection.unsubRead();
-		}
-		std::cout << _stream_write_chain;
+	}
+	else
+	{
+		end = HttpRequest::extractBody(_read_chain, _stream_write_chain, _req);
+	}
+	// if end then all body has been received
+	if (end)
+	{
+		Log::debug("All the body has been read");
+		if (_resp->getStreamWrite() == -1)
+			_stream_write_chain.flush();
+		_status_socket = DONE;
+	}
+	std::cout << _stream_write_chain;
+}
+
+// This methods is called each time there's a socket read
+// The bytes have already been loaded into _read_cahin by ths point
+void Http::handleRead()
+{
+	Log::debug("handleRead()");	
+	if (_status_socket == WAITING_HEADERS)
+		handleNewRequest();
+
+	if (_status_socket == WAITING_BODY)
+		handleBodyRead();
+
+	if (_status_socket == DONE)
+	{
+		std::cout << "REQUEST END" << std::endl;
+		destroyRequest();
+		destroyResponse();
+		_status_socket = WAITING_HEADERS;
 	}
 }
 
@@ -141,7 +157,12 @@ void Http::handleStreamRead()
 		{
 			ret = BufferChain::readToBuffer(_write_chain, _resp->getStreamRead());
 			if (ret == 0)
+			{
+				destroyResponse();
+				destroyRequest();
+				_connection.subRead();
 				_connection.unsubStreamRead();
+			}
 		}
 		catch(const std::exception& e)
 		{
@@ -187,4 +208,22 @@ Http::~Http()
 		delete _req;
 	if (_resp)
 		delete _resp;
+}
+
+void	Http::destroyRequest()
+{
+	if (_req)
+	{
+		delete _req;
+		_req = NULL;
+	}
+}
+
+void	Http::destroyResponse()
+{
+	if (_resp)
+	{
+		delete _resp;
+		_resp = NULL;
+	}
 }

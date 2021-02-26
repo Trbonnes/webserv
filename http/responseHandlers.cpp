@@ -66,8 +66,6 @@ void            HttpResponse::del()
     if (stat(_route.c_str(), &file))
     {
         _statusCode = NOT_FOUND;
-        Log::debug("STat error DEL");
-
         return;
     }
 
@@ -138,7 +136,6 @@ void        HttpResponse::error()
     fd = open(_route.c_str(), O_RDONLY);
     if (fd == -1)
     {
-        std::cout << "NOW DOING STUFF" << std::endl;
         _body = new std::string();
         _body->append("<!DOCTYPE html>\n<html>\n<body>\n\n<h1>");
         char *tmp = ft_itoa(_statusCode);
@@ -154,4 +151,10 @@ void        HttpResponse::error()
         close(fd);
         get(true);
     }
+}
+
+void        HttpResponse::post()
+{
+    std::cout << "Here" << std::endl;
+    _contentLength = 0;
 }
