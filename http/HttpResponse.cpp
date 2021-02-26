@@ -179,6 +179,12 @@ void            HttpResponse::init()
         setOtherHeaders(*_headers);
     // end of headers
     _headers->append("\r\n");
+
+    if (_request->getMethod().compare("HEAD") == 0 && _body)
+    {
+        delete _body;
+        _body = 0;
+    }
 }
 
 //** Check if the method is authorized for the non CGI locations **

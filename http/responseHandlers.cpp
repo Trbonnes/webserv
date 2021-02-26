@@ -152,6 +152,6 @@ void        HttpResponse::error()
     else
     {
         close(fd);
-        get();
+        get(true);
     }
 }
