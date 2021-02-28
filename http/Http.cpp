@@ -9,6 +9,7 @@ _write_chain(c.getWriteChain())
 	_resp = NULL;
 	_config = NULL;
 	_status_socket = WAITING_HEADERS;
+	_status_stream = DONE;
 }
 
 Http::Http(const Http &c) :
@@ -34,11 +35,9 @@ void Http::handleNewRequest()
 		
 
 		size_t pos;
-		std::cout << _requestBuffer << std::endl;
 		// If the end of headers are reached
 		if ((pos = _requestBuffer.find("\r\n\r\n")) != _requestBuffer.npos) // TO DO might have to hcange this for small buffers
 		{
-			std::cout << "New request " << std::endl;
 			std::string request;
 			request.append(_requestBuffer, 0, pos + 1); // TO DO realloc good ?
 			if (pos < _requestBuffer.size() - 5)
@@ -52,31 +51,24 @@ void Http::handleNewRequest()
 			// Instantiate a new response from that request
 			_resp = new HttpResponse(_req, _config->getServerUnit(_req->getPort(), _req->getHost()));
 
-			// Subbing
-			_connection.subWrite();
 
-			// Getting headers of response
-			buff = _resp->getHeaders();
-			// Getting the headers and eventually the full response
-			_write_chain.pushBack(buff);
-			// If body is true append body
-			buff = _resp->getBody();
-			if (buff)
-				_write_chain.pushBack(buff);
+
+
 			
 			if (_req->getContentLength() > 0 || _req->getTransferEncoding() == "chunked\r") // TO DO why ?
-			{
-				std::cout << "We gotta wait some body" << std::endl;
 				_status_socket = WAITING_BODY;
-			}
 			else
+			{
+				_connection.unsubRead();
 				_status_socket = DONE;
+			}
 			// Adding streams in select fd sets
 			// By this point the Response should have fd's for CGI or a regular file
 			// if stream in
 			// CGI and PUT
 			if (_resp->getStreamWrite() != -1)
 			{
+				_status_stream = ACTIVE;
 				_connection.setStreamWrite(_resp->getStreamWrite());
 				_connection.subStreamWrite();	
 			}
@@ -84,9 +76,27 @@ void Http::handleNewRequest()
 			// CGI and GET
 			if (_resp->getStreamRead() != -1)
 			{
+				_status_stream = ACTIVE;
 				_connection.setStreamRead(_resp->getStreamRead());
 				_connection.subStreamRead();
 			}
+
+			// if the request use cg iwe might have to get others http headers from it, we can'
+			if (_resp->use_cgi() == false)
+			{
+				// Subbing
+				_connection.subWrite();
+				// Getting headers of response
+				buff = _resp->getHeaders();
+				// Getting the headers and eventually the full response
+				_write_chain.pushBack(buff);
+				// If body is true append body
+				buff = _resp->getBody();
+				if (buff)
+					_write_chain.pushBack(buff);
+			}
+			else
+				_status_stream = WAITING_CGI_HEADERS;
 		}
 }
 
@@ -99,7 +109,6 @@ void Http::handleBodyRead()
 		try
 		{
 			end = HttpRequest::extractChunks(_read_chain, _stream_write_chain); // TO DO is it ugly ? II think so
-			std::cout << end << std::endl;
 		}
 		catch(const std::exception& e)
 		{
@@ -119,7 +128,6 @@ void Http::handleBodyRead()
 			_stream_write_chain.flush();
 		_status_socket = DONE;
 	}
-	std::cout << _stream_write_chain;
 }
 
 // This methods is called each time there's a socket read
@@ -133,22 +141,59 @@ void Http::handleRead()
 	if (_status_socket == WAITING_BODY)
 		handleBodyRead();
 
-	if (_status_socket == DONE)
+	if (_status_socket == DONE && _status_stream == DONE)
+		reset();
+}
+
+
+void Http::handleCGIRead()
+{
+	int ret;
+	size_t pos;
+
+	if (_status_stream == WAITING_CGI_HEADERS)
 	{
-		std::cout << "REQUEST END" << std::endl;
-		destroyRequest();
-		destroyResponse();
-		_status_socket = WAITING_HEADERS;
+		try
+		{
+			ret = BufferChain::readToBuffer(_stream_read_chain, _resp->getStreamRead());
+			if (ret == 0)
+				reset();
+		}
+		catch(const std::exception& e)
+		{
+			throw;
+		}
+		if ((pos = _stream_read_chain.getFirst()->find("\n\n")) != std::string::npos) // TO DO add join mechanic if buffer is incomplete
+		{
+			std::string *headers = new std::string();
+			headers->reserve(pos + 2);
+			headers->append(*_stream_read_chain.getFirst(), 0, pos);
+			std::string *body = chunkify((char*)_stream_read_chain.getFirst()->c_str(), pos, _stream_read_chain.getFirst()->size() - pos);
+			_write_chain.pushBack(_resp->getHeaders()); 
+			_write_chain.pushBack(headers); 
+			_write_chain.pushBack(body);
+			delete _stream_read_chain.getFirst();
+			_stream_read_chain.popFirst();
+			_status_stream = ACTIVE;
+			
+			// dont forget to like and subwrite
+			_connection.subWrite();
+		}
 	}
 }
 
 void Http::handleStreamRead()
 {
-	int ret = -1;
+	int ret;
 	Log::debug("handleStreamRead()");
-	if (_resp->getTransferEncoding() == "chunked")
+
+	if (_status_stream == WAITING_CGI_HEADERS) // TODO rather than doing all this checking you could just make a pointer to function
+		handleCGIRead();
+	else if (_resp->getTransferEncoding() == "chunked")
 	{
-		// HttpResponse::
+		ret = readChunkToBuffer(_write_chain, _resp->getStreamRead());
+		if (ret == 0)
+			reset();
 	}
 	// Regular body, no formatting required
 	else
@@ -157,12 +202,7 @@ void Http::handleStreamRead()
 		{
 			ret = BufferChain::readToBuffer(_write_chain, _resp->getStreamRead());
 			if (ret == 0)
-			{
-				destroyResponse();
-				destroyRequest();
-				_connection.subRead();
-				_connection.unsubStreamRead();
-			}
+				reset();
 		}
 		catch(const std::exception& e)
 		{
@@ -226,4 +266,51 @@ void	Http::destroyResponse()
 		delete _resp;
 		_resp = NULL;
 	}
+}
+
+void	Http::reset()
+{
+		std::cout << "REQUEST END" << std::endl;
+		destroyRequest();
+		destroyResponse();
+		_connection.subRead();
+		_connection.unsubStreamRead();
+		_connection.unsubStreamWrite();
+		_status_socket = WAITING_HEADERS;
+		_status_stream = DONE;
+}
+
+std::string*	Http::chunkify(char* buff, size_t start, size_t len)
+{
+	//converting to hex
+	std::stringstream ss;
+	ss << std::hex << len;
+	std::string* n = new std::string();
+	std::string chunkstr = ss.str();
+
+	// reserving the space needed
+	n->reserve(chunkstr.size() + 2 + len + 2);
+
+	// appending the chunk
+	n->append(chunkstr);
+	n->append("\r\n");
+	if(len != 0)
+		n->append(buff, start, len);
+	n->append("\r\n");
+	std::cout << "chnukstr: " << chunkstr << " len: " <<  len << std::endl;
+	return n;
+}
+
+
+int		Http::readChunkToBuffer(BufferChain& chain, FD fd)
+{
+	int ret;
+	std::string *n;
+
+	ret = read(fd, g_read_large, BUFFER_SIZE_LARGE); // TO DO keep this size ?
+	if (ret == -1)
+		throw IOError();
+	n = chunkify(g_read_large, 0, ret);
+	chain.pushBack(n);
+	return ret;
 }

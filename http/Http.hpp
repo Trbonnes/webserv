@@ -3,6 +3,7 @@
 
 
 #include <string>
+#include <sstream> // TO DO is this legal ?
 
 #include "core/BufferChain.hpp"
 #include "core/Config.hpp"
@@ -47,9 +48,8 @@ private:
 	{
 		WAITING_HEADERS,
 		WAITING_BODY,
-		// WAITING_STREAM_WRITE,
-		// WAITING_STREAM_READ,
-		// INACTIVE,
+		WAITING_CGI_HEADERS,
+		ACTIVE,
 		DONE
 	} status_t;
 
@@ -71,9 +71,18 @@ public:
 	void handleNewRequest();
 	void handleBodyRead();
 
+
+	void handleCGIRead();
 	// destroy the HttpRequest object
 	void	destroyRequest();
 	void	destroyResponse();
+
+	// reset the state of the module
+	void	reset();
+
+	// Utils function to copy a chunk into a new buffer
+	int				readChunkToBuffer(BufferChain&, FD);
+	std::string*	chunkify(char*, size_t, size_t);
 
 };
 

@@ -115,36 +115,60 @@ bool        HttpResponse::mypred(char val1, char val2)
 void        HttpResponse::cgi_exe()
 {
     int         pid;
-    int         ret;
     char*       args[2];
+    int         cgi_in[2];
+    int         cgi_out[2];
     std::string route;
 
-    ret = EXIT_SUCCESS;
+    // put args to 0
     ft_bzero(args, sizeof(args));
 
+    // first pipe
+    if (pipe(cgi_in))
+    {
+        _statusCode = INTERNAL_SERVER_ERROR;
+        return;
+    }
+
+    // second pipe
+    if (pipe(cgi_out))
+    {
+        close(cgi_in[0]);
+        close(cgi_in[1]);
+        _statusCode = INTERNAL_SERVER_ERROR;
+        return;
+    }
+
+    // Fork
     pid = fork();
     if (pid < 0)
         _statusCode = INTERNAL_SERVER_ERROR;
     else if (pid == 0)
     {
-            Log::debug("CGI launched\n");
+        Log::debug("CGI launched\n");
 
-        // close(_cgi_in[SIDE_IN]);
-        // close(_cgi_out[SIDE_OUT]);
-        // dup2(_cgi_in[SIDE_OUT], STDIN_FILENO);
-        // dup2(_cgi_out[SIDE_IN], STDOUT_FILENO);
+        // Closing unused end in chlid process
+        close(cgi_in[SIDE_IN]);
+        close(cgi_out[SIDE_OUT]);
+        // Redirecting the other pipe to stdin and stdout
+        dup2(cgi_in[SIDE_OUT], STDIN_FILENO);
+        dup2(cgi_out[SIDE_IN], STDOUT_FILENO);
+
         args[0] = ft_strdup(_config.getCGI_root(_location).c_str());
-        if ((ret = execve(args[0], args, _cgi_env)) == -1)
+        if (execve(args[0], args, _cgi_env) == -1)
         {
-            Log::debug("CGI launch error\n");
+            Log::debug("CGI launch error");
             exit(EXIT_FAILURE);
         }
         // TO DO test for bad gateway just in case
     }
     else
     {
-        // close(_cgi_in[SIDE_OUT]);
-        // close(_cgi_out[SIDE_IN]);
+        // closing unused pipe in parent and storing fd fd in streams
+        close(cgi_in[SIDE_OUT]);
+        close(cgi_out[SIDE_IN]);
+        _stream_write = cgi_in[SIDE_IN];
+        _stream_read = cgi_out[SIDE_OUT];
     }
 }
 

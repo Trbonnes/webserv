@@ -179,6 +179,7 @@ void            HttpResponse::init()
         setAllowMethodsResponse(*_headers);
     else
         setOtherHeaders(*_headers);
+    
     // end of headers
     _headers->append("\r\n");
 
