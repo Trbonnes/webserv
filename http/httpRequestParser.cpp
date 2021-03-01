@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   httpRequestParser.cpp                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: yorn <yorn@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/30 15:45:46 by trbonnes          #+#    #+#             */
-/*   Updated: 2021/02/26 18:29:52 by yorn             ###   ########.fr       */
+/*   Updated: 2021/03/01 14:38:12 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,18 +14,18 @@
 
 static int		httpRequestParseHeaders(std::string request, HttpRequest *socket) {
 	char const *x[] = {
-		"\nAccept-Charset",
-		"\nAccept-Language",
-		"\nAuthorization",
-		"\nContent-Length",
-		"\nContent-Location",
-		"\nContent-Type",
-		"\nDate",
-		"\nHost",
-		"\nReferer",
-		"\nTransfer-Encoding",
-		"\nUser-Agent",
-		"\nX-Secret"
+		"\naccept-charset",
+		"\naccept-language",
+		"\nauthorization",
+		"\ncontent-length",
+		"\ncontent-location",
+		"\ncontent-type",
+		"\ndate",
+		"\nhost",
+		"\nreferer",
+		"\ntransfer-encoding",
+		"\nuser-agent",
+		"\nx-secret"
 	};
 	void (*f[])(HttpRequest*, std::string&, size_t) = {
 		&ParseAcceptCharset,
@@ -46,8 +46,13 @@ static int		httpRequestParseHeaders(std::string request, HttpRequest *socket) {
 	size_t		pos;
 	int			j = 0;
 
+	for (std::string::iterator it = request.begin(); it != request.end(); it++) {
+		s2.append(1, std::tolower(*it));
+	}
+	
+
 	for (std::vector<std::string>::iterator i = headerVec.begin(); i != headerVec.end(); i++) {
-		pos = request.find(*i);
+		pos = s2.find(*i);
 		if (pos != request.npos)
 			f[j](socket, request, pos);
 		j++;
@@ -107,6 +112,7 @@ HttpRequest* HttpRequest::parseRequest(std::string &request) {
 	HttpRequest *socket;
 
 	socket = new HttpRequest();
+	Log::debug(request);
 	httpRequestParseRequestLine(request, socket);
 	httpRequestParseHeaders(request, socket);
 	// httpRequestParseBody(request, socket);
