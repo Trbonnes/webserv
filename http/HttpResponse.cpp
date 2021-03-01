@@ -397,7 +397,7 @@ void            HttpResponse::setOtherHeaders(std::string &response)
         if (_contentLanguage.length() > 0 && _request->getMethod().compare("PUT") && _request->getMethod().compare("DELETE"))
             response.append("Content-Language: ").append(_contentLanguage).append("\r\n");
         if (_transferEncoding.length() > 0)
-            response.append("Tranfer-Encoding: ").append(_transferEncoding);
+            response.append("Transfer-Encoding: ").append(_transferEncoding);
     }
     else if (_statusCode == UNAUTHORIZED)
         response.append("WWW-Authenticate: ").append("Basic realm=").append(_config.getAuth_basic(_location)).append("\r\n");

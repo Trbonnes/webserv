@@ -163,15 +163,18 @@ void Http::handleCGIRead()
 		{
 			throw;
 		}
-		if ((pos = _stream_read_chain.getFirst()->find("\n\n")) != std::string::npos) // TO DO add join mechanic if buffer is incomplete
+		if ((pos = _stream_read_chain.getFirst()->find("\r\n\r\n")) != std::string::npos) // TO DO add join mechanic if buffer is incomplete
 		{
 			std::string *headers = new std::string();
-			headers->reserve(pos + 2);
+			headers->reserve(pos + 4);
 			headers->append(*_stream_read_chain.getFirst(), 0, pos);
-			std::string *body = chunkify((char*)_stream_read_chain.getFirst()->c_str(), pos, _stream_read_chain.getFirst()->size() - pos);
+			headers->append("\r\n\r\n");
+
+			std::string *body = chunkify((char*)_stream_read_chain.getFirst()->c_str(), pos + 4 , _stream_read_chain.getFirst()->size() - pos - 4);
 			_write_chain.pushBack(_resp->getHeaders()); 
 			_write_chain.pushBack(headers); 
 			_write_chain.pushBack(body);
+			std::cout << _write_chain;
 			delete _stream_read_chain.getFirst();
 			_stream_read_chain.popFirst();
 			_status_stream = ACTIVE;
@@ -282,6 +285,7 @@ void	Http::reset()
 
 std::string*	Http::chunkify(char* buff, size_t start, size_t len)
 {
+	std::cout << "============ Chunkyfying ==============" << std::endl;
 	//converting to hex
 	std::stringstream ss;
 	ss << std::hex << len;
@@ -297,7 +301,8 @@ std::string*	Http::chunkify(char* buff, size_t start, size_t len)
 	if(len != 0)
 		n->append(buff, start, len);
 	n->append("\r\n");
-	std::cout << "chnukstr: " << chunkstr << " len: " <<  len << std::endl;
+	std::cout << "chunkstr: " << chunkstr << " len: " <<  len << std::endl;
+	std::cout << "chunkstr: " << chunkstr << " len: " <<  len << std::endl;
 	return n;
 }
 
