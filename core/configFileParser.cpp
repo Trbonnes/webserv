@@ -6,7 +6,7 @@
 /*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/14 08:46:39 by trbonnes          #+#    #+#             */
-/*   Updated: 2021/01/06 14:17:48 by user42           ###   ########.fr       */
+/*   Updated: 2021/03/01 16:52:01 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,26 @@ size_t	findClosingBracket(size_t pos, std::string configFile) {
 	}
 
 	return configFile.npos;
+}
+
+std::vector<std::string>		readAuthFile(std::string file) {
+	int		fd;
+	int		ret;
+    char	*line;
+	std::vector<std::string> v;
+
+	if ((fd = open(file.c_str(), O_RDONLY)) >= 0) {
+		while ((ret = get_next_line(fd, &line)) > 0)
+		{
+			v.push_back(line);
+			free(line);
+			line = NULL;
+		}
+		free(line);
+		line = NULL;
+		close(fd);
+	}
+	return v;
 }
 
 std::string		configFileParseServerLocation(std::string parseServer, ConfigServer *server) {
@@ -239,6 +259,7 @@ std::string		configFileParseServerLocation(std::string parseServer, ConfigServer
 		while (s[pos] == ' ') { pos++; }
 		i = s.find(";", pos);
 		location._auth_basic_user_file = s.substr(pos, i - pos);
+		location._authorizations = readAuthFile(location._auth_basic_user_file);
 	}
 
 	server->insertLocation(location._location, location);
@@ -485,6 +506,7 @@ int		configFileParseServerUnit(std::string configFile, std::vector<ConfigServer>
 		while (parseServer[pos] == ' ') { pos++; }
 		i = parseServer.find(";", pos);
 		v->back().setAuth_basic_user_file(parseServer.substr(pos, i - pos));
+		v->back().setAuthorizations(readAuthFile(parseServer.substr(pos, i - pos)));
 	}
 
 

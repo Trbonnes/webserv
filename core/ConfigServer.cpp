@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ConfigServer.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: yorn <yorn@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/09 15:13:35 by trbonnes          #+#    #+#             */
-/*   Updated: 2021/02/25 18:03:23 by yorn             ###   ########.fr       */
+/*   Updated: 2021/03/01 16:49:23 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -308,6 +308,22 @@ std::string                 ConfigServer::getAuth_basic_user_file(std::string lo
     return _defaultAuth_basic_user_file;   
 }
 
+std::vector<std::string>	&ConfigServer::getAuthorizations(std::string location)
+{
+    std::map<std::string, Location, Compare<std::string> >::iterator itBegin;
+    std::map<std::string, Location, Compare<std::string> >::iterator itEnd;  
+
+    itBegin = _locationList.begin();
+    itEnd = _locationList.end();
+    while (itBegin != itEnd)
+    {
+        if (location.compare(itBegin->first) == 0 && itBegin->second._authorizations.size() > 0)
+            return (itBegin->second._authorizations);
+        itBegin++;
+    }
+    return _defaultAuthorizations;
+}
+
 int                 ConfigServer::getAutoindex(std::string location)
 {
     std::map<std::string, Location, Compare<std::string> >::iterator itBegin;
@@ -509,6 +525,11 @@ void					ConfigServer::setAuth_basic(std::string auth) {
 void					ConfigServer::setAuth_basic_user_file(std::string user_file) {
 	_defaultAuth_basic_user_file = user_file;
 }
+
+void					ConfigServer::setAuthorizations(std::vector<std::string> auth) {
+	_defaultAuthorizations = auth;
+}
+
 
 void					ConfigServer::setErrorRoot(std::string root) {
 	_errorFilesRoot = root;

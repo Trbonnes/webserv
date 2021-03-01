@@ -19,6 +19,7 @@ public:
     std::vector<std::string>    _language;
     std::string                 _auth_basic;
     std::string                 _auth_basic_user_file;
+	std::vector<std::string>	_authorizations;
 
 	std::string					_location;
 	std::vector<std::string>	_cgi;

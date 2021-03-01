@@ -298,9 +298,6 @@ void         HttpResponse::setRoute()
 // ** Check if the autorization mode is on and if the user is authorized to make the request **
 void            HttpResponse::authorization()
 {
-    int     fd;
-    int     ret;
-    char    *line;
     size_t  length;
 
     if (_config.getAuth_basic(_location).compare("") != 0)
@@ -309,27 +306,19 @@ void            HttpResponse::authorization()
             _statusCode = UNAUTHORIZED;
         else
         {
-            if ((fd = open(_config.getAuth_basic_user_file(_location).c_str(), O_RDONLY)) >= 0)
-            {
-                while ((ret = get_next_line(fd, &line)) > 0)
-                {
-                    length = _request->getAuthorization().length();
-                    if (base64_decode(_request->getAuthorization().substr(6, length)).compare(line) == 0)
-                    {
-                        _wwwAuthenticate.assign("OK");
-                        break ;
-                    }
-                    free(line);
-                    line = NULL;
-                }
-                if (base64_decode(_request->getAuthorization().substr(6, length)).compare(line) == 0)
-                    _wwwAuthenticate.assign("OK");
-                if (_wwwAuthenticate.compare("OK") != 0)
-                    _statusCode = UNAUTHORIZED;
-                free(line);
-                line = NULL;
-                close(fd);
-            }
+			std::vector<std::string> authorizations = _config.getAuthorizations(_location);
+    		std::vector<std::string>::iterator itBegin = authorizations.begin();
+    		std::vector<std::string>::iterator itEnd = authorizations.end();
+			for(; itBegin != itEnd; itBegin++) {
+				length = _request->getAuthorization().length();
+				if (base64_decode(_request->getAuthorization().substr(6, length)).compare(*itBegin) == 0)
+				{
+					_wwwAuthenticate.assign("OK");
+					break ;
+				}
+			}
+            if (_wwwAuthenticate.compare("OK") != 0)
+            	_statusCode = UNAUTHORIZED;
         }
     }
     else

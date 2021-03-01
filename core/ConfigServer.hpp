@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ConfigServer.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: yorn <yorn@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/09 12:19:51 by trbonnes          #+#    #+#             */
-/*   Updated: 2021/02/25 18:03:23 by yorn             ###   ########.fr       */
+/*   Updated: 2021/03/01 16:46:19 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,8 @@ private:
     std::vector<std::string>    _defaultLanguage;
     std::string                 _defaultAuth_basic;
     std::string                 _defaultAuth_basic_user_file;
-    int	                        _defaultAutoindex;
+    std::vector<std::string>	_defaultAuthorizations;
+	int	                        _defaultAutoindex;
 
 	// CGI
 	std::vector<std::string>	_defaultCgi;
@@ -79,6 +80,7 @@ public:
     std::string                 getLocation(std::string location);
     std::string                 getAuth_basic(std::string location);
     std::string                 getAuth_basic_user_file(std::string location);
+	std::vector<std::string>	&getAuthorizations(std::string location);
     int	                        getAutoindex(std::string location);
     std::string                 getAlias(std::string location);
     std::vector<std::string>    &getCGI(std::string location);
@@ -107,6 +109,7 @@ public:
     void                    setAllow(std::vector<std::string> allow);
     void					setAuth_basic(std::string auth);
     void					setAuth_basic_user_file(std::string user_file);
+	void					setAuthorizations(std::vector<std::string> auth);
 	void					setErrorRoot(std::string root);
     void                    setErrorPages(int error, std::string page);
 
