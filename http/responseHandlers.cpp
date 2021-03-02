@@ -7,7 +7,6 @@ void            HttpResponse::get(bool include_body = true)
     struct stat file;
 
 
-    std::cout << "ROUTE: " << _route << std::endl;
     // Try to get stat of route
     // if it returns anything other than 0, assume it's not found
     if (stat(_route.c_str(), &file))

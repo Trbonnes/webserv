@@ -118,8 +118,10 @@ void            HttpResponse::init()
     _statusCode = OK;
     ft_bzero(_cgi_env, sizeof(char*) * NB_METAVARIABLES + 1);
     _uri = _request->getRequestURI();
+    std::cout << "URI " << _uri <<  std::endl;
     // Absolute location route for the server
     _location = _config.getLocation(_uri);
+    std::cout << "LOCATION " << _location <<  std::endl;
     // Check if length is given
     if (_request->getBody().length() > 0 && _request->getContentLength() == 0 && _request->getTransferEncoding().length() == 0)
         _statusCode = LENGTH_REQUIRED;
@@ -133,8 +135,10 @@ void            HttpResponse::init()
     setDate();
     // set the route of the ressource
     setRoute();
+    std::cout << "URI " << _uri <<  std::endl;
+
     // TO DO set server
-    std::cout << "METHOD BB" << _route <<  std::endl;
+    std::cout << "ROUTE " << _route <<  std::endl;
 
     size_t      extension;
     std::string str;
@@ -225,6 +229,7 @@ void         HttpResponse::setRoute()
     ft_bzero(&file, sizeof(file));
     if (_uri.compare(0, 4, "http") == 0)
     {
+        std::cout << "I M HERE NOTICE ME SENPAI" << std::endl;
         //** Absolute path **
         find = _route.append(_request->getRequestURI()).find(_request->getHost());
         _route.erase(0, find + _config.getServerName()[0].length());
@@ -242,8 +247,8 @@ void         HttpResponse::setRoute()
         else
         {
             _route.assign(_config.getRoot(_location));
-            _route.append(_request->getRequestURI());
         }
+            _route.append(_request->getRequestURI());
         stat(_route.c_str(), &file);
 
         // ** If file exist or put request, return **
