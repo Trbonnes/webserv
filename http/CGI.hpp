@@ -8,7 +8,6 @@ enum cgi_variables
 {
     REDIRECT_STATUS,
     AUTH_TYPE,
-    CONTENT_LENGTH,
     CONTENT_TYPE,
     GATEWAY_INTERFACE,
     PATH_INFO,
@@ -25,6 +24,7 @@ enum cgi_variables
     SERVER_PROTOCOL,
     SERVER_SOFTWARE,
     X_SECRET,
+    CONTENT_LENGTH,
     NB_METAVARIABLES
 };
 
@@ -36,7 +36,6 @@ struct              CGI
 {
     std::string     _redirect_status;
     std::string     _auth_type;
-    std::string     _content_length;
     std::string     _content_type;
     std::string     _gateway_interface;
     std::string     _path_info;
@@ -52,6 +51,7 @@ struct              CGI
     std::string     _server_port;
     std::string     _server_protocol;
     std::string     _server_software;
+    std::string     _content_length;
 
 };
 

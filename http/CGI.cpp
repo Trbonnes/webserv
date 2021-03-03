@@ -59,8 +59,6 @@ void        HttpResponse::setEnv()
 {
     _cgi_env[REDIRECT_STATUS] = ft_strdup(_cgi._redirect_status.insert(0, "REDIRECT_STATUS=").c_str());
     _cgi_env[AUTH_TYPE] = ft_strdup(_cgi._auth_type.insert(0, "AUTH_TYPE=").c_str());
-    _cgi_env[CONTENT_LENGTH] = ft_strdup(_cgi._content_length.insert(0, "CONTENT_LENGTH=").c_str());
-    std::cout << "----------------------------------------------------------- ///////////////////// " << _cgi._content_length << std::endl;
     _cgi_env[CONTENT_TYPE] = ft_strdup(_cgi._content_type.insert(0, "CONTENT_TYPE=").c_str());
     _cgi_env[GATEWAY_INTERFACE] = ft_strdup(_cgi._gateway_interface.insert(0, "GATEWAY_INTERFACE=").c_str());
     _cgi_env[PATH_INFO] = ft_strdup(_cgi._path_info.insert(0, "PATH_INFO=").c_str());
@@ -78,6 +76,8 @@ void        HttpResponse::setEnv()
     _cgi_env[SERVER_SOFTWARE] = ft_strdup(_cgi._server_software.insert(0, "SERVER_SOFTWARE=").c_str());
     if (_request->getXSecret().compare(""))
         _cgi_env[X_SECRET] = ft_strdup("HTTP_X_SECRET_HEADER_FOR_TEST=1");
+    if (_request->getTransferEncoding() == "chunked\r") // TO DO why the \r
+        _cgi_env[CONTENT_LENGTH] = ft_strdup(_cgi._content_length.insert(0, "CONTENT_LENGTH=").c_str());
     _cgi_env[NB_METAVARIABLES] = NULL;
 }
 
@@ -166,9 +166,6 @@ void        HttpResponse::cgi_exe()
     }
     else
     {
-        std::cout << "WAITING= ==== == == === =" << std::endl;
-        wait(NULL);
-        std::cout << "WAITED= ==== == == === =" << std::endl;
         // closing unused pipe in parent and storing fd fd in streams
         close(cgi_in[SIDE_OUT]);
         close(cgi_out[SIDE_IN]);

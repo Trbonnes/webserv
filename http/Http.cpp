@@ -40,9 +40,9 @@ void Http::handleNewRequest()
 		{
 			std::string request;
 			request.append(_requestBuffer, 0, pos + 1); // TO DO realloc good ?
-			if (pos < _requestBuffer.size() - 5)
+			if (pos < _requestBuffer.size() - 4)
 			{
-				std::string* leftovers = new std::string(_requestBuffer, pos + 4, _requestBuffer.size() - pos - 5);
+				std::string* leftovers = new std::string(_requestBuffer, pos + 4, _requestBuffer.size() - pos - 4);
 				_read_chain.pushFront(leftovers);
 			}
 			_requestBuffer.clear();
@@ -225,15 +225,23 @@ void Http::handleStreamWrite()
 	try
 	{
 		BufferChain::writeBufferToFd(_stream_write_chain, _resp->getStreamWrite());
+		std::string* buff = _stream_write_chain.getFirst();
+		delete buff;
+		_stream_write_chain.popFirst();
 	}
 	catch(const std::exception& e)
 	{
 		throw;
 	}
-	if (_write_chain.getFirst() == NULL)
+	
+	if (_stream_write_chain.getFirst() == NULL)
+	{
 		_connection.unsubStreamWrite();
+		// if all the body i s received, then we don't have anything more to do
+		if (_status_socket == DONE)
+			close(_resp->getStreamWrite());
+	}
 	_connection.subStreamRead();
-
 }
 
 void	Http::setConfig(Config* c)
