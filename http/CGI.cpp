@@ -6,21 +6,17 @@ int         HttpResponse::checkCGImethods(std::string method)
 {
     std::vector<std::string>::iterator itBegin;
     std::vector<std::string>::iterator itEnd;
-    int ret;
 
-    ret = 0;
     itBegin = _config.getCGI_allow(_location).begin();
     itEnd = _config.getCGI_allow(_location).end();
     while (itBegin != itEnd)
     {
         _allow.push_back(*itBegin);
         if ((*itBegin).compare(method) == 0)
-            ret = 1;
+            return 1;
         itBegin++;
     }
-    if (!ret)
-        _statusCode = METHOD_NOT_ALLOWED;
-    return (ret);
+    return 0;
 }
 
 // ** Define the meta variables for the CGI script **

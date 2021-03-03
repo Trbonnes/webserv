@@ -147,7 +147,6 @@ void            HttpResponse::init()
     // If it's a CGI request we must fork and prepare the stream in and out
     if (is_good_exe(str.assign(_route).erase(0, extension + 1)) && checkCGImethods(_request->getMethod()))
     {
-        std::cout << "=------------------------------ CGI has been launched \n";
         cgi();
     }
     // If it's not CGI we got to open read streams or write streams
@@ -202,21 +201,17 @@ int         HttpResponse::checkAllowMethods(std::string method)
 {
     std::vector<std::string>::iterator itBegin;
     std::vector<std::string>::iterator itEnd;
-    int ret;
 
-    ret = 0;
     itBegin = _config.getAllow(_location).begin();
     itEnd = _config.getAllow(_location).end();
     while (itBegin != itEnd)
     {
         _allow.push_back(*itBegin);
         if ((*itBegin).compare(method) == 0)
-            ret = 1;
+            return 1;
         itBegin++;
     }
-    if (!ret)
-      _statusCode = METHOD_NOT_ALLOWED;
-    return (ret);
+    return 0;
 }
 
 
