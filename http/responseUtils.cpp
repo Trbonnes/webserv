@@ -155,7 +155,7 @@ void            HttpResponse::autoIndex()
         _body->append("<html>\n<head><title>Index of /</title></head>\n<body>\n<h1>Index of /</h1><hr><pre>\n");
         while ((dirent = readdir(dir)) != NULL)
         {
-            stat(str.assign(_uri).append(dirent->d_name).c_str(), &directory);
+            stat(str.assign(_route).append(dirent->d_name).c_str(), &directory);
             if (str.assign(dirent->d_name).compare(".") == 0)
                 continue ;
             str.assign("<a href=\"");

@@ -146,7 +146,10 @@ void            HttpResponse::init()
     extension = _route.find_last_of('.');
     // If it's a CGI request we must fork and prepare the stream in and out
     if (is_good_exe(str.assign(_route).erase(0, extension + 1)) && checkCGImethods(_request->getMethod()))
+    {
+        std::cout << "=------------------------------ CGI has been launched \n";
         cgi();
+    }
     // If it's not CGI we got to open read streams or write streams
     else if (checkAllowMethods(_request->getMethod()))
     {
@@ -216,88 +219,64 @@ int         HttpResponse::checkAllowMethods(std::string method)
     return (ret);
 }
 
+
 // ** Set the root with language and location directory if needed **
 void         HttpResponse::setRoute()
 {
-    int         fd;
-    int         find;
-    std::string str;
-    struct stat file;
     std::vector<std::string>::iterator itIndexBegin;
     std::vector<std::string>::iterator itIndexEnd;
+    struct stat file;
+    std::string str;
+    int ret;
 
-    ft_bzero(&file, sizeof(file));
-    if (_uri.compare(0, 4, "http") == 0)
+    std::cout << "Location: "<< _location << std::endl;
+    std::string root = _config.getRoot(_location); 
+    std::string alias = _config.getAlias(_location);
+
+
+    Log::debug(_route);
+    //** Relative path **
+    if (alias.length() > 0)
     {
-        std::cout << "I M HERE NOTICE ME SENPAI" << std::endl;
-        //** Absolute path **
-        find = _route.append(_request->getRequestURI()).find(_request->getHost());
-        _route.erase(0, find + _config.getServerName()[0].length());
-        _route.insert(0, _config.getRoot(_location));
-        _route.insert(_config.getRoot(_location).length(), acceptLanguage());
+        _route.assign(alias).append("/");
+        std::cout << "Threre's an alias : " << alias << std::endl; 
     }
     else
     {
-        //** Replace URI by the location **
-        _uri.assign(_config.getRoot(_location));
-        
-        //** Relative path **
-        if (_config.getAlias(_location).length() > 0)
-            _route.assign(_config.getAlias(_location)).append("/");
-        else
-        {
-            _route.assign(_config.getRoot(_location));
-        }
-            _route.append(_request->getRequestURI());
-        stat(_route.c_str(), &file);
+        _route.assign(root);
+        std::cout << "Threre's a root : " << root << std::endl; 
+        // _route.append(_uri);
+        // std::cout << "Stick URI : " << _uri << std::endl; 
 
-        // ** If file exist or put request, return **
-        if (((S_ISREG(file.st_mode) && (fd = open(_route.c_str(), O_RDONLY)) != -1)) || _request->getMethod().compare("PUT") == 0
-            || (((file.st_mode & S_IFMT) == S_IFDIR) && _request->getMethod().compare("DELETE") == 0))
-        {
-            close(fd);
-            return ;
-        }
+    }
+    Log::debug(_route);
+    ret = stat(_route.c_str(), &file);
+    // if is file  exists or put request we're done
+    if ((ret == 0 && S_ISREG(file.st_mode)) || _request->getMethod() == "PUT")
+        return;
 
-        // ** Else, add the language **
-        _route.assign(_config.getRoot(_location));
-        if (_config.getAlias(_location).length() > 0)
-            _route.assign(_config.getAlias(_location)).append("/");
-        _route.append(acceptLanguage());
-        _route.append(str.assign(_request->getRequestURI()).erase(0, _location.length()));
-        
-        stat(_route.c_str(), &file);
-        // ** If file exist or delete request, return **
-        if ((((file.st_mode & S_IFMT) == S_IFREG && (fd = open(_route.c_str(), O_RDONLY)) != -1))
-        || _request->getMethod().compare("DELETE") == 0)
-        {
-            close(fd);
-            return ;
-        }
+    
 
-        // ** Else, add index if it is not a put or delete request **
-        itIndexBegin = _config.getIndex(_location).begin();
-        itIndexEnd = _config.getIndex(_location).end();
-        stat(_route.c_str(), &file);
+    // accpet lagnguage
+    _route.append(acceptLanguage());
+    _route.append(str.assign(_request->getRequestURI()).erase(0, _location.length()));
+    
+
+    // ** Else, add index if it is not a put or delete request **
+    itIndexBegin = _config.getIndex(_location).begin();
+    itIndexEnd = _config.getIndex(_location).end();
+    stat(_route.c_str(), &file);
+    str.assign(_route);
+    while (itIndexBegin != itIndexEnd && !S_ISREG(file.st_mode))
+    {
         str.assign(_route);
-        while (itIndexBegin != itIndexEnd &&
-        ((file.st_mode & S_IFMT) != S_IFREG && (fd = open(_route.c_str(), O_RDONLY)) != -1))
-        {
-            str.assign(_route);
-            if (str.at(str.length() - 1) != '/')
-                str.append("/");
-            str.append(*itIndexBegin);
-            stat(str.c_str(), &file);
-            itIndexBegin++;
-            close(fd);
-        }
-        _route.assign(str);
+        if (str.at(str.length() - 1) != '/')
+            str.append("/");
+        str.append(*itIndexBegin);
+        stat(str.c_str(), &file);
+        itIndexBegin++;
     }
-    if ((fd = open(_route.c_str(), O_RDONLY)) == -1)
-        _route = _request->getRequestURI();
-    else
-        close(fd);
-    return ;
+    _route.assign(str);
 }
 
 // ** Check if the autorization mode is on and if the user is authorized to make the request **

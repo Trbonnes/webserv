@@ -68,9 +68,9 @@ void Http::handleNewRequest()
 			// CGI and PUT
 			if (_resp->getStreamWrite() != -1)
 			{
+				std::cout << "Stream write active !" << std::endl;
 				_status_stream = ACTIVE;
 				_connection.setStreamWrite(_resp->getStreamWrite());
-				_connection.subStreamWrite();	
 			}
 			//if stream out
 			// CGI and GET
@@ -78,7 +78,6 @@ void Http::handleNewRequest()
 			{
 				_status_stream = ACTIVE;
 				_connection.setStreamRead(_resp->getStreamRead());
-				_connection.subStreamRead();
 			}
 
 			// if the request use cg iwe might have to get others http headers from it, we can'
@@ -127,6 +126,11 @@ void Http::handleBodyRead()
 		if (_resp->getStreamWrite() == -1)
 			_stream_write_chain.flush();
 		_status_socket = DONE;
+	}
+	if (_resp->getStreamWrite() != -1 && _stream_write_chain.getFirst() != NULL)
+	{
+		std::cout << "SUBBING STREAMWRITE" << std::endl;
+		_connection.subStreamWrite();
 	}
 }
 
@@ -218,26 +222,18 @@ void Http::handleStreamRead()
 
 void Http::handleStreamWrite()
 {
-	// char* buff = NULL;
-	// size_t read;
+	try
+	{
+		BufferChain::writeBufferToFd(_stream_write_chain, _resp->getStreamWrite());
+	}
+	catch(const std::exception& e)
+	{
+		throw;
+	}
+	if (_write_chain.getFirst() == NULL)
+		_connection.unsubStreamWrite();
+	_connection.subStreamRead();
 
-	// // If read buffer are supposed to get chunked out
-	// if (_rep->getTransferEncoding() == "chunked")
-	// {
-	// 	read = _rep->parseChunk(&buff);
-	// }
-	// else
-	// {
-	// 	read = _rep->parseBody(&buff);
-	// }
-	// // if EOF
-	// if (read == 0)
-	// {
-	// 	_connection.unsubStreamRead();
-	// 	return;
-	// }
-	// _write_chain.pushBack(buff, read);
-	// TO DO can we really have a larger buffer chain than content length ?
 }
 
 void	Http::setConfig(Config* c)
