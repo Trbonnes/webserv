@@ -78,6 +78,7 @@ void Http::handleNewRequest()
 			{
 				_status_stream = ACTIVE;
 				_connection.setStreamRead(_resp->getStreamRead());
+				_connection.subStreamRead();
 			}
 
 			// if the request use cg iwe might have to get others http headers from it, we can'
