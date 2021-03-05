@@ -37,6 +37,7 @@ public:
 
 
 void	sig_handler(int sig);
+void	sigpipe_handler(int sig);
 
 
 #endif // PROCESSMANAGER

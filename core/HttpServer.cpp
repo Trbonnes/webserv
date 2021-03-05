@@ -27,6 +27,7 @@ void HttpServer::run()
 {
 	signal(SIGINT, sig_handler);
 	signal(SIGTERM, sig_handler);
+	signal(SIGPIPE, sigpipe_handler);
 	try
 	{
 		initConf();

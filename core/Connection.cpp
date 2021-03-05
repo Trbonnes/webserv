@@ -200,10 +200,6 @@ void Connection::close()
 {
 	if (_socket != -1)
 		::close(_socket);
-	if (_stream_read != -1)
-		::close(_stream_read);
-	if (_stream_write != -1)
-		::close(_stream_read);
 }
 
 Connection::~Connection()

@@ -18,3 +18,8 @@ void	sig_handler(int sig)
 		}
 	}
 }
+
+void	sigpipe_handler(int sig)
+{
+	(void) sig;
+}

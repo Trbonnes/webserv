@@ -260,10 +260,10 @@ void	Http::reset()
 		_connection.subRead();
 		_connection.unsubStreamRead();
 		_connection.unsubStreamWrite();
+		if (_resp->getStreamWrite() != -1)
 			close(_resp->getStreamWrite());
-		if (_resp->getStreamRead() != 1)
+		if (_resp->getStreamRead() != -1)
 			close(_resp->getStreamRead());
-		if (_resp->getStreamWrite() != 1)
 		_connection.setStreamRead(-1);
 		_connection.setStreamWrite(-1);
 		if (_req)
