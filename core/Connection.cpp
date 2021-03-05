@@ -151,6 +151,7 @@ void Connection::write()
 	{
 		throw;
 	}
+	_module.handleWrite();
 }
 
 void Connection::streamWrite()

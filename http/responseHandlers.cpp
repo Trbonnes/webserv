@@ -98,6 +98,7 @@ void            HttpResponse::put()
     // if -1 then it doesn't exist
     if (_stream_write == -1)
     {
+        std::cout << "FILE DOES NOT EXISTS" << std::endl;
         _statusCode = NO_CONTENT; // Should be 201 but the tester expect 204
         // Trying to create the file then
         _stream_write = open(_route.c_str(), O_CREAT | O_WRONLY, S_IRUSR | S_IWUSR);
@@ -105,7 +106,10 @@ void            HttpResponse::put()
             _statusCode = INTERNAL_SERVER_ERROR;
     }
     else
+    {
+        std::cout << "FILE ALREADY EXISTS" << std::endl;
         _statusCode = NO_CONTENT;
+    }
     setContentLocation();
 }
 

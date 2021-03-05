@@ -6,7 +6,7 @@
 /*   By: yorn <yorn@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/30 15:45:46 by trbonnes          #+#    #+#             */
-/*   Updated: 2021/03/03 02:05:29 by yorn             ###   ########.fr       */
+/*   Updated: 2021/03/05 17:22:17 by yorn             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -159,6 +159,9 @@ static int appendChunk(BufferChain& chain, std::string* dst, size_t *offset)
 
 	// popping the current buffer cause it's gonna be split
 	std::string *buff = chain.getFirst();
+	if (buff == 0)
+		return 0;
+
 	chain.popFirst();
 
 	hexEnd = buff->find("\r\n", hexStart);
@@ -234,11 +237,7 @@ bool         HttpRequest::extractChunks(BufferChain& read_chain, BufferChain& st
 
 	offset = 0;
 	while ((r = appendChunk(read_chain, newBuffer, &offset)) == 1)
-	{
-		std::cout << "|" << *newBuffer <<  "|" << std::endl;
-		// std::cout << "|" << *read_chain.getFirst() <<  "|" << std::endl;
 		continue;
-	}
 	std::cout << "Value of r: " << r << std::endl;
 	// if -1 error
 	if (r == -1)

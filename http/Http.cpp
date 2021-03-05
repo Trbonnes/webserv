@@ -28,6 +28,7 @@ Http& Http::operator=(const Http &c)
 
 void Http::handleNewRequest()
 {
+		std::cout << "SHOULD BE HERE AIGHT ? " << std::endl;
 		std::string* buff = _read_chain.getFirst(); // TO DO might do a strrchr on bfufer chain to avoid multiple allocation
 		_requestBuffer.append(*buff);
 		delete buff;
@@ -50,10 +51,6 @@ void Http::handleNewRequest()
 			_req = HttpRequest::parseRequest(request);
 			// Instantiate a new response from that request
 			_resp = new HttpResponse(_req, _config->getServerUnit(_req->getPort(), _req->getHost()));
-
-
-
-
 			
 			if (_req->getContentLength() > 0 || _req->getTransferEncoding() == "chunked\r") // TO DO why ?
 				_status_socket = WAITING_BODY;
@@ -100,7 +97,7 @@ void Http::handleNewRequest()
 		}
 }
 
-void Http::handleBodyRead()
+void Http::	handleBodyRead()
 {
 	bool	end = false;
 
@@ -139,17 +136,17 @@ void Http::handleBodyRead()
 // The bytes have already been loaded into _read_cahin by ths point
 void Http::handleRead()
 {
-	Log::debug("handleRead()");	
 	if (_status_socket == WAITING_HEADERS)
 		handleNewRequest();
-
 	if (_status_socket == WAITING_BODY)
 		handleBodyRead();
-
-	if (_status_socket == DONE && _status_stream == DONE)
-		reset();
 }
 
+void Http::handleWrite()
+{
+	if (_status_socket == DONE && _status_stream == DONE && _write_chain.getFirst() == NULL)
+		reset();
+}
 
 void Http::handleCGIRead()
 {
@@ -179,7 +176,6 @@ void Http::handleCGIRead()
 			_write_chain.pushBack(_resp->getHeaders()); 
 			_write_chain.pushBack(headers); 
 			_write_chain.pushBack(body);
-			std::cout << _write_chain;
 			delete _stream_read_chain.getFirst();
 			_stream_read_chain.popFirst();
 			_status_stream = ACTIVE;
@@ -225,8 +221,9 @@ void Http::handleStreamWrite()
 {
 	try
 	{
-		BufferChain::writeBufferToFd(_stream_write_chain, _resp->getStreamWrite());
+		int ret = BufferChain::writeBufferToFd(_stream_write_chain, _resp->getStreamWrite());
 		std::string* buff = _stream_write_chain.getFirst();
+		std::cout << "my big fat buffer : " << ret << std::endl;	
 		delete buff;
 		_stream_write_chain.popFirst();
 	}
@@ -234,15 +231,13 @@ void Http::handleStreamWrite()
 	{
 		throw;
 	}
-	
 	if (_stream_write_chain.getFirst() == NULL)
 	{
+		// If there's no stream to read
+		if (_resp->getStreamRead() == -1)
+			_status_stream = DONE;
 		_connection.unsubStreamWrite();
-		// if all the body i s received, then we don't have anything more to do
-		if (_status_socket == DONE)
-			close(_resp->getStreamWrite());
 	}
-	_connection.subStreamRead();
 }
 
 void	Http::setConfig(Config* c)
@@ -258,32 +253,29 @@ Http::~Http()
 		delete _resp;
 }
 
-void	Http::destroyRequest()
-{
-	if (_req)
-	{
-		delete _req;
-		_req = NULL;
-	}
-}
-
-void	Http::destroyResponse()
-{
-	if (_resp)
-	{
-		delete _resp;
-		_resp = NULL;
-	}
-}
 
 void	Http::reset()
 {
 		std::cout << "REQUEST END" << std::endl;
-		destroyRequest();
-		destroyResponse();
 		_connection.subRead();
 		_connection.unsubStreamRead();
 		_connection.unsubStreamWrite();
+			close(_resp->getStreamWrite());
+		if (_resp->getStreamRead() != 1)
+			close(_resp->getStreamRead());
+		if (_resp->getStreamWrite() != 1)
+		_connection.setStreamRead(-1);
+		_connection.setStreamWrite(-1);
+		if (_req)
+		{
+			delete _req;
+			_req = NULL;
+		}
+		if (_resp)
+		{
+			delete _resp;
+			_resp = NULL;
+		}
 		_status_socket = WAITING_HEADERS;
 		_status_stream = DONE;
 }

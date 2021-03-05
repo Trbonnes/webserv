@@ -65,6 +65,7 @@ public:
 	void setConfig(Config*);
 
 	void handleRead();
+	void handleWrite();
 	void handleStreamWrite();
 	void handleStreamRead();
 
@@ -73,9 +74,6 @@ public:
 
 
 	void handleCGIRead();
-	// destroy the HttpRequest object
-	void	destroyRequest();
-	void	destroyResponse();
 
 	// reset the state of the module
 	void	reset();
