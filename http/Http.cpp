@@ -86,6 +86,8 @@ void Http::handleStreamRead()
 	{
 		_status_stream_read = DONE;
 		_connection.unsubStreamRead();
+		_status_stream_write = DONE;
+		_connection.unsubStreamWrite();
 	}
 	if (_write_chain.getFirst())
 		_connection.subWrite();
@@ -135,16 +137,16 @@ void Http::handleStreamWrite()
 
 void	Http::checkState()
 {
-	// std::cout << " _read_chain: " << _read_chain;
-	// std::cout << " _stream_write_chain: " << _stream_write_chain;
-	// std::cout << " _stream_read_chain: " << _stream_read_chain;
-	// std::cout << " _write_chain: " <<_write_chain;
-	// std::cout << "_status_socket: " << _status_socket <<std::endl;
-	// std::cout << "_status_stream_write: " << _status_stream_write <<std::endl;
-	// std::cout << "_status_stream_read: " << _status_stream_read <<std::endl;  
-	// std::cout << "================= Body received so far" << _bodyRec << std::endl;
-	// std::cout << "================= Body stream written so far" << _bodyStreamWritten << std::endl;
-	// std::cout << "================= Body send so far " << _bodySend << std::endl;
+	std::cout << " _read_chain: " << _read_chain;
+	std::cout << " _stream_write_chain: " << _stream_write_chain;
+	std::cout << " _stream_read_chain: " << _stream_read_chain;
+	std::cout << " _write_chain: " <<_write_chain;
+	std::cout << "_status_socket: " << _status_socket <<std::endl;
+	std::cout << "_status_stream_write: " << _status_stream_write <<std::endl;
+	std::cout << "_status_stream_read: " << _status_stream_read <<std::endl;  
+	std::cout << "================= Body received so far" << _bodyRec << std::endl;
+	std::cout << "================= Body stream written so far" << _bodyStreamWritten << std::endl;
+	std::cout << "================= Body send so far " << _bodySend << std::endl;
 
 	if (_status_socket == DONE && 
 		(_status_stream_write == NONE || _status_stream_write == DONE) &&

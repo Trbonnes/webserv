@@ -83,6 +83,7 @@ int         HttpResponse::is_good_exe(std::string exe)
     std::vector<std::string>::iterator cgi_begin;
     std::vector<std::string>::iterator cgi_end;
 
+    std::cout << "_route |" << _route << "|" << std::endl;
     std::cout << "exe |" << exe << "|" << std::endl;
     std::cout << "Here is the location" << _location << "|" << std::endl;
     std::cout << _config.getCGI_root(_location).length() << std::endl;
