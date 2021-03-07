@@ -68,9 +68,6 @@ class   HttpResponse
     std::string*                _body;
 
 
-    void            prepapreMethod(std::string method);
-    void            callMethod(std::string method);
-
     int             checkAllowMethods(std::string method);
     int             checkCGImethods(std::string method);
     void            setConfigURI(void);

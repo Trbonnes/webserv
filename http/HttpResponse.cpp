@@ -118,10 +118,8 @@ void            HttpResponse::init()
     _statusCode = OK;
     ft_bzero(_cgi_env, sizeof(char*) * NB_METAVARIABLES + 1);
     _uri = _request->getRequestURI();
-    std::cout << "URI " << _uri <<  std::endl;
     // Absolute location route for the server
     _location = _config.getLocation(_uri);
-    std::cout << "LOCATION " << _location <<  std::endl;
     // Check if length is given
     if (_request->getBody().length() > 0 && _request->getContentLength() == 0 && _request->getTransferEncoding().length() == 0)
         _statusCode = LENGTH_REQUIRED;
@@ -135,16 +133,15 @@ void            HttpResponse::init()
     setDate();
     // set the route of the ressource
     setRoute();
-    std::cout << "URI " << _uri <<  std::endl;
-
-    // TO DO set server
-    std::cout << "ROUTE " << _route <<  std::endl;
 
     size_t      extension;
     std::string str;
 
     extension = _route.find_last_of('.');
     // If it's a CGI request we must fork and prepare the stream in and out
+    std::cout << "Are we in cgi ?" << (is_good_exe(str.assign(_route).erase(0, extension + 1)) && checkCGImethods(_request->getMethod())) << std::endl;
+    std::cout << "With " << is_good_exe(str.assign(_route).erase(0, extension + 1)) << " and " << checkCGImethods(_request->getMethod()) << std::endl;
+    
     if (is_good_exe(str.assign(_route).erase(0, extension + 1)) && checkCGImethods(_request->getMethod()))
     {
         cgi();
@@ -224,39 +221,23 @@ void         HttpResponse::setRoute()
     std::string str;
     int ret;
 
-    std::cout << "Location: "<< _location << std::endl;
-    std::string root = _config.getRoot(_location); 
+    std::string root = _config.getRoot(_location);  
     std::string alias = _config.getAlias(_location);
 
 
     Log::debug(_route);
     //** Relative path **
     if (alias.length() > 0)
-    {
         _route.assign(alias).append("/");
-        std::cout << "Threre's an alias : " << alias << std::endl; 
-    }
     else
-    {
         _route.assign(root);
-        std::cout << "Threre's a root : " << root << std::endl; 
-        // _route.append(_uri);
-        // std::cout << "Stick URI : " << _uri << std::endl; 
-
-    }
-    Log::debug(_route);
     ret = stat(_route.c_str(), &file);
     // if is file  exists or put request we're done
     if ((ret == 0 && S_ISREG(file.st_mode)) || _request->getMethod() == "PUT")
         return;
-
-    
-
     // accpet lagnguage
     _route.append(acceptLanguage());
     _route.append(str.assign(_request->getRequestURI()).erase(0, _location.length()));
-    
-
     // ** Else, add index if it is not a put or delete request **
     itIndexBegin = _config.getIndex(_location).begin();
     itIndexEnd = _config.getIndex(_location).end();

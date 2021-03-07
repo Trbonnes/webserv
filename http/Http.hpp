@@ -40,21 +40,40 @@ private:
 	Config* _config;
 
 	std::string		_requestBuffer;
+	std::string		_streamBuffer;
 	// Prevent call to these functions
 	Http();
+
+	// TO OD remove those fuckers
+	size_t _bodySend;
+	size_t _bodyStreamWritten;
+	size_t _bodyRec;
+
+	// check the sate of the module and resets it if needed
+	void	checkState();
+	// reset the state of the module
+	void	reset();
+
+	// Utils function to copy a chunk into a new buffer
+	int				readChunkToBuffer(BufferChain&, FD);
+	std::string*	chunkify(char*, size_t, size_t);
 
 
 	typedef enum e_status
 	{
-		WAITING_HEADERS,
-		WAITING_BODY,
+		NONE,
+		WAITING_HTTP_HEADERS,
+		WAITING_HTTP_BODY,
 		WAITING_CGI_HEADERS,
-		ACTIVE,
+		WAITING_STREAM_READ,
+		WAITING_STREAM_WRITE,
 		DONE
 	} status_t;
 
 	status_t _status_socket;
-	status_t _status_stream;
+	status_t _status_stream_read;
+	status_t _status_stream_write;
+
 public:
 	Http(Connection &c);
 	Http(const Http&);
@@ -75,12 +94,6 @@ public:
 
 	void handleCGIRead();
 
-	// reset the state of the module
-	void	reset();
-
-	// Utils function to copy a chunk into a new buffer
-	int				readChunkToBuffer(BufferChain&, FD);
-	std::string*	chunkify(char*, size_t, size_t);
 
 };
 

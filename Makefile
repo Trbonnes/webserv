@@ -40,6 +40,12 @@ HTTPSRC =	http/Http.cpp \
 			http/responseUtils.cpp \
 			http/parseHeaders.cpp \
 			http/setHeaders.cpp \
+			http/events/newRequest.cpp \
+			http/events/readBody.cpp \
+			http/events/readCGI.cpp \
+			http/events/readChunk.cpp \
+			http/events/readStream.cpp \
+			http/events/writeStream.cpp \
 			http/CGI.cpp
 
 
@@ -77,7 +83,7 @@ OBJECTS = $(addprefix $(OBJECTSDIR)/, $(subst .cpp,.o,$(SRCS)))
 OBJECTSDIRS = 	$(OBJECTSDIR)/core \
 				$(OBJECTSDIR)/core/utils \
 				$(OBJECTSDIR)/http/bin-cgi \
-				$(OBJECTSDIR)/http/Methods
+				$(OBJECTSDIR)/http/events
 
 
 $(OBJECTSDIR)/%.o: ./%.cpp $(HEADERS)

@@ -51,6 +51,7 @@ void	HttpWorker::run()
 	{
 		read_fs = _active_read;
 		write_fs = _active_write;
+		Log::debug("Select");
 		if (select(FD_SETSIZE, &read_fs, &write_fs, NULL, NULL) == -1)
 		{
 			if (g_server->getStatus() == HttpServer::STOPPING)
@@ -70,14 +71,14 @@ void	HttpWorker::run()
 			Connection* c = *ic;
 			try
 			{
+				if (c->isStreamWriteReady(&write_fs))
+					c->streamWrite();
+				if (c->isWriteReady(&write_fs))
+					c->write();
 				if (c->isStreamReadReady(&read_fs))
 					c->streamRead();
-				else if (c->isStreamWriteReady(&write_fs))
-					c->streamWrite();
-				else if (c->isReadReady(&read_fs))
+				if (c->isReadReady(&read_fs))
 					c->read();
-				else if (c->isWriteReady(&write_fs))
-					c->write();
 			}
 			catch(const std::exception& e)
 			{

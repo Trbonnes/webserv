@@ -122,6 +122,7 @@ void Connection::read()
 	try
 	{
 		read = BufferChain::readToBuffer(_read_chain, _socket);
+		Log::debug(read);
 	}
 	catch(const IOError& e)
 	{
@@ -141,7 +142,6 @@ void Connection::write()
 	{
 		BufferChain::writeBufferToFd(_write_chain, _socket);
 		std::string* buff = _write_chain.getFirst();
-		std::cout << *buff << std::endl;
 		delete buff;
 		_write_chain.popFirst();
 		if (_write_chain.getFirst() == NULL)

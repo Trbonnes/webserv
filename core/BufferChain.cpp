@@ -84,9 +84,9 @@ int		BufferChain::writeBufferToFd(BufferChain& chain, FD fd)
 	std::string* buff;
 	
 	buff = chain.getFirst();
-	std::cout << "About to write to fd " << fd << " with size " << buff->size() << std::endl;
+	// std::cout << "About to write to fd " << fd << " with size " << buff->size() << std::endl;
 	ret = write(fd, buff->c_str(), buff->size());
-	std::cout << "Written " <<  std::endl;
+	// std::cout << "Written " << ret <<  std::endl;
 
 	if (ret == -1) // TO DO check if write fails to write all bytes
 		throw IOError();
@@ -103,16 +103,18 @@ int		BufferChain::readToBuffer(BufferChain& chain, FD fd)
 	if (ret > 0)
 	{
 		std::string* n = new std::string(g_read_large, ret);
-		chain.pushBack(n);
+		// std::cout << "STP  | " <<  *n << " |STP " << std::endl;
+ 		chain.pushBack(n);
 	}
 	return ret;
 }
 
 const char* IOError::what() const throw()
 {
-	return "An input or output eror has occurred";
+	return "An input or output error has occurred";
 }
 
+#include <algorithm>
 std::ostream&	operator<<(std::ostream& out, BufferChain& chain)
 {
 	BufferChain::iterator it = chain.begin();
@@ -120,9 +122,12 @@ std::ostream&	operator<<(std::ostream& out, BufferChain& chain)
 	out << "BufferChain: .size=" << chain.size() << std::endl;
 	while (it != chain.end())
 	{
+		std::string toprint = (**it).size() > 10 ? std::string(**it, 0, 7).append("...") : **it;
+		std::replace(toprint.begin(), toprint.end(), '\n', 'N');
+		std::replace(toprint.begin(), toprint.end(), '\r', 'R');
 		out << "|";
-		out << **it;
-		out << "| ";
+		out << toprint;
+		out <<  "|" << "size: " << (**it).size() << " ";
 		it++;
 	}
 	out << std::endl;

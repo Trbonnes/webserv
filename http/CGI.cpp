@@ -136,7 +136,6 @@ void        HttpResponse::cgi_exe()
         _statusCode = INTERNAL_SERVER_ERROR;
         return;
     }
-
     // Fork
     pid = fork();
     if (pid < 0)
@@ -152,6 +151,8 @@ void        HttpResponse::cgi_exe()
         dup2(cgi_in[SIDE_OUT], STDIN_FILENO);
         dup2(cgi_out[SIDE_IN], STDOUT_FILENO);
 
+        
+
         args[0] = ft_strdup(_config.getCGI_root(_location).c_str());
         if (execve(args[0], args, _cgi_env) == -1)
         {
@@ -162,11 +163,15 @@ void        HttpResponse::cgi_exe()
     }
     else
     {
+        sleep(1);
         // closing unused pipe in parent and storing fd fd in streams
         close(cgi_in[SIDE_OUT]);
         close(cgi_out[SIDE_IN]);
         _stream_write = cgi_in[SIDE_IN];
         _stream_read = cgi_out[SIDE_OUT];
+        std::cout << "==========>    fd is " << _stream_write << std::endl;
+        fcntl(_stream_write, F_SETFL, O_NONBLOCK);
+        fcntl(_stream_read, F_SETFL, O_NONBLOCK);
     }
 }
 

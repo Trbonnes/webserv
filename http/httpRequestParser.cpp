@@ -6,7 +6,7 @@
 /*   By: yorn <yorn@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/30 15:45:46 by trbonnes          #+#    #+#             */
-/*   Updated: 2021/03/05 17:22:17 by yorn             ###   ########.fr       */
+/*   Updated: 2021/03/06 13:41:23 by yorn             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -159,7 +159,7 @@ static int appendChunk(BufferChain& chain, std::string* dst, size_t *offset)
 
 	// popping the current buffer cause it's gonna be split
 	std::string *buff = chain.getFirst();
-	if (buff == 0)
+	if (buff == NULL)
 		return 0;
 
 	chain.popFirst();
@@ -191,8 +191,8 @@ static int appendChunk(BufferChain& chain, std::string* dst, size_t *offset)
 	size_t bodyLen;
 	char* endptr;
 	bodyLen = std::strtol(hexLen.c_str(), &endptr, 16);
-	std::cout << "bodyLen : " << bodyLen << std::endl;
-	// if it's not all in basse 16
+
+	// if it's not all in base 16
 	if ((unsigned long)(endptr - hexLen.c_str()) != hexEnd - hexStart)
 		return -1;
 	size_t bodyStart = hexEnd + 2;
@@ -217,7 +217,6 @@ static int appendChunk(BufferChain& chain, std::string* dst, size_t *offset)
 	}
 	if (bodyLen == 0)
 	{
-		std::cout << "0 body len ma foi"<< std::endl;
 		cutLeftovers(chain, buff, bodyEnd + 2); // + 2 to avoid the \r\n
 		return 2;
 	}
@@ -230,7 +229,7 @@ static int appendChunk(BufferChain& chain, std::string* dst, size_t *offset)
 // Extract chunks into a regular body
 bool         HttpRequest::extractChunks(BufferChain& read_chain, BufferChain& stream_write_chain)
 { // TO DO optimizations
-
+	
 	size_t offset = 0;
 	int r;
 	std::string* newBuffer = new std::string("");
@@ -238,11 +237,9 @@ bool         HttpRequest::extractChunks(BufferChain& read_chain, BufferChain& st
 	offset = 0;
 	while ((r = appendChunk(read_chain, newBuffer, &offset)) == 1)
 		continue;
-	std::cout << "Value of r: " << r << std::endl;
 	// if -1 error
 	if (r == -1)
 		throw HttpRequest::MalformedChunk();
-
 	// If there's something to write do it. else rease the buffer
 	if (newBuffer->size() > 0)
 		stream_write_chain.pushBack(newBuffer);
@@ -273,13 +270,11 @@ bool         HttpRequest::extractBody(BufferChain& read_chain, BufferChain& stre
 	// whle there are buffers to read or break
 	while ((buff = read_chain.getFirst()) != NULL)
 	{
-		Log::debug("loop");
 		// This is how many byte left do we need to read to have the full body
 		diff = request->getContentLength() - request->getBodyReceived();
 		// If the buffer doesn't contains the end of the body
 		if (diff > (int)buff->size())
 		{
-			Log::debug("Reading all buffer");
 			stream_write_chain.pushBack(buff);
 			request->incBodyReceived(buff->size());
 			read_chain.popFirst();
@@ -287,7 +282,6 @@ bool         HttpRequest::extractBody(BufferChain& read_chain, BufferChain& stre
 		// else the buffer contains the last bytes needed
 		else
 		{
-			Log::debug("Reading a part of the buffer");
 			// copying the last part of the body into a buffer
 			std::string* n = new std::string(buff->c_str(), diff);
 			stream_write_chain.pushBack(n);
@@ -306,7 +300,7 @@ bool         HttpRequest::extractBody(BufferChain& read_chain, BufferChain& stre
 		}
 	}
 	// If the body receveived match the content lenght we've read all the body
-	if (request->getBodyReceived() == request->getContentLength())
+	if (request->getBodyReceived() >= request->getContentLength())
 		return true;
 	return false;
 }
