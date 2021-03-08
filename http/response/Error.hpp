@@ -3,10 +3,10 @@
 
 #include "HttpResponse.hpp"
 
-class Error : HttpResponse
+class Error : public HttpResponse
 {
 public:
-	Error(ConfigServer*, HttpRequest*, int);
+	Error(ConfigServer*, HttpRequest*, BufferChain&, int);
 	~Error();
 };
 

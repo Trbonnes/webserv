@@ -6,6 +6,7 @@
 #include <iostream>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/time.h>
 #include <unistd.h>
 
 // Core includes
@@ -14,15 +15,24 @@
 
 // Http includes
 #include "http/HttpRequest.hpp"
+#include "http/response/Error.hpp"
+#include "http/response/FileDownLoad.hpp"
+#include "http/response/FolderIndex.hpp"
 
 class HttpResponse
 {
-protected:
+	
+	protected:
 
-    private:
 	// Pointer to the request
     HttpRequest*                _request;
     ConfigServer*               _config;
+
+	//Utils
+	std::string 				_location;
+
+	// used to store errors string
+	StatusCode					_mapCodes;
 
     // File streams
     FD                         _streamWriteFd;
@@ -66,7 +76,6 @@ public:
 	typedef struct	s_state
 	{
 		t_status read;
-		t_status write;
 		t_status readStream;
 		t_status writeStream;
 	}				t_state;
@@ -92,13 +101,30 @@ public:
 	virtual void handleStreamRead(BufferChain& writeChain); 
 	virtual void handleStreamWrite();
 
+
+	//Getters
+	BufferChain&	getStreamReadChain();
+	BufferChain&	getStreamWriteChain();
+	FD				getStreamReadFd();
+	FD				getStreamWriteFd();
+
+	//Setteers
+	void        	setServerName();
+	void        	setContentLocation();
+	void        	setDate();
+
+
 	// Returns a newResponse based on the Request and Conffiguration
-	static HttpResponse* newReponse(HttpRequest *socket, ConfigServer *config);
+	static HttpResponse* newResponse(HttpRequest *socket, ConfigServer *config, BufferChain& writeChain);
 
 	class   HttpError : public std::exception
 	{
+		int _statusCode;
+
 		public:
-			const char * what () const throw ();
+			HttpError(int code) : _statusCode(code) {}
+			const char * what () const throw () {return "HttpError ecountered";}
+			int getStatusCode() const {return _statusCode;}
 	};
 };
 #endif // HTTP_RESPONSE

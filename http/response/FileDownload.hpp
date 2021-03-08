@@ -4,15 +4,22 @@
 #include "http/response/HttpResponse.hpp"
 
 
-class FileDownload : HttpResponse
+class FileDownload : public HttpResponse
 {
+
+private:
+
+	struct stat *_file;
+
 public:
 	//Coplien to do
-	FileDownload(std::string);
+	FileDownload(ConfigServer*, HttpRequest*, std::string, std::string, struct stat*);
 	~FileDownload();
 
-	void	abort();
-	void	handleStreamRead();
+	// Utils
+	void        setCharset(void);
+	void        setContentType();
+	void        setLastModified();
 }
 
 

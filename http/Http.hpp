@@ -7,7 +7,8 @@
 
 #include "core/BufferChain.hpp"
 #include "core/Config.hpp"
-#include "HttpResponse.hpp"
+#include "http/response/HttpResponse.hpp"
+#include "http/response/Error.hpp"
 // This is the entrypoint of the http module
 // All of the filesystem write/read are handled by this module
 // The connection socket read and write are handled by the Worker itself
@@ -26,11 +27,7 @@ private:
 	HttpRequest *_req;
 
 	// Header of the response
-	HttpResponseOld *_resp;
-
-	// Pointers to socket buffer's chain
-	BufferChain		_stream_read_chain;
-	BufferChain		_stream_write_chain;
+	HttpResponse *_resp;
 
 	// Reference to connection socket buffer chains
 	BufferChain&	_read_chain;
@@ -44,11 +41,6 @@ private:
 	// Prevent call to these functions
 	Http();
 
-	// TO OD remove those fuckers
-	size_t _bodySend;
-	size_t _bodyStreamWritten;
-	size_t _bodyRec;
-
 	// check the sate of the module and resets it if needed
 	void	checkState();
 	// reset the state of the module
@@ -58,21 +50,6 @@ private:
 	int				readChunkToBuffer(BufferChain&, FD);
 	std::string*	chunkify(char*, size_t, size_t);
 
-
-	typedef enum e_status
-	{
-		NONE,
-		WAITING_HTTP_HEADERS,
-		WAITING_HTTP_BODY,
-		WAITING_CGI_HEADERS,
-		WAITING_STREAM_READ,
-		WAITING_STREAM_WRITE,
-		DONE
-	} status_t;
-
-	status_t _status_socket;
-	status_t _status_stream_read;
-	status_t _status_stream_write;
 
 public:
 	Http(Connection &c);

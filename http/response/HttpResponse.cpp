@@ -1,4 +1,4 @@
-#include "http/response/HttpResponse.hpp"
+#include "HttpResponse.hpp"
 
 
 HttpResponse::HttpResponse()
@@ -6,21 +6,19 @@ HttpResponse::HttpResponse()
     _request = NULL;
     _streamWriteFd = -1;
     _streamReadFd = -1;
-    _route = route;
+    _route = "";
     _statusCode = OK;
-    _allow = "";
     _wwwAuthenticate = "";
     _referer = "";
     _server = "Webserver";
     _contentLanguage = "";
-    _contentLength = 0;
+    _contentLength = -1;
     _contentLocation = "";
     _contentType = "";
     _charset = "";
     _retryAfter = "";
     _transferEncoding = "";
     _state.read = NONE;
-    _state.write = NONE;
     _state.readStream = NONE;
     _state.writeStream = NONE;
 }
@@ -31,21 +29,19 @@ HttpResponse::HttpResponse(ConfigServer* config, HttpRequest* req)
     _request = req;
     _streamWriteFd = -1;
     _streamReadFd = -1;
-    _route = route;
+    _route = "";
     _statusCode = OK;
-    _allow = "";
     _wwwAuthenticate = "";
     _referer = "";
     _server = "Webserver";
     _contentLanguage = "";
-    _contentLength = 0;
+    _contentLength = -1;
     _contentLocation = "";
     _contentType = "";
     _charset = "";
     _retryAfter = "";
     _transferEncoding = "";
     _state.read = NONE;
-    _state.write = NONE;
     _state.readStream = NONE;
     _state.writeStream = NONE;
 }
@@ -60,19 +56,17 @@ HttpResponse::HttpResponse(ConfigServer* config, HttpRequest* req, std::string r
     _streamReadFd = -1;
     _route = route;
     _statusCode = OK;
-    _allow = "";
     _wwwAuthenticate = "";
     _referer = "";
     _server = "Webserver";
     _contentLanguage = "";
-    _contentLength = 0;
+    _contentLength = -1;
     _contentLocation = "";
     _contentType = "";
     _charset = "";
     _retryAfter = "";
     _transferEncoding = "";
     _state.read = NONE;
-    _state.write = NONE;
     _state.readStream = NONE;
     _state.writeStream = NONE;
 }
@@ -106,7 +100,7 @@ void HttpResponse::handleRead(BufferChain& readChain)
 	}
 	else
 	{
-		end = HttpRequest::extractBody(readChain, _streamWriteChain, _req);
+		end = HttpRequest::extractBody(readChain, _streamWriteChain, _request);
 	}
 
     // TO DO if payload too large
@@ -117,12 +111,15 @@ void HttpResponse::handleRead(BufferChain& readChain)
         _state.read = DONE;
 
     // Stream write state update
-	if (_streamWriteChain.getFirst())
-        _state.writeStream = READY;
-    else if (_state.read == DONE)
-        _state.writeStream = DONE;
-    else
-        _state.writeStream = WAITING;
+	if (_state.writeStream != NONE)
+    {
+        if (_streamWriteChain.getFirst())
+            _state.writeStream = READY;
+        else if (_state.read == DONE)
+            _state.writeStream = DONE;
+        else
+            _state.writeStream = WAITING;
+    }
 }
 
 void HttpResponse::handleStreamRead(BufferChain& writeChain)
@@ -142,10 +139,6 @@ void HttpResponse::handleStreamRead(BufferChain& writeChain)
         // close the stream
         close(_streamReadFd);
         _state.readStream = DONE;
-        if (writeChain.getFirst())
-            _state.write = READY;
-        else
-            _state.write = DONE;
     }
 }
 
@@ -189,7 +182,7 @@ void HttpResponse::handleStreamWrite()
 	}
 }
 
-static std::string        getRoute(ConfigServer* config, HttpRequest req, std::string &location)
+static std::string        getRoute(ConfigServer* config, HttpRequest* req, std::string &location)
 {
     std::vector<std::string>::iterator itIndexBegin;
     std::vector<std::string>::iterator itIndexEnd;
@@ -209,7 +202,7 @@ static std::string        getRoute(ConfigServer* config, HttpRequest req, std::s
         route.assign(root);
     ret = stat(route.c_str(), &file);
     // if is file  exists or put request we're done
-    if ((ret == 0 && S_ISREG(file.st_mode)) || _request->getMethod() == "PUT" || _request->getMethod() == "DELETE")
+    if ((ret == 0 && S_ISREG(file.st_mode)) || req->getMethod() == "PUT" || req->getMethod() == "DELETE")
         return;
     
     // accept lagnguage
@@ -246,8 +239,8 @@ static bool       isMethodAllowed(ConfigServer* config, std::string& method, std
     std::vector<std::string>::iterator itBegin;
     std::vector<std::string>::iterator itEnd;
 
-    itBegin = config->getAllow(_location).begin();
-    itEnd = config->getAllow(_location).end();
+    itBegin = config->getAllow(location).begin();
+    itEnd = config->getAllow(location).end();
     while (itBegin != itEnd)
     {
         if ((*itBegin) == method)
@@ -257,7 +250,7 @@ static bool       isMethodAllowed(ConfigServer* config, std::string& method, std
     return false;
 }
 
-HttpResponse* HttpResponse::newReponse(HttpRequest *request, ConfigServer *config)
+HttpResponse* HttpResponse::newResponse(HttpRequest *request, ConfigServer *config, BufferChain& writeChain)
 {
 	std::string uri;
 	std::string location;
@@ -266,14 +259,14 @@ HttpResponse* HttpResponse::newReponse(HttpRequest *request, ConfigServer *confi
 
 
 	uri = request->getRequestURI();
-    location = _config.getLocation(uri);
+    location = config->getLocation(uri);
     
     // Check if length is given
     if (request->getBody().length() > 0 && request->getContentLength() == 0 && request->getTransferEncoding().length() == 0)
-        return new Error(LENGTH_REQUIRED);
+        return new Error(config, request, writeChain, LENGTH_REQUIRED);
     
     // set the route of the ressource
-    route = getRoute();
+    route = getRoute(config, request, location);
 
     // TO DO insert authorization mechanic
 
@@ -295,27 +288,135 @@ HttpResponse* HttpResponse::newReponse(HttpRequest *request, ConfigServer *confi
             struct stat file; 
             
             if (stat(_route.c_str(), &file))
-                return new Error(NOT_FOUND);
-
+                return new Error(config, request, writeChain, NOT_FOUND);
+            if (!S_IREAD(file.st_mode))
+                return new Error(config, request, writeChain, FORBIDDEN);
             if (S_IFREG(file.st_mode))
-                return new FileDownload(route);
-
+                return new FileDownload(config, request, route, location);
             if (S_ISDIR(file.st_mode))
             {
                 if (config->getAutoindex(location) == true)
-                    return new FolderIndex(route);
+                        return new FolderIndex(route);
                 else
-                    return new Error(FORBIDDEN);
+                    return new Error(config, request, writeChain, FORBIDDEN);
             }
         }
     }
     // If else the method is not allowed
     else
-        return new Error(METHOD_NOT_ALLOWED);
+        return new Error(config, request, writeChain, METHOD_NOT_ALLOWED);
 
 }
 
-std::string HttpResponse::*getRawHeaders()
+std::string* HttpResponse::getRawHeaders()
 {
+    std::string* buff = new std::string();
 
+    buff->append(_config.getHttpVersion());
+    buff->append(" ");
+    char *tmp = ft_itoa(_statusCode);
+    buff->append(tmp).append(" ");
+    free(tmp);
+    buff->append(_mapCodes.codes[_statusCode]).append("\r\n");
+    buff->append("Server: ").append(_config.getServerSoftware()).append("\r\n");
+    if (ft_strlen(_date) > 0)
+        buff->append("Date: ").append(_date).append("\r\n");
+    if (_contentType.length() > 0)
+        buff->append("Content-Type: ").append(_contentType).append("\r\n");
+    if (_contentLength >= 0)
+    {
+        tmp = ft_itoa(_contentLength);
+        buff->append("Content-Length: ").append(tmp).append("\r\n");
+        free(tmp);
+    }
+
+    if (_request->getMethod().compare("OPTIONS") == 0 || _statusCode == METHOD_NOT_ALLOWED)
+    {
+        std::vector<std::string>::iterator it;
+        std::vector<std::string>::iterator itEnd;
+        std::size_t extension;
+        std::string str;
+
+        buff->append("Allow: ");
+        extension = _route.find_last_of('.');
+        if (is_good_exe(str.assign(_route).erase(0, extension + 1)))
+        {
+            it = _config.getCGI_allow(_location).begin();
+            itEnd = _config.getCGI_allow(_location).end();
+        }
+        else
+        {
+            it = _config.getAllow(_location).begin();
+            itEnd = _config.getAllow(_location).end();
+        }
+        while (it != itEnd)
+        {
+            buff->append(*it).append(" ");
+            it++;
+        }
+        buff->append("\r\n");
+    }
+    else
+    {
+        if (_charset.length() > 0)
+            buff->append("Charset: ").append(_charset).append("\r\n");
+        if (_statusCode < 300)
+        {
+            if (ft_strlen(_lastModified) > 0)
+                buff->append("Last-Modified: ").append(_lastModified).append("\r\n");
+            if (_contentLocation.length() > 0)
+                buff->append("Content-Location: ").append(_contentLocation).append("\r\n");
+            if (_contentLanguage.length() > 0 && _request->getMethod().compare("PUT") && _request->getMethod().compare("DELETE"))
+                buff->append("Content-Language: ").append(_contentLanguage).append("\r\n");
+            if (_transferEncoding.length() > 0)
+                buff->append("Transfer-Encoding: ").append(_transferEncoding);
+        }
+        else if (_statusCode == UNAUTHORIZED)
+            buff->append("WWW-Authenticate: ").append("Basic realm=").append(_config.getAuth_basic(_location)).append("\r\n");
+    }
+    buff->append("\r\n");
+    return buff;
+}
+
+BufferChain&	HttpResponse::getStreamReadChain()
+{
+    return _streamReadChain;
+}
+
+BufferChain&	HttpResponse::getStreamWriteChain()
+{
+    return _streamWriteChain;
+}
+
+FD				HttpResponse::getStreamReadFd()
+{
+    return _streamReadFd;
+}
+
+FD				HttpResponse::getStreamWriteFd()
+{
+    return _streamWriteFd;
+}
+
+void        HttpResponse::setServerName()
+{
+    _server = _request->getHost();
+}
+
+
+void        HttpResponse::setContentLocation()
+{
+    _contentLocation.assign("http://").append(_request->getHost()).append("/").append(_route);
+}
+
+void        HttpResponse::setDate()
+{
+    struct timeval  tv;
+    struct tm       *timeinfo;
+
+    if (gettimeofday(&tv, NULL) == 0)
+    {
+        timeinfo = localtime(&(tv.tv_sec));
+        strftime(_date, 100, "%a %d %b 20%y %OH:%OM:%OS GMT", timeinfo);
+    }
 }

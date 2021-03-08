@@ -34,9 +34,11 @@ CORESRC = 	core/Runnable.cpp \
 
 HTTPSRC =	http/Http.cpp \
 			http/response/HttpResponse.cpp \
+			http/response/Error.cpp \
+			http/response/FileDownload.cpp \
+			http/response/FolderIndex.cpp \
 			http/HttpRequest.cpp \
 			http/httpRequestParser.cpp \
-			# http/responseHandlers.cpp #
 			http/responseUtils.cpp \
 			http/parseHeaders.cpp \
 			http/setHeaders.cpp \
@@ -62,9 +64,11 @@ HEADERS = 	core/Location.hpp \
 			http/statusCodes.hpp \
 			http/Http.hpp \
 			http/response/HttpResponse.hpp \
+			http/response/FileDownload.hpp \
+			http/response/FolderIndex.hpp \
+			http/response/Error.hpp \
 			http/HttpRequest.hpp \
 			core/BufferChain.hpp \
-			http/CGI.hpp \
 			core/Connection.hpp
 
 
