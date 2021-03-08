@@ -3,7 +3,6 @@
 
 #include "http/response/HttpResponse.hpp"
 
-
 class FileDownload : public HttpResponse
 {
 
@@ -20,7 +19,7 @@ public:
 	void        setCharset(void);
 	void        setContentType();
 	void        setLastModified();
-}
+};
 
 
 #endif // FILEDOWNLOAD_HPP

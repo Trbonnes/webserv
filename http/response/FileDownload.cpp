@@ -67,3 +67,7 @@ void        FileDownload::setContentType()
         _contentType = _config->getType(_location);
 }
 
+FileDownload::~FileDownload()
+{
+
+}

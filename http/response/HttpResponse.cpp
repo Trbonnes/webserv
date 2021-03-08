@@ -3,6 +3,7 @@
 
 HttpResponse::HttpResponse()
 {
+    ft_bzero(_date, 100);
     _request = NULL;
     _streamWriteFd = -1;
     _streamReadFd = -1;
@@ -25,6 +26,7 @@ HttpResponse::HttpResponse()
 
 HttpResponse::HttpResponse(ConfigServer* config, HttpRequest* req)
 {
+    ft_bzero(_date, 100);
     _config = config;
     _request = req;
     _streamWriteFd = -1;
@@ -49,6 +51,7 @@ HttpResponse::HttpResponse(ConfigServer* config, HttpRequest* req)
 
 HttpResponse::HttpResponse(ConfigServer* config, HttpRequest* req, std::string route)
 {
+    ft_bzero(_date, 100);
     _config = config;
     _route = route;
     _request = req;
@@ -203,7 +206,7 @@ static std::string        getRoute(ConfigServer* config, HttpRequest* req, std::
     ret = stat(route.c_str(), &file);
     // if is file  exists or put request we're done
     if ((ret == 0 && S_ISREG(file.st_mode)) || req->getMethod() == "PUT" || req->getMethod() == "DELETE")
-        return;
+        return route;
     
     // accept lagnguage
     // route.append(acceptLanguage());
@@ -232,6 +235,7 @@ static std::string        getRoute(ConfigServer* config, HttpRequest* req, std::
         itIndexBegin++;
     }
     route.assign(str);
+    return route;
 }
 
 static bool       isMethodAllowed(ConfigServer* config, std::string& method, std::string &location)
@@ -281,22 +285,22 @@ HttpResponse* HttpResponse::newResponse(HttpRequest *request, ConfigServer *conf
     // }
 
     // If it's not CGI check if the method is authorized
-    if (isMethodAllowed(config, method, location)
+    if (isMethodAllowed(config, method, location))
     {
         if (method == "GET")
         {
             struct stat file; 
             
-            if (stat(_route.c_str(), &file))
+            if (stat(route.c_str(), &file))
                 return new Error(config, request, writeChain, NOT_FOUND);
-            if (!S_IREAD(file.st_mode))
+            if (!(file.st_mode & S_IRUSR))
                 return new Error(config, request, writeChain, FORBIDDEN);
-            if (S_IFREG(file.st_mode))
-                return new FileDownload(config, request, route, location);
+            if (S_ISREG(file.st_mode))
+                return new FileDownload(config, request, route, location, &file);
             if (S_ISDIR(file.st_mode))
             {
                 if (config->getAutoindex(location) == true)
-                        return new FolderIndex(route);
+                        return new FolderIndex(config, request, route, writeChain);
                 else
                     return new Error(config, request, writeChain, FORBIDDEN);
             }
@@ -306,19 +310,20 @@ HttpResponse* HttpResponse::newResponse(HttpRequest *request, ConfigServer *conf
     else
         return new Error(config, request, writeChain, METHOD_NOT_ALLOWED);
 
+    return NULL;
 }
 
 std::string* HttpResponse::getRawHeaders()
 {
     std::string* buff = new std::string();
 
-    buff->append(_config.getHttpVersion());
+    buff->append(_config->getHttpVersion());
     buff->append(" ");
     char *tmp = ft_itoa(_statusCode);
     buff->append(tmp).append(" ");
     free(tmp);
     buff->append(_mapCodes.codes[_statusCode]).append("\r\n");
-    buff->append("Server: ").append(_config.getServerSoftware()).append("\r\n");
+    buff->append("Server: ").append(_config->getServerSoftware()).append("\r\n");
     if (ft_strlen(_date) > 0)
         buff->append("Date: ").append(_date).append("\r\n");
     if (_contentType.length() > 0)
@@ -339,16 +344,16 @@ std::string* HttpResponse::getRawHeaders()
 
         buff->append("Allow: ");
         extension = _route.find_last_of('.');
-        if (is_good_exe(str.assign(_route).erase(0, extension + 1)))
-        {
-            it = _config.getCGI_allow(_location).begin();
-            itEnd = _config.getCGI_allow(_location).end();
-        }
-        else
-        {
-            it = _config.getAllow(_location).begin();
-            itEnd = _config.getAllow(_location).end();
-        }
+        // if (is_good_exe(str.assign(_route).erase(0, extension + 1)))
+        // {
+        //     it = _config->getCGI_allow(_location).begin();
+        //     itEnd = _config->getCGI_allow(_location).end();
+        // }
+        // else
+        // {
+            it = _config->getAllow(_location).begin();
+            itEnd = _config->getAllow(_location).end();
+        // }
         while (it != itEnd)
         {
             buff->append(*it).append(" ");
@@ -372,7 +377,7 @@ std::string* HttpResponse::getRawHeaders()
                 buff->append("Transfer-Encoding: ").append(_transferEncoding);
         }
         else if (_statusCode == UNAUTHORIZED)
-            buff->append("WWW-Authenticate: ").append("Basic realm=").append(_config.getAuth_basic(_location)).append("\r\n");
+            buff->append("WWW-Authenticate: ").append("Basic realm=").append(_config->getAuth_basic(_location)).append("\r\n");
     }
     buff->append("\r\n");
     return buff;
@@ -419,4 +424,9 @@ void        HttpResponse::setDate()
         timeinfo = localtime(&(tv.tv_sec));
         strftime(_date, 100, "%a %d %b 20%y %OH:%OM:%OS GMT", timeinfo);
     }
+}
+
+HttpResponse::~HttpResponse()
+{
+    
 }

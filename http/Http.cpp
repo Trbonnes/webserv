@@ -55,9 +55,7 @@ void Http::handleWrite()
 
 void Http::handleStreamRead()
 {
-	int ret = -1;
 	Log::debug("handleStreamRead()");
-
 	try
 	{
 		_resp->handleStreamRead(_write_chain);
@@ -71,8 +69,6 @@ void Http::handleStreamRead()
 
 void Http::handleStreamWrite()
 {
-	int ret;
-
 	try
 	{
 		_resp->handleStreamWrite();

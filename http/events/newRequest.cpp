@@ -43,4 +43,5 @@ void Http::handleNewRequest()
 			_connection.setStreamRead(_resp->getStreamReadFd());
 			_connection.subStreamRead();
 		}
+	}
 }

@@ -15,9 +15,6 @@
 
 // Http includes
 #include "http/HttpRequest.hpp"
-#include "http/response/Error.hpp"
-#include "http/response/FileDownLoad.hpp"
-#include "http/response/FolderIndex.hpp"
 
 class HttpResponse
 {
@@ -87,7 +84,7 @@ public:
 	HttpResponse();
 	HttpResponse(ConfigServer*, HttpRequest*);
 	HttpResponse(ConfigServer*, HttpRequest*, std::string route);
-	~HttpResponse();
+	virtual ~HttpResponse();
 
 	//public funciton
 	std::string *getRawHeaders();
@@ -127,4 +124,9 @@ public:
 			int getStatusCode() const {return _statusCode;}
 	};
 };
+
+#include "http/response/Error.hpp"
+#include "http/response/FileDownload.hpp"
+#include "http/response/FolderIndex.hpp"
+
 #endif // HTTP_RESPONSE

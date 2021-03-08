@@ -31,3 +31,8 @@ Error::Error(ConfigServer* config, HttpRequest* req, BufferChain& writeChain, in
     //     get(true);
     // }
 }
+
+Error::~Error()
+{
+
+}

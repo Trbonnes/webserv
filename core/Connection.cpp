@@ -124,7 +124,7 @@ void Connection::read()
 		read = BufferChain::readToBuffer(_read_chain, _socket);
 		Log::debug(read);
 	}
-	catch(const IOError& e)
+	catch(const BufferChain::IOError& e)
 	{
 		throw;
 	}
@@ -147,7 +147,7 @@ void Connection::write()
 		if (_write_chain.getFirst() == NULL)
 			unsubWrite();
 	}
-	catch(const IOError& e)
+	catch(const BufferChain::IOError& e)
 	{
 		throw;
 	}
@@ -161,7 +161,7 @@ void Connection::streamWrite()
 	{
 		_module.handleStreamWrite();
 	}
-	catch(const IOError& e)
+	catch(const BufferChain::IOError& e)
 	{
 		throw ConnectionClose();
 	}
@@ -174,7 +174,7 @@ void Connection::streamRead()
 	{
 		_module.handleStreamRead();
 	}
-	catch(const IOError& e)
+	catch(const BufferChain::IOError& e)
 	{
 	 	throw ConnectionClose();
 	}

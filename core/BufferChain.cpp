@@ -109,7 +109,7 @@ int		BufferChain::readToBuffer(BufferChain& chain, FD fd)
 	return ret;
 }
 
-const char* IOError::what() const throw()
+const char* BufferChain::IOError::what() const throw()
 {
 	return "An input or output error has occurred";
 }
