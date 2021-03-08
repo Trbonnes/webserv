@@ -18,7 +18,7 @@ void Http::	handleBodyRead()
 			std::cerr << e.what() << '\n';
 			// TO DO set error bad request in response status
 		}
-		if (end && (_req->getMethod() == "PUT" || _req->getMethod() == "POST"))
+		if (end && (_req->getMethod() == "PUT" || _req->getMethod() == "POST") && _stream_write_chain.getFirst() != NULL)
 			_connection.subStreamWrite();
 
 	}

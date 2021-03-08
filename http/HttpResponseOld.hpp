@@ -21,7 +21,7 @@
 # include "statusCodes.hpp"
 # include "CGI.hpp"
 
-class   HttpResponse
+class   HttpResponseOld
 {
     private:
 
@@ -117,12 +117,12 @@ class   HttpResponse
     void            configureErrorFile(std::string&);
 
     public:
-    HttpResponse();
-    HttpResponse(HttpRequest *socket, ConfigServer *config);
-    HttpResponse(HttpResponse &copy);
-    ~HttpResponse();
+    HttpResponseOld();
+    HttpResponseOld(HttpRequest *socket, ConfigServer *config);
+    HttpResponseOld(HttpResponseOld &copy);
+    ~HttpResponseOld();
 
-    HttpResponse            &operator=(HttpResponse &rhs);
+    HttpResponseOld            &operator=(HttpResponseOld &rhs);
 
 
     //Getters
@@ -133,6 +133,7 @@ class   HttpResponse
 
     std::string*    getHeaders();
     std::string*    getBody();
+    int             getClientBodySize();
     bool            use_cgi();
     void            setFirstHeadersResponse(std::string &response);
     void            setAllowMethodsResponse(std::string &response);

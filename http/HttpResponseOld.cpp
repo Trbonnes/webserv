@@ -1,11 +1,11 @@
-#include "HttpResponse.hpp"
+#include "HttpResponseOld.hpp"
 
-const std::string HttpResponse::_base64_chars = 
+const std::string HttpResponseOld::_base64_chars = 
              "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
              "abcdefghijklmnopqrstuvwxyz"
              "0123456789+/";
 
-HttpResponse::HttpResponse() :
+HttpResponseOld::HttpResponseOld() :
 _request(NULL),
 _config(),
 _mapCodes(),
@@ -28,7 +28,7 @@ _transferEncoding("")
 {
 }
 
-HttpResponse::HttpResponse(HttpRequest *req, ConfigServer *config) :
+HttpResponseOld::HttpResponseOld(HttpRequest *req, ConfigServer *config) :
 _request(req),
 _config(*config),
 _mapCodes(),
@@ -59,7 +59,7 @@ _transferEncoding("")
     init(); // TO DO should i just copy the code of init in here ? 
 }
 
-HttpResponse::HttpResponse(HttpResponse &copy)
+HttpResponse::HttpResponseOld(HttpResponse &copy)
 {
     _request = copy._request;
     _config = copy._config;
@@ -78,7 +78,7 @@ HttpResponse::HttpResponse(HttpResponse &copy)
     _transferEncoding = copy._transferEncoding;
 }
 
-HttpResponse::~HttpResponse()
+HttpResponse::~HttpResponseOld()
 {
     int     i;
 
@@ -139,9 +139,6 @@ void            HttpResponse::init()
 
     extension = _route.find_last_of('.');
     // If it's a CGI request we must fork and prepare the stream in and out
-    std::cout << "Are we in cgi ?" << (is_good_exe(str.assign(_route).erase(0, extension + 1)) && checkCGImethods(_request->getMethod())) << std::endl;
-    std::cout << "With " << is_good_exe(str.assign(_route).erase(0, extension + 1)) << " and " << checkCGImethods(_request->getMethod()) << std::endl;
-    
     if (is_good_exe(str.assign(_route).erase(0, extension + 1)) && checkCGImethods(_request->getMethod()))
     {
         cgi();
@@ -233,11 +230,21 @@ void         HttpResponse::setRoute()
         _route.assign(root);
     ret = stat(_route.c_str(), &file);
     // if is file  exists or put request we're done
-    if ((ret == 0 && S_ISREG(file.st_mode)) || _request->getMethod() == "PUT")
+    if ((ret == 0 && S_ISREG(file.st_mode)) || _request->getMethod() == "PUT" || _request->getMethod() == "DELETE")
         return;
+    
     // accpet lagnguage
     _route.append(acceptLanguage());
     _route.append(str.assign(_request->getRequestURI()).erase(0, _location.length()));
+
+    // CGI
+    size_t pos = _route.find_last_of('.'); 
+    if (pos != _route.npos)
+    {
+        std::string extension = _route.substr(pos + 1);
+        if (is_good_exe(extension))
+            return;
+    }
     // ** Else, add index if it is not a put or delete request **
     itIndexBegin = _config.getIndex(_location).begin();
     itIndexEnd = _config.getIndex(_location).end();
@@ -386,4 +393,10 @@ std::string*    HttpResponse::getHeaders()
 std::string*    HttpResponse::getBody()
 {
     return _body;
+}
+
+// TO DO doesn't feel like a good solution
+int    HttpResponse::getClientBodySize()
+{
+    return _config.getClientBodySize(_location);
 }

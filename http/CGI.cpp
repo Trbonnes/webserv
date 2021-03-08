@@ -70,11 +70,15 @@ void        HttpResponse::setEnv()
     _cgi_env[SERVER_PORT] = ft_strdup(_cgi._server_port.insert(0, "SERVER_PORT=").c_str());
     _cgi_env[SERVER_PROTOCOL] = ft_strdup(_cgi._server_protocol.insert(0, "SERVER_PROTOCOL=").c_str());
     _cgi_env[SERVER_SOFTWARE] = ft_strdup(_cgi._server_software.insert(0, "SERVER_SOFTWARE=").c_str());
-    if (_request->getXSecret().compare(""))
+    if (_request->getXSecret().compare("")) // TO DO assez crade ma foi
         _cgi_env[X_SECRET] = ft_strdup("HTTP_X_SECRET_HEADER_FOR_TEST=1");
-    if (_request->getTransferEncoding() == "chunked\r") // TO DO why the \r
+    if (_request->getTransferEncoding() == "chunked" || _request->getTransferEncoding() == "chunked\r") // TO DO why the \r
+        _cgi_env[CONTENT_LENGTH] = ft_strdup("CONTENT_LENGTH=");
+    else
         _cgi_env[CONTENT_LENGTH] = ft_strdup(_cgi._content_length.insert(0, "CONTENT_LENGTH=").c_str());
     _cgi_env[NB_METAVARIABLES] = NULL;
+
+    std::cout << "CONTENCT LENGTH FOR CGI " << _cgi_env[CONTENT_LENGTH] << "|" << std::endl;
 }
 
 // ** Verify if the extensions correspond to the config file (CGI) ** 
@@ -82,11 +86,6 @@ int         HttpResponse::is_good_exe(std::string exe)
 {
     std::vector<std::string>::iterator cgi_begin;
     std::vector<std::string>::iterator cgi_end;
-
-    std::cout << "_route |" << _route << "|" << std::endl;
-    std::cout << "exe |" << exe << "|" << std::endl;
-    std::cout << "Here is the location" << _location << "|" << std::endl;
-    std::cout << _config.getCGI_root(_location).length() << std::endl;
 
     if (_config.getCGI_root(_location).length() > 0)
     {

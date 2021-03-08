@@ -34,19 +34,8 @@ void Http::handleRead()
 	if (_status_socket == WAITING_HTTP_HEADERS)
 		handleNewRequest();
 	if (_status_socket == WAITING_HTTP_BODY)
-	{
 		handleBodyRead();
-		if (_stream_write_chain.getLast())
-		{
-			_bodyRec += _stream_write_chain.getLast()->size();
-		}
 		
-	if (_status_socket == DONE && _req->getMethod() == "PUT")
-			_connection.subWrite();
-		// If there's something to write to stream
-		if (_status_stream_write == WAITING_STREAM_WRITE && _stream_write_chain.getFirst())
-			_connection.subStreamWrite();
-	}
 	checkState();
 }
 

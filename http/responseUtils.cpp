@@ -6,7 +6,7 @@ inline bool   HttpResponse::is_base64(unsigned char c)
 }
 
 //** Encode password in base64 **
-std::string   HttpResponse::base64_encode(unsigned char const* bytes_to_encode, unsigned int in_len)
+std::string   HttpResponseOld::base64_encode(unsigned char const* bytes_to_encode, unsigned int in_len)
 {
   std::string   ret;
   int           i;

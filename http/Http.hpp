@@ -26,7 +26,7 @@ private:
 	HttpRequest *_req;
 
 	// Header of the response
-	HttpResponse *_resp;
+	HttpResponseOld *_resp;
 
 	// Pointers to socket buffer's chain
 	BufferChain		_stream_read_chain;

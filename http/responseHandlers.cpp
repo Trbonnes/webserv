@@ -1,4 +1,3 @@
-#include "HttpResponse.hpp"
 
 // Set the response to upload a file
 void            HttpResponse::get(bool include_body = true)
@@ -11,8 +10,6 @@ void            HttpResponse::get(bool include_body = true)
     // if it returns anything other than 0, assume it's not found
     if (stat(_route.c_str(), &file))
     {
-        Log::debug(_route.c_str());
-        Log::debug("STat error GET");
         _statusCode = NOT_FOUND;
         return;
     }

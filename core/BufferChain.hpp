@@ -63,12 +63,13 @@ public:
 	iterator begin();
 	iterator end();
 	size_t size();
+
+	class	IOError: public std::exception {
+		public:
+			virtual const char* what() const throw();
+	};
 };
 
-class	IOError: public std::exception {
-	public:
-		virtual const char* what() const throw();
-};
 
 
 std::ostream&	operator<<(std::ostream&, BufferChain&);

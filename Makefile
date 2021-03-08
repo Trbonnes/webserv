@@ -33,10 +33,10 @@ CORESRC = 	core/Runnable.cpp \
 			core/utils/ft_realloc.cpp
 
 HTTPSRC =	http/Http.cpp \
-			http/HttpResponse.cpp \
+			http/response/HttpResponse.cpp \
 			http/HttpRequest.cpp \
 			http/httpRequestParser.cpp \
-			http/responseHandlers.cpp \
+			# http/responseHandlers.cpp #
 			http/responseUtils.cpp \
 			http/parseHeaders.cpp \
 			http/setHeaders.cpp \
@@ -45,8 +45,7 @@ HTTPSRC =	http/Http.cpp \
 			http/events/readCGI.cpp \
 			http/events/readChunk.cpp \
 			http/events/readStream.cpp \
-			http/events/writeStream.cpp \
-			http/CGI.cpp
+			http/events/writeStream.cpp
 
 
 HEADERS = 	core/Location.hpp \
@@ -62,7 +61,7 @@ HEADERS = 	core/Location.hpp \
 			core/utils/utils.hpp \
 			http/statusCodes.hpp \
 			http/Http.hpp \
-			http/HttpResponse.hpp \
+			http/response/HttpResponse.hpp \
 			http/HttpRequest.hpp \
 			core/BufferChain.hpp \
 			http/CGI.hpp \

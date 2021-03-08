@@ -13,21 +13,10 @@ void Http::handleNewRequest()
 	// If the end of headers are reached
 	if ((pos = _requestBuffer.find("\r\n\r\n")) != _requestBuffer.npos) // TO DO might have to hcange this for small buffers
 	{
-
-
-
-
-
-
-
-
 		// TO OD help thos poor souls
 		_bodySend = 0;
 		_bodyRec = 0;
-		_bodyStreamWritten = 0;
-		
-		
-		
+		_bodyStreamWritten = 0;	
 		
 		std::string request;
 		request.append(_requestBuffer, 0, pos + 1); // TO DO realloc good ?
@@ -44,7 +33,7 @@ void Http::handleNewRequest()
 		// Instantiate new request
 		_req = HttpRequest::parseRequest(request);
 		// Instantiate a new response from that request
-		_resp = new HttpResponse(_req, _config->getServerUnit(_req->getPort(), _req->getHost()));
+		_resp = new HttpResponseOld(_req, _config->getServerUnit(_req->getPort(), _req->getHost()));
 		
 		// If the content length is superior to 0 or the body is chunked, then wait for the body
 		if (_req->getContentLength() > 0 || _req->getTransferEncoding() == "chunked\r") // TO DO why ?
