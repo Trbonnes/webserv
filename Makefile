@@ -35,8 +35,10 @@ CORESRC = 	core/Runnable.cpp \
 HTTPSRC =	http/Http.cpp \
 			http/response/HttpResponse.cpp \
 			http/response/Error.cpp \
+			http/response/HeadersError.cpp \
 			http/response/FileDownload.cpp \
 			http/response/FolderIndex.cpp \
+			http/response/HeadersOnly.cpp \
 			http/HttpRequest.cpp \
 			http/httpRequestParser.cpp \
 			http/responseUtils.cpp \

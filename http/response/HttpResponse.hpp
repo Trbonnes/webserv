@@ -65,6 +65,7 @@ public:
 	{
 		NONE,
 		WAITING,
+		IGNORE,
 		READY,
 		DONE
 	}				t_status;
@@ -73,6 +74,7 @@ public:
 	typedef struct	s_state
 	{
 		t_status read;
+		t_status write;
 		t_status readStream;
 		t_status writeStream;
 	}				t_state;
@@ -95,6 +97,7 @@ public:
 
 	// Read/write eent processing, might be redefined by child classes
 	virtual void handleRead(BufferChain& readChain);
+	virtual void handleWrite(BufferChain& writeChain);
 	virtual void handleStreamRead(BufferChain& writeChain); 
 	virtual void handleStreamWrite();
 
@@ -105,10 +108,13 @@ public:
 	FD				getStreamReadFd();
 	FD				getStreamWriteFd();
 
-	//Setteers
+	//Setters
 	void        	setServerName();
 	void        	setContentLocation();
 	void        	setDate();
+	void  	      	setCharset(void);
+	void    	    setContentType();
+	void        	setLastModified(struct stat* file);
 
 
 	// Returns a newResponse based on the Request and Conffiguration
@@ -123,10 +129,17 @@ public:
 			const char * what () const throw () {return "HttpError ecountered";}
 			int getStatusCode() const {return _statusCode;}
 	};
+
+	class   ConnectionClose : public std::exception
+	{
+		public:
+			const char * what () const throw () {return "Closing the connection";}
+	};
 };
 
 #include "http/response/Error.hpp"
 #include "http/response/FileDownload.hpp"
 #include "http/response/FolderIndex.hpp"
+#include "http/response/HeadersOnly.hpp"
 
 #endif // HTTP_RESPONSE

@@ -26,6 +26,8 @@ void Http::handleNewRequest()
 		Log::debug(tmp);
 		_requestBuffer.clear();
 		// Instantiate new request
+		std::cout << "Request" << std::endl;
+		std::cout << "|" << request << "|" << std::endl;
 		_req = HttpRequest::parseRequest(request);
 		// Instantiate a new response from that request
 		_resp = HttpResponse::newResponse(_req, _config->getServerUnit(_req->getPort(), _req->getHost()), _write_chain);	

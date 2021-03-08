@@ -23,13 +23,27 @@ Error::Error(ConfigServer* config, HttpRequest* req, BufferChain& writeChain, in
 	//appending the buffers
 	writeChain.pushBack(getRawHeaders());
 	writeChain.pushBack(buff);
-	_state.read = DONE;
+	_state.read = IGNORE;
 	// }
     // else
     // {
     //     close(fd);
     //     get(true);
     // }
+}
+
+
+void	Error::handleRead(BufferChain& readChain)
+{
+	HttpResponse::handleRead(readChain);
+	_state.read = IGNORE;
+}
+
+void	Error::handleWrite(BufferChain& writeChain)
+{
+	std::cout << "---------------------------------------------------------- " << writeChain <<std::endl;
+	if (writeChain.getFirst() == NULL)
+		throw HttpResponse::ConnectionClose();
 }
 
 Error::~Error()

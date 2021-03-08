@@ -6,19 +6,10 @@
 class FileDownload : public HttpResponse
 {
 
-private:
-
-	struct stat *_file;
-
 public:
 	//Coplien to do
 	FileDownload(ConfigServer*, HttpRequest*, std::string, std::string, BufferChain& writeChain, struct stat*);
 	~FileDownload();
-
-	// Utils
-	void        setCharset(void);
-	void        setContentType();
-	void        setLastModified();
 };
 
 

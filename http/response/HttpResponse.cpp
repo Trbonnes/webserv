@@ -20,7 +20,8 @@ HttpResponse::HttpResponse()
     _charset = "";
     _retryAfter = "";
     _transferEncoding = "";
-    _state.read = NONE;
+    _state.read = READY;
+    _state.write = READY;
     _state.readStream = NONE;
     _state.writeStream = NONE;
 }
@@ -45,7 +46,8 @@ HttpResponse::HttpResponse(ConfigServer* config, HttpRequest* req)
     _charset = "";
     _retryAfter = "";
     _transferEncoding = "";
-    _state.read = NONE;
+    _state.read = READY;
+    _state.write = READY;
     _state.readStream = NONE;
     _state.writeStream = NONE;
 }
@@ -72,7 +74,8 @@ HttpResponse::HttpResponse(ConfigServer* config, HttpRequest* req, std::string r
     _charset = "";
     _retryAfter = "";
     _transferEncoding = "";
-    _state.read = NONE;
+    _state.read = READY;
+    _state.write = READY;
     _state.readStream = NONE;
     _state.writeStream = NONE;
 }
@@ -127,6 +130,12 @@ void HttpResponse::handleRead(BufferChain& readChain)
             _state.writeStream = WAITING;
     }
 }
+
+void HttpResponse::handleWrite(BufferChain& writeChain)
+{
+    (void) writeChain;
+}
+
 
 void HttpResponse::handleStreamRead(BufferChain& writeChain)
 {
@@ -266,6 +275,9 @@ HttpResponse* HttpResponse::newResponse(HttpRequest *request, ConfigServer *conf
 	std::string route;
     std::string &method = request->getMethod();
 
+    std::cout << config << std::endl;
+    std::cout << "------------------------------+" << std::endl;
+
 
 	uri = request->getRequestURI();
     location = config->getLocation(uri);
@@ -295,7 +307,7 @@ HttpResponse* HttpResponse::newResponse(HttpRequest *request, ConfigServer *conf
     {
         if (method == "GET")
         {
-            struct stat file; 
+            struct stat file;
             
             if (stat(route.c_str(), &file))
                 return new Error(config, request, writeChain, NOT_FOUND);
@@ -311,10 +323,25 @@ HttpResponse* HttpResponse::newResponse(HttpRequest *request, ConfigServer *conf
                     return new Error(config, request, writeChain, FORBIDDEN);
             }
         }
+        if (method == "HEAD")
+        {
+            struct stat file;
+            
+            if (stat(route.c_str(), &file))
+                return new HeadersError(config, request, writeChain, NOT_FOUND);
+            if (!(file.st_mode & S_IRUSR))
+                return new HeadersError(config, request, writeChain, FORBIDDEN);
+            return new HeadersOnly(config, request, writeChain, route, location, &file);
+        }
     }
     // If else the method is not allowed
     else
-        return new Error(config, request, writeChain, METHOD_NOT_ALLOWED);
+    {
+        if(method == "HEAD")
+            return new HeadersError(config, request, writeChain, METHOD_NOT_ALLOWED);
+        else
+            return new Error(config, request, writeChain, METHOD_NOT_ALLOWED);
+    }
 
     return NULL;
 }
@@ -430,6 +457,49 @@ void        HttpResponse::setDate()
         timeinfo = localtime(&(tv.tv_sec));
         strftime(_date, 100, "%a %d %b 20%y %OH:%OM:%OS GMT", timeinfo);
     }
+}
+
+void        HttpResponse::setCharset(void)
+{
+    _charset = _config->getCharset(_location);
+}
+
+void        HttpResponse::setLastModified(struct stat* file)
+{
+    struct tm *timeinfo;
+
+	#ifdef __linux__
+    		timeinfo = localtime(&(file->st_mtim.tv_sec));
+	#else
+            timeinfo = localtime(&(file->st_mtimespec.tv_sec)); // st_mtimespec.tv_sec = macos ; st_mtim = linux
+	#endif // TARGET_OS_MAC
+    strftime(_lastModified, 100, "%a %d %b 20%y %OH:%OM:%OS GMT", timeinfo);
+}
+
+
+void        HttpResponse::setContentType()
+{
+    int                     find;
+    int                     length;
+    std::map<std::string, std::string>::iterator it;
+
+    find = _route.find_last_of('.');
+    find += 1;
+    length = _route.length() - find;
+    _contentType = _route.substr(find, length);
+    find = -1;
+    it = _config->getMimeTypes().begin();
+
+    while (it != _config->getMimeTypes().end())
+    {
+        if ((it->first).compare(_contentType) == 0)
+            break;
+        it++;
+    }
+    if (it != _config->getMimeTypes().end())
+        _contentType = it->second;
+    else
+        _contentType = _config->getType(_location);
 }
 
 HttpResponse::~HttpResponse()

@@ -70,8 +70,6 @@ public:
 
 
 	void handleCGIRead();
-
-
 };
 
 #include "core/Connection.hpp"

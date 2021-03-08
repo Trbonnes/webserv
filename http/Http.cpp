@@ -30,25 +30,42 @@ void Http::handleRead()
 {
 	if (_resp == NULL)
 		handleNewRequest();
-	else
+	
+	if (_resp && _read_chain.getFirst())
+	{
+		try
 		{
-			try
-			{
-				_resp->handleRead(_read_chain);
-			}
-			catch(const HttpResponse::HttpError& e)
-			{
-				_resp->abort();
-				delete _resp;
-				// _resp = new Error(_config, _req, _write_chain, e.getStatusCode());
-			}
-			
+			_resp->handleRead(_read_chain);
 		}
+		catch(const HttpResponse::HttpError& e)
+		{
+			_resp->abort();
+			delete _resp;
+			// TO DO Throw error
+			// _resp = new Error(_config, _req, _write_chain, e.getStatusCode());
+		}
+	}
 	checkState();
 }
 
 void Http::handleWrite()
 {
+		try
+		{
+			if (_resp)
+				_resp->handleWrite(_write_chain);
+		}
+		catch(const HttpResponse::HttpError& e)
+		{
+			_resp->abort();
+			delete _resp;
+			// _resp = new Error(_config, _req, _write_chain, e.getStatusCode());
+		}
+		catch(const HttpResponse::ConnectionClose& e)
+		{
+			std::cout << "===== AN error has been thrown" << std::endl;
+			throw;
+		}
 	checkState();
 }
 
@@ -116,7 +133,7 @@ void	Http::checkState()
 				handleRead();
 		}
 	}
-	if (_write_chain.getFirst())
+	if (_write_chain.getFirst() &&  (!_resp || _resp->_state.write == HttpResponse::READY))
 		_connection.subWrite();
 	// if there's a buffer, try init a new request
 }
