@@ -1,8 +1,60 @@
 #include "http/response/HttpResponse.hpp"
 
 
-HttpResponse::HttpResponse(HttpRequest* req, std::string route)
+HttpResponse::HttpResponse()
 {
+    _request = NULL;
+    _streamWriteFd = -1;
+    _streamReadFd = -1;
+    _route = route;
+    _statusCode = OK;
+    _allow = "";
+    _wwwAuthenticate = "";
+    _referer = "";
+    _server = "Webserver";
+    _contentLanguage = "";
+    _contentLength = 0;
+    _contentLocation = "";
+    _contentType = "";
+    _charset = "";
+    _retryAfter = "";
+    _transferEncoding = "";
+    _state.read = NONE;
+    _state.write = NONE;
+    _state.readStream = NONE;
+    _state.writeStream = NONE;
+}
+
+HttpResponse::HttpResponse(ConfigServer* config, HttpRequest* req)
+{
+    _config = config;
+    _request = req;
+    _streamWriteFd = -1;
+    _streamReadFd = -1;
+    _route = route;
+    _statusCode = OK;
+    _allow = "";
+    _wwwAuthenticate = "";
+    _referer = "";
+    _server = "Webserver";
+    _contentLanguage = "";
+    _contentLength = 0;
+    _contentLocation = "";
+    _contentType = "";
+    _charset = "";
+    _retryAfter = "";
+    _transferEncoding = "";
+    _state.read = NONE;
+    _state.write = NONE;
+    _state.readStream = NONE;
+    _state.writeStream = NONE;
+}
+
+
+HttpResponse::HttpResponse(ConfigServer* config, HttpRequest* req, std::string route)
+{
+    _config = config;
+    _route = route;
     _request = req;
     _streamWriteFd = -1;
     _streamReadFd = -1;

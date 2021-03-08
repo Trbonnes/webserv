@@ -22,6 +22,7 @@ protected:
     private:
 	// Pointer to the request
     HttpRequest*                _request;
+    ConfigServer*               _config;
 
     // File streams
     FD                         _streamWriteFd;
@@ -75,6 +76,8 @@ public:
 
 	//Coplien // TODO
 	HttpResponse();
+	HttpResponse(ConfigServer*, HttpRequest*);
+	HttpResponse(ConfigServer*, HttpRequest*, std::string route);
 	~HttpResponse();
 
 	//public funciton
