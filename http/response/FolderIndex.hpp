@@ -11,7 +11,7 @@
 class FolderIndex : public HttpResponse
 {
 public:
-	FolderIndex(ConfigServer*, HttpRequest*, std::string, BufferChain&);
+	FolderIndex(ConfigServer*, HttpRequest*, std::string, BufferChain&, struct stat*);
 	~FolderIndex();
 };
 

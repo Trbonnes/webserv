@@ -4,6 +4,7 @@
 HttpResponse::HttpResponse()
 {
     ft_bzero(_date, 100);
+    ft_bzero(_lastModified, 100);
     _request = NULL;
     _streamWriteFd = -1;
     _streamReadFd = -1;
@@ -27,6 +28,7 @@ HttpResponse::HttpResponse()
 HttpResponse::HttpResponse(ConfigServer* config, HttpRequest* req)
 {
     ft_bzero(_date, 100);
+    ft_bzero(_lastModified, 100);
     _config = config;
     _request = req;
     _streamWriteFd = -1;
@@ -52,6 +54,7 @@ HttpResponse::HttpResponse(ConfigServer* config, HttpRequest* req)
 HttpResponse::HttpResponse(ConfigServer* config, HttpRequest* req, std::string route)
 {
     ft_bzero(_date, 100);
+    ft_bzero(_lastModified, 100);
     _config = config;
     _route = route;
     _request = req;
@@ -191,18 +194,20 @@ static std::string        getRoute(ConfigServer* config, HttpRequest* req, std::
     std::vector<std::string>::iterator itIndexEnd;
     struct stat file;
     std::string str;
-	std::string route;
+	std::string route = "";
     int ret;
 
     std::string root = config->getRoot(location);  
     std::string alias = config->getAlias(location);
+    std::string uri = req->getRequestURI();
 
-    Log::debug(route);
     //** Relative path **
     if (alias.length() > 0)
         route.assign(alias).append("/");
     else
         route.assign(root);
+    
+    route.append(uri);
     ret = stat(route.c_str(), &file);
     // if is file  exists or put request we're done
     if ((ret == 0 && S_ISREG(file.st_mode)) || req->getMethod() == "PUT" || req->getMethod() == "DELETE")
@@ -285,6 +290,7 @@ HttpResponse* HttpResponse::newResponse(HttpRequest *request, ConfigServer *conf
     // }
 
     // If it's not CGI check if the method is authorized
+    std::cout << "HERE COMES THE ROUTE _---------------------------- " << route << std::endl;
     if (isMethodAllowed(config, method, location))
     {
         if (method == "GET")
@@ -296,11 +302,11 @@ HttpResponse* HttpResponse::newResponse(HttpRequest *request, ConfigServer *conf
             if (!(file.st_mode & S_IRUSR))
                 return new Error(config, request, writeChain, FORBIDDEN);
             if (S_ISREG(file.st_mode))
-                return new FileDownload(config, request, route, location, &file);
+                return new FileDownload(config, request, route, location, writeChain, &file);
             if (S_ISDIR(file.st_mode))
             {
                 if (config->getAutoindex(location) == true)
-                        return new FolderIndex(config, request, route, writeChain);
+                        return new FolderIndex(config, request, route, writeChain, &file);
                 else
                     return new Error(config, request, writeChain, FORBIDDEN);
             }

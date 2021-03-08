@@ -5,10 +5,9 @@ FolderIndex::FolderIndex(
 		ConfigServer* config,
 		HttpRequest* request,
 		std::string route,
-		BufferChain &writeChain) : HttpResponse(config, request, route)
+		BufferChain &writeChain, struct stat* directory) : HttpResponse(config, request, route)
 {
 	std::string             str;
-    struct stat             directory;
     DIR                     *dir;
     struct dirent           *dirent;
     struct tm               *timeinfo;
@@ -25,7 +24,7 @@ FolderIndex::FolderIndex(
 	buff->append("<html>\n<head><title>Index of /</title></head>\n<body>\n<h1>Index of /</h1><hr><pre>\n");
 	while ((dirent = readdir(dir)) != NULL)
 	{
-		stat(str.assign(_route).append(dirent->d_name).c_str(), &directory);
+		stat(str.assign(_route).append(dirent->d_name).c_str(), directory);
 		if (str.assign(dirent->d_name).compare(".") == 0)
 			continue ;
 		str.assign("<a href=\"");
@@ -38,9 +37,9 @@ FolderIndex::FolderIndex(
 			str.append("/");
 		str.append("</a>\t\t\t\t");
 		#ifdef __linux__
-			timeinfo = localtime(&(directory.st_mtim.tv_sec));
+			timeinfo = localtime(&(directory->st_mtim.tv_sec));
 		#else
-			timeinfo = localtime(&(directory.st_mtimespec.tv_sec));
+			timeinfo = localtime(&(directory->st_mtimespec.tv_sec));
 		#endif // TARGET_OS_MAC
 		
 		strftime(lastModifications, 100, "%d-%b-20%y %OH:%OM", timeinfo);
@@ -50,7 +49,7 @@ FolderIndex::FolderIndex(
 			str.append("-");
 		else
 		{
-			char *dirSize = ft_itoa(directory.st_size);
+			char *dirSize = ft_itoa(directory->st_size);
 			str.append(dirSize);
 			free(dirSize);
 		}

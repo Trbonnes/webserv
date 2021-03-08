@@ -83,8 +83,11 @@ void Http::handleStreamWrite()
 void	Http::checkState()
 {
 	std::cout << " _read_chain: " << _read_chain;
-	std::cout << " _stream_write_chain: " << _resp->getStreamWriteChain();
-	std::cout << " _stream_read_chain: " << _resp->getStreamReadChain();
+	if (_resp)
+	{
+		std::cout << " _stream_write_chain: " << _resp->getStreamWriteChain();
+		std::cout << " _stream_read_chain: " << _resp->getStreamReadChain();
+	}
 	std::cout << " _write_chain: " <<_write_chain;
 	if (_resp)
 	{
@@ -104,10 +107,10 @@ void	Http::checkState()
 		
 		// End of request
 		if (_resp->_state.read == HttpResponse::DONE &&
-			_resp->_state.readStream == HttpResponse::DONE &&
-			_resp->_state.writeStream == HttpResponse::DONE)
+			(_resp->_state.readStream == HttpResponse::DONE || _resp->_state.readStream == HttpResponse::NONE) &&
+			(_resp->_state.writeStream == HttpResponse::DONE || _resp->_state.writeStream == HttpResponse::NONE))
 		{
-			// std::cout << "======================================= REQUEST END" << std::endl;
+			std::cout << "======================================= REQUEST END" << std::endl;
 			reset();
 			if (_read_chain.size() > 0)
 				handleRead();
@@ -125,7 +128,6 @@ void	Http::setConfig(Config* c)
 
 void	Http::reset()
 {
-		_resp->abort();
 		_connection.subRead();
 		_connection.unsubStreamRead();
 		_connection.unsubStreamWrite();
@@ -138,6 +140,7 @@ void	Http::reset()
 		}
 		if (_resp)
 		{
+			_resp->abort();
 			delete _resp;
 			_resp = NULL;
 		}

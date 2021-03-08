@@ -1,6 +1,6 @@
 #include "FileDownload.hpp"
 
-FileDownload::FileDownload(ConfigServer* config, HttpRequest* request,std::string route, std::string location, struct stat *file) : HttpResponse(config, request, route)
+FileDownload::FileDownload(ConfigServer* config, HttpRequest* request,std::string route, std::string location, BufferChain& writeChain, struct stat *file) : HttpResponse(config, request, route)
 {
 	int fd;
 
@@ -16,11 +16,15 @@ FileDownload::FileDownload(ConfigServer* config, HttpRequest* request,std::strin
         _contentLength = _file->st_size;
         setServerName();
         setContentLocation();
+        std::string* buff;
+        buff = getRawHeaders();
+        writeChain.pushBack(buff);
     } 
 	else
 	{
 		// to do throw error
 	}
+
 	_streamReadFd = fd;
 }
 

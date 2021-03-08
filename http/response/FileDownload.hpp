@@ -12,7 +12,7 @@ private:
 
 public:
 	//Coplien to do
-	FileDownload(ConfigServer*, HttpRequest*, std::string, std::string, struct stat*);
+	FileDownload(ConfigServer*, HttpRequest*, std::string, std::string, BufferChain& writeChain, struct stat*);
 	~FileDownload();
 
 	// Utils
