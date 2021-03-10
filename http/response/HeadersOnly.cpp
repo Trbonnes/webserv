@@ -2,27 +2,18 @@
 
 
 // HEAD
-HeadersOnly::HeadersOnly(ConfigServer* config, HttpRequest* request, BufferChain& writeChain, std::string route, std::string location, struct stat* file)
+HeadersOnly::HeadersOnly(ConfigServer* config, HttpRequest* request, BufferChain& writeChain, std::string route, std::string location, struct stat* file) : HttpResponse(config, request, route) 
 {
-	int fd;
-
 	_location = location;
 	if (S_ISREG(file->st_mode))
 	{
-		if ((fd = open(_route.c_str(), O_RDONLY)) != -1)
+		try
 		{
-			setLastModified(file);
-			setContentType();
-			setCharset();
-			_contentLength = file->st_size;
-			setServerName();
-			setContentLocation();
-			std::string* buff;
-			buff = getRawHeaders();
-			writeChain.pushBack(buff);
-		} 
-		else
+			_subResponse = new FileDownload(config, request, route, location, _fakeWriteChain, file);
+		}
+		catch(const std::exception& e)
 		{
+			// std::cerr << e.what() << '\n';
 			// TO DO throw error
 		}
 	}
@@ -31,9 +22,6 @@ HeadersOnly::HeadersOnly(ConfigServer* config, HttpRequest* request, BufferChain
 		try
 		{
 			_subResponse = new FolderIndex(config, request, route, _fakeWriteChain, file);
-			writeChain.pushBack(_fakeWriteChain.getFirst());
-			_fakeWriteChain.popFirst();
-			_fakeWriteChain.flush();
 		}
 		catch(const std::exception& e)
 		{
@@ -41,7 +29,11 @@ HeadersOnly::HeadersOnly(ConfigServer* config, HttpRequest* request, BufferChain
 			// TO DO throw error
 		}
 	}
-	_state.write = WAITING;
+	delete _subResponse;
+	writeChain.pushBack(_fakeWriteChain.getFirst());
+	_fakeWriteChain.popFirst();
+	_fakeWriteChain.flush();
+	_state.write = READY;
 }
 
 void	HeadersOnly::handleRead(BufferChain& readChain, BufferChain& writeChain)

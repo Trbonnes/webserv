@@ -11,6 +11,7 @@ private:
 public:
 	// HEAD
 	HeadersOnly(ConfigServer*, HttpRequest*, BufferChain& writeChain, std::string route, std::string location, struct stat*);
+	HeadersOnly(ConfigServer*, HttpRequest*, BufferChain& writeChain, std::string route, std::string location);
 	// OPTIONS
 	// HeadersOnly(ConfigServer*, HttpRequest*, BufferChain& writeChain, std::string route, std::string location, );
 	~HeadersOnly();
