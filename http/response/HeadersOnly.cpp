@@ -36,6 +36,12 @@ HeadersOnly::HeadersOnly(ConfigServer* config, HttpRequest* request, BufferChain
 	_state.write = READY;
 }
 
+HeadersOnly::HeadersOnly(ConfigServer* config, HttpRequest* request, BufferChain& writeChain, std::string route) : HttpResponse(config, request, route)
+{
+	writeChain.pushBack(getRawHeaders());
+	_state.write = WAITING;
+}
+
 void	HeadersOnly::handleRead(BufferChain& readChain, BufferChain& writeChain)
 {
 	HttpResponse::handleRead(readChain, writeChain);
