@@ -23,6 +23,8 @@ FileDownload::FileDownload(ConfigServer* config, HttpRequest* request,std::strin
 		// TO DO throw error
 	}
 	_streamReadFd = fd;
+    _state.read = DONE;
+    _state.readStream = READY;
 }
 
 FileDownload::~FileDownload()

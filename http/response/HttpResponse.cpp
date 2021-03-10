@@ -91,8 +91,10 @@ void HttpResponse::abort()
     _streamWriteChain.flush();
 }
 
-void HttpResponse::handleRead(BufferChain& readChain)
+void HttpResponse::handleRead(BufferChain& readChain, BufferChain& writeChain)
 {
+    (void) writeChain;
+    Log::debug("HttpResponse::handleRead()");
     bool	end = false;
 
 	if (_request->getTransferEncoding() == "chunked\r") // TO DO why the f do i have to add \r
@@ -113,32 +115,29 @@ void HttpResponse::handleRead(BufferChain& readChain)
 	}
 
     // TO DO if payload too large
-    // if ()
 
 	// if end then all body has been received
 	if (end)
+    {
+        std::cout << "THIS IS THE END OF THE BODY" << std::endl;
         _state.read = DONE;
 
-    // Stream write state update
-	if (_state.writeStream != NONE)
-    {
-        if (_streamWriteChain.getFirst())
-            _state.writeStream = READY;
-        else if (_state.read == DONE)
-            _state.writeStream = DONE;
-        else
-            _state.writeStream = WAITING;
+    if (_streamWriteChain.getFirst())
+        _state.writeStream = READY;
     }
 }
 
-void HttpResponse::handleWrite(BufferChain& writeChain)
+void HttpResponse::handleWrite(BufferChain& readChain, BufferChain& writeChain)
 {
     (void) writeChain;
+    (void) readChain;
 }
 
-
-void HttpResponse::handleStreamRead(BufferChain& writeChain)
+void HttpResponse::handleStreamRead(BufferChain& readChain, BufferChain& writeChain)
 {
+    (void) readChain;
+    (void) writeChain;
+
     int ret;
     try
 	{
@@ -154,13 +153,18 @@ void HttpResponse::handleStreamRead(BufferChain& writeChain)
         // close the stream
         close(_streamReadFd);
         _state.readStream = DONE;
+        if (writeChain.getFirst() == NULL)
+            _state.write = DONE;
     }
 }
 
-void HttpResponse::handleStreamWrite()
+void HttpResponse::handleStreamWrite(BufferChain& readChain, BufferChain& writeChain)
 {
+
+    (void) readChain;
     int ret;
 
+    (void) writeChain;
 	try
 	{
 		ret = BufferChain::writeBufferToFd(_streamWriteChain, _streamWriteFd);
@@ -197,7 +201,7 @@ void HttpResponse::handleStreamWrite()
 	}
 }
 
-static std::string        getRoute(ConfigServer* config, HttpRequest* req, std::string &location)
+static std::string        getRoute(ConfigServer* config, HttpRequest* req, std::string location)
 {
     std::vector<std::string>::iterator itIndexBegin;
     std::vector<std::string>::iterator itIndexEnd;
@@ -210,13 +214,30 @@ static std::string        getRoute(ConfigServer* config, HttpRequest* req, std::
     std::string alias = config->getAlias(location);
     std::string uri = req->getRequestURI();
 
+
     //** Relative path **
     if (alias.length() > 0)
-        route.assign(alias).append("/");
-    else
-        route.assign(root);
-    
-    route.append(uri);
+    {
+        if (stat(alias.c_str(), &file) != -1)
+        {
+            if (((file.st_mode & S_IFMT) == S_IFDIR))
+                alias.append("/");
+            route.assign(alias);
+            route.append(uri.substr(location.size()));
+        }
+    }
+    else 
+    {
+        route.assign(root.substr(0, root.size() - (root[root.size() - 1] == '*')));
+        std::cout << "ROOT FIRST STEP " << route << std::endl;
+        route.append(uri.substr(location.size() - (location[location.size() - 1] == '*')));
+        std::cout << "ROOT SECOND STEP " << route << std::endl;
+
+    }
+    std::cout << "=========== root:" << root << std::endl;
+    std::cout << "=========== alias:" << alias << std::endl;
+    std::cout << "=========== uri:" << uri << std::endl;
+    std::cout << "=========== location:" << location << std::endl;
     ret = stat(route.c_str(), &file);
     // if is file  exists or put request we're done
     if ((ret == 0 && S_ISREG(file.st_mode)) || req->getMethod() == "PUT" || req->getMethod() == "DELETE")
@@ -332,6 +353,10 @@ HttpResponse* HttpResponse::newResponse(HttpRequest *request, ConfigServer *conf
             if (!(file.st_mode & S_IRUSR))
                 return new HeadersError(config, request, writeChain, FORBIDDEN);
             return new HeadersOnly(config, request, writeChain, route, location, &file);
+        }
+        if (method == "PUT")
+        {
+            return new FileUpload(config, request, route, location);
         }
     }
     // If else the method is not allowed
@@ -504,5 +529,10 @@ void        HttpResponse::setContentType()
 
 HttpResponse::~HttpResponse()
 {
-    
+    if (_streamWriteFd != -1)
+        close(_streamWriteFd);
+    if (_streamReadFd != -1)
+        close(_streamReadFd);
+    _streamWriteChain.flush();
+    _streamReadChain.flush();
 }

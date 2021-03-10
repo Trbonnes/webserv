@@ -96,10 +96,10 @@ public:
 	virtual void abort();
 
 	// Read/write eent processing, might be redefined by child classes
-	virtual void handleRead(BufferChain& readChain);
-	virtual void handleWrite(BufferChain& writeChain);
-	virtual void handleStreamRead(BufferChain& writeChain); 
-	virtual void handleStreamWrite();
+	virtual void handleRead(BufferChain& readChain, BufferChain& writeChain);
+	virtual void handleWrite(BufferChain& readChain, BufferChain& writeChain);
+	virtual void handleStreamRead(BufferChain& readChain, BufferChain& writeChain); 
+	virtual void handleStreamWrite(BufferChain& readChain, BufferChain& writeChain);
 
 
 	//Getters
@@ -141,5 +141,6 @@ public:
 #include "http/response/FileDownload.hpp"
 #include "http/response/FolderIndex.hpp"
 #include "http/response/HeadersOnly.hpp"
+#include "http/response/FileUpload.hpp"
 
 #endif // HTTP_RESPONSE

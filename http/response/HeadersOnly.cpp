@@ -44,9 +44,9 @@ HeadersOnly::HeadersOnly(ConfigServer* config, HttpRequest* request, BufferChain
 	_state.write = WAITING;
 }
 
-void	HeadersOnly::handleRead(BufferChain& readChain)
+void	HeadersOnly::handleRead(BufferChain& readChain, BufferChain& writeChain)
 {
-	HttpResponse::handleRead(readChain);
+	HttpResponse::handleRead(readChain, writeChain);
 	_streamWriteChain.flush();
 	if (_state.read == DONE)
 		_state.write = READY;

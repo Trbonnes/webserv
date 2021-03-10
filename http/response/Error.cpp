@@ -33,14 +33,18 @@ Error::Error(ConfigServer* config, HttpRequest* req, BufferChain& writeChain, in
 }
 
 
-void	Error::handleRead(BufferChain& readChain)
+void	Error::handleRead(BufferChain& readChain, BufferChain& writeChain)
 {
-	HttpResponse::handleRead(readChain);
+	(void) writeChain;
+
+	HttpResponse::handleRead(readChain, writeChain);
 	_state.read = IGNORE;
 }
 
-void	Error::handleWrite(BufferChain& writeChain)
+void	Error::handleWrite(BufferChain& readChain, BufferChain& writeChain)
 {
+	(void) readChain;
+
 	std::cout << "---------------------------------------------------------- " << writeChain <<std::endl;
 	if (writeChain.getFirst() == NULL)
 		throw HttpResponse::ConnectionClose();

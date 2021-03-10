@@ -37,6 +37,7 @@ HTTPSRC =	http/Http.cpp \
 			http/response/Error.cpp \
 			http/response/HeadersError.cpp \
 			http/response/FileDownload.cpp \
+			http/response/FileUpload.cpp \
 			http/response/FolderIndex.cpp \
 			http/response/HeadersOnly.cpp \
 			http/HttpRequest.cpp \

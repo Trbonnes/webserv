@@ -9,8 +9,8 @@ public:
 	Error(ConfigServer*, HttpRequest*, BufferChain&, int);
 	~Error();
 
-	void	handleRead(BufferChain&);
-	void	handleWrite(BufferChain&);
+	void	handleRead(BufferChain& readChain, BufferChain& writeChain);
+	void	handleWrite(BufferChain& readChain, BufferChain& writeChain);
 
 };
 
@@ -20,8 +20,8 @@ public:
 	HeadersError(ConfigServer*, HttpRequest*, BufferChain&, int);
 	~HeadersError();
 
-	void	handleRead(BufferChain&);
-	void	handleWrite(BufferChain&);
+	void	handleRead(BufferChain& readChain, BufferChain& writeChain);
+	void	handleWrite(BufferChain& readChain, BufferChain& writeChain);
 };
 
 #endif // ERROR_HPP

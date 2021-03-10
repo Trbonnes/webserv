@@ -35,7 +35,7 @@ void Http::handleRead()
 	{
 		try
 		{
-			_resp->handleRead(_read_chain);
+			_resp->handleRead(_read_chain, _write_chain);
 		}
 		catch(const HttpResponse::HttpError& e)
 		{
@@ -53,7 +53,7 @@ void Http::handleWrite()
 		try
 		{
 			if (_resp)
-				_resp->handleWrite(_write_chain);
+				_resp->handleWrite(_read_chain, _write_chain);
 		}
 		catch(const HttpResponse::HttpError& e)
 		{
@@ -75,7 +75,7 @@ void Http::handleStreamRead()
 	Log::debug("handleStreamRead()");
 	try
 	{
-		_resp->handleStreamRead(_write_chain);
+		_resp->handleStreamRead(_read_chain, _write_chain);
 	}
 	catch(const std::exception& e)
 	{
@@ -88,7 +88,7 @@ void Http::handleStreamWrite()
 {
 	try
 	{
-		_resp->handleStreamWrite();
+		_resp->handleStreamWrite(_read_chain, _write_chain);
 	}
 	catch(const std::exception& e)
 	{
@@ -106,6 +106,17 @@ void	Http::checkState()
 		std::cout << " _stream_read_chain: " << _resp->getStreamReadChain();
 	}
 	std::cout << " _write_chain: " <<_write_chain;
+
+
+	if (_resp)
+	{
+		std::cout << "status _read: " << _resp->_state.read;
+		std::cout << " status _stream_write: " << _resp->_state.writeStream;
+		std::cout << " status _stream_read: " << _resp->_state.readStream;
+		std::cout << " status _write: " << _resp->_state.write << std::endl;
+	}
+	
+	
 	if (_resp)
 	{
 		// Unsub
@@ -157,7 +168,6 @@ void	Http::reset()
 		}
 		if (_resp)
 		{
-			_resp->abort();
 			delete _resp;
 			_resp = NULL;
 		}

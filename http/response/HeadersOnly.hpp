@@ -14,6 +14,6 @@ public:
 	// OPTIONS
 	// HeadersOnly(ConfigServer*, HttpRequest*, BufferChain& writeChain, std::string route, std::string location, );
 	~HeadersOnly();
-	void	handleRead(BufferChain&);
+	void	handleRead(BufferChain& readChain, BufferChain& writeChain);
 };
 #endif // HEADERSONLY_HPP
