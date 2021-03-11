@@ -1,7 +1,7 @@
 #include "CgiResponse.hpp"
 
 
-CgiResponse::CgiResponse(ConfigServer* config, HttpRequest* request,std::string route, std::string location) : HttpResponse(config, request, route)
+CgiResponse::CgiResponse(ConfigServer* config, HttpRequest* request,std::string route, std::string location) : HttpResponse(config, request, route, location)
 {
 	_headersReceived = false;
 	_cgipid = -1;

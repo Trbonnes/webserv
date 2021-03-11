@@ -109,6 +109,9 @@ public:
 	BufferChain&	getStreamWriteChain();
 	FD				getStreamReadFd();
 	FD				getStreamWriteFd();
+	std::string&	getRoute();
+	std::string&	getLocation();
+	ConfigServer*	getConfig();
 
 	//Setters
 	void        	setServerName();

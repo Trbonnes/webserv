@@ -17,7 +17,7 @@ public:
 class HeadersError : public HttpResponse
 {
 public:
-	HeadersError(ConfigServer*, HttpRequest*, BufferChain&, int);
+	HeadersError(ConfigServer*, HttpRequest*, std::string& route, std::string& location, BufferChain&, int);
 	~HeadersError();
 
 	void	handleRead(BufferChain& readChain, BufferChain& writeChain);

@@ -36,6 +36,7 @@ void Http::handleNewRequest()
 		// By this point the Response should have fd's for CGI or a regular file
 		// if stream write
 		// CGI and PUT
+		// TO DO Try and remove this
 		if (_resp->getStreamWriteFd() != -1)
 			_connection.setStreamWrite(_resp->getStreamWriteFd());
 		

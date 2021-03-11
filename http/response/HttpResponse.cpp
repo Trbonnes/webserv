@@ -89,27 +89,39 @@ void HttpResponse::handleRead(BufferChain& readChain, BufferChain& writeChain)
 	}
 
     // TO DO if payload too large
-	// if (_config.getClientBodySize(_location) != -1 && ft_atoi(_socket.getContentLength().c_str()) > _config.getClientBodySize(_location))
-    // {
-    //     _statusCode = REQUEST_ENTITY_TOO_LARGE;
-    //     return ;
-    // }
-    // if end then all body has been received
-	if (end)
+    if (_maxBodySize != -1)
     {
-        std::cout << "THIS IS THE END OF THE BODY" << std::endl;
-        _state.read = DONE;
-        if (_streamWriteChain.getFirst() == NULL)
+        std::cout << "BODY SIZE MAX DETECTED : " << _streamWriteChain.totalSize() << " vs " <<  _maxBodySize << std::endl;
+        if ((int)_streamWriteChain.totalSize() > _maxBodySize)
         {
-            std::cout << "stream write it's done for you" << std::endl;
-
-            _state.writeStream = DONE;
-            close(_streamWriteFd);
+            std::cout << "THROWING HTTP ERROR" << std::endl;
+            throw HttpError(REQUEST_ENTITY_TOO_LARGE);
+        }
+        if (end)
+        {
+            _state.read = DONE;
+            if (_state.writeStream != NONE && _streamWriteChain.getFirst())
+                _state.writeStream = READY;
         }
     }
+    else
+    {
+        if (end)
+        {
+            std::cout << "THIS IS THE END OF THE BODY" << std::endl;
+            _state.read = DONE;
+            if (_streamWriteChain.getFirst() == NULL)
+            {
+                std::cout << "stream write it's done for you" << std::endl;
 
-    if (_streamWriteChain.getFirst())
-        _state.writeStream = READY;
+                _state.writeStream = DONE;
+                close(_streamWriteFd);
+            }
+        }
+
+        if (_streamWriteChain.getFirst() && _state.writeStream != NONE)
+            _state.writeStream = READY;
+    }
 }
 
 void HttpResponse::handleWrite(BufferChain& readChain, BufferChain& writeChain)
@@ -252,7 +264,7 @@ static bool         isCgiExtension(ConfigServer* config, std::string& location, 
     return false;
 }
 
-static std::string        getRoute(ConfigServer* config, HttpRequest* req, std::string location)
+static std::string        createRoute(ConfigServer* config, HttpRequest* req, std::string location)
 {
     std::vector<std::string>::iterator itIndexBegin;
     std::vector<std::string>::iterator itIndexEnd;
@@ -344,7 +356,7 @@ HttpResponse* HttpResponse::newResponse(HttpRequest *request, ConfigServer *conf
         return new Error(config, request, route, location, writeChain, LENGTH_REQUIRED);
     
     // set the route of the ressource
-    route = getRoute(config, request, location);
+    route = createRoute(config, request, location);
 
     // TO DO insert authorization mechanic
 
@@ -383,10 +395,10 @@ HttpResponse* HttpResponse::newResponse(HttpRequest *request, ConfigServer *conf
             struct stat file;
             
             if (stat(route.c_str(), &file))
-                return new HeadersError(config, request, writeChain, NOT_FOUND);
+                return new HeadersError(config, request, route, location, writeChain, NOT_FOUND);
             if (!(file.st_mode & S_IRUSR))
-                return new HeadersError(config, request, writeChain, FORBIDDEN);
-            return new HeadersOnly(config, request, writeChain, route, location, &file);
+                return new HeadersError(config, request, route, location, writeChain, FORBIDDEN);
+            return new HeadersOnly(config, request, route, location, writeChain, &file);
         }
         if (method == "PUT")
         {
@@ -394,14 +406,14 @@ HttpResponse* HttpResponse::newResponse(HttpRequest *request, ConfigServer *conf
         }
         if (method == "POST")
         {
-            return new HeadersOnly(config, request, writeChain, route);
+            return new HeadersOnly(config, request, route, location, writeChain);
         }
     }
     // If else the method is not allowed
     else
     {
         if(method == "HEAD")
-            return new HeadersError(config, request, writeChain, METHOD_NOT_ALLOWED);
+            return new HeadersError(config, request, route, location, writeChain, METHOD_NOT_ALLOWED);
         else
             return new Error(config, request, route, location, writeChain, METHOD_NOT_ALLOWED);
     }
@@ -497,6 +509,21 @@ FD				HttpResponse::getStreamReadFd()
 FD				HttpResponse::getStreamWriteFd()
 {
     return _streamWriteFd;
+}
+
+std::string&	HttpResponse::getRoute()
+{
+    return _route;
+}
+
+ConfigServer*	HttpResponse::getConfig()
+{
+    return _config;
+}
+
+std::string&	HttpResponse::getLocation()
+{
+    return _location;
 }
 
 void        HttpResponse::setServerName()

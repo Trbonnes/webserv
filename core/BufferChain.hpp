@@ -63,6 +63,7 @@ public:
 	iterator begin();
 	iterator end();
 	size_t size();
+	size_t totalSize();
 
 	class	IOError: public std::exception {
 		public:

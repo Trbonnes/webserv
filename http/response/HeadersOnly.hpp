@@ -10,10 +10,9 @@ private:
 	HttpResponse*	_subResponse;
 public:
 	// HEAD
-	HeadersOnly(ConfigServer*, HttpRequest*, BufferChain& writeChain, std::string route, std::string location, struct stat*);
-	HeadersOnly(ConfigServer*, HttpRequest*, BufferChain& writeChain, std::string route, std::string location);
+	HeadersOnly(ConfigServer* config, HttpRequest* request, std::string& route, std::string& location, BufferChain& writeChain, struct stat* file);
 	// POST
-	HeadersOnly(ConfigServer*, HttpRequest*, BufferChain& writeChain, std::string route);
+	HeadersOnly(ConfigServer* config, HttpRequest* request, std::string& route, std::string& location, BufferChain& writeChain);
 	// OPTIONS
 	// HeadersOnly(ConfigServer*, HttpRequest*, BufferChain& writeChain, std::string route, std::string location, );
 	~HeadersOnly();

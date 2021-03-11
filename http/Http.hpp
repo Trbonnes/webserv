@@ -63,9 +63,9 @@ public:
 	void handleStreamWrite();
 	void handleStreamRead();
 
+
 	void handleNewRequest();
-	void handleBodyRead();
-	void handleCGIRead();
+	void handleHttpError(int statusCode);
 
 	static	int				readChunkToBuffer(BufferChain&, FD);
 	static	std::string*	chunkify(char*, size_t, size_t);

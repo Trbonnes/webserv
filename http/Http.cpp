@@ -30,7 +30,6 @@ void Http::handleRead()
 {
 	if (_resp == NULL)
 		handleNewRequest();
-	
 	if (_resp && _read_chain.getFirst())
 	{
 		try
@@ -39,10 +38,7 @@ void Http::handleRead()
 		}
 		catch(const HttpResponse::HttpError& e)
 		{
-			_resp->abort();
-			delete _resp;
-			// TO DO Throw error
-			// _resp = new Error(_config, _req, _write_chain, e.getStatusCode());
+			handleHttpError(e.getStatusCode());
 		}
 	}
 	checkState();
@@ -57,9 +53,7 @@ void Http::handleWrite()
 		}
 		catch(const HttpResponse::HttpError& e)
 		{
-			_resp->abort();
-			delete _resp;
-			// _resp = new Error(_config, _req, _write_chain, e.getStatusCode());
+			handleHttpError(e.getStatusCode());
 		}
 		catch(const HttpResponse::ConnectionClose& e)
 		{
@@ -95,6 +89,16 @@ void Http::handleStreamWrite()
 		std::cerr << e.what() << '\n';
 	}
 	checkState();
+}
+
+void Http::handleHttpError(int statusCode)
+{
+		_write_chain.flush();		
+		HttpResponse* n = new Error(_resp->getConfig(), _req, _resp->getRoute(), _resp->getLocation(), _write_chain, statusCode);
+		_resp->abort();
+		delete _resp;
+		_resp = n;
+
 }
 
 void	Http::checkState()

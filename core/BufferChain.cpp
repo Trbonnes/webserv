@@ -67,6 +67,18 @@ size_t BufferChain::size()
 	return _chain.size();
 }
 
+size_t BufferChain::totalSize()
+{
+	// TO DO might be optimizable by stroring a variable tha\s getting modified after each pushfront/pushback
+	size_t total = 0;
+
+	for (std::list<std::string*>::iterator it = _chain.begin(); it != _chain.end(); *it++)
+	{
+		total += (*it)->size();
+	}
+	return total;
+}
+
 void	BufferChain::flush()
 {
 	std::string* tmp;

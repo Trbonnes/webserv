@@ -2,7 +2,7 @@
 
 
 // HEAD
-HeadersOnly::HeadersOnly(ConfigServer* config, HttpRequest* request, BufferChain& writeChain, std::string route, std::string location, struct stat* file) : HttpResponse(config, request, route, location) 
+HeadersOnly::HeadersOnly(ConfigServer* config, HttpRequest* request, std::string& route, std::string& location, BufferChain& writeChain, struct stat* file) : HttpResponse(config, request, route, location) 
 {
 	if (S_ISREG(file->st_mode))
 	{
@@ -20,7 +20,7 @@ HeadersOnly::HeadersOnly(ConfigServer* config, HttpRequest* request, BufferChain
 	{
 		try
 		{
-			_subResponse = new FolderIndex(config, request, route, _fakeWriteChain, file);
+			_subResponse = new FolderIndex(config, request, route, location, _fakeWriteChain, file);
 		}
 		catch(const std::exception& e)
 		{
@@ -35,7 +35,7 @@ HeadersOnly::HeadersOnly(ConfigServer* config, HttpRequest* request, BufferChain
 	_state.write = READY;
 }
 
-HeadersOnly::HeadersOnly(ConfigServer* config, HttpRequest* request, BufferChain& writeChain, std::string route) : HttpResponse(config, request, route)
+HeadersOnly::HeadersOnly(ConfigServer* config, HttpRequest* request, std::string& route, std::string& location, BufferChain& writeChain) : HttpResponse(config, request, route, location)
 {
 	_contentLength = 0;
 	writeChain.pushBack(getRawHeaders());
