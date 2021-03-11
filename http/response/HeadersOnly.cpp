@@ -2,9 +2,8 @@
 
 
 // HEAD
-HeadersOnly::HeadersOnly(ConfigServer* config, HttpRequest* request, BufferChain& writeChain, std::string route, std::string location, struct stat* file) : HttpResponse(config, request, route) 
+HeadersOnly::HeadersOnly(ConfigServer* config, HttpRequest* request, BufferChain& writeChain, std::string route, std::string location, struct stat* file) : HttpResponse(config, request, route, location) 
 {
-	_location = location;
 	if (S_ISREG(file->st_mode))
 	{
 		try

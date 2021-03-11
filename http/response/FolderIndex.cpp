@@ -4,8 +4,9 @@
 FolderIndex::FolderIndex(
 		ConfigServer* config,
 		HttpRequest* request,
-		std::string route,
-		BufferChain &writeChain, struct stat* directory) : HttpResponse(config, request, route)
+		std::string& route,
+		std::string& location,
+		BufferChain &writeChain, struct stat* directory) : HttpResponse(config, request, route, location)
 {
 	std::string             str;
     DIR                     *dir;

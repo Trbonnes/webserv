@@ -1,6 +1,6 @@
 #include "Error.hpp"
 
-Error::Error(ConfigServer* config, HttpRequest* req, BufferChain& writeChain, int statusCode) : HttpResponse(config, req)
+Error::Error(ConfigServer* config, HttpRequest* req, std::string& route, std::string& location, BufferChain& writeChain, int statusCode) : HttpResponse(config, req, route, location)
 {
 	_statusCode = statusCode;
 

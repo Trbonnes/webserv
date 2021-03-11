@@ -4,7 +4,7 @@ FileUpload::FileUpload(
 	ConfigServer* config,
 	HttpRequest* request,
 	std::string route,
-	std::string location) : HttpResponse(config, request, route)
+	std::string location) : HttpResponse(config, request, route, location)
 {
 	_location = location;
 

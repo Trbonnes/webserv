@@ -34,6 +34,9 @@ class HttpResponse
     // File streams
     FD                         _streamWriteFd;
     FD                         _streamReadFd;
+	// Max body size allowed to read, -1 if no limits
+	int							_maxBodySize;
+
 	// BufferChain
 	BufferChain					_streamWriteChain;
 	BufferChain					_streamReadChain;
@@ -84,8 +87,7 @@ public:
 
 	//Coplien // TODO
 	HttpResponse();
-	HttpResponse(ConfigServer*, HttpRequest*);
-	HttpResponse(ConfigServer*, HttpRequest*, std::string route);
+	HttpResponse(ConfigServer*, HttpRequest*, std::string route, std::string& location);
 	virtual ~HttpResponse();
 
 	//public funciton

@@ -5,10 +5,8 @@ HttpResponse::HttpResponse()
 {
     ft_bzero(_date, 100);
     ft_bzero(_lastModified, 100);
-    _request = NULL;
     _streamWriteFd = -1;
     _streamReadFd = -1;
-    _route = "";
     _statusCode = OK;
     _wwwAuthenticate = "";
     _referer = "";
@@ -27,40 +25,13 @@ HttpResponse::HttpResponse()
     setDate();
 }
 
-HttpResponse::HttpResponse(ConfigServer* config, HttpRequest* req)
-{
-    ft_bzero(_date, 100);
-    ft_bzero(_lastModified, 100);
-    _config = config;
-    _request = req;
-    _streamWriteFd = -1;
-    _streamReadFd = -1;
-    _route = "";
-    _statusCode = OK;
-    _wwwAuthenticate = "";
-    _referer = "";
-    _server = "Webserver";
-    _contentLanguage = "";
-    _contentLength = -1;
-    _contentLocation = "";
-    _contentType = "";
-    _charset = "";
-    _retryAfter = "";
-    _transferEncoding = "";
-    _state.read = READY;
-    _state.write = READY;
-    _state.readStream = NONE;
-    _state.writeStream = NONE;
-    setDate();
-}
-
-
-HttpResponse::HttpResponse(ConfigServer* config, HttpRequest* req, std::string route)
+HttpResponse::HttpResponse(ConfigServer* config, HttpRequest* req, std::string route, std::string& location)
 {
     ft_bzero(_date, 100);
     ft_bzero(_lastModified, 100);
     _config = config;
     _route = route;
+    _location = location;
     _request = req;
     _streamWriteFd = -1;
     _streamReadFd = -1;
@@ -81,6 +52,7 @@ HttpResponse::HttpResponse(ConfigServer* config, HttpRequest* req, std::string r
     _state.readStream = NONE;
     _state.writeStream = NONE;
     setDate();
+    _maxBodySize = _config->getClientBodySize(_location);
 }
 
 
@@ -117,8 +89,12 @@ void HttpResponse::handleRead(BufferChain& readChain, BufferChain& writeChain)
 	}
 
     // TO DO if payload too large
-    if ()
-	// if end then all body has been received
+	// if (_config.getClientBodySize(_location) != -1 && ft_atoi(_socket.getContentLength().c_str()) > _config.getClientBodySize(_location))
+    // {
+    //     _statusCode = REQUEST_ENTITY_TOO_LARGE;
+    //     return ;
+    // }
+    // if end then all body has been received
 	if (end)
     {
         std::cout << "THIS IS THE END OF THE BODY" << std::endl;
@@ -365,7 +341,7 @@ HttpResponse* HttpResponse::newResponse(HttpRequest *request, ConfigServer *conf
     
     // Check if length is given
     if (request->getBody().length() > 0 && request->getContentLength() == 0 && request->getTransferEncoding().length() == 0)
-        return new Error(config, request, writeChain, LENGTH_REQUIRED);
+        return new Error(config, request, route, location, writeChain, LENGTH_REQUIRED);
     
     // set the route of the ressource
     route = getRoute(config, request, location);
@@ -389,17 +365,17 @@ HttpResponse* HttpResponse::newResponse(HttpRequest *request, ConfigServer *conf
             struct stat file;
             
             if (stat(route.c_str(), &file))
-                return new Error(config, request, writeChain, NOT_FOUND);
+                return new Error(config, request, route, location, writeChain, NOT_FOUND);
             if (!(file.st_mode & S_IRUSR))
-                return new Error(config, request, writeChain, FORBIDDEN);
+                return new Error(config, request, route, location, writeChain, FORBIDDEN);
             if (S_ISREG(file.st_mode))
                 return new FileDownload(config, request, route, location, writeChain, &file);
             if (S_ISDIR(file.st_mode))
             {
                 if (config->getAutoindex(location) == true)
-                        return new FolderIndex(config, request, route, writeChain, &file);
+                        return new FolderIndex(config, request, route, location, writeChain, &file);
                 else
-                    return new Error(config, request, writeChain, FORBIDDEN);
+                    return new Error(config, request, route, location, writeChain, FORBIDDEN);
             }
         }
         if (method == "HEAD")
@@ -427,7 +403,7 @@ HttpResponse* HttpResponse::newResponse(HttpRequest *request, ConfigServer *conf
         if(method == "HEAD")
             return new HeadersError(config, request, writeChain, METHOD_NOT_ALLOWED);
         else
-            return new Error(config, request, writeChain, METHOD_NOT_ALLOWED);
+            return new Error(config, request, route, location, writeChain, METHOD_NOT_ALLOWED);
     }
 
     return NULL;
