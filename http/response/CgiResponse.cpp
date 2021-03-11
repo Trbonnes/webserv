@@ -186,7 +186,6 @@ void	CgiResponse::handleStreamRead(BufferChain& readChain, BufferChain& writeCha
 			writeChain.pushBack(body);
 			_streamBuffer.clear();
 			std::cout << *httpHeaders << *cgiHeaders;
-			_state.read = READY;
 		}
 		_headersReceived = true;
 	}

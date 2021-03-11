@@ -38,8 +38,12 @@ HeadersOnly::HeadersOnly(ConfigServer* config, HttpRequest* request, BufferChain
 
 HeadersOnly::HeadersOnly(ConfigServer* config, HttpRequest* request, BufferChain& writeChain, std::string route) : HttpResponse(config, request, route)
 {
+	_contentLength = 0;
 	writeChain.pushBack(getRawHeaders());
-	_state.write = WAITING;
+	if (request->getContentLength() <= 0 && request->getTransferEncoding() != "chunked\r") // TO DO why ? 
+		_state.write = READY;
+	else
+		_state.write = WAITING;
 }
 
 void	HeadersOnly::handleRead(BufferChain& readChain, BufferChain& writeChain)

@@ -42,11 +42,12 @@ void    FileUpload::handleRead(BufferChain& readChain, BufferChain& writeChain)
     (void) writeChain;
 
     HttpResponse::handleRead(readChain, writeChain);
-    if (_state.read == DONE && _streamWriteChain.getFirst() == NULL)
+    if (_state.read == DONE && _state.writeStream == DONE)
     {
         std::string *buff = getRawHeaders();
         writeChain.pushBack(buff);
-        _state.write = DONE;
+        _state.writeStream = DONE;
+        _state.write = READY;
     }
 }
 

@@ -24,6 +24,7 @@ HttpResponse::HttpResponse()
     _state.write = READY;
     _state.readStream = NONE;
     _state.writeStream = NONE;
+    setDate();
 }
 
 HttpResponse::HttpResponse(ConfigServer* config, HttpRequest* req)
@@ -50,6 +51,7 @@ HttpResponse::HttpResponse(ConfigServer* config, HttpRequest* req)
     _state.write = READY;
     _state.readStream = NONE;
     _state.writeStream = NONE;
+    setDate();
 }
 
 
@@ -78,6 +80,7 @@ HttpResponse::HttpResponse(ConfigServer* config, HttpRequest* req, std::string r
     _state.write = READY;
     _state.readStream = NONE;
     _state.writeStream = NONE;
+    setDate();
 }
 
 
@@ -99,7 +102,6 @@ void HttpResponse::handleRead(BufferChain& readChain, BufferChain& writeChain)
 
 	if (_request->getTransferEncoding() == "chunked\r") // TO DO why the f do i have to add \r
 	{
-		Log::debug("CHUNKING");
 		try
 		{
 			end = HttpRequest::extractChunks(readChain, _streamWriteChain); // TO DO is it ugly ? II think so
@@ -115,15 +117,21 @@ void HttpResponse::handleRead(BufferChain& readChain, BufferChain& writeChain)
 	}
 
     // TO DO if payload too large
-
+    if ()
 	// if end then all body has been received
 	if (end)
     {
         std::cout << "THIS IS THE END OF THE BODY" << std::endl;
         _state.read = DONE;
         if (_streamWriteChain.getFirst() == NULL)
-        _state.writeStream = DONE;
-    }   
+        {
+            std::cout << "stream write it's done for you" << std::endl;
+
+            _state.writeStream = DONE;
+            close(_streamWriteFd);
+        }
+    }
+
     if (_streamWriteChain.getFirst())
         _state.writeStream = READY;
 }
@@ -132,6 +140,11 @@ void HttpResponse::handleWrite(BufferChain& readChain, BufferChain& writeChain)
 {
     (void) writeChain;
     (void) readChain;
+    if (_state.read == DONE &&
+        (_state.writeStream == DONE || _state.writeStream == NONE) &&
+        (_state.readStream == DONE || _state.readStream == NONE) &&
+        writeChain.getFirst() == NULL)
+            _state.write = DONE;
 }
 
 void HttpResponse::handleStreamRead(BufferChain& readChain, BufferChain& writeChain)
@@ -142,20 +155,18 @@ void HttpResponse::handleStreamRead(BufferChain& readChain, BufferChain& writeCh
     int ret;
     try
 	{
-		ret = BufferChain::readToBuffer(writeChain, _streamReadFd);
+        if (_transferEncoding == "chunked")
+            ret = Http::readChunkToBuffer(writeChain, _streamReadFd);
+        else
+		    ret = BufferChain::readToBuffer(writeChain, _streamReadFd);
 	}
 	catch(const std::exception& e)
 	{
 		throw HttpError(INTERNAL_SERVER_ERROR);
 	}
-    // If it's the end
 	if (ret == 0)
+    // If it's the end
     {
-        if (_transferEncoding == "chunked")
-        {
-            writeChain.pushBack(Http::chunkify((char*)"", 0, 0));
-            _state.write = READY;
-        }
         // close the stream
         close(_streamReadFd);
         _state.readStream = DONE;
@@ -208,78 +219,6 @@ void HttpResponse::handleStreamWrite(BufferChain& readChain, BufferChain& writeC
         else
             _state.writeStream = WAITING;
 	}
-}
-
-static std::string        getRoute(ConfigServer* config, HttpRequest* req, std::string location)
-{
-    std::vector<std::string>::iterator itIndexBegin;
-    std::vector<std::string>::iterator itIndexEnd;
-    struct stat file;
-    std::string str;
-	std::string route = "";
-    int ret;
-
-    std::string root = config->getRoot(location);  
-    std::string alias = config->getAlias(location);
-    std::string uri = req->getRequestURI();
-
-
-    //** Relative path **
-    if (alias.length() > 0)
-    {
-        if (stat(alias.c_str(), &file) != -1)
-        {
-            if (((file.st_mode & S_IFMT) == S_IFDIR))
-                alias.append("/");
-            route.assign(alias);
-            route.append(uri.substr(location.size()));
-        }
-    }
-    else 
-    {
-        route.assign(root.substr(0, root.size() - (root[root.size() - 1] == '*')));
-        std::cout << "ROOT FIRST STEP " << route << std::endl;
-        route.append(uri.substr(location.size() - (location[location.size() - 1] == '*')));
-        std::cout << "ROOT SECOND STEP " << route << std::endl;
-
-    }
-    std::cout << "=========== root:" << root << std::endl;
-    std::cout << "=========== alias:" << alias << std::endl;
-    std::cout << "=========== uri:" << uri << std::endl;
-    std::cout << "=========== location:" << location << std::endl;
-    ret = stat(route.c_str(), &file);
-    // if is file  exists or put request we're done
-    if ((ret == 0 && S_ISREG(file.st_mode)) || req->getMethod() == "PUT" || req->getMethod() == "DELETE")
-        return route;
-    
-    // accept lagnguage
-    // route.append(acceptLanguage());
-    // route.append(str.assign(_request->getRequestURI()).erase(0, location.length()));
-
-    // CGI
-    // size_t pos = route.find_last_of('.'); 
-    // if (pos != route.npos)
-    // {
-    //     std::string extension = route.substr(pos + 1);
-    //     if (is_good_exe(extension))
-    //         return;
-    // }
-    // ** Else, add index if it is not a put or delete request **
-    itIndexBegin = config->getIndex(location).begin();
-    itIndexEnd = config->getIndex(location).end();
-    stat(route.c_str(), &file);
-    str.assign(route);
-    while (itIndexBegin != itIndexEnd && !S_ISREG(file.st_mode))
-    {
-        str.assign(route);
-        if (str.at(str.length() - 1) != '/')
-            str.append("/");
-        str.append(*itIndexBegin);
-        stat(str.c_str(), &file);
-        itIndexBegin++;
-    }
-    route.assign(str);
-    return route;
 }
 
 static bool       isMethodAllowed(ConfigServer* config, std::string& method, std::string &location)
@@ -335,6 +274,79 @@ static bool         isCgiExtension(ConfigServer* config, std::string& location, 
         }
     }
     return false;
+}
+
+static std::string        getRoute(ConfigServer* config, HttpRequest* req, std::string location)
+{
+    std::vector<std::string>::iterator itIndexBegin;
+    std::vector<std::string>::iterator itIndexEnd;
+    struct stat file;
+    std::string str;
+	std::string route = "";
+    int ret;
+
+    std::string root = config->getRoot(location);  
+    std::string alias = config->getAlias(location);
+    std::string uri = req->getRequestURI();
+
+
+    //** Relative path **
+    if (alias.length() > 0)
+    {
+        if (stat(alias.c_str(), &file) != -1)
+        {
+            if (((file.st_mode & S_IFMT) == S_IFDIR))
+                alias.append("/");
+            route.assign(alias);
+            route.append(uri.substr(location.size()));
+        }
+    }
+    else 
+    {
+        route.assign(root.substr(0, root.size() - (root[root.size() - 1] == '*')));
+        std::cout << "ROOT FIRST STEP " << route << std::endl;
+        route.append(uri.substr(location.size() - (location[location.size() - 1] == '*')));
+        std::cout << "ROOT SECOND STEP " << route << std::endl;
+
+    }
+    std::cout << "=========== root:" << root << std::endl;
+    std::cout << "=========== alias:" << alias << std::endl;
+    std::cout << "=========== uri:" << uri << std::endl;
+    std::cout << "=========== location:" << location << std::endl;
+    ret = stat(route.c_str(), &file);
+    // if is file  exists or put request we're done
+    if ((ret == 0 && S_ISREG(file.st_mode)) || req->getMethod() == "PUT" || req->getMethod() == "DELETE")
+        return route;
+    
+
+    // TO DO redundant
+    size_t pos = route.find_last_of('.');
+    std::string extension(route);
+    extension.erase(0, pos + 1);
+    if (isCgiExtension(config, location, extension))
+        return route;
+
+    // accept lagnguage
+    // route.append(acceptLanguage());
+    // route.append(str.assign(_request->getRequestURI()).erase(0, location.length())); // TO DO how does this works
+
+
+    // ** Else, add index if it is not a put or delete request **
+    itIndexBegin = config->getIndex(location).begin();
+    itIndexEnd = config->getIndex(location).end();
+    stat(route.c_str(), &file);
+    str.assign(route);
+    while (itIndexBegin != itIndexEnd && !S_ISREG(file.st_mode))
+    {
+        str.assign(route);
+        if (str.at(str.length() - 1) != '/')
+            str.append("/");
+        str.append(*itIndexBegin);
+        stat(str.c_str(), &file);
+        itIndexBegin++;
+    }
+    route.assign(str);
+    return route;
 }
 
 HttpResponse* HttpResponse::newResponse(HttpRequest *request, ConfigServer *config, BufferChain& writeChain)

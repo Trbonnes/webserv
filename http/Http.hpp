@@ -47,7 +47,6 @@ private:
 	void	reset();
 
 	// Utils function to copy a chunk into a new buffer
-	int				readChunkToBuffer(BufferChain&, FD);
 
 
 public:
@@ -68,7 +67,8 @@ public:
 	void handleBodyRead();
 	void handleCGIRead();
 
-	static std::string*	chunkify(char*, size_t, size_t);
+	static	int				readChunkToBuffer(BufferChain&, FD);
+	static	std::string*	chunkify(char*, size_t, size_t);
 };
 
 #include "core/Connection.hpp"

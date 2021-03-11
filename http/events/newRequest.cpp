@@ -11,8 +11,10 @@ void Http::handleNewRequest()
 
 	size_t pos;
 	// If the end of headers are reached
+		Log::debug(_requestBuffer);
 	if ((pos = _requestBuffer.find("\r\n\r\n")) != _requestBuffer.npos) // TO DO might have to hcange this for small buffers
 	{	
+		std::cout << "================================== REQUEST START" << std::endl;
 		std::string request;
 		request.append(_requestBuffer, 0, pos + 1); // TO DO realloc good ?
 		
@@ -23,7 +25,6 @@ void Http::handleNewRequest()
 			_read_chain.pushFront(leftovers);
 		}
 		std::string tmp = _requestBuffer.substr(0, pos + 1);
-		Log::debug(tmp);
 		_requestBuffer.clear();
 		// Instantiate new request
 		std::cout << "Request" << std::endl;

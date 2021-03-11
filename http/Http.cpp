@@ -99,22 +99,30 @@ void Http::handleStreamWrite()
 
 void	Http::checkState()
 {
-	// std::cout << " _read_chain: " << _read_chain;
-	// if (_resp)
-	// {
-	// 	std::cout << " _stream_write_chain: " << _resp->getStreamWriteChain();
-	// 	std::cout << " _stream_read_chain: " << _resp->getStreamReadChain();
-	// }
-	// std::cout << " _write_chain: " <<_write_chain;
+	std::cout << " _read_chain: " << _read_chain;
+	if (_resp)
+	{
+		std::cout << " _stream_write_chain: " << _resp->getStreamWriteChain();
+		std::cout << " _stream_read_chain: " << _resp->getStreamReadChain();
+	}
+	std::cout << " _write_chain: " <<_write_chain;
 
 
-	// if (_resp)
-	// {
-	// 	std::cout << "status _read: " << _resp->_state.read;
-	// 	std::cout << " status _stream_write: " << _resp->_state.writeStream;
-	// 	std::cout << " status _stream_read: " << _resp->_state.readStream;
-	// 	std::cout << " status _write: " << _resp->_state.write << std::endl;
-	// }
+	if (_resp)
+	{
+		char* states[5];
+
+		states[HttpResponse::NONE] = (char*)"NONE";
+		states[HttpResponse::WAITING] = (char*)"WAITING";
+		states[HttpResponse::IGNORE] = (char*)"IGNORE";
+		states[HttpResponse::READY] = (char*)"READY";
+		states[HttpResponse::DONE] = (char*)"DONE"; 
+
+		std::cout << " status _read: " << states[_resp->_state.read] << std::endl;
+		std::cout << " status _stream_write: " << states[_resp->_state.writeStream] << std::endl;
+		std::cout << " status _stream_read: " << states[_resp->_state.readStream] << std::endl;
+		std::cout << " status _write: " << states[_resp->_state.write] << std::endl;
+	}
 	
 	
 	if (_resp)
@@ -134,7 +142,7 @@ void	Http::checkState()
 			_connection.subStreamWrite();
 		
 		// End of request
-		if (_resp->_state.read == HttpResponse::DONE &&
+		if (_resp->_state.read == HttpResponse::DONE && _write_chain.getFirst() == NULL && 
 			(_resp->_state.readStream == HttpResponse::DONE || _resp->_state.readStream == HttpResponse::NONE) &&
 			(_resp->_state.writeStream == HttpResponse::DONE || _resp->_state.writeStream == HttpResponse::NONE))
 		{
