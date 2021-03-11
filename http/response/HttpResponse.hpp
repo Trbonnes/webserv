@@ -142,5 +142,6 @@ public:
 #include "http/response/FolderIndex.hpp"
 #include "http/response/HeadersOnly.hpp"
 #include "http/response/FileUpload.hpp"
+#include "http/response/CgiResponse.hpp"
 
 #endif // HTTP_RESPONSE

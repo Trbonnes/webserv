@@ -99,22 +99,22 @@ void Http::handleStreamWrite()
 
 void	Http::checkState()
 {
-	std::cout << " _read_chain: " << _read_chain;
-	if (_resp)
-	{
-		std::cout << " _stream_write_chain: " << _resp->getStreamWriteChain();
-		std::cout << " _stream_read_chain: " << _resp->getStreamReadChain();
-	}
-	std::cout << " _write_chain: " <<_write_chain;
+	// std::cout << " _read_chain: " << _read_chain;
+	// if (_resp)
+	// {
+	// 	std::cout << " _stream_write_chain: " << _resp->getStreamWriteChain();
+	// 	std::cout << " _stream_read_chain: " << _resp->getStreamReadChain();
+	// }
+	// std::cout << " _write_chain: " <<_write_chain;
 
 
-	if (_resp)
-	{
-		std::cout << "status _read: " << _resp->_state.read;
-		std::cout << " status _stream_write: " << _resp->_state.writeStream;
-		std::cout << " status _stream_read: " << _resp->_state.readStream;
-		std::cout << " status _write: " << _resp->_state.write << std::endl;
-	}
+	// if (_resp)
+	// {
+	// 	std::cout << "status _read: " << _resp->_state.read;
+	// 	std::cout << " status _stream_write: " << _resp->_state.writeStream;
+	// 	std::cout << " status _stream_read: " << _resp->_state.readStream;
+	// 	std::cout << " status _write: " << _resp->_state.write << std::endl;
+	// }
 	
 	
 	if (_resp)

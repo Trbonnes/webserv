@@ -121,10 +121,11 @@ void HttpResponse::handleRead(BufferChain& readChain, BufferChain& writeChain)
     {
         std::cout << "THIS IS THE END OF THE BODY" << std::endl;
         _state.read = DONE;
-
+        if (_streamWriteChain.getFirst() == NULL)
+        _state.writeStream = DONE;
+    }   
     if (_streamWriteChain.getFirst())
         _state.writeStream = READY;
-    }
 }
 
 void HttpResponse::handleWrite(BufferChain& readChain, BufferChain& writeChain)
@@ -150,6 +151,11 @@ void HttpResponse::handleStreamRead(BufferChain& readChain, BufferChain& writeCh
     // If it's the end
 	if (ret == 0)
     {
+        if (_transferEncoding == "chunked")
+        {
+            writeChain.pushBack(Http::chunkify((char*)"", 0, 0));
+            _state.write = READY;
+        }
         // close the stream
         close(_streamReadFd);
         _state.readStream = DONE;
@@ -163,7 +169,6 @@ void HttpResponse::handleStreamWrite(BufferChain& readChain, BufferChain& writeC
 
     (void) readChain;
     int ret;
-
     (void) writeChain;
 	try
 	{
@@ -187,6 +192,8 @@ void HttpResponse::handleStreamWrite(BufferChain& readChain, BufferChain& writeC
 	}
 	catch(const BufferChain::IOError& e)
 	{
+        std::cout << "Stream write error" << std::endl;
+        sleep(5);
 		throw HttpError(INTERNAL_SERVER_ERROR);
 	}
 
@@ -198,6 +205,8 @@ void HttpResponse::handleStreamWrite(BufferChain& readChain, BufferChain& writeC
             close(_streamWriteFd);
             _state.writeStream = DONE;
         }
+        else
+            _state.writeStream = WAITING;
 	}
 }
 
@@ -289,6 +298,45 @@ static bool       isMethodAllowed(ConfigServer* config, std::string& method, std
     return false;
 }
 
+//** Check if the method is autorized for the CGI locations **
+static bool         isMethodAllowedCGI(ConfigServer* config, std::string& method, std::string& location)
+{
+    std::vector<std::string>::iterator itBegin;
+    std::vector<std::string>::iterator itEnd;
+
+    itBegin = config->getCGI_allow(location).begin();
+    itEnd = config->getCGI_allow(location).end();
+    while (itBegin != itEnd)
+    {
+        if ((*itBegin).compare(method) == 0)
+            return true;
+        itBegin++;
+    }
+    return false;
+}
+
+static bool         isCgiExtension(ConfigServer* config, std::string& location, std::string& exe)
+{
+    std::vector<std::string>::iterator cgi_begin;
+    std::vector<std::string>::iterator cgi_end;
+
+    if (config->getCGI_root(location).length() > 0)
+    {
+        if (config->getCGI(location).empty() == false)
+        {
+            cgi_begin = config->getCGI(location).begin();
+            cgi_end = config->getCGI(location).end();
+            while (cgi_begin != cgi_end)
+            {
+                if (exe.compare(*cgi_begin) == 0)
+                    return true;
+                cgi_begin++;
+            }
+        }
+    }
+    return false;
+}
+
 HttpResponse* HttpResponse::newResponse(HttpRequest *request, ConfigServer *config, BufferChain& writeChain)
 {
 	std::string uri;
@@ -313,14 +361,12 @@ HttpResponse* HttpResponse::newResponse(HttpRequest *request, ConfigServer *conf
     // TO DO insert authorization mechanic
 
 
-    // size_t      extension;
-    // std::string str;
-    // extension = route.find_last_of('.');
-    // If it's a CGI request we must fork and prepare the stream in and out
-    // if (is_good_exe(str.assign(route).erase(0, extension + 1)) && checkCGImethods(request->getMethod()))
-    // {
-    //     cgi();
-    // }
+    // // If it's a CGI request we must fork and prepare the stream in and out
+    size_t pos = route.find_last_of('.');
+    std::string extension(route);
+    extension.erase(0, pos + 1);
+    if (isCgiExtension(config, location, extension) && isMethodAllowedCGI(config, request->getMethod(), location))
+        return  new CgiResponse(config, request, route, location);
 
     // If it's not CGI check if the method is authorized
     std::cout << "HERE COMES THE ROUTE _---------------------------- " << route << std::endl;
@@ -436,7 +482,7 @@ std::string* HttpResponse::getRawHeaders()
             if (_contentLanguage.length() > 0 && _request->getMethod().compare("PUT") && _request->getMethod().compare("DELETE"))
                 buff->append("Content-Language: ").append(_contentLanguage).append("\r\n");
             if (_transferEncoding.length() > 0)
-                buff->append("Transfer-Encoding: ").append(_transferEncoding);
+                buff->append("Transfer-Encoding: ").append(_transferEncoding).append("\r\n");
         }
         else if (_statusCode == UNAUTHORIZED)
             buff->append("WWW-Authenticate: ").append("Basic realm=").append(_config->getAuth_basic(_location)).append("\r\n");

@@ -1,23 +1,7 @@
 #include "HttpResponse.hpp"
 #include "CGI.hpp"
 
-//** Check if the method is autorized for the CGI locations **
-int         HttpResponse::checkCGImethods(std::string method)
-{
-    std::vector<std::string>::iterator itBegin;
-    std::vector<std::string>::iterator itEnd;
 
-    itBegin = _config.getCGI_allow(_location).begin();
-    itEnd = _config.getCGI_allow(_location).end();
-    while (itBegin != itEnd)
-    {
-        _allow.push_back(*itBegin);
-        if ((*itBegin).compare(method) == 0)
-            return 1;
-        itBegin++;
-    }
-    return 0;
-}
 
 // ** Define the meta variables for the CGI script **
 void        HttpResponse::cgi_metaVariables()
@@ -104,14 +88,6 @@ int         HttpResponse::is_good_exe(std::string exe)
     return (0);
 }
 
-// ** Function for the std::adjacent_find, to find the first two \n \r in CGI response and separate the body from the headers **
-bool        HttpResponse::mypred(char val1, char val2)
-{
-    if (val1 == '\n' && val2 == '\r')
-        return true;
-    return false;
-}
-
 // ** Execute the CGI script and get the body and headers **
 void        HttpResponse::cgi_exe()
 {
@@ -146,15 +122,12 @@ void        HttpResponse::cgi_exe()
     else if (pid == 0)
     {
         Log::debug("CGI launched\n");
-
         // Closing unused end in chlid process
         close(cgi_in[SIDE_IN]);
         close(cgi_out[SIDE_OUT]);
         // Redirecting the other pipe to stdin and stdout
         dup2(cgi_in[SIDE_OUT], STDIN_FILENO);
         dup2(cgi_out[SIDE_IN], STDOUT_FILENO);
-
-        
 
         args[0] = ft_strdup(_config.getCGI_root(_location).c_str());
         if (execve(args[0], args, _cgi_env) == -1)
@@ -170,10 +143,10 @@ void        HttpResponse::cgi_exe()
         // closing unused pipe in parent and storing fd fd in streams
         close(cgi_in[SIDE_OUT]);
         close(cgi_out[SIDE_IN]);
-        _stream_write = cgi_in[SIDE_IN];
+        _streamWriteFd = cgi_in[SIDE_IN];
         _stream_read = cgi_out[SIDE_OUT];
-        std::cout << "==========>    fd is " << _stream_write << std::endl;
-        fcntl(_stream_write, F_SETFL, O_NONBLOCK);
+        std::cout << "==========>    fd is " << _streamWriteFd << std::endl;
+        fcntl(_streamWriteFd, F_SETFL, O_NONBLOCK);
         fcntl(_stream_read, F_SETFL, O_NONBLOCK);
     }
 }

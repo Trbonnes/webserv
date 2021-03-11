@@ -117,16 +117,13 @@ void            HttpResponse::options()
 
 void            HttpResponse::cgi()
 {
-        _transferEncoding.assign("chunked");
         _use_cgi = true;
 
         // If it's a head request, just stop there
         // TO DO is this right ?
         if (_request->getMethod().compare("HEAD") != 0) // TO DO string comparison is so gross
         {
-            cgi_metaVariables();
-            setEnv();
-            cgi_exe();
+
         }
 }
 
