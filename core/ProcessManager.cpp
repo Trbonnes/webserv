@@ -76,6 +76,7 @@ void ProcessManager::manage()
 		if (proc->isRespawn() && g_server->getStatus() != HttpServer::STOPPING)
 		{
 			std::cerr << "Respawning a worker" << std::endl;
+			sleep(50);
 			this->run(*proc, 1, false);
 			// If it's a worker exiting
 			if (g_ismaster == false)

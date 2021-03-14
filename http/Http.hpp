@@ -68,7 +68,7 @@ public:
 	void handleHttpError(int statusCode);
 
 	static	int				readChunkToBuffer(BufferChain&, FD);
-	static	std::string*	chunkify(char*, size_t, size_t);
+	static	std::string*	chunkify(char* buff, size_t n);
 };
 
 #include "core/Connection.hpp"

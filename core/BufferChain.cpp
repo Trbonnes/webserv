@@ -12,9 +12,10 @@ BufferChain::BufferChain(BufferChain&)
 	// TO DO add deep copy
 }
 
-BufferChain& BufferChain::operator=(BufferChain&)
+BufferChain& BufferChain::operator=(BufferChain& chain)
 {
-	// TO DO add flush then deep copy
+	flush();
+	_chain = chain._chain;
 	return (*this);
 }
 

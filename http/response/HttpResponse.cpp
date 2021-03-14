@@ -19,7 +19,7 @@ HttpResponse::HttpResponse()
     _retryAfter = "";
     _transferEncoding = "";
     _state.read = READY;
-    _state.write = READY;
+    _state.write = WAITING;
     _state.readStream = NONE;
     _state.writeStream = NONE;
     setDate();
@@ -48,7 +48,7 @@ HttpResponse::HttpResponse(ConfigServer* config, HttpRequest* req, std::string r
     _retryAfter = "";
     _transferEncoding = "";
     _state.read = READY;
-    _state.write = READY;
+    _state.write = WAITING;
     _state.readStream = NONE;
     _state.writeStream = NONE;
     setDate();
@@ -58,9 +58,13 @@ HttpResponse::HttpResponse(ConfigServer* config, HttpRequest* req, std::string r
 
 void HttpResponse::abort()
 {
-	if (_streamReadFd != -1)
+    std::cout << "Closing " << _streamWriteFd << std::endl;
+    std::cout << "Closing " << _streamReadFd << std::endl;
+
+    // Don't need to close them if they are done
+	if (_state.readStream != NONE && _state.readStream != DONE)
 		close(_streamReadFd);
-	if (_streamWriteFd != -1)
+	if (_state.writeStream != NONE && _state.writeStream != DONE)
 		close(_streamWriteFd);
     _streamReadChain.flush();
     _streamWriteChain.flush();
@@ -76,7 +80,7 @@ void HttpResponse::handleRead(BufferChain& readChain, BufferChain& writeChain)
 	{
 		try
 		{
-			end = HttpRequest::extractChunks(readChain, _streamWriteChain); // TO DO is it ugly ? II think so
+			end = HttpRequest::extractChunks(readChain, _streamWriteChain);
 		}
 		catch(const HttpRequest::MalformedChunk& e)
 		{
@@ -88,55 +92,37 @@ void HttpResponse::handleRead(BufferChain& readChain, BufferChain& writeChain)
 		end = HttpRequest::extractBody(readChain, _streamWriteChain, _request);
 	}
 
-    // TO DO if payload too large
+    // check if payload too large
     if (_maxBodySize != -1)
     {
-        std::cout << "BODY SIZE MAX DETECTED : " << _streamWriteChain.totalSize() << " vs " <<  _maxBodySize << std::endl;
         if ((int)_streamWriteChain.totalSize() > _maxBodySize)
-        {
-            std::cout << "THROWING HTTP ERROR" << std::endl;
             throw HttpError(REQUEST_ENTITY_TOO_LARGE);
-        }
-        if (end)
+    }
+    if (end)
+    {
+        _state.read = DONE;
+        if (_streamWriteChain.getFirst() == NULL)
         {
-            _state.read = DONE;
-            if (_state.writeStream != NONE && _streamWriteChain.getFirst())
-                _state.writeStream = READY;
+            close(_streamWriteFd);
+            _state.writeStream = DONE;
         }
     }
-    else
+    if (_state.writeStream == WAITING && _streamWriteChain.getFirst())
     {
-        if (end)
-        {
-            std::cout << "THIS IS THE END OF THE BODY" << std::endl;
-            _state.read = DONE;
-            if (_streamWriteChain.getFirst() == NULL)
-            {
-                std::cout << "stream write it's done for you" << std::endl;
-
-                _state.writeStream = DONE;
-                close(_streamWriteFd);
-            }
-        }
-
-        if (_streamWriteChain.getFirst() && _state.writeStream != NONE)
-            _state.writeStream = READY;
+        _state.writeStream = READY;
     }
 }
 
 void HttpResponse::handleWrite(BufferChain& readChain, BufferChain& writeChain)
 {
+    Log::debug("HttpResponse::handleWrite()");
     (void) writeChain;
     (void) readChain;
-    if (_state.read == DONE &&
-        (_state.writeStream == DONE || _state.writeStream == NONE) &&
-        (_state.readStream == DONE || _state.readStream == NONE) &&
-        writeChain.getFirst() == NULL)
-            _state.write = DONE;
 }
 
 void HttpResponse::handleStreamRead(BufferChain& readChain, BufferChain& writeChain)
 {
+    Log::debug("HttpResponse::handleStreamRead()");
     (void) readChain;
     (void) writeChain;
 
@@ -155,58 +141,54 @@ void HttpResponse::handleStreamRead(BufferChain& readChain, BufferChain& writeCh
 	if (ret == 0)
     // If it's the end
     {
+        
+        std::cout << "Closing " << _streamReadFd << std::endl;
         // close the stream
         close(_streamReadFd);
         _state.readStream = DONE;
-        if (writeChain.getFirst() == NULL)
-            _state.write = DONE;
     }
 }
 
 void HttpResponse::handleStreamWrite(BufferChain& readChain, BufferChain& writeChain)
 {
-
+    Log::debug("HttpResponse::handleStreamWrite()");
     (void) readChain;
-    int ret;
     (void) writeChain;
-	try
-	{
-		ret = BufferChain::writeBufferToFd(_streamWriteChain, _streamWriteFd);
-		std::string* buff = _streamWriteChain.getFirst();
+    int ret;
+    try
+    {
+        ret = BufferChain::writeBufferToFd(_streamWriteChain, _streamWriteFd);
+        std::string* buff = _streamWriteChain.getFirst();
         // since the fds are non blocking we check if some bytes are left 
-		if ((size_t) ret < buff->size())
-		{
-			std::string * leftovers = new std::string();
-			leftovers->reserve(buff->size() - ret);
-			leftovers->append(*buff, ret);
-			delete buff;
-			_streamWriteChain.popFirst();
-			_streamWriteChain.pushFront(leftovers);
-		}
-		else
-		{
-			delete buff;
-			_streamWriteChain.popFirst();
-		}
-	}
-	catch(const BufferChain::IOError& e)
-	{
-        std::cout << "Stream write error" << std::endl;
-        sleep(5);
-		throw HttpError(INTERNAL_SERVER_ERROR);
-	}
-
-    // State update
-	if (_streamWriteChain.getFirst() == NULL)
-	{
-        if (_state.read == DONE)
+        if ((size_t) ret < buff->size())
         {
-            close(_streamWriteFd);
-            _state.writeStream = DONE;
+            std::string * leftovers = new std::string();
+            leftovers->reserve(buff->size() - ret);
+            leftovers->append(*buff, ret);
+            delete buff;
+            _streamWriteChain.popFirst();
+            _streamWriteChain.pushFront(leftovers);
         }
         else
-            _state.writeStream = WAITING;
-	}
+        {
+            delete buff;
+            _streamWriteChain.popFirst();
+        }
+    }
+    catch(const BufferChain::IOError& e)
+    {
+        std::cout << getpid() << "HANDLE STREAM WRIIIIIIIIIIIIITE  " << strerror(errno)  << " " << _streamWriteFd << std::endl;
+        throw HttpError(INTERNAL_SERVER_ERROR);
+    }
+    // State update
+    if (_state.readStream == DONE || (_state.read == DONE && _streamWriteChain.getFirst() == NULL))
+    {
+        std::cout << "Closing in stream write " << _streamWriteFd << std::endl;
+        close(_streamWriteFd);
+        _state.writeStream = DONE;
+    }
+    else if (_streamWriteChain.getFirst() == NULL)
+        _state.writeStream = WAITING;
 }
 
 static bool       isMethodAllowed(ConfigServer* config, std::string& method, std::string &location)
@@ -292,15 +274,9 @@ static std::string        createRoute(ConfigServer* config, HttpRequest* req, st
     else 
     {
         route.assign(root.substr(0, root.size() - (root[root.size() - 1] == '*')));
-        std::cout << "ROOT FIRST STEP " << route << std::endl;
         route.append(uri.substr(location.size() - (location[location.size() - 1] == '*')));
-        std::cout << "ROOT SECOND STEP " << route << std::endl;
-
     }
-    std::cout << "=========== root:" << root << std::endl;
-    std::cout << "=========== alias:" << alias << std::endl;
-    std::cout << "=========== uri:" << uri << std::endl;
-    std::cout << "=========== location:" << location << std::endl;
+    // std::cout << "=========== root:" << root << std::endl << "=========== alias:" << alias << std::endl << "=========== uri:" << uri << std::endl << "=========== location:" << location << std::endl;
     ret = stat(route.c_str(), &file);
     // if is file  exists or put request we're done
     if ((ret == 0 && S_ISREG(file.st_mode)) || req->getMethod() == "PUT" || req->getMethod() == "DELETE")
@@ -344,10 +320,6 @@ HttpResponse* HttpResponse::newResponse(HttpRequest *request, ConfigServer *conf
 	std::string route;
     std::string &method = request->getMethod();
 
-    std::cout << config << std::endl;
-    std::cout << "------------------------------+" << std::endl;
-
-
 	uri = request->getRequestURI();
     location = config->getLocation(uri);
     
@@ -369,7 +341,6 @@ HttpResponse* HttpResponse::newResponse(HttpRequest *request, ConfigServer *conf
         return  new CgiResponse(config, request, route, location);
 
     // If it's not CGI check if the method is authorized
-    std::cout << "HERE COMES THE ROUTE _---------------------------- " << route << std::endl;
     if (isMethodAllowed(config, method, location))
     {
         if (method == "GET")
@@ -594,10 +565,5 @@ void        HttpResponse::setContentType()
 
 HttpResponse::~HttpResponse()
 {
-    if (_streamWriteFd != -1)
-        close(_streamWriteFd);
-    if (_streamReadFd != -1)
-        close(_streamReadFd);
-    _streamWriteChain.flush();
-    _streamReadChain.flush();
+    abort();
 }

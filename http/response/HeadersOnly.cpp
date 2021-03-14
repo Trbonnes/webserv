@@ -37,12 +37,8 @@ HeadersOnly::HeadersOnly(ConfigServer* config, HttpRequest* request, std::string
 
 HeadersOnly::HeadersOnly(ConfigServer* config, HttpRequest* request, std::string& route, std::string& location, BufferChain& writeChain) : HttpResponse(config, request, route, location)
 {
+	(void) writeChain;
 	_contentLength = 0;
-	writeChain.pushBack(getRawHeaders());
-	if (request->getContentLength() <= 0 && request->getTransferEncoding() != "chunked\r") // TO DO why ? 
-		_state.write = READY;
-	else
-		_state.write = WAITING;
 }
 
 void	HeadersOnly::handleRead(BufferChain& readChain, BufferChain& writeChain)
@@ -50,7 +46,10 @@ void	HeadersOnly::handleRead(BufferChain& readChain, BufferChain& writeChain)
 	HttpResponse::handleRead(readChain, writeChain);
 	_streamWriteChain.flush();
 	if (_state.read == DONE)
+	{
+		writeChain.pushBack(getRawHeaders());
 		_state.write = READY;
+	}
 }
 
 

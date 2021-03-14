@@ -1,6 +1,6 @@
 # Implicit variable definition
 CXX = clang++
-CXXFLAGS = -Wall -Wextra -Werror -std=c++98 -g
+CXXFLAGS = -Wall -Wextra -Werror -std=c++98 -g -fsanitize=address # TO DO remove
 
 # Sources files
 
@@ -46,8 +46,6 @@ HTTPSRC =	http/Http.cpp \
 			http/responseUtils.cpp \
 			http/parseHeaders.cpp \
 			http/events/newRequest.cpp \
-			http/events/readBody.cpp \
-			http/events/readCGI.cpp \
 			http/events/readChunk.cpp \
 			http/events/readStream.cpp \
 			http/events/writeStream.cpp

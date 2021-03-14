@@ -1,6 +1,6 @@
 #include "http/Http.hpp"
 
-std::string*	Http::chunkify(char* buff, size_t start, size_t len)
+std::string*	Http::chunkify(char* buff, size_t len)
 {
 	//converting to hex
 	std::stringstream ss;
@@ -15,7 +15,10 @@ std::string*	Http::chunkify(char* buff, size_t start, size_t len)
 	n->append(chunkstr);
 	n->append("\r\n");
 	if(len != 0)
-		n->append(buff, start, len);
+	{
+		// std::cout << "|" << strlen(buff) << "| " << start << " " << len << std::endl;
+		n->append(buff, len);
+	}
 	n->append("\r\n");
 	return n;
 }
@@ -28,7 +31,7 @@ int		Http::readChunkToBuffer(BufferChain& chain, FD fd)
 	ret = read(fd, g_read_large, BUFFER_SIZE_LARGE); // TO DO keep this size ?
 	if (ret == -1)
 		throw BufferChain::IOError();
-	n = chunkify(g_read_large, 0, ret);
+	n = chunkify(g_read_large, ret);
 	chain.pushBack(n);
 	return ret;
 }

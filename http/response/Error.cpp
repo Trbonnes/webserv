@@ -23,13 +23,14 @@ Error::Error(ConfigServer* config, HttpRequest* req, std::string& route, std::st
 	//appending the buffers
 	writeChain.pushBack(getRawHeaders());
 	writeChain.pushBack(buff);
-	_state.read = IGNORE;
+	// std::cout << buff<< std::endl;
 	// }
     // else
     // {
     //     close(fd);
     //     get(true);
     // }
+	std::cout << "/* message */ " << _mapCodes.codes[_statusCode] << std::endl;
 }
 
 
@@ -38,17 +39,17 @@ void	Error::handleRead(BufferChain& readChain, BufferChain& writeChain)
 	(void) writeChain;
 
 	HttpResponse::handleRead(readChain, writeChain);
-	_state.read = IGNORE;
+	_streamWriteChain.flush();
 }
 
-void	Error::handleWrite(BufferChain& readChain, BufferChain& writeChain)
-{
-	(void) readChain;
+// void	Error::handleWrite(BufferChain& readChain, BufferChain& writeChain)
+// {
+// 	(void) readChain;
 
-	std::cout << "---------------------------------------------------------- " << writeChain <<std::endl;
-	if (writeChain.getFirst() == NULL)
-		throw HttpResponse::ConnectionClose();
-}
+// 	std::cout << "---------------------------------------------------------- " << writeChain <<std::endl;
+// 	if (writeChain.getFirst() == NULL)
+// 		throw HttpResponse::ConnectionClose(); 
+// }
 
 Error::~Error()
 {

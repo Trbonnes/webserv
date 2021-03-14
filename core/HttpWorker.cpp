@@ -57,7 +57,7 @@ void	HttpWorker::run()
 			if (g_server->getStatus() == HttpServer::STOPPING)
 				break;
 			else
-				std::cerr << "Select error: " << strerror(errno) << std::endl;
+				std::cerr << "oooooooooooooooooooooooooooooooooooooooo>>> Select error: " << strerror(errno) << std::endl;
 		}
 		if (g_server->getStatus() == HttpServer::STOPPING)
 				break;
@@ -71,13 +71,14 @@ void	HttpWorker::run()
 			Connection* c = *ic;
 			try
 			{
+				std::cout << "=== > Connection "  << c << std::endl;
 				if (c->isStreamWriteReady(&write_fs))
 					c->streamWrite();
-				if (c->isWriteReady(&write_fs))
+				else if (c->isWriteReady(&write_fs))
 					c->write();
-				if (c->isStreamReadReady(&read_fs))
+				else if (c->isStreamReadReady(&read_fs))
 					c->streamRead();
-				if (c->isReadReady(&read_fs))
+				else if (c->isReadReady(&read_fs))
 					c->read();
 			}
 			catch(const std::exception& e)

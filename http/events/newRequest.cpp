@@ -8,16 +8,16 @@ void Http::handleNewRequest()
 	delete buff;
 	_read_chain.popFirst();
 
-
 	size_t pos;
 	// If the end of headers are reached
-		Log::debug(_requestBuffer);
 	if ((pos = _requestBuffer.find("\r\n\r\n")) != _requestBuffer.npos) // TO DO might have to hcange this for small buffers
-	{	
+	{
 		std::cout << "================================== REQUEST START" << std::endl;
 		std::string request;
 		request.append(_requestBuffer, 0, pos + 1); // TO DO realloc good ?
 		
+	
+		// Log::debug(request);
 		// if pos is before that, then there's some body left
 		if (pos < _requestBuffer.size() - 4)
 		{
@@ -27,25 +27,13 @@ void Http::handleNewRequest()
 		std::string tmp = _requestBuffer.substr(0, pos + 1);
 		_requestBuffer.clear();
 		// Instantiate new request
-		std::cout << "Request" << std::endl;
-		std::cout << "|" << request << "|" << std::endl;
 		_req = HttpRequest::parseRequest(request);
 		// Instantiate a new response from that request
+		// TO DO add try catch for errors
+		// std::cout << _req->getPort() << " AND " << _req->getHost() << std::endl;
 		_resp = HttpResponse::newResponse(_req, _config->getServerUnit(_req->getPort(), _req->getHost()), _write_chain);	
 		// Adding streams in select fd sets
-		// By this point the Response should have fd's for CGI or a regular file
-		// if stream write
-		// CGI and PUT
-		// TO DO Try and remove this
-		if (_resp->getStreamWriteFd() != -1)
-			_connection.setStreamWrite(_resp->getStreamWriteFd());
-		
-		//if stream read
-		// CGI and GET
-		if (_resp->getStreamReadFd() != -1)
-		{
-			_connection.setStreamRead(_resp->getStreamReadFd());
-			_connection.subStreamRead();
-		}
+		_connection.setStreamWrite(_resp->getStreamWriteFd());
+		_connection.setStreamRead(_resp->getStreamReadFd());
 	}
 }

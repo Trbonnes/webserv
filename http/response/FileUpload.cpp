@@ -15,18 +15,18 @@ FileUpload::FileUpload(
     // opening the ouputStream
     // trying to open this existing file with O_TRUNCK to erase content while writing
     _streamWriteFd = open(_file.c_str(), O_WRONLY | O_TRUNC);
-    std::cout << "00000000000000000 trying to creat file:" << _file <<std::endl;
+    // std::cout << "00000000000000000 trying to creat file:" << _file <<std::endl;
     // if -1 then it doesn't exist
     _statusCode = NO_CONTENT;
     if (_streamWriteFd == -1)
     {
-        std::cout << "FILE DOES NOT EXISTS or error" << std::endl;
+        // std::cout << "FILE DOES NOT EXISTS or error" << std::endl;
         _statusCode = NO_CONTENT; // Should be 201 but the tester expect 204
         // Trying to create the file then
         _streamWriteFd = open(_file.c_str(), O_CREAT | O_WRONLY, S_IRUSR | S_IWUSR);
         if (_streamWriteFd == -1)
         {
-            std::cout << "Failed to create" << _file.c_str() << std::endl;
+            std::cout << "ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo Failed to create " << _file.c_str() << " " << strerror(errno)<< std::endl;
             // TO DO throw error
         }
     }
@@ -39,22 +39,17 @@ FileUpload::FileUpload(
 
 void    FileUpload::handleRead(BufferChain& readChain, BufferChain& writeChain)
 {
-    (void) writeChain;
-
     HttpResponse::handleRead(readChain, writeChain);
-    if (_state.read == DONE && _state.writeStream == DONE)
+    if (_state.writeStream == DONE)
     {
         std::string *buff = getRawHeaders();
         writeChain.pushBack(buff);
-        _state.writeStream = DONE;
         _state.write = READY;
     }
 }
 
 void    FileUpload::handleStreamWrite(BufferChain& readChain, BufferChain& writeChain)
 {
-    (void) readChain;
-
     HttpResponse::handleStreamWrite(readChain, writeChain);
     if (_state.writeStream == DONE)
     {
@@ -74,5 +69,4 @@ void FileUpload::abort()
 
 FileUpload::~FileUpload()
 {
-
 }

@@ -18,27 +18,29 @@ CgiResponse::CgiResponse(ConfigServer* config, HttpRequest* request,std::string 
     if (pipe(cgi_in))
     {
 		// TO DO throw error
-        _statusCode = INTERNAL_SERVER_ERROR;
+        Log::debug("PIPE 1 FAILLLLLLLLLLLED");
         return;
     }
 
     // second pipe
     if (pipe(cgi_out))
     {
+        Log::debug("PIPE 2 FAILLLLLLLLLLLED");
         close(cgi_in[0]);
         close(cgi_in[1]);
 		// TO DO throw error
-        _statusCode = INTERNAL_SERVER_ERROR;
         return;
     }
     // Fork
     _cgipid = fork();
     if (_cgipid < 0)
-		// TO DO throw error
+    {
+        Log::debug("FORK FAILLLLLLLLLLLED");
         _statusCode = INTERNAL_SERVER_ERROR;
+    }		// TO DO throw error
     else if (_cgipid == 0)
     {
-        Log::debug("CGI launched\n");
+        // Log::debug("FORK GOOD");
 
         // Closing unused end in chlid process
         close(cgi_in[SIDE_IN]);
@@ -58,7 +60,6 @@ CgiResponse::CgiResponse(ConfigServer* config, HttpRequest* request,std::string 
     }
     else
     {
-        sleep(1);
         // closing unused pipe in parent and storing fd fd in streams
         close(cgi_in[SIDE_OUT]);
         close(cgi_out[SIDE_IN]);
@@ -139,8 +140,6 @@ void        CgiResponse::setEnv()
     else
         _cgi_env[CONTENT_LENGTH] = ft_strdup(_cgi._content_length.insert(0, "CONTENT_LENGTH=").c_str());
     _cgi_env[NB_METAVARIABLES] = NULL;
-
-    std::cout << "CONTENCT LENGTH FOR CGI " << _cgi_env[CONTENT_LENGTH] << "|" << std::endl;
 }
 
 
@@ -182,10 +181,9 @@ void	CgiResponse::handleStreamRead(BufferChain& readChain, BufferChain& writeCha
 
 			writeChain.pushBack(httpHeaders);
 			writeChain.pushBack(cgiHeaders);
-			std::string *body = Http::chunkify((char*)_streamBuffer.c_str(), pos + 4 , _streamBuffer.size() - pos - 4);
+			std::string *body = Http::chunkify((char*)_streamBuffer.c_str() + pos + 4 , _streamBuffer.size() - pos - 4);
 			writeChain.pushBack(body);
 			_streamBuffer.clear();
-			std::cout << *httpHeaders << *cgiHeaders;
 		}
 		_headersReceived = true;
 	}

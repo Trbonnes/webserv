@@ -40,40 +40,51 @@ void Http::handleRead()
 		{
 			handleHttpError(e.getStatusCode());
 		}
+		catch(const HttpResponse::ConnectionClose& e)
+		{
+			// std::cout << "COnnection is closed by exception" << std::endl;
+			throw;
+		}
 	}
-	checkState();
+	if (_resp)
+		checkState();
 }
 
 void Http::handleWrite()
 {
-		try
-		{
-			if (_resp)
-				_resp->handleWrite(_read_chain, _write_chain);
-		}
-		catch(const HttpResponse::HttpError& e)
-		{
-			handleHttpError(e.getStatusCode());
-		}
-		catch(const HttpResponse::ConnectionClose& e)
-		{
-			std::cout << "===== AN error has been thrown" << std::endl;
-			throw;
-		}
+	try
+	{
+		if (_resp)
+			_resp->handleWrite(_read_chain, _write_chain);
+	}
+	catch(const HttpResponse::HttpError& e)
+	{
+		handleHttpError(e.getStatusCode());
+	}
+	catch(const HttpResponse::ConnectionClose& e)
+	{
+		// std::cout << "COnnection is closed by exception" << std::endl;
+		throw;
+	}
 	checkState();
 }
 
 
 void Http::handleStreamRead()
 {
-	Log::debug("handleStreamRead()");
+	// Log::debug("handleStreamRead()");
 	try
 	{
 		_resp->handleStreamRead(_read_chain, _write_chain);
 	}
-	catch(const std::exception& e)
+	catch(const HttpResponse::HttpError& e)
 	{
-		std::cerr << e.what() << '\n';
+		handleHttpError(e.getStatusCode());
+	}
+	catch(const HttpResponse::ConnectionClose& e)
+	{
+		// std::cout << "COnnection is closed by exception" << std::endl;
+		throw;
 	}
 	checkState();
 }
@@ -84,25 +95,22 @@ void Http::handleStreamWrite()
 	{
 		_resp->handleStreamWrite(_read_chain, _write_chain);
 	}
-	catch(const std::exception& e)
+	catch(const HttpResponse::HttpError& e)
 	{
-		std::cerr << e.what() << '\n';
+		handleHttpError(e.getStatusCode());
+        sleep(50);
+	}
+	catch(const HttpResponse::ConnectionClose& e)
+	{
+		// std::cout << "COnnection is closed by exception" << std::endl;
+		throw;
 	}
 	checkState();
 }
 
 void Http::handleHttpError(int statusCode)
 {
-		_write_chain.flush();		
-		HttpResponse* n = new Error(_resp->getConfig(), _req, _resp->getRoute(), _resp->getLocation(), _write_chain, statusCode);
-		_resp->abort();
-		delete _resp;
-		_resp = n;
 
-}
-
-void	Http::checkState()
-{
 	std::cout << " _read_chain: " << _read_chain;
 	if (_resp)
 	{
@@ -122,29 +130,59 @@ void	Http::checkState()
 		states[HttpResponse::READY] = (char*)"READY";
 		states[HttpResponse::DONE] = (char*)"DONE"; 
 
-		std::cout << " status _read: " << states[_resp->_state.read] << std::endl;
-		std::cout << " status _stream_write: " << states[_resp->_state.writeStream] << std::endl;
-		std::cout << " status _stream_read: " << states[_resp->_state.readStream] << std::endl;
-		std::cout << " status _write: " << states[_resp->_state.write] << std::endl;
+		std::cout << getpid() << " status _read: " << states[_resp->_state.read]
+			<< " status _stream_write: " << states[_resp->_state.writeStream] 
+			<< " status _stream_read: " << states[_resp->_state.readStream]
+			<< " status _write: " << states[_resp->_state.write] << std::endl;
 	}
+		_write_chain.flush();
+		_connection.unsubStreamRead();
+		_connection.unsubStreamWrite();
+		HttpResponse* n = new Error(_resp->getConfig(), _req, _resp->getRoute(), _resp->getLocation(), _write_chain, statusCode);
+		_connection.setStreamRead(n->getStreamReadFd());
+		if (n->getStreamReadFd() != -1)
+			_connection.subStreamRead();
+		_resp->abort();
+		delete _resp;
+		_resp = n;
+		
+		_connection.setStreamRead(_resp->getStreamReadFd());
+		_connection.setStreamWrite(_resp->getStreamWriteFd());
+
+}
+
+void	Http::checkState()
+{
 	
 	
 	if (_resp)
 	{
-		// Unsub
-		if (_resp->_state.read == HttpResponse::DONE)
+		if (_resp->_state.read == HttpResponse::READY)
+			_connection.subRead();
+		else
 			_connection.unsubRead();
-		if (_resp->_state.readStream == HttpResponse::DONE)
-			_connection.unsubStreamRead();
-		if (_resp->_state.writeStream == HttpResponse::DONE || _resp->_state.writeStream == HttpResponse::WAITING)
-			_connection.unsubStreamWrite();
-
-		// Sub
 		if (_resp->_state.readStream == HttpResponse::READY)
 			_connection.subStreamRead();
+		else
+		{
+			_connection.unsubStreamRead();
+			if (_resp->_state.readStream == HttpResponse::DONE)
+				_connection.setStreamRead(-1);
+		}
 		if (_resp->_state.writeStream == HttpResponse::READY)
 			_connection.subStreamWrite();
+		else
+		{
+			_connection.unsubStreamWrite();
+			if (_resp->_state.writeStream == HttpResponse::DONE)
+				_connection.setStreamWrite(-1);
+		}
 		
+		if (_write_chain.getFirst())
+			_connection.subWrite();
+		else
+			_connection.unsubWrite();
+				
 		// End of request
 		if (_resp->_state.read == HttpResponse::DONE && _write_chain.getFirst() == NULL && 
 			(_resp->_state.readStream == HttpResponse::DONE || _resp->_state.readStream == HttpResponse::NONE) &&
@@ -156,8 +194,6 @@ void	Http::checkState()
 				handleRead();
 		}
 	}
-	if (_write_chain.getFirst() &&  (!_resp || _resp->_state.write == HttpResponse::READY))
-		_connection.subWrite();
 	// if there's a buffer, try init a new request
 }
 
@@ -185,6 +221,7 @@ void	Http::reset()
 		}
 		_requestBuffer.clear();
 		_streamBuffer.clear();
+
 }
 
 Http::~Http()

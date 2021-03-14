@@ -10,8 +10,6 @@ public:
 	~Error();
 
 	void	handleRead(BufferChain& readChain, BufferChain& writeChain);
-	void	handleWrite(BufferChain& readChain, BufferChain& writeChain);
-
 };
 
 class HeadersError : public HttpResponse
@@ -21,7 +19,6 @@ public:
 	~HeadersError();
 
 	void	handleRead(BufferChain& readChain, BufferChain& writeChain);
-	void	handleWrite(BufferChain& readChain, BufferChain& writeChain);
 };
 
 #endif // ERROR_HPP
