@@ -69,12 +69,11 @@ CgiResponse::CgiResponse(ConfigServer* config, HttpRequest* request,std::string 
         fcntl(_streamReadFd, F_SETFL, O_NONBLOCK);
 		
 
-        // State update
-		if (request->getContentLength() == -1 && request->getTransferEncoding() != "chunked\r")
+        // STAte update
+        if (_state.read == DONE)
         {
             close(_streamWriteFd);
             _state.writeStream = DONE;
-            _state.read = DONE;
         }
         else
         {

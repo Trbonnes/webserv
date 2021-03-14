@@ -53,6 +53,10 @@ HttpResponse::HttpResponse(ConfigServer* config, HttpRequest* req, std::string r
     _state.writeStream = NONE;
     setDate();
     _maxBodySize = _config->getClientBodySize(_location);
+    if (req->getContentLength() == -1 && req->getTransferEncoding() != "chunked\r")
+    {
+        _state.read = DONE;
+    }
 }
 
 

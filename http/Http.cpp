@@ -211,7 +211,7 @@ void	Http::checkState()
 			(_resp->_state.readStream == HttpResponse::DONE || _resp->_state.readStream == HttpResponse::NONE) &&
 			(_resp->_state.writeStream == HttpResponse::DONE || _resp->_state.writeStream == HttpResponse::NONE))
 		{
-			// std::cout << "======================================= REQUEST END" << std::endl;
+			std::cout << "======================================= REQUEST END" << std::endl;
 			reset();
 			if (_read_chain.size() > 0)
 				handleRead();
