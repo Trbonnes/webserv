@@ -58,8 +58,8 @@ HttpResponse::HttpResponse(ConfigServer* config, HttpRequest* req, std::string r
 
 void HttpResponse::abort()
 {
-    std::cout << "Closing " << _streamWriteFd << std::endl;
-    std::cout << "Closing " << _streamReadFd << std::endl;
+    // std::cout << "Closing " << _streamWriteFd << std::endl;
+    // std::cout << "Closing " << _streamReadFd << std::endl;
 
     // Don't need to close them if they are done
 	if (_state.readStream != NONE && _state.readStream != DONE)
@@ -142,7 +142,7 @@ void HttpResponse::handleStreamRead(BufferChain& readChain, BufferChain& writeCh
     // If it's the end
     {
         
-        std::cout << "Closing " << _streamReadFd << std::endl;
+        // std::cout << "Closing " << _streamReadFd << std::endl;
         // close the stream
         close(_streamReadFd);
         _state.readStream = DONE;
@@ -183,7 +183,7 @@ void HttpResponse::handleStreamWrite(BufferChain& readChain, BufferChain& writeC
     // State update
     if (_state.readStream == DONE || (_state.read == DONE && _streamWriteChain.getFirst() == NULL))
     {
-        std::cout << "Closing in stream write " << _streamWriteFd << std::endl;
+        // std::cout << "Closing in stream write " << _streamWriteFd << std::endl;
         close(_streamWriteFd);
         _state.writeStream = DONE;
     }

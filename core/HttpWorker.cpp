@@ -71,7 +71,7 @@ void	HttpWorker::run()
 			Connection* c = *ic;
 			try
 			{
-				std::cout << "=== > Connection "  << c << std::endl;
+				// std::cout << "=== > Connection "  << c << std::endl;
 				if (c->isStreamWriteReady(&write_fs))
 					c->streamWrite();
 				else if (c->isWriteReady(&write_fs))

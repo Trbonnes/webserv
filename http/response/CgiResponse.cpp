@@ -68,13 +68,23 @@ CgiResponse::CgiResponse(ConfigServer* config, HttpRequest* request,std::string 
         fcntl(_streamWriteFd, F_SETFL, O_NONBLOCK);
         fcntl(_streamReadFd, F_SETFL, O_NONBLOCK);
 		
-		// State update
-		_state.readStream = READY;
-		if (_streamWriteChain.getFirst())
-			_state.writeStream = READY;
-		else
-			_state.writeStream = WAITING;
-	}
+
+        // State update
+		if (request->getContentLength() == -1 && request->getTransferEncoding() != "chunked\r")
+        {
+            close(_streamWriteFd);
+            _state.writeStream = DONE;
+            _state.read = DONE;
+        }
+        else
+        {
+            if (_streamWriteChain.getFirst())
+                _state.writeStream = READY;
+            else
+                _state.writeStream = WAITING;
+        }
+        _state.readStream = READY;
+    }
 }
 
 
@@ -148,6 +158,7 @@ void	CgiResponse::handleStreamRead(BufferChain& readChain, BufferChain& writeCha
 	
 	int ret;
 	size_t pos;
+                std::cout << "dsddddddddddddddddddddddddddd Nothing more to see here" << std::endl;
 
 	if (_headersReceived == false)
 	{

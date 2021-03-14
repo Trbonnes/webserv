@@ -61,7 +61,7 @@ void Connection::setStreamWrite(int fd)
 
 void Connection::subStreamWrite()
 {
-	std::cout << "SUB WRITE " << _stream_write << std::endl;
+	// std::cout << "SUB WRITE " << _stream_write << std::endl;
 	FD_SET(_stream_write, _active_write);
 }
 
@@ -72,7 +72,7 @@ void Connection::setStreamRead(int fd)
 
 void Connection::subStreamRead()
 {
-	std::cout << "SUB READ " << _stream_read << std::endl;
+	// std::cout << "SUB READ " << _stream_read << std::endl;
 	FD_SET(_stream_read, _active_read);
 }
 
@@ -88,13 +88,13 @@ void Connection::unsubRead()
 
 void Connection::unsubStreamWrite()
 {
-	std::cout << "UNSUB WRITE " << _stream_write << std::endl;
+	// std::cout << "UNSUB WRITE " << _stream_write << std::endl;
 	FD_CLR(_stream_write, _active_write);
 }
 
 void Connection::unsubStreamRead()
 {
-	std::cout << "UNSUB READ " << _stream_read << std::endl;
+	// std::cout << "UNSUB READ " << _stream_read << std::endl;
 	FD_CLR(_stream_read, _active_read);
 }
 
