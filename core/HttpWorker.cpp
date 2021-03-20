@@ -64,7 +64,10 @@ void	HttpWorker::run()
 		// New connection
 		for (il = _listen_socket.begin(); il != _listen_socket.end(); il++)
 			if (FD_ISSET(il->getSock(), &read_fs))
+			{
+				std::cout << "New Connection !" << std::endl;
 				acceptConnection(il->getSock());
+			}
 		ic = _connections.begin();
 		while (ic != _connections.end())
 		{
@@ -73,7 +76,7 @@ void	HttpWorker::run()
 			{
 				// std::cout << "=== > Connection "  << c << std::endl;
 				if (c->isStreamWriteReady(&write_fs))
-					c->streamWrite();
+					c->streamWrite(); // TO DO remove the else if
 				else if (c->isWriteReady(&write_fs))
 					c->write();
 				else if (c->isStreamReadReady(&read_fs))
@@ -83,7 +86,8 @@ void	HttpWorker::run()
 			}
 			catch(const std::exception& e)
 			{
-				Log::debug("Connection close");
+				// Log::debug("Connection close");
+				std::cout << "=== > Connection closed "  << c << std::endl;
 				ic = _connections.erase(ic);
 				delete c;
 				continue;

@@ -157,7 +157,7 @@ void	CgiResponse::handleStreamRead(BufferChain& readChain, BufferChain& writeCha
 	
 	int ret;
 	size_t pos;
-                std::cout << "dsddddddddddddddddddddddddddd Nothing more to see here" << std::endl;
+                // std::cout << "dsddddddddddddddddddddddddddd Nothing more to see here" << std::endl;
 
 	if (_headersReceived == false)
 	{
@@ -167,6 +167,7 @@ void	CgiResponse::handleStreamRead(BufferChain& readChain, BufferChain& writeCha
 			if (ret == 0)
 			{
 				_state.readStream = DONE;
+                close(_streamReadFd);
 				return;
 			}
 			_streamBuffer.append(*_streamReadChain.getFirst());
@@ -191,8 +192,13 @@ void	CgiResponse::handleStreamRead(BufferChain& readChain, BufferChain& writeCha
 
 			writeChain.pushBack(httpHeaders);
 			writeChain.pushBack(cgiHeaders);
-			std::string *body = Http::chunkify((char*)_streamBuffer.c_str() + pos + 4 , _streamBuffer.size() - pos - 4);
-			writeChain.pushBack(body);
+            std::string *body;
+
+            if (_streamBuffer.size() > pos + 4)
+            {
+			    body = Http::chunkify((char*)_streamBuffer.c_str() + pos + 4 , _streamBuffer.size() - pos - 4);
+                writeChain.pushBack(body);
+            }
 			_streamBuffer.clear();
 		}
 		_headersReceived = true;

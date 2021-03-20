@@ -62,8 +62,6 @@ HttpResponse::HttpResponse(ConfigServer* config, HttpRequest* req, std::string r
 
 void HttpResponse::abort()
 {
-    // std::cout << "Closing " << _streamWriteFd << std::endl;
-    // std::cout << "Closing " << _streamReadFd << std::endl;
 
     // Don't need to close them if they are done
 	if (_state.readStream != NONE && _state.readStream != DONE)
@@ -77,7 +75,7 @@ void HttpResponse::abort()
 void HttpResponse::handleRead(BufferChain& readChain, BufferChain& writeChain)
 {
     (void) writeChain;
-    Log::debug("HttpResponse::handleRead()");
+    // Log::debug("HttpResponse::handleRead()");
     bool	end = false;
 
 	if (_request->getTransferEncoding() == "chunked\r") // TO DO why the f do i have to add \r
@@ -119,14 +117,14 @@ void HttpResponse::handleRead(BufferChain& readChain, BufferChain& writeChain)
 
 void HttpResponse::handleWrite(BufferChain& readChain, BufferChain& writeChain)
 {
-    Log::debug("HttpResponse::handleWrite()");
+    // Log::debug("HttpResponse::handleWrite()");
     (void) writeChain;
     (void) readChain;
 }
 
 void HttpResponse::handleStreamRead(BufferChain& readChain, BufferChain& writeChain)
 {
-    Log::debug("HttpResponse::handleStreamRead()");
+    // Log::debug("HttpResponse::handleStreamRead()");
     (void) readChain;
     (void) writeChain;
 
@@ -155,7 +153,7 @@ void HttpResponse::handleStreamRead(BufferChain& readChain, BufferChain& writeCh
 
 void HttpResponse::handleStreamWrite(BufferChain& readChain, BufferChain& writeChain)
 {
-    Log::debug("HttpResponse::handleStreamWrite()");
+    // Log::debug("HttpResponse::handleStreamWrite()");
     (void) readChain;
     (void) writeChain;
     int ret;
@@ -165,7 +163,7 @@ void HttpResponse::handleStreamWrite(BufferChain& readChain, BufferChain& writeC
         std::string* buff = _streamWriteChain.getFirst();
         // since the fds are non blocking we check if some bytes are left 
         if ((size_t) ret < buff->size())
-        {
+        { 
             std::string * leftovers = new std::string();
             leftovers->reserve(buff->size() - ret);
             leftovers->append(*buff, ret);
