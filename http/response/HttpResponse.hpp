@@ -117,9 +117,12 @@ public:
 	void        	setServerName();
 	void        	setContentLocation();
 	void        	setDate();
-	void  	      	setCharset(void);
+	void  	      setCharset(void);
 	void    	    setContentType();
 	void        	setLastModified(struct stat* file);
+	void					setStreamReadFd(int fd);
+	void					setStreamWriteFd(int fd);
+
 
 
 	// Returns a newResponse based on the Request and Conffiguration

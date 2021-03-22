@@ -22,11 +22,13 @@ void	HttpWorker::acceptConnection(int s)
 	{
 		Connection *c = new Connection(s, &_active_read, &_active_write, _config);
 		_connections.push_front(c);
+		std::cout << "Connection pointer value" << c << std::endl;
 		FD_SET(c->getSock(), &_active_read);
 		// std::cerr << "New connection " << c->getSock() << std::endl;
 	}
 	catch(const std::exception& e)
 	{
+		std::cout << "Couldn't open connection : " << e.what() << std::endl;
 	}
 }
 
@@ -52,6 +54,7 @@ void	HttpWorker::run()
 		read_fs = _active_read;
 		write_fs = _active_write;
 		Log::debug("Select");
+		std::cout << "================================================= SELECT" << std::endl;
 		if (select(FD_SETSIZE, &read_fs, &write_fs, NULL, NULL) == -1)
 		{
 			if (g_server->getStatus() == HttpServer::STOPPING)
@@ -59,6 +62,7 @@ void	HttpWorker::run()
 			else
 				std::cerr << "oooooooooooooooooooooooooooooooooooooooo>>> Select error: " << strerror(errno) << std::endl;
 		}
+		Log::debug("After select");
 		if (g_server->getStatus() == HttpServer::STOPPING)
 				break;
 		// New connection
@@ -72,16 +76,23 @@ void	HttpWorker::run()
 		while (ic != _connections.end())
 		{
 			Connection* c = *ic;
+			std::cout << "=== Connection Event "  << c << std::endl;
 			try
 			{
-				// std::cout << "=== > Connection "  << c << std::endl;
+				// std::cout << "=============== status : " << FD_ISSET(63, &_active_read) << std::endl;
+				std::cout << c->isStreamWriteReady(&write_fs) << c->isWriteReady(&write_fs) << c->isStreamReadReady(&read_fs) << c->isReadReady(&read_fs) << std::endl;
 				if (c->isStreamWriteReady(&write_fs))
-					c->streamWrite(); // TO DO remove the else if
-				else if (c->isWriteReady(&write_fs))
+					c->streamWrite();
+				// std::cout << "=============== status : " << FD_ISSET(63, &_active_read) << std::endl;
+				
+				if (c->isWriteReady(&write_fs))
 					c->write();
-				else if (c->isStreamReadReady(&read_fs))
+				// std::cout << "=============== status : " << FD_ISSET(63, &_active_read) << std::endl;
+				
+				if (c->isStreamReadReady(&read_fs))
 					c->streamRead();
-				else if (c->isReadReady(&read_fs))
+				// std::cout << "=============== status : " << FD_ISSET(63, &_active_read) << std::endl;
+				if (c->isReadReady(&read_fs))
 					c->read();
 			}
 			catch(const std::exception& e)
@@ -89,6 +100,11 @@ void	HttpWorker::run()
 				// Log::debug("Connection close");
 				std::cout << "=== > Connection closed "  << c << std::endl;
 				ic = _connections.erase(ic);
+				std::cout << "Lenght : " << _connections.size() << std::endl;
+				if (_connections.size() == 1)
+				{
+					std::cout << *_connections.begin() << std::endl;
+				}
 				delete c;
 				continue;
 			}

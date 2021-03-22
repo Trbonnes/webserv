@@ -21,8 +21,10 @@ FileDownload::FileDownload(ConfigServer* config, HttpRequest* request,std::strin
 	else
 	{
 		// TO DO throw error
+        std::cout << "FILE ERROR" << std::endl;
 	}
 	_streamReadFd = fd;
+    std::cout << "New file fd" << _streamReadFd << std::endl;
     _state.read = DONE;
     _state.readStream = READY;
 }

@@ -64,10 +64,16 @@ void HttpResponse::abort()
 {
 
     // Don't need to close them if they are done
-	if (_state.readStream != NONE && _state.readStream != DONE)
+	if (_streamReadFd != -1)
+    {
 		close(_streamReadFd);
-	if (_state.writeStream != NONE && _state.writeStream != DONE)
-		close(_streamWriteFd);
+        std::cout << "Closing " << _streamReadFd << std::endl;
+    }
+	if (_streamWriteFd != -1)
+	{
+    	close(_streamWriteFd);
+        std::cout << "Closing " << _streamWriteFd << std::endl;
+    }
     _streamReadChain.flush();
     _streamWriteChain.flush();
 }
@@ -104,15 +110,10 @@ void HttpResponse::handleRead(BufferChain& readChain, BufferChain& writeChain)
     {
         _state.read = DONE;
         if (_streamWriteChain.getFirst() == NULL)
-        {
-            close(_streamWriteFd);
             _state.writeStream = DONE;
-        }
     }
     if (_state.writeStream == WAITING && _streamWriteChain.getFirst())
-    {
         _state.writeStream = READY;
-    }
 }
 
 void HttpResponse::handleWrite(BufferChain& readChain, BufferChain& writeChain)
@@ -143,10 +144,8 @@ void HttpResponse::handleStreamRead(BufferChain& readChain, BufferChain& writeCh
 	if (ret == 0)
     // If it's the end
     {
-        
-        // std::cout << "Closing " << _streamReadFd << std::endl;
-        // close the stream
-        close(_streamReadFd);
+        std::cout << "End of stream reached" << std::endl;
+        std::cout << "Closing " << _streamReadFd << std::endl;
         _state.readStream = DONE;
     }
 }
@@ -185,8 +184,6 @@ void HttpResponse::handleStreamWrite(BufferChain& readChain, BufferChain& writeC
     // State update
     if (_state.readStream == DONE || (_state.read == DONE && _streamWriteChain.getFirst() == NULL))
     {
-        // std::cout << "Closing in stream write " << _streamWriteFd << std::endl;
-        close(_streamWriteFd);
         _state.writeStream = DONE;
     }
     else if (_streamWriteChain.getFirst() == NULL)
@@ -482,6 +479,16 @@ FD				HttpResponse::getStreamReadFd()
 FD				HttpResponse::getStreamWriteFd()
 {
     return _streamWriteFd;
+}
+
+void			HttpResponse::setStreamReadFd(int fd)
+{
+    _streamReadFd = fd;
+}
+
+void			HttpResponse::setStreamWriteFd(int fd)
+{
+    _streamWriteFd = fd;
 }
 
 std::string&	HttpResponse::getRoute()
