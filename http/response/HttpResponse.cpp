@@ -67,12 +67,12 @@ void HttpResponse::abort()
 	if (_streamReadFd != -1)
     {
 		close(_streamReadFd);
-        std::cout << "Closing " << _streamReadFd << std::endl;
+        // std::cout << "Closing " << _streamReadFd << std::endl;
     }
 	if (_streamWriteFd != -1)
 	{
     	close(_streamWriteFd);
-        std::cout << "Closing " << _streamWriteFd << std::endl;
+        // std::cout << "Closing " << _streamWriteFd << std::endl;
     }
     _streamReadChain.flush();
     _streamWriteChain.flush();
@@ -144,8 +144,8 @@ void HttpResponse::handleStreamRead(BufferChain& readChain, BufferChain& writeCh
 	if (ret == 0)
     // If it's the end
     {
-        std::cout << "End of stream reached" << std::endl;
-        std::cout << "Closing " << _streamReadFd << std::endl;
+        // std::cout << "End of stream reached" << std::endl;
+        // std::cout << "Closing " << _streamReadFd << std::endl;
         _state.readStream = DONE;
     }
 }

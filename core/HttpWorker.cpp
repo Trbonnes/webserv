@@ -53,8 +53,8 @@ void	HttpWorker::run()
 	{
 		read_fs = _active_read;
 		write_fs = _active_write;
-		Log::debug("Select");
-		std::cout << "================================================= SELECT" << std::endl;
+		// Log::debug("Select");
+		// std::cout << "================================================= SELECT" << std::endl;
 		if (select(FD_SETSIZE, &read_fs, &write_fs, NULL, NULL) == -1)
 		{
 			if (g_server->getStatus() == HttpServer::STOPPING)
@@ -62,7 +62,7 @@ void	HttpWorker::run()
 			else
 				std::cerr << "oooooooooooooooooooooooooooooooooooooooo>>> Select error: " << strerror(errno) << std::endl;
 		}
-		Log::debug("After select");
+		// Log::debug("After select");
 		if (g_server->getStatus() == HttpServer::STOPPING)
 				break;
 		// New connection
@@ -76,11 +76,11 @@ void	HttpWorker::run()
 		while (ic != _connections.end())
 		{
 			Connection* c = *ic;
-			std::cout << "=== Connection Event "  << c << std::endl;
+			// std::cout << "=== Connection Event "  << c << std::endl;
 			try
 			{
 				// std::cout << "=============== status : " << FD_ISSET(63, &_active_read) << std::endl;
-				std::cout << c->isStreamWriteReady(&write_fs) << c->isWriteReady(&write_fs) << c->isStreamReadReady(&read_fs) << c->isReadReady(&read_fs) << std::endl;
+				// std::cout << c->isStreamWriteReady(&write_fs) << c->isWriteReady(&write_fs) << c->isStreamReadReady(&read_fs) << c->isReadReady(&read_fs) << std::endl;
 				if (c->isStreamWriteReady(&write_fs))
 					c->streamWrite();
 				// std::cout << "=============== status : " << FD_ISSET(63, &_active_read) << std::endl;

@@ -76,7 +76,7 @@ void Connection::subStreamWrite()
 
 void Connection::subStreamRead()
 {
-	std::cout << "SUB STREAM READ " << _stream_read << std::endl;
+	// std::cout << "SUB STREAM READ " << _stream_read << std::endl;
 	FD_SET(_stream_read, _active_read);
 }
 
@@ -99,7 +99,7 @@ void Connection::unsubStreamWrite()
 
 void Connection::unsubStreamRead()
 {
-	std::cout << "UNSUB STREAM READ " << _stream_read << std::endl;
+	// std::cout << "UNSUB STREAM READ " << _stream_read << std::endl;
 	// std::cout << "UNSUB READ " << _stream_read << std::endl;
 	if (_stream_read != -1)
 		FD_CLR(_stream_read, _active_read);
@@ -145,7 +145,7 @@ int	Connection::isStreamReadReady(fd_set* set)
 
 void Connection::read()
 {
-	Log::debug("Connection::read");
+	// Log::debug("Connection::read");
 	int read;
 	
 	try
@@ -166,7 +166,7 @@ void Connection::read()
 
 void Connection::write()
 {
-	Log::debug("Connection::write");
+	// Log::debug("Connection::write");
 	try
 	{
 		BufferChain::writeBufferToFd(_write_chain, _socket);
@@ -185,7 +185,7 @@ void Connection::write()
 
 void Connection::streamWrite()
 {
-	Log::debug("Connection::streamWrite");
+	// Log::debug("Connection::streamWrite");
 	try
 	{
 		_module.handleStreamWrite();
@@ -198,7 +198,7 @@ void Connection::streamWrite()
 
 void Connection::streamRead()
 {
-	Log::debug("Connection::streamRead");
+	// Log::debug("Connection::streamRead");
 	try
 	{
 		_module.handleStreamRead();
