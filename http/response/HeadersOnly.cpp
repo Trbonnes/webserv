@@ -35,11 +35,19 @@ HeadersOnly::HeadersOnly(ConfigServer* config, HttpRequest* request, std::string
 	_state.write = READY;
 }
 
-HeadersOnly::HeadersOnly(ConfigServer* config, HttpRequest* request, std::string& route, std::string& location, BufferChain& writeChain) : HttpResponse(config, request, route, location)
+HeadersOnly::HeadersOnly(ConfigServer* config, HttpRequest* request, std::string& route, std::string& location, BufferChain& writeChain, std::string& method) : HttpResponse(config, request, route, location)
 {
 	(void) writeChain;
 	_contentLength = 0;
+	if (method == "OPTIONS")
+		_statusCode = NO_CONTENT;
+	if (_state.read == DONE)
+	{
+		writeChain.pushBack(getRawHeaders());
+		_state.write = READY;
+	}
 }
+
 
 void	HeadersOnly::handleRead(BufferChain& readChain, BufferChain& writeChain)
 {

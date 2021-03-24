@@ -157,7 +157,7 @@ void Http::handleHttpError(int statusCode)
 
 void	Http::checkState()
 {
-	std::cout << "---------------------- STATE" << std::endl;
+	// std::cout << "---------------------- STATE" << std::endl;
 	
 	if (_resp)
 	{

@@ -374,10 +374,8 @@ HttpResponse* HttpResponse::newResponse(HttpRequest *request, ConfigServer *conf
         {
             return new FileUpload(config, request, route, location);
         }
-        if (method == "POST")
-        {
-            return new HeadersOnly(config, request, route, location, writeChain);
-        }
+        if (method == "POST" || method == "OPTIONS")
+            return new HeadersOnly(config, request, route, location, writeChain, method);
     }
     // If else the method is not allowed
     else
