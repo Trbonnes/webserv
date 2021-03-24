@@ -12,11 +12,11 @@ void Http::handleNewRequest()
 	// If the end of headers are reached
 	if ((pos = _requestBuffer.find("\r\n\r\n")) != _requestBuffer.npos) // TO DO might have to hcange this for small buffers
 	{
-		// std::cout << "================================== REQUEST START" << std::endl;
+		// std::cout << "===>=============================== REQUEST START" << std::endl;
 		std::string request;
 		request.append(_requestBuffer, 0, pos + 1); // TO DO realloc good ?
 		
-		// Log::debug(request);
+		Log::debug(request);
 		// if pos is before that, then there's some body left
 		if (pos < _requestBuffer.size() - 4)
 		{

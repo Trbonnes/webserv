@@ -152,6 +152,8 @@ void Connection::read()
 	{
 		read = BufferChain::readToBuffer(_read_chain, _socket);
 		// Log::debug(read);
+		std::cout << "@@@@@@@@@ Connection read" << std::endl;
+		std::cout << _read_chain << std::endl;
 	}
 	catch(const BufferChain::IOError& e)
 	{

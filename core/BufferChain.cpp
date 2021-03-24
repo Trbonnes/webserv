@@ -135,7 +135,11 @@ std::ostream&	operator<<(std::ostream& out, BufferChain& chain)
 	out << "BufferChain: .size=" << chain.size() << std::endl;
 	while (it != chain.end())
 	{
-		std::string toprint = (**it).size() > 10 ? std::string(**it, 0, 7).append("...") : **it;
+		std::string toprint;
+		if ((**it).size() > 1000)
+			std::string toprint = (**it).size() > 10 ? std::string(**it, 0, 7).append("...") : **it;
+		else
+			toprint = **it;
 		std::replace(toprint.begin(), toprint.end(), '\n', 'N');
 		std::replace(toprint.begin(), toprint.end(), '\r', 'R');
 		out << "|";

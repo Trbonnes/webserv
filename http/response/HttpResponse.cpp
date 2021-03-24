@@ -100,17 +100,17 @@ void HttpResponse::handleRead(BufferChain& readChain, BufferChain& writeChain)
 		end = HttpRequest::extractBody(readChain, _streamWriteChain, _request);
 	}
 
-    // check if payload too large
-    if (_maxBodySize != -1)
-    {
-        if ((int)_streamWriteChain.totalSize() > _maxBodySize)
-            throw HttpError(REQUEST_ENTITY_TOO_LARGE);
-    }
     if (end)
     {
         _state.read = DONE;
         if (_streamWriteChain.getFirst() == NULL)
             _state.writeStream = DONE;
+    }
+    // check if payload too large
+    if (_maxBodySize != -1)
+    {
+        if ((int)_streamWriteChain.totalSize() > _maxBodySize)
+            throw HttpError(REQUEST_ENTITY_TOO_LARGE);
     }
     if (_state.writeStream == WAITING && _streamWriteChain.getFirst())
         _state.writeStream = READY;
