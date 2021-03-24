@@ -339,52 +339,60 @@ HttpResponse* HttpResponse::newResponse(HttpRequest *request, ConfigServer *conf
     if (isCgiExtension(config, location, extension) && isMethodAllowedCGI(config, request->getMethod(), location))
         return  new CgiResponse(config, request, route, location);
 
-    // If it's not CGI check if the method is authorized
-    if (isMethodAllowed(config, method, location))
+    try
     {
-        if (method == "GET")
+        // If it's not CGI check if the method is authorized
+        if (isMethodAllowed(config, method, location))
         {
-            struct stat file;
-            
-            if (stat(route.c_str(), &file))
-                return new Error(config, request, route, location, writeChain, NOT_FOUND);
-            if (!(file.st_mode & S_IRUSR))
-                return new Error(config, request, route, location, writeChain, FORBIDDEN);
-            if (S_ISREG(file.st_mode))
-                return new FileDownload(config, request, route, location, writeChain, &file);
-            if (S_ISDIR(file.st_mode))
+            if (method == "GET")
             {
-                if (config->getAutoindex(location) == true)
-                        return new FolderIndex(config, request, route, location, writeChain, &file);
-                else
+                struct stat file;
+                
+                if (stat(route.c_str(), &file))
+                    return new Error(config, request, route, location, writeChain, NOT_FOUND);
+                if (!(file.st_mode & S_IRUSR))
                     return new Error(config, request, route, location, writeChain, FORBIDDEN);
+                if (S_ISREG(file.st_mode))
+                    return new FileDownload(config, request, route, location, writeChain, &file);
+                if (S_ISDIR(file.st_mode))
+                {
+                    if (config->getAutoindex(location) == true)
+                            return new FolderIndex(config, request, route, location, writeChain, &file);
+                    else
+                        return new Error(config, request, route, location, writeChain, FORBIDDEN);
+                }
             }
+            if (method == "HEAD")
+            {
+                struct stat file;
+                
+                if (stat(route.c_str(), &file))
+                    return new HeadersError(config, request, route, location, writeChain, NOT_FOUND);
+                if (!(file.st_mode & S_IRUSR))
+                    return new HeadersError(config, request, route, location, writeChain, FORBIDDEN);
+                return new HeadersOnly(config, request, route, location, writeChain, &file);
+            }
+            if (method == "PUT")
+                return new FileUpload(config, request, route, location);
+            if (method == "POST" || method == "OPTIONS")
+                return new HeadersOnly(config, request, route, location, writeChain, method);
+            if (method == "DELETE")
+                return new FileDelete(config, request, route, location, writeChain);
         }
-        if (method == "HEAD")
-        {
-            struct stat file;
-            
-            if (stat(route.c_str(), &file))
-                return new HeadersError(config, request, route, location, writeChain, NOT_FOUND);
-            if (!(file.st_mode & S_IRUSR))
-                return new HeadersError(config, request, route, location, writeChain, FORBIDDEN);
-            return new HeadersOnly(config, request, route, location, writeChain, &file);
-        }
-        if (method == "PUT")
-        {
-            return new FileUpload(config, request, route, location);
-        }
-        if (method == "POST" || method == "OPTIONS")
-            return new HeadersOnly(config, request, route, location, writeChain, method);
-    }
-    // If else the method is not allowed
-    else
-    {
-        if(method == "HEAD")
-            return new HeadersError(config, request, route, location, writeChain, METHOD_NOT_ALLOWED);
+        // If else the method is not allowed
         else
-            return new Error(config, request, route, location, writeChain, METHOD_NOT_ALLOWED);
+        {
+            if(method == "HEAD")
+                return new HeadersError(config, request, route, location, writeChain, METHOD_NOT_ALLOWED);
+            else
+                return new Error(config, request, route, location, writeChain, METHOD_NOT_ALLOWED);
+        }
     }
+    catch(const HttpError& e)
+    {
+        return new Error(config, request, route, location, writeChain, e.getStatusCode());
+    }
+    
 
     return NULL;
 }

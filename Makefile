@@ -38,6 +38,7 @@ HTTPSRC =	http/Http.cpp \
 			http/response/HeadersError.cpp \
 			http/response/FileDownload.cpp \
 			http/response/FileUpload.cpp \
+			http/response/FileDelete.cpp \
 			http/response/FolderIndex.cpp \
 			http/response/HeadersOnly.cpp \
 			http/response/CgiResponse.cpp \
@@ -62,16 +63,19 @@ HEADERS = 	core/Location.hpp \
 			core/ConfigServer.hpp \
 			core/HttpServer.hpp \
 			core/utils/utils.hpp \
+			core/BufferChain.hpp \
+			core/Connection.hpp \
 			http/statusCodes.hpp \
 			http/Http.hpp \
-			http/response/HttpResponse.hpp \
-			http/response/FileDownload.hpp \
-			http/response/FolderIndex.hpp \
+			http/HttpRequest.hpp \
 			http/response/CgiResponse.hpp \
 			http/response/Error.hpp \
-			http/HttpRequest.hpp \
-			core/BufferChain.hpp \
-			core/Connection.hpp
+			http/response/FileDownload.hpp \
+			http/response/FileUpload.hpp \
+			http/response/FolderIndex.hpp \
+			http/response/HeadersOnly.hpp \
+			http/response/HttpResponse.hpp
+
 
 
 INCLUDES = -I .

@@ -1,6 +1,10 @@
 #include "HeadersOnly.hpp"
 
 
+HeadersOnly::HeadersOnly(ConfigServer* config, HttpRequest* request, std::string& route, std::string& location) : HttpResponse(config, request, route, location) 
+{
+}
+
 // HEAD
 HeadersOnly::HeadersOnly(ConfigServer* config, HttpRequest* request, std::string& route, std::string& location, BufferChain& writeChain, struct stat* file) : HttpResponse(config, request, route, location) 
 {
