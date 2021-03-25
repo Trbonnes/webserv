@@ -18,6 +18,7 @@ HttpResponse::HttpResponse()
     _charset = "";
     _retryAfter = "";
     _transferEncoding = "";
+    _wwwAuthenticate = "OK";
     _state.read = READY;
     _state.write = WAITING;
     _state.readStream = NONE;
@@ -47,6 +48,7 @@ HttpResponse::HttpResponse(ConfigServer* config, HttpRequest* req, std::string r
     _charset = "";
     _retryAfter = "";
     _transferEncoding = "";
+    _wwwAuthenticate = "OK";
     _state.read = READY;
     _state.write = WAITING;
     _state.readStream = NONE;
@@ -312,6 +314,30 @@ static std::string        createRoute(ConfigServer* config, HttpRequest* req, st
     return route;
 }
 
+
+// ** Check if the autorization mode is on and if the user is authorized to make the request **
+static bool            isAuthorized(ConfigServer* config, HttpRequest* request, std::string& location)
+{
+    size_t  length;
+
+    if (config->getAuth_basic(location).compare("") != 0)
+    {
+        if (request->getAuthorization().compare("") == 0)
+            return false;
+        std::vector<std::string> authorizations = config->getAuthorizations(location);
+        std::vector<std::string>::iterator itBegin = authorizations.begin();
+        std::vector<std::string>::iterator itEnd = authorizations.end();
+        for(; itBegin != itEnd; itBegin++) {
+            length = request->getAuthorization().length();
+            if (base64_decode(request->getAuthorization().substr(6, length)).compare(*itBegin) == 0)
+                return true;
+        }
+         return false;
+    }
+    return true;
+}
+
+
 HttpResponse* HttpResponse::newResponse(HttpRequest *request, ConfigServer *config, BufferChain& writeChain)
 {
 	std::string uri;
@@ -329,8 +355,10 @@ HttpResponse* HttpResponse::newResponse(HttpRequest *request, ConfigServer *conf
     // set the route of the ressource
     route = createRoute(config, request, location);
 
-    // TO DO insert authorization mechanic
+    // Autorization
 
+    if (!isAuthorized(config, request, location))
+        return new Error(config, request, route, location, writeChain, UNAUTHORIZED);
 
     // // If it's a CGI request we must fork and prepare the stream in and out
     size_t pos = route.find_last_of('.');
@@ -418,7 +446,6 @@ std::string* HttpResponse::getRawHeaders()
         buff->append("Content-Length: ").append(tmp).append("\r\n");
         free(tmp);
     }
-
     if (_request->getMethod().compare("OPTIONS") == 0 || _statusCode == METHOD_NOT_ALLOWED)
     {
         std::vector<std::string>::iterator it;
@@ -428,16 +455,8 @@ std::string* HttpResponse::getRawHeaders()
 
         buff->append("Allow: ");
         extension = _route.find_last_of('.');
-        // if (is_good_exe(str.assign(_route).erase(0, extension + 1)))
-        // {
-        //     it = _config->getCGI_allow(_location).begin();
-        //     itEnd = _config->getCGI_allow(_location).end();
-        // }
-        // else
-        // {
-            it = _config->getAllow(_location).begin();
-            itEnd = _config->getAllow(_location).end();
-        // }
+        it = _config->getAllow(_location).begin();
+        itEnd = _config->getAllow(_location).end();
         while (it != itEnd)
         {
             buff->append(*it).append(" ");

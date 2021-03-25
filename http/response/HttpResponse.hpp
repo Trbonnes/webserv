@@ -41,24 +41,24 @@ class HttpResponse
 	BufferChain					_streamWriteChain;
 	BufferChain					_streamReadChain;
 
-    // Utils
-    std::string                 _route;
+	// Utils
+	std::string                 _route;
 
-    // headers
-    int                         _statusCode;
-    std::vector<std::string>    _allow;
-    std::string                 _wwwAuthenticate;
-    std::string                 _referer;
-    char                        _lastModified[100];
-    char                        _date[100];
-    std::string                 _server;
-    std::string                 _contentLanguage;
-    int                         _contentLength;
-    std::string                 _contentLocation;
-    std::string                 _contentType;
-    std::string                 _charset;
-    std::string                 _retryAfter;
-    std::string                 _transferEncoding;
+	// headers
+	int                         _statusCode;
+	std::vector<std::string>    _allow;
+	std::string                 _wwwAuthenticate;
+	std::string                 _referer;
+	char                        _lastModified[100];
+	char                        _date[100];
+	std::string                 _server;
+	std::string                 _contentLanguage;
+	int                         _contentLength;
+	std::string                 _contentLocation;
+	std::string                 _contentType;
+	std::string                 _charset;
+	std::string                 _retryAfter;
+	std::string                 _transferEncoding;
 
 public:
 
@@ -144,6 +144,9 @@ public:
 			const char * what () const throw () {return "Closing the connection";}
 	};
 };
+
+
+std::string   base64_decode(std::string const& encoded_string);
 
 #include "http/response/HeadersOnly.hpp"
 #include "http/response/Error.hpp"
