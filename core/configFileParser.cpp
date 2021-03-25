@@ -6,7 +6,7 @@
 /*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/14 08:46:39 by trbonnes          #+#    #+#             */
-/*   Updated: 2021/03/01 16:52:01 by user42           ###   ########.fr       */
+/*   Updated: 2021/03/25 09:42:49 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,6 +53,8 @@ std::vector<std::string>		readAuthFile(std::string file) {
 			free(line);
 			line = NULL;
 		}
+		if(line)
+			v.push_back(line);
 		free(line);
 		line = NULL;
 		close(fd);
