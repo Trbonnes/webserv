@@ -2,6 +2,28 @@
 <html>
 <body>
 
+<style>
+
+	@keyframes pulse {
+		0% {color: black;font-size: 2em;}
+		50% {color:red;font-size: 3em;}
+		100% {color:black;font-size: 2em;}
+	}
+
+	body
+	{
+		margin: 0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		height: 100vh;
+	}
+	h1
+	{
+		animation: pulse 1s infinite;
+	}
+</style>
+
 <h1>404 NOT FOUND - CUSTOM</h1>
 
 </body>
