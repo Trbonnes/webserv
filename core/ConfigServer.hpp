@@ -6,7 +6,7 @@
 /*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/09 12:19:51 by trbonnes          #+#    #+#             */
-/*   Updated: 2021/03/01 16:46:19 by user42           ###   ########.fr       */
+/*   Updated: 2021/03/26 16:42:16 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,7 @@
 # include "utils/utils.hpp"
 # include "Compare.hpp"
 # include "Location.hpp"
+# include "Log.hpp"
 
 class	ConfigServer {
 private:

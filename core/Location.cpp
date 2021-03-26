@@ -7,6 +7,7 @@ Location::Location() :
 	_language(0),
     _auth_basic(""),
     _auth_basic_user_file(""),
+	_authorizations(0),
 
 	_location(""),
 	_cgi(0),
@@ -27,6 +28,7 @@ Location::Location(const Location &c) {
     _language = c._language;
     _auth_basic = c._auth_basic;
     _auth_basic_user_file = c._auth_basic_user_file;
+	_authorizations = c._authorizations;
 	_location = c._location;
 	_cgi = c._cgi;
 	_cgi_allow = c._cgi_allow;
@@ -49,6 +51,7 @@ Location &Location::operator=(const Location &c) {
     _language = c._language;
     _auth_basic = c._auth_basic;
     _auth_basic_user_file = c._auth_basic_user_file;
+	_authorizations = c._authorizations;
 	_location = c._location;
 	_cgi = c._cgi;
 	_cgi_allow = c._cgi_allow;
