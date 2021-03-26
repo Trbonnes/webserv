@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ConfigServer.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: yorn <yorn@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/09 15:13:35 by trbonnes          #+#    #+#             */
-/*   Updated: 2021/03/25 01:06:09 by yorn             ###   ########.fr       */
+/*   Updated: 2021/03/26 16:42:02 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -105,6 +105,7 @@ ConfigServer::ConfigServer(const ConfigServer &copy)
     _defaultLanguage = copy._defaultLanguage;
     _defaultAuth_basic = copy._defaultAuth_basic;
     _defaultAuth_basic_user_file = copy._defaultAuth_basic_user_file;
+	_defaultAuthorizations = copy._defaultAuthorizations;
     _defaultAutoindex = copy._defaultAutoindex;
 	_defaultCgi = copy._defaultCgi;
 	_defaultCgi_allow = copy._defaultCgi_allow;
@@ -135,6 +136,7 @@ ConfigServer                  &ConfigServer::operator=(ConfigServer const &rhs)
     _defaultLanguage = rhs._defaultLanguage;
     _defaultAuth_basic = rhs._defaultAuth_basic;
     _defaultAuth_basic_user_file = rhs._defaultAuth_basic_user_file;
+	_defaultAuthorizations = rhs._defaultAuthorizations;
     _defaultAutoindex = rhs._defaultAutoindex;
 	_defaultCgi = rhs._defaultCgi;
 	_defaultCgi_allow = rhs._defaultCgi_allow;
