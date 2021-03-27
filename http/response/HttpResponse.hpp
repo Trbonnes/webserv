@@ -91,7 +91,7 @@ public:
 	virtual ~HttpResponse();
 
 	//public funciton
-	std::string *getRawHeaders();
+	virtual std::string *getRawHeaders();
 	
 	// public virtual fucntions
 	// abort the current request

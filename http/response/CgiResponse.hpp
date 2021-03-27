@@ -71,7 +71,8 @@ private:
 	void        setEnv();
 
 public:
-	CgiResponse(ConfigServer* config, HttpRequest* request,std::string route, std::string location);
+	CgiResponse(ConfigServer* config, HttpRequest* request,std::string route, std::string location,  BufferChain& writeChain);
+	std::string* getRawHeaders();
 	~CgiResponse();
 
 	void abort();

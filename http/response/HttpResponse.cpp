@@ -345,14 +345,15 @@ HttpResponse* HttpResponse::newResponse(HttpRequest *request, ConfigServer *conf
 	std::string location;
 	std::string route;
 
+    // That's the case when the clients send a request that does not match any configuration
     if (config == NULL)
     {
+        // we create a new config object so we can get the basic server's headers
         config = new ConfigServer();
         HttpResponse* err = new Error(config, request, route, location, writeChain, BAD_REQUEST);
         delete config;
         return err;
     }
-
     std::string &method = request->getMethod();
 	uri = request->getRequestURI();
     std::cout << "Config " << config << std::endl;
@@ -375,8 +376,7 @@ HttpResponse* HttpResponse::newResponse(HttpRequest *request, ConfigServer *conf
     std::string extension(route);
     extension.erase(0, pos + 1);
     if (isCgiExtension(config, location, extension) && isMethodAllowedCGI(config, request->getMethod(), location))
-        return  new CgiResponse(config, request, route, location);
-
+        return  new CgiResponse(config, request, route, location, writeChain);
     try
     {
         // If it's not CGI check if the method is authorized

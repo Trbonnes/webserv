@@ -1,7 +1,7 @@
 #include "CgiResponse.hpp"
 
 
-CgiResponse::CgiResponse(ConfigServer* config, HttpRequest* request,std::string route, std::string location) : HttpResponse(config, request, route, location)
+CgiResponse::CgiResponse(ConfigServer* config, HttpRequest* request,std::string route, std::string location, BufferChain& writeChain) : HttpResponse(config, request, route, location)
 {
 	_headersReceived = false;
 	_cgipid = -1;
@@ -13,6 +13,15 @@ CgiResponse::CgiResponse(ConfigServer* config, HttpRequest* request,std::string 
     char*       args[2];
     int         cgi_in[2];
     int         cgi_out[2];
+
+
+    // If it's a head request or an options, just don't bother with all the rest
+    if (request->getMethod() == "HEAD" || request->getMethod() == "OPTIONS")
+    {
+        writeChain.pushBack(getRawHeaders());
+        _state.write = READY;
+        return;
+    }
 
     // first pipe
     if (pipe(cgi_in))
@@ -214,6 +223,69 @@ void	CgiResponse::handleStreamRead(BufferChain& readChain, BufferChain& writeCha
 			throw;
 		}
 	}
+}
+
+std::string* CgiResponse::getRawHeaders()
+{
+    std::string* buff = new std::string();
+
+    buff->append(_config->getHttpVersion());
+    buff->append(" ");
+    char *tmp = ft_itoa(_statusCode);
+    buff->append(tmp).append(" ");
+    free(tmp);
+    buff->append(_mapCodes.codes[_statusCode]).append("\r\n");
+    buff->append("Server: ").append(_config->getServerSoftware()).append("\r\n");
+    if (ft_strlen(_date) > 0)
+        buff->append("Date: ").append(_date).append("\r\n");
+    if (_contentType.length() > 0)
+        buff->append("Content-Type: ").append(_contentType).append("\r\n");
+    if (_contentLength >= 0)
+    {
+        tmp = ft_itoa(_contentLength);
+        buff->append("Content-Length: ").append(tmp).append("\r\n");
+        free(tmp);
+    }
+    if (_request->getMethod().compare("OPTIONS") == 0 || _statusCode == METHOD_NOT_ALLOWED)
+    {
+        std::vector<std::string>::iterator it;
+        std::vector<std::string>::iterator itEnd;
+        std::size_t extension;
+        std::string str;
+
+        if (_contentLength == -1)
+            buff->append("Content-Length: 0\r\n");
+        buff->append("Allow: ");
+        extension = _route.find_last_of('.');
+        it = _config->getCGI_allow(_location).begin();
+        itEnd = _config->getCGI_allow(_location).end();
+        while (it != itEnd)
+        {
+            buff->append(*it).append(" ");
+            it++;
+        }
+        buff->append("\r\n");
+    }
+    else
+    {
+        if (_charset.length() > 0)
+            buff->append("Charset: ").append(_charset).append("\r\n");
+        if (_statusCode < 300)
+        {
+            if (ft_strlen(_lastModified) > 0)
+                buff->append("Last-Modified: ").append(_lastModified).append("\r\n");
+            if (_contentLocation.length() > 0)
+                buff->append("Content-Location: ").append(_contentLocation).append("\r\n");
+            if (_contentLanguage.length() > 0 && _request->getMethod().compare("PUT") && _request->getMethod().compare("DELETE"))
+                buff->append("Content-Language: ").append(_contentLanguage).append("\r\n");
+            if (_transferEncoding.length() > 0)
+                buff->append("Transfer-Encoding: ").append(_transferEncoding).append("\r\n");
+        }
+        else if (_statusCode == UNAUTHORIZED)
+            buff->append("WWW-Authenticate: ").append("Basic realm=").append(_config->getAuth_basic(_location)).append("\r\n");
+    }
+    buff->append("\r\n");
+    return buff;
 }
 
 
