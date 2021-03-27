@@ -54,7 +54,8 @@ HttpResponse::HttpResponse(ConfigServer* config, HttpRequest* req, std::string r
     _state.readStream = NONE;
     _state.writeStream = NONE;
     setDate();
-    _maxBodySize = _config->getClientBodySize(_location);
+    if (config)
+        _maxBodySize = _config->getClientBodySize(_location);
     if (req->getContentLength() == -1 && req->getTransferEncoding() != "chunked\r")
     {
         _state.read = DONE;
@@ -343,9 +344,18 @@ HttpResponse* HttpResponse::newResponse(HttpRequest *request, ConfigServer *conf
 	std::string uri;
 	std::string location;
 	std::string route;
-    std::string &method = request->getMethod();
 
+    if (config == NULL)
+    {
+        config = new ConfigServer();
+        HttpResponse* err = new Error(config, request, route, location, writeChain, BAD_REQUEST);
+        delete config;
+        return err;
+    }
+
+    std::string &method = request->getMethod();
 	uri = request->getRequestURI();
+    std::cout << "Config " << config << std::endl;
     location = config->getLocation(uri);
     
     // Check if length is given

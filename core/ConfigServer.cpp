@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ConfigServer.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
+/*   By: yorn <yorn@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/09 15:13:35 by trbonnes          #+#    #+#             */
-/*   Updated: 2021/03/26 16:42:02 by user42           ###   ########.fr       */
+/*   Updated: 2021/03/26 16:57:03 by yorn             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -151,6 +151,8 @@ std::string             ConfigServer::getLocation(std::string uri)
     std::string location;
     size_t      length;
 
+    std::cout  << "uri: "<< uri << std::endl;
+    std::cout <<  "list e des locations: " << _locationList.size() << std::endl;
     itBegin = _locationList.begin();
     itEnd = _locationList.end();
     while (itBegin != itEnd)
