@@ -44,6 +44,7 @@ HttpResponse::HttpResponse(ResponseContext& ctx)
     _contentLength = -1;
     _contentLocation = "";
     _contentType = "";
+    _contentLanguage = ctx.language;
     _charset = "";
     _retryAfter = "";
     _transferEncoding = "";
@@ -263,32 +264,24 @@ static std::string    acceptLanguage(ResponseContext& ctx, std::string& root)
         // Iterating  through client languages preferences
         while (itClientBegin != itClientEnd)
         {
-            std::cout << "Match found ! --------- " << "|" << *itClientBegin << "|" << std::endl;
-            itServer = std::find(ctx.config->getLanguage(ctx.location).begin(), ctx.config->getLanguage(ctx.location).end(), *itClientBegin);
             
+            itServer = std::find(ctx.config->getLanguage(ctx.location).begin(), ctx.config->getLanguage(ctx.location).end(), *itClientBegin);
 
-            for (std::vector<std::string>::iterator i = ctx.config->getLanguage(ctx.location).begin(); i != ctx.config->getLanguage(ctx.location).end(); i++)
-            {
-                std::cout << "-=------------------- config lang: |" << *i  << "|"<< std::endl;
-            }
             // if match
             if (itServer != itServerEnd)
             {
                 str.assign(*itServer);
-                str.append("/");
-                stat(trydir.assign(root).append(str).c_str(), &dir);
-                if ((dir.st_mode & S_IFMT) == S_IFDIR)
+                if (stat(trydir.assign(root).append(str).c_str(), &dir) == 0 && (dir.st_mode & S_IFMT) == S_IFDIR)
                     return (str);   
                 else
                     str.assign("");
             }
-            else
-            {
-            }
             itClientBegin++;
         }
         // fallback case, try the first one in the server's configuration
-        str.append(*(ctx.config->getLanguage(ctx.request->getRequestURI()).begin()));
+        itServer = ctx.config->getLanguage(ctx.location).begin();
+        str.append(*itServer);
+        // std::cout << "--------- falback: " << trydir.assign(root).append(str).c_str() << "      " << stat(trydir.assign(root).append(str).c_str(), &dir) << std::endl;
         if (stat(trydir.assign(root).append(str).c_str(), &dir) == 0 && (dir.st_mode & S_IFMT) == S_IFDIR)
             return (str);
     }
@@ -310,8 +303,6 @@ static void       initRoute(ResponseContext& ctx)
 
 
     // accept lagnguage
-    ctx.language = acceptLanguage(ctx, root);
-    std::cout << "Language =================== " << ctx.language << std::endl;
     // route.append();
     // route.append(str.assign(_request->getRequestURI()).erase(0, location.length())); // TO DO how does this works
 
@@ -329,6 +320,11 @@ static void       initRoute(ResponseContext& ctx)
     else 
     {
         route.assign(root.substr(0, root.size() - (root[root.size() - 1] == '*')));
+        ctx.language = acceptLanguage(ctx, route);
+        std::cout << "Returned language : " << ctx.language << std::endl;
+        if (ctx.language != "")
+            route.append(ctx.language).append("/");
+        // std::cout << "Language =================== " << ctx.language << std::endl;
         route.append(uri.substr(ctx.location.size() - (ctx.location[ctx.location.size() - 1] == '*')));
     }
     // std::cout << "=========== root:" << root << std::endl << "=========== alias:" << alias << std::endl << "=========== uri:" << uri << std::endl << "=========== location:" << location << std::endl;
