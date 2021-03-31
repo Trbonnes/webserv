@@ -1,12 +1,7 @@
 #include "FolderIndex.hpp"
 
 
-FolderIndex::FolderIndex(
-		ConfigServer* config,
-		HttpRequest* request,
-		std::string& route,
-		std::string& location,
-		BufferChain &writeChain, struct stat* directory) : HttpResponse(config, request, route, location)
+FolderIndex::FolderIndex(ResponseContext& ctx, BufferChain &writeChain, struct stat* directory) : HttpResponse(ctx)
 {
 	std::string             str;
     DIR                     *dir;

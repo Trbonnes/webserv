@@ -6,7 +6,7 @@
 /*   By: yorn <yorn@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/30 18:55:18 by trbonnes          #+#    #+#             */
-/*   Updated: 2021/03/25 01:55:54 by yorn             ###   ########.fr       */
+/*   Updated: 2021/03/31 14:30:26 by yorn             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ std::string ParseStdHeaders(std::string& request, size_t pos) {
 	while (request[pos] && request[pos] != ':') { pos++; }
 	pos++;
 	while (request[pos] && request[pos] == ' ') { pos++; }
-	while (request[pos] && request[pos] != '\n') {
+	while (request[pos] && request[pos] != '\r') {
 		s.push_back(request[pos++]);
 	}
 	return s;

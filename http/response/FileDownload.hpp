@@ -8,7 +8,7 @@ class FileDownload : public HttpResponse
 
 public:
 	//Coplien to do
-	FileDownload(ConfigServer* config, HttpRequest* request,std::string route, std::string location, BufferChain& writeChain, struct stat *file);
+	FileDownload(ResponseContext& ctx, BufferChain& writeChain, struct stat *file);
 	~FileDownload();
 };
 

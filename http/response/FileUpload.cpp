@@ -1,15 +1,9 @@
 #include "FileUpload.hpp"
 
-FileUpload::FileUpload(
-	ConfigServer* config,
-	HttpRequest* request,
-	std::string route,
-	std::string location) : HttpResponse(config, request, route, location)
+FileUpload::FileUpload(ResponseContext& ctx) : HttpResponse(ctx)
 {
-	_location = location;
-
     // Getting path root and appending the file's name
-    std::string filename = route.substr(route.find_last_of('/')); // TO DO very ugly
+    std::string filename = _route.substr(_route.find_last_of('/')); // TO DO very ugly
     _file = _config->getPutRoot().append(filename); // TO DO pas convaincu
     
     // opening the ouputStream

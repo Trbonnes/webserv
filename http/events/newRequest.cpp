@@ -14,7 +14,7 @@ void Http::handleNewRequest()
 	{
 		// std::cout << "===>=============================== REQUEST START" << std::endl;
 		std::string request;
-		request.append(_requestBuffer, 0, pos + 1); // TO DO realloc good ?
+		request.append(_requestBuffer, 0, pos); // TO DO realloc good ?
 		
 		Log::debug(request);
 		// if pos is before that, then there's some body left
@@ -23,10 +23,10 @@ void Http::handleNewRequest()
 			std::string* leftovers = new std::string(_requestBuffer, pos + 4);
 			_read_chain.pushFront(leftovers);
 		}
-		std::string tmp = _requestBuffer.substr(0, pos + 1);
 		_requestBuffer.clear();
 		// Instantiate new request
 		_req = HttpRequest::parseRequest(request);
+		std::cout << "|" << _req->getTransferEncoding() << "|" << std::endl;
 		// Instantiate a new response from that request
 		// TO DO add try catch for errors
 		// std::cout << _req->getPort() << " AND " << _req->getHost() << std::endl;

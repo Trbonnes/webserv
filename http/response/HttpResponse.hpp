@@ -8,6 +8,7 @@
 #include <sys/stat.h>
 #include <sys/time.h>
 #include <unistd.h>
+#include <algorithm>
 
 // Core includes
 #include "core/BufferChain.hpp"
@@ -15,6 +16,18 @@
 
 // Http includes
 #include "http/HttpRequest.hpp"
+
+
+
+typedef struct s_responseContext
+{
+	ConfigServer* config;
+	HttpRequest* request;
+	std::string location;
+	std::string route;
+	std::string language;
+} ResponseContext;
+
 
 class HttpResponse
 {
@@ -60,6 +73,9 @@ class HttpResponse
 	std::string                 _retryAfter;
 	std::string                 _transferEncoding;
 
+
+	std::string					acceptLanguage();
+
 public:
 
 	// Public types
@@ -87,7 +103,7 @@ public:
 
 	//Coplien // TODO
 	HttpResponse();
-	HttpResponse(ConfigServer*, HttpRequest*, std::string route, std::string& location);
+	HttpResponse(ResponseContext&);
 	virtual ~HttpResponse();
 
 	//public funciton
@@ -117,11 +133,11 @@ public:
 	void        	setServerName();
 	void        	setContentLocation();
 	void        	setDate();
-	void  	      setCharset(void);
+	void  	      	setCharset(void);
 	void    	    setContentType();
 	void        	setLastModified(struct stat* file);
-	void					setStreamReadFd(int fd);
-	void					setStreamWriteFd(int fd);
+	void			setStreamReadFd(int fd);
+	void			setStreamWriteFd(int fd);
 
 
 
@@ -144,7 +160,6 @@ public:
 			const char * what () const throw () {return "Closing the connection";}
 	};
 };
-
 
 std::string   base64_decode(std::string const& encoded_string);
 

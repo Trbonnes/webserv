@@ -1,7 +1,7 @@
 #include "HeadersOnly.hpp"
 
 
-FileDelete::FileDelete(ConfigServer* config, HttpRequest* request,std::string route, std::string location, BufferChain& writeChain) : HeadersOnly(config, request, route, location)
+FileDelete::FileDelete(ResponseContext& ctx, BufferChain& writeChain) : HeadersOnly(ctx)
 {
 	struct stat file;
 

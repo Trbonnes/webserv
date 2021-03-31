@@ -10,16 +10,15 @@ private:
 	HttpResponse*	_subResponse;
 public:
 	//Other
-	HeadersOnly(ConfigServer* config, HttpRequest* request, std::string& route, std::string& location);
+	HeadersOnly(ResponseContext& ctx);
 
 	// HEAD
-	HeadersOnly(ConfigServer* config, HttpRequest* request, std::string& route, std::string& location, BufferChain& writeChain, struct stat* file);
+	HeadersOnly(ResponseContext& ctx, BufferChain& writeChain, struct stat* file);
 	// POST
-	HeadersOnly(ConfigServer* config, HttpRequest* request, std::string& route, std::string& location, BufferChain& writeChain, std::string& method);
-	// OPTIONS
-	// HeadersOnly(ConfigServer*, HttpRequest*, BufferChain& writeChain, std::string route, std::string location, );
-	virtual ~HeadersOnly();
+	HeadersOnly(ResponseContext& ctx, BufferChain& writeChain, std::string& method);
 	void	handleRead(BufferChain& readChain, BufferChain& writeChain);
+
+	~HeadersOnly();
 };
 
 class FileDelete : public HeadersOnly
@@ -27,7 +26,7 @@ class FileDelete : public HeadersOnly
 
 public:
 	//Coplien to do
-	FileDelete(ConfigServer* config, HttpRequest* request,std::string route, std::string location, BufferChain& writeChain);
+	FileDelete(ResponseContext& ctx, BufferChain& writeChain);
 	~FileDelete();
 };
 

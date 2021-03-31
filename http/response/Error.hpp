@@ -6,7 +6,7 @@
 class Error : public HttpResponse
 {
 public:
-	Error(ConfigServer*, HttpRequest*, std::string& route, std::string& location, BufferChain&, int);
+	Error(ResponseContext&, BufferChain&, int);
 	~Error();
 
 	void	handleRead(BufferChain& readChain, BufferChain& writeChain);
@@ -15,7 +15,7 @@ public:
 class HeadersError : public HttpResponse
 {
 public:
-	HeadersError(ConfigServer*, HttpRequest*, std::string& route, std::string& location, BufferChain&, int);
+	HeadersError(ResponseContext&, BufferChain&, int);
 	~HeadersError();
 
 	void	handleRead(BufferChain& readChain, BufferChain& writeChain);

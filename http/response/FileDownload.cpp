@@ -1,10 +1,8 @@
 #include "FileDownload.hpp"
 
-FileDownload::FileDownload(ConfigServer* config, HttpRequest* request,std::string route, std::string location, BufferChain& writeChain, struct stat *file) : HttpResponse(config, request, route, location)
+FileDownload::FileDownload(ResponseContext& ctx, BufferChain& writeChain, struct stat *file) : HttpResponse(ctx)
 {
 	int fd;
-
-	_location = location;
 
     if ((fd = open(_route.c_str(), O_RDONLY)) != -1)
     {

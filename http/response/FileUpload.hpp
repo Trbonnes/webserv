@@ -9,7 +9,7 @@ class FileUpload : public HttpResponse
 	std::string _file;
 
 public:
-	FileUpload(ConfigServer*, HttpRequest*, std::string, std::string);
+	FileUpload(ResponseContext& ctx);
 	//Coplien to do
 	~FileUpload();
 

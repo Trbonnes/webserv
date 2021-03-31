@@ -1,18 +1,18 @@
 #include "HeadersOnly.hpp"
 
 
-HeadersOnly::HeadersOnly(ConfigServer* config, HttpRequest* request, std::string& route, std::string& location) : HttpResponse(config, request, route, location) 
+HeadersOnly::HeadersOnly(ResponseContext& ctx) : HttpResponse(ctx) 
 {
 }
 
 // HEAD
-HeadersOnly::HeadersOnly(ConfigServer* config, HttpRequest* request, std::string& route, std::string& location, BufferChain& writeChain, struct stat* file) : HttpResponse(config, request, route, location) 
+HeadersOnly::HeadersOnly(ResponseContext& ctx, BufferChain& writeChain, struct stat* file) : HttpResponse(ctx) 
 {
 	if (S_ISREG(file->st_mode))
 	{
 		try
 		{
-			_subResponse = new FileDownload(config, request, route, location, _fakeWriteChain, file);
+			_subResponse = new FileDownload(ctx, _fakeWriteChain, file);
 		}
 		catch(const std::exception& e)
 		{
@@ -24,7 +24,7 @@ HeadersOnly::HeadersOnly(ConfigServer* config, HttpRequest* request, std::string
 	{
 		try
 		{
-			_subResponse = new FolderIndex(config, request, route, location, _fakeWriteChain, file);
+			_subResponse = new FolderIndex(ctx, _fakeWriteChain, file);
 		}
 		catch(const std::exception& e)
 		{
@@ -39,7 +39,7 @@ HeadersOnly::HeadersOnly(ConfigServer* config, HttpRequest* request, std::string
 	_state.write = READY;
 }
 
-HeadersOnly::HeadersOnly(ConfigServer* config, HttpRequest* request, std::string& route, std::string& location, BufferChain& writeChain, std::string& method) : HttpResponse(config, request, route, location)
+HeadersOnly::HeadersOnly(ResponseContext& ctx, BufferChain& writeChain, std::string& method) : HttpResponse(ctx)
 {
 	(void) writeChain;
 	_contentLength = 0;

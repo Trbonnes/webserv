@@ -1,9 +1,9 @@
 #include "Error.hpp"
 
-HeadersError::HeadersError(ConfigServer *config , HttpRequest*request, std::string& route, std::string& location, BufferChain& writeChain, int code) : HttpResponse(config, request, route, location)
+HeadersError::HeadersError(ResponseContext& ctx, BufferChain& writeChain, int code) : HttpResponse(ctx)
 {
 	BufferChain fakeWriteChain;
-	HttpResponse* subError = new Error(config, request, route, location, fakeWriteChain, code);
+	HttpResponse* subError = new Error(ctx, fakeWriteChain, code);
 	writeChain.pushBack(fakeWriteChain.getFirst());
 	fakeWriteChain.popFirst();
 	fakeWriteChain.flush();

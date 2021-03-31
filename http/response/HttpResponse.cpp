@@ -26,22 +26,21 @@ HttpResponse::HttpResponse()
     setDate();
 }
 
-HttpResponse::HttpResponse(ConfigServer* config, HttpRequest* req, std::string route, std::string& location)
+HttpResponse::HttpResponse(ResponseContext& ctx)
 {
     ft_bzero(_date, 100);
     ft_bzero(_lastModified, 100);
-    _config = config;
-    _route = route;
-    _location = location;
-    _request = req;
+    _config = ctx.config;
+    _route = ctx.route;
+    _location = ctx.location;
+    _request = ctx.request;
     _streamWriteFd = -1;
     _streamReadFd = -1;
-    _route = route;
+    _route = ctx.route;
     _statusCode = OK;
     _wwwAuthenticate = "";
     _referer = "";
     _server = "Webserver";
-    _contentLanguage = "";
     _contentLength = -1;
     _contentLocation = "";
     _contentType = "";
@@ -54,12 +53,10 @@ HttpResponse::HttpResponse(ConfigServer* config, HttpRequest* req, std::string r
     _state.readStream = NONE;
     _state.writeStream = NONE;
     setDate();
-    if (config)
+    if (_config)
         _maxBodySize = _config->getClientBodySize(_location);
-    if (req->getContentLength() == -1 && req->getTransferEncoding() != "chunked\r")
-    {
+    if (_request->getContentLength() == -1 && _request->getTransferEncoding() != "chunked")
         _state.read = DONE;
-    }
 }
 
 
@@ -87,7 +84,7 @@ void HttpResponse::handleRead(BufferChain& readChain, BufferChain& writeChain)
     // Log::debug("HttpResponse::handleRead()");
     bool	end = false;
 
-	if (_request->getTransferEncoding() == "chunked\r") // TO DO why the f do i have to add \r
+	if (_request->getTransferEncoding() == "chunked") // TO DO why the f do i have to add \r
 	{
 		try
 		{
@@ -248,7 +245,57 @@ static bool         isCgiExtension(ConfigServer* config, std::string& location, 
     return false;
 }
 
-static std::string        createRoute(ConfigServer* config, HttpRequest* req, std::string location)
+static std::string    acceptLanguage(ResponseContext& ctx, std::string& root)
+{
+    std::vector<std::string>::iterator itClientBegin;
+    std::vector<std::string>::iterator itClientEnd;
+    std::vector<std::string>::iterator itServer;
+    std::vector<std::string>::iterator itServerEnd;
+    std::string str;
+    std::string trydir;
+    struct stat dir;
+
+    if (!ctx.config->getLanguage(ctx.location).empty())
+    {
+        itClientBegin = ctx.request->getAcceptLanguage().begin();
+        itClientEnd = ctx.request->getAcceptLanguage().end();
+        itServerEnd = ctx.config->getLanguage(ctx.location).end();
+        // Iterating  through client languages preferences
+        while (itClientBegin != itClientEnd)
+        {
+            std::cout << "Match found ! --------- " << "|" << *itClientBegin << "|" << std::endl;
+            itServer = std::find(ctx.config->getLanguage(ctx.location).begin(), ctx.config->getLanguage(ctx.location).end(), *itClientBegin);
+            
+
+            for (std::vector<std::string>::iterator i = ctx.config->getLanguage(ctx.location).begin(); i != ctx.config->getLanguage(ctx.location).end(); i++)
+            {
+                std::cout << "-=------------------- config lang: |" << *i  << "|"<< std::endl;
+            }
+            // if match
+            if (itServer != itServerEnd)
+            {
+                str.assign(*itServer);
+                str.append("/");
+                stat(trydir.assign(root).append(str).c_str(), &dir);
+                if ((dir.st_mode & S_IFMT) == S_IFDIR)
+                    return (str);   
+                else
+                    str.assign("");
+            }
+            else
+            {
+            }
+            itClientBegin++;
+        }
+        // fallback case, try the first one in the server's configuration
+        str.append(*(ctx.config->getLanguage(ctx.request->getRequestURI()).begin()));
+        if (stat(trydir.assign(root).append(str).c_str(), &dir) == 0 && (dir.st_mode & S_IFMT) == S_IFDIR)
+            return (str);
+    }
+    return ("");
+}
+
+static void       initRoute(ResponseContext& ctx)
 {
     std::vector<std::string>::iterator itIndexBegin;
     std::vector<std::string>::iterator itIndexEnd;
@@ -257,10 +304,16 @@ static std::string        createRoute(ConfigServer* config, HttpRequest* req, st
 	std::string route = "";
     int ret;
 
-    std::string root = config->getRoot(location);  
-    std::string alias = config->getAlias(location);
-    std::string uri = req->getRequestURI();
+    std::string root = ctx.config->getRoot(ctx.location);  
+    std::string alias = ctx.config->getAlias(ctx.location);
+    std::string uri = ctx.request->getRequestURI();
 
+
+    // accept lagnguage
+    ctx.language = acceptLanguage(ctx, root);
+    std::cout << "Language =================== " << ctx.language << std::endl;
+    // route.append();
+    // route.append(str.assign(_request->getRequestURI()).erase(0, location.length())); // TO DO how does this works
 
     //** Relative path **
     if (alias.length() > 0)
@@ -270,36 +323,35 @@ static std::string        createRoute(ConfigServer* config, HttpRequest* req, st
             if (((file.st_mode & S_IFMT) == S_IFDIR))
                 alias.append("/");
             route.assign(alias);
-            route.append(uri.substr(location.size()));
+            route.append(uri.substr(ctx.location.size()));
         }
     }
     else 
     {
         route.assign(root.substr(0, root.size() - (root[root.size() - 1] == '*')));
-        route.append(uri.substr(location.size() - (location[location.size() - 1] == '*')));
+        route.append(uri.substr(ctx.location.size() - (ctx.location[ctx.location.size() - 1] == '*')));
     }
     // std::cout << "=========== root:" << root << std::endl << "=========== alias:" << alias << std::endl << "=========== uri:" << uri << std::endl << "=========== location:" << location << std::endl;
     ret = stat(route.c_str(), &file);
     // if is file  exists or put request we're done
-    if ((ret == 0 && S_ISREG(file.st_mode)) || req->getMethod() == "PUT" || req->getMethod() == "DELETE")
-        return route;
+    if ((ret == 0 && S_ISREG(file.st_mode)) || ctx.request->getMethod() == "PUT" || ctx.request->getMethod() == "DELETE")
+    {
+        ctx.route = route;
+        return ;
+    }
     
-
     // TO DO redundant
     size_t pos = route.find_last_of('.');
     std::string extension(route);
     extension.erase(0, pos + 1);
-    if (isCgiExtension(config, location, extension))
-        return route;
-
-    // accept lagnguage
-    // route.append(acceptLanguage());
-    // route.append(str.assign(_request->getRequestURI()).erase(0, location.length())); // TO DO how does this works
-
-
+    if (isCgiExtension(ctx.config, ctx.location, extension))
+    {
+        ctx.route = route;
+        return ;
+    }
     // ** Else, add index if it is not a put or delete request **
-    itIndexBegin = config->getIndex(location).begin();
-    itIndexEnd = config->getIndex(location).end();
+    itIndexBegin = ctx.config->getIndex(ctx.location).begin();
+    itIndexEnd = ctx.config->getIndex(ctx.location).end();
     stat(route.c_str(), &file);
     str.assign(route);
     while (itIndexBegin != itIndexEnd && !S_ISREG(file.st_mode))
@@ -312,7 +364,7 @@ static std::string        createRoute(ConfigServer* config, HttpRequest* req, st
         itIndexBegin++;
     }
     route.assign(str);
-    return route;
+    ctx.route = route;
 }
 
 
@@ -341,94 +393,90 @@ static bool            isAuthorized(ConfigServer* config, HttpRequest* request, 
 
 HttpResponse* HttpResponse::newResponse(HttpRequest *request, ConfigServer *config, BufferChain& writeChain)
 {
-	std::string uri;
-	std::string location;
-	std::string route;
+    ResponseContext ctx;
 
     // That's the case when the clients send a request that does not match any configuration
     if (config == NULL)
     {
         // we create a new config object so we can get the basic server's headers
         config = new ConfigServer();
-        HttpResponse* err = new Error(config, request, route, location, writeChain, BAD_REQUEST);
+        HttpResponse* err = new Error(ctx, writeChain, BAD_REQUEST);
         delete config;
         return err;
     }
-    std::string &method = request->getMethod();
-	uri = request->getRequestURI();
-    std::cout << "Config " << config << std::endl;
-    location = config->getLocation(uri);
-    
+    // Init context
+    ctx.config = config;
+    ctx.location = config->getLocation(request->getRequestURI());
+    ctx.request = request;
+    initRoute(ctx);
+
     // Check if length is given
     if (request->getBody().length() > 0 && request->getContentLength() == 0 && request->getTransferEncoding().length() == 0)
-        return new Error(config, request, route, location, writeChain, LENGTH_REQUIRED);
-    
+        return new Error(ctx, writeChain, LENGTH_REQUIRED);
     // set the route of the ressource
-    route = createRoute(config, request, location);
-
     // Autorization
-
-    if (!isAuthorized(config, request, location))
-        return new Error(config, request, route, location, writeChain, UNAUTHORIZED);
-
+    if (!isAuthorized(config, request, ctx.location))
+        return new Error(ctx, writeChain, UNAUTHORIZED);
     // // If it's a CGI request we must fork and prepare the stream in and out
-    size_t pos = route.find_last_of('.');
-    std::string extension(route);
+    size_t pos = ctx.route.find_last_of('.');
+    std::string extension(ctx.route);
     extension.erase(0, pos + 1);
-    if (isCgiExtension(config, location, extension) && isMethodAllowedCGI(config, request->getMethod(), location))
-        return  new CgiResponse(config, request, route, location, writeChain);
+
+    std::string &method = request->getMethod();
+    if (isCgiExtension(config, ctx.location, extension) && isMethodAllowedCGI(config, request->getMethod(), ctx.location))
+        return  new CgiResponse(ctx, writeChain);
     try
     {
         // If it's not CGI check if the method is authorized
-        if (isMethodAllowed(config, method, location))
+        if (isMethodAllowed(config, method, ctx.location))
         {
             if (method == "GET")
             {
                 struct stat file;
                 
-                if (stat(route.c_str(), &file))
-                    return new Error(config, request, route, location, writeChain, NOT_FOUND);
+                if (stat(ctx.route.c_str(), &file))
+                    return new Error(ctx, writeChain, NOT_FOUND);
                 if (!(file.st_mode & S_IRUSR))
-                    return new Error(config, request, route, location, writeChain, FORBIDDEN);
+                    return new Error(ctx, writeChain, FORBIDDEN);
                 if (S_ISREG(file.st_mode))
-                    return new FileDownload(config, request, route, location, writeChain, &file);
+                    return new FileDownload(ctx, writeChain, &file);
                 if (S_ISDIR(file.st_mode))
                 {
-                    if (config->getAutoindex(location) == true)
-                            return new FolderIndex(config, request, route, location, writeChain, &file);
+                    if (config->getAutoindex(ctx.location) == true)
+                            return new FolderIndex(ctx, writeChain, &file);
                     else
-                        return new Error(config, request, route, location, writeChain, FORBIDDEN);
+                        return new Error(ctx, writeChain, FORBIDDEN);
                 }
             }
             if (method == "HEAD")
             {
                 struct stat file;
                 
-                if (stat(route.c_str(), &file))
-                    return new HeadersError(config, request, route, location, writeChain, NOT_FOUND);
+                if (stat(ctx.route.c_str(), &file))
+                    return new HeadersError(ctx, writeChain, NOT_FOUND);
                 if (!(file.st_mode & S_IRUSR))
-                    return new HeadersError(config, request, route, location, writeChain, FORBIDDEN);
-                return new HeadersOnly(config, request, route, location, writeChain, &file);
+                    return new HeadersError(ctx, writeChain, FORBIDDEN);
+                return new HeadersOnly(ctx, writeChain, &file);
             }
             if (method == "PUT")
-                return new FileUpload(config, request, route, location);
+                return new FileUpload(ctx);
             if (method == "POST" || method == "OPTIONS")
-                return new HeadersOnly(config, request, route, location, writeChain, method);
+                return new HeadersOnly(ctx, writeChain, method);
             if (method == "DELETE")
-                return new FileDelete(config, request, route, location, writeChain);
+                return new FileDelete(ctx, writeChain);
         }
         // If else the method is not allowed
         else
         {
             if(method == "HEAD")
-                return new HeadersError(config, request, route, location, writeChain, METHOD_NOT_ALLOWED);
+                return new HeadersError(ctx, writeChain, METHOD_NOT_ALLOWED);
             else
-                return new Error(config, request, route, location, writeChain, METHOD_NOT_ALLOWED);
+                return new Error(ctx, writeChain, METHOD_NOT_ALLOWED);
         }
     }
     catch(const HttpError& e)
     {
-        return new Error(config, request, route, location, writeChain, e.getStatusCode());
+        return new Error(ctx, writeChain, e.getStatusCode());
     }
     
 

@@ -1,11 +1,10 @@
 #include "CgiResponse.hpp"
 
 
-CgiResponse::CgiResponse(ConfigServer* config, HttpRequest* request,std::string route, std::string location, BufferChain& writeChain) : HttpResponse(config, request, route, location)
+CgiResponse::CgiResponse(ResponseContext& ctx, BufferChain& writeChain) : HttpResponse(ctx)
 {
 	_headersReceived = false;
 	_cgipid = -1;
-	_location = location;
     _transferEncoding.assign("chunked");
 	cgi_metaVariables();
 	setEnv();
@@ -16,7 +15,7 @@ CgiResponse::CgiResponse(ConfigServer* config, HttpRequest* request,std::string 
 
 
     // If it's a head request or an options, just don't bother with all the rest
-    if (request->getMethod() == "HEAD" || request->getMethod() == "OPTIONS")
+    if (_request->getMethod() == "HEAD" || _request->getMethod() == "OPTIONS")
     {
         writeChain.pushBack(getRawHeaders());
         _state.write = READY;
@@ -153,7 +152,7 @@ void        CgiResponse::setEnv()
         _cgi_env[X_SECRET] = ft_strdup("HTTP_X_SECRET_HEADER_FOR_TEST=1");
 	else
         _cgi_env[X_SECRET] = ft_strdup("HTTP_X_SECRET_HEADER_FOR_TEST=");
-    if (_request->getTransferEncoding() == "chunked" || _request->getTransferEncoding() == "chunked\r") // TO DO why the \r
+    if (_request->getTransferEncoding() == "chunked" || _request->getTransferEncoding() == "chunked") // TO DO why the \r
         _cgi_env[CONTENT_LENGTH] = ft_strdup("CONTENT_LENGTH=");
     else
         _cgi_env[CONTENT_LENGTH] = ft_strdup(_cgi._content_length.insert(0, "CONTENT_LENGTH=").c_str());
