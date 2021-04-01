@@ -376,11 +376,13 @@ HttpResponse* HttpResponse::newResponse(HttpRequest *request, ConfigServer *conf
 {
     ResponseContext ctx;
 
+    ctx.request = request;
     // That's the case when the clients send a request that does not match any configuration
     if (config == NULL)
     {
         // we create a new config object so we can get the basic server's headers
         config = new ConfigServer();
+        ctx.config = config;
         HttpResponse* err = new Error(ctx, writeChain, BAD_REQUEST);
         delete config;
         return err;
@@ -388,7 +390,6 @@ HttpResponse* HttpResponse::newResponse(HttpRequest *request, ConfigServer *conf
     // Init context
     ctx.config = config;
     ctx.location = config->getLocation(request->getRequestURI());
-    ctx.request = request;
     initRoute(ctx);
 
     // Check if length is given
