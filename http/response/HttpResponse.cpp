@@ -256,6 +256,8 @@ static std::string    acceptLanguage(ResponseContext& ctx, std::string& root)
         itClientBegin = ctx.request->getAcceptLanguage().begin();
         itClientEnd = ctx.request->getAcceptLanguage().end();
         itServerEnd = ctx.config->getLanguage(ctx.location).end();
+        if (itClientBegin == itClientEnd)
+            return "";
         // Iterating  through client languages preferences
         while (itClientBegin != itClientEnd)
         {
