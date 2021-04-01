@@ -7,9 +7,9 @@ BufferChain::BufferChain()
 {
 }
 
-BufferChain::BufferChain(BufferChain&)
+BufferChain::BufferChain(BufferChain& buff)
 {
-	// TO DO add deep copy
+	_chain = buff._chain;
 }
 
 BufferChain& BufferChain::operator=(BufferChain& chain)
@@ -70,7 +70,6 @@ size_t BufferChain::size()
 
 size_t BufferChain::totalSize()
 {
-	// TO DO might be optimizable by stroring a variable tha\s getting modified after each pushfront/pushback
 	size_t total = 0;
 
 	for (std::list<std::string*>::iterator it = _chain.begin(); it != _chain.end(); *it++)
@@ -97,11 +96,8 @@ int		BufferChain::writeBufferToFd(BufferChain& chain, FD fd)
 	std::string* buff;
 	
 	buff = chain.getFirst();
-	// std::cout << "About to write to fd " << fd << " with size " << buff->size() << std::endl;
 	ret = write(fd, buff->c_str(), buff->size());
-	// std::cout << "Written " << ret <<  std::endl;
-
-	if (ret == -1) // TO DO check if write fails to write all bytes
+	if (ret == -1)
 		throw IOError();
 	return ret;
 }
@@ -110,13 +106,12 @@ int		BufferChain::readToBuffer(BufferChain& chain, FD fd)
 {
 	int ret;
 
-	ret = read(fd, g_read_large, BUFFER_SIZE_LARGE); // TO DO keep this size ?
+	ret = read(fd, g_read_large, BUFFER_SIZE_LARGE);
 	if (ret == -1)
 		throw IOError();
 	if (ret > 0)
 	{
 		std::string* n = new std::string(g_read_large, ret);
-		// std::cout << "STP  | " <<  *n << " |STP " << std::endl;
  		chain.pushBack(n);
 	}
 	return ret;

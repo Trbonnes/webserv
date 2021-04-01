@@ -39,11 +39,12 @@ private:
 	Connection();
 	Connection(const Connection&);
 	Connection &operator=(const Connection &);
+	FD				_socket;
+	FD				_stream_read;
+	FD				_stream_write;
+
 public:
 	// server <-> client socket
-	FD				_socket;
-	FD				_stream_read; // TO DO put them in private
-	FD				_stream_write;
 
 	// Coplien
 	Connection(int, fd_set* r, fd_set* w, Config* c);

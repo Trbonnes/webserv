@@ -6,7 +6,7 @@
 /*   By: yorn <yorn@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/09 10:32:47 by trbonnes          #+#    #+#             */
-/*   Updated: 2021/03/26 17:01:04 by yorn             ###   ########.fr       */
+/*   Updated: 2021/04/01 02:07:01 by yorn             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,8 +37,6 @@ std::vector<ConfigServer>	&Config::getServerList() {
 }
 
 ConfigServer				*Config::getServerUnit(int port, std::string name) {
-	std::cout << "Port :" << port << std::endl;
-	std::cout << "Name :" << name << std::endl;
 	for (size_t i = 0; i < _server.size(); i++) {
 		std::vector<int> _port = _server[i].getPort();
 		std::vector<std::string> _serverName = _server[i].getServerName();

@@ -16,7 +16,6 @@ std::string*	Http::chunkify(char* buff, size_t len)
 	n->append("\r\n");
 	if(len != 0)
 	{
-		// std::cout << "|" << strlen(buff) << "| " << start << " " << len << std::endl;
 		n->append(buff, len);
 	}
 	n->append("\r\n");
@@ -28,7 +27,7 @@ int		Http::readChunkToBuffer(BufferChain& chain, FD fd)
 	int ret;
 	std::string *n;
 
-	ret = read(fd, g_read_large, BUFFER_SIZE_LARGE); // TO DO keep this size ?
+	ret = read(fd, g_read_large, BUFFER_SIZE_LARGE);
 	if (ret == -1)
 		throw BufferChain::IOError();
 	n = chunkify(g_read_large, ret);

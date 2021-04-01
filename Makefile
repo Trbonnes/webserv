@@ -1,6 +1,6 @@
 # Implicit variable definition
 CXX = clang++
-CXXFLAGS = -Wall -Wextra -Werror -std=c++98 -o3 -g #-fsanitize=address # TO DO remove
+CXXFLAGS = -Wall -Wextra -Werror -std=c++98 -o3 #-fsanitize=address # TO DO remove
 
 # Sources files
 

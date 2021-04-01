@@ -15,12 +15,11 @@ _connection(c._connection),
 _read_chain(c._connection.getReadChain()),
 _write_chain(c._connection.getWriteChain())
 {
-	(void) c; // TO DO implement copy and operator=
 }
 
 Http& Http::operator=(const Http &c)
 {
-	(void) c; // TO DO implement copy and operator=
+	(void) c;
 	return *this;
 }
 
@@ -42,7 +41,6 @@ void Http::handleRead()
 		}
 		catch(const HttpResponse::ConnectionClose& e)
 		{
-			// std::cout << "COnnection is closed by exception" << std::endl;
 			throw;
 		}
 	}
@@ -63,7 +61,6 @@ void Http::handleWrite()
 	}
 	catch(const HttpResponse::ConnectionClose& e)
 	{
-		// std::cout << "COnnection is closed by exception" << std::endl;
 		throw;
 	}
 	checkState();
@@ -83,7 +80,6 @@ void Http::handleStreamRead()
 	}
 	catch(const HttpResponse::ConnectionClose& e)
 	{
-		// std::cout << "COnnection is closed by exception" << std::endl;
 		throw;
 	}
 	checkState();
@@ -101,7 +97,6 @@ void Http::handleStreamWrite()
 	}
 	catch(const HttpResponse::ConnectionClose& e)
 	{
-		// std::cout << "COnnection is closed by exception" << std::endl;
 		throw;
 	}
 	checkState();
@@ -109,61 +104,31 @@ void Http::handleStreamWrite()
 
 void Http::handleHttpError(int statusCode)
 {
-
-
-	std::cout << "==================================================== handleHttpError" << std::endl;
-	std::cout << " _read_chain: " << _read_chain;
-	if (_resp)
-	{
-		std::cout << " _stream_write_chain: " << _resp->getStreamWriteChain();
-		std::cout << " _stream_read_chain: " << _resp->getStreamReadChain();
-	}
-	std::cout << " _write_chain: " <<_write_chain;
-
-
-	if (_resp)
-	{
-		char* states[5];
-
-		states[HttpResponse::NONE] = (char*)"NONE";
-		states[HttpResponse::WAITING] = (char*)"WAITING";
-		states[HttpResponse::IGNORE] = (char*)"IGNORE";
-		states[HttpResponse::READY] = (char*)"READY";
-		states[HttpResponse::DONE] = (char*)"DONE"; 
-
-		std::cout << getpid() << " status _read: " << states[_resp->_state.read]
-			<< " status _stream_write: " << states[_resp->_state.writeStream] 
-			<< " status _stream_read: " << states[_resp->_state.readStream]
-			<< " status _write: " << states[_resp->_state.write] << std::endl;
-	}
-		_write_chain.flush();
-		_read_chain.flush();
-		_connection.unsubStreamRead();
-		_connection.unsubStreamWrite();
-		ResponseContext ctx;
-		ctx.config = _resp->getConfig();
-		ctx.request = _req;
-		ctx.route = _resp->getRoute();
-		ctx.location = _resp->getLocation();
-		HttpResponse* n = new Error(ctx, _write_chain, statusCode);
-		_connection.setStreamRead(n->getStreamReadFd());
-		if (n->getStreamReadFd() != -1)
-			_connection.subStreamRead();
-		if (_resp->_state.read == HttpResponse::DONE)
-			n->_state.read = HttpResponse::DONE;
-		_resp->abort();
-		delete _resp;
-		_resp = n;
-		
-		_connection.setStreamRead(_resp->getStreamReadFd());
-		_connection.setStreamWrite(_resp->getStreamWriteFd());
-
+	_write_chain.flush();
+	_read_chain.flush();
+	_connection.unsubStreamRead();
+	_connection.unsubStreamWrite();
+	ResponseContext ctx;
+	ctx.config = _resp->getConfig();
+	ctx.request = _req;
+	ctx.route = _resp->getRoute();
+	ctx.location = _resp->getLocation();
+	HttpResponse* n = new Error(ctx, _write_chain, statusCode);
+	_connection.setStreamRead(n->getStreamReadFd());
+	if (n->getStreamReadFd() != -1)
+		_connection.subStreamRead();
+	if (_resp->_state.read == HttpResponse::DONE)
+		n->_state.read = HttpResponse::DONE;
+	_resp->abort();
+	delete _resp;
+	_resp = n;
+	
+	_connection.setStreamRead(_resp->getStreamReadFd());
+	_connection.setStreamWrite(_resp->getStreamWriteFd());
 }
 
 void	Http::checkState()
 {
-	// std::cout << "---------------------- STATE" << std::endl;
-	
 	if (_resp)
 	{
 		if (_resp->_state.read == HttpResponse::READY)
@@ -185,8 +150,8 @@ void	Http::checkState()
 			_connection.unsubStreamWrite();
 			if (_resp->_state.writeStream == HttpResponse::DONE)
 			{
-				// std::cout << "Closing " << _resp->getStreamWriteFd() << std::endl;
-   			close(_resp->getStreamWriteFd());
+   				if (_resp->getStreamWriteFd() != -1)
+					close(_resp->getStreamWriteFd());
 				_resp->setStreamWriteFd(-1);
 				_connection.setStreamWrite(-1);
 			}
@@ -196,36 +161,11 @@ void	Http::checkState()
 			_connection.subWrite();
 		else
 			_connection.unsubWrite();
-	// std::cout << " _read_chain: " << _read_chain;
-	// if (_resp)
-	// {
-	// 	std::cout << " _stream_write_chain: " << _resp->getStreamWriteChain();
-	// 	std::cout << " _stream_read_chain: " << _resp->getStreamReadChain();
-	// }
-	// std::cout << " _write_chain: " <<_write_chain;
-
-
-	// if (_resp)
-	// {
-	// 	char* states[5];
-
-	// 	states[HttpResponse::NONE] = (char*)"NONE";
-	// 	states[HttpResponse::WAITING] = (char*)"WAITING";
-	// 	states[HttpResponse::IGNORE] = (char*)"IGNORE";
-	// 	states[HttpResponse::READY] = (char*)"READY";
-	// 	states[HttpResponse::DONE] = (char*)"DONE"; 
-
-	// 	std::cout << getpid() << " status _read: " << states[_resp->_state.read]
-	// 		<< " status _stream_write: " << states[_resp->_state.writeStream] 
-	// 		<< " status _stream_read: " << states[_resp->_state.readStream]
-	// 		<< " status _write: " << states[_resp->_state.write] << std::endl;
-	// }
 		// End of request
 		if (_resp->_state.read == HttpResponse::DONE && _write_chain.getFirst() == NULL && 
 			(_resp->_state.readStream == HttpResponse::DONE || _resp->_state.readStream == HttpResponse::NONE) &&
 			(_resp->_state.writeStream == HttpResponse::DONE || _resp->_state.writeStream == HttpResponse::NONE))
 		{
-			// std::cout << "-------------- Request End " << &_connection << std::endl;
 			reset();
 			if (_read_chain.size() > 0)
 				handleRead();

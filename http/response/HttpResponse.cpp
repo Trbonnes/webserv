@@ -68,12 +68,10 @@ void HttpResponse::abort()
 	if (_streamReadFd != -1)
     {
 		close(_streamReadFd);
-        // std::cout << "Closing " << _streamReadFd << std::endl;
     }
 	if (_streamWriteFd != -1)
 	{
     	close(_streamWriteFd);
-        // std::cout << "Closing " << _streamWriteFd << std::endl;
     }
     _streamReadChain.flush();
     _streamWriteChain.flush();
@@ -85,7 +83,7 @@ void HttpResponse::handleRead(BufferChain& readChain, BufferChain& writeChain)
     // Log::debug("HttpResponse::handleRead()");
     bool	end = false;
 
-	if (_request->getTransferEncoding() == "chunked") // TO DO why the f do i have to add \r
+	if (_request->getTransferEncoding() == "chunked")
 	{
 		try
 		{
@@ -145,8 +143,6 @@ void HttpResponse::handleStreamRead(BufferChain& readChain, BufferChain& writeCh
 	if (ret == 0)
     // If it's the end
     {
-        // std::cout << "End of stream reached" << std::endl;
-        // std::cout << "Closing " << _streamReadFd << std::endl;
         _state.readStream = DONE;
     }
 }
@@ -179,7 +175,6 @@ void HttpResponse::handleStreamWrite(BufferChain& readChain, BufferChain& writeC
     }
     catch(const BufferChain::IOError& e)
     {
-        std::cout << getpid() << "HANDLE STREAM WRIIIIIIIIIIIIITE  " << strerror(errno)  << " " << _streamWriteFd << std::endl;
         throw HttpError(INTERNAL_SERVER_ERROR);
     }
     // State update
@@ -281,7 +276,6 @@ static std::string    acceptLanguage(ResponseContext& ctx, std::string& root)
         // fallback case, try the first one in the server's configuration
         itServer = ctx.config->getLanguage(ctx.location).begin();
         str.append(*itServer);
-        // std::cout << "--------- falback: " << trydir.assign(root).append(str).c_str() << "      " << stat(trydir.assign(root).append(str).c_str(), &dir) << std::endl;
         if (stat(trydir.assign(root).append(str).c_str(), &dir) == 0 && (dir.st_mode & S_IFMT) == S_IFDIR)
             return (str);
     }
@@ -301,11 +295,6 @@ static void       initRoute(ResponseContext& ctx)
     std::string alias = ctx.config->getAlias(ctx.location);
     std::string uri = ctx.request->getRequestURI();
 
-
-    // accept lagnguage
-    // route.append();
-    // route.append(str.assign(_request->getRequestURI()).erase(0, location.length())); // TO DO how does this works
-
     //** Relative path **
     if (alias.length() > 0)
     {
@@ -321,13 +310,10 @@ static void       initRoute(ResponseContext& ctx)
     {
         route.assign(root.substr(0, root.size() - (root[root.size() - 1] == '*')));
         ctx.language = acceptLanguage(ctx, route);
-        std::cout << "Returned language : " << ctx.language << std::endl;
         if (ctx.language != "")
             route.append(ctx.language).append("/");
-        // std::cout << "Language =================== " << ctx.language << std::endl;
         route.append(uri.substr(ctx.location.size() - (ctx.location[ctx.location.size() - 1] == '*')));
     }
-    // std::cout << "=========== root:" << root << std::endl << "=========== alias:" << alias << std::endl << "=========== uri:" << uri << std::endl << "=========== location:" << location << std::endl;
     ret = stat(route.c_str(), &file);
     // if is file  exists or put request we're done
     if ((ret == 0 && S_ISREG(file.st_mode)) || ctx.request->getMethod() == "PUT" || ctx.request->getMethod() == "DELETE")
@@ -336,7 +322,6 @@ static void       initRoute(ResponseContext& ctx)
         return ;
     }
     
-    // TO DO redundant
     size_t pos = route.find_last_of('.');
     std::string extension(route);
     extension.erase(0, pos + 1);

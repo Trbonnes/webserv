@@ -9,8 +9,8 @@ class FileUpload : public HttpResponse
 	std::string _file;
 
 public:
+	// OPTIMIZATION coplien
 	FileUpload(ResponseContext& ctx);
-	//Coplien to do
 	~FileUpload();
 
 	void handleStreamWrite(BufferChain& readChain, BufferChain& writeChain);

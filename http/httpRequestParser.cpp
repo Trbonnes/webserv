@@ -6,7 +6,7 @@
 /*   By: yorn <yorn@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/30 15:45:46 by trbonnes          #+#    #+#             */
-/*   Updated: 2021/03/10 02:58:32 by yorn             ###   ########.fr       */
+/*   Updated: 2021/03/31 21:04:39 by yorn             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -140,7 +140,6 @@ static void cutLeftovers(BufferChain& chain, std::string* curr, size_t hexStart)
 	}
 }
 
-// TO DO might optimize this
 static void appendNext(BufferChain& chain, std::string* curr)
 {
 	std::string *first;
@@ -228,8 +227,8 @@ static int appendChunk(BufferChain& chain, std::string* dst, size_t *offset)
 
 // Extract chunks into a regular body
 bool         HttpRequest::extractChunks(BufferChain& read_chain, BufferChain& stream_write_chain)
-{ // TO DO optimizations
-	
+{
+	// OPTIMIZATION	
 	size_t offset = 0;
 	int r;
 	std::string* newBuffer = new std::string("");

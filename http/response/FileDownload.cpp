@@ -18,11 +18,9 @@ FileDownload::FileDownload(ResponseContext& ctx, BufferChain& writeChain, struct
     } 
 	else
 	{
-		// TO DO throw error
-        std::cout << "FILE ERROR" << std::endl;
-	}
+        throw HttpError(INTERNAL_SERVER_ERROR);
+    }
 	_streamReadFd = fd;
-    std::cout << "New file fd" << _streamReadFd << std::endl;
     _state.read = DONE;
     _state.readStream = READY;
 }

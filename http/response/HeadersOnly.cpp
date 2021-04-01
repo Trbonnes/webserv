@@ -14,10 +14,9 @@ HeadersOnly::HeadersOnly(ResponseContext& ctx, BufferChain& writeChain, struct s
 		{
 			_subResponse = new FileDownload(ctx, _fakeWriteChain, file);
 		}
-		catch(const std::exception& e)
+		catch(const HttpError& e)
 		{
-			// std::cerr << e.what() << '\n';
-			// TO DO throw error
+			throw e;
 		}
 	}
 	else if (S_ISDIR(file->st_mode))
@@ -26,10 +25,9 @@ HeadersOnly::HeadersOnly(ResponseContext& ctx, BufferChain& writeChain, struct s
 		{
 			_subResponse = new FolderIndex(ctx, _fakeWriteChain, file);
 		}
-		catch(const std::exception& e)
+		catch(const HttpError& e)
 		{
-			// std::cerr << e.what() << '\n';
-			// TO DO throw error
+			throw e;
 		}
 	}
 	delete _subResponse;

@@ -19,7 +19,7 @@ Error::Error(ResponseContext& ctx, BufferChain& writeChain, int statusCode) : Ht
 		setServerName();
 		setContentLocation();
 		_streamReadFd = fd;
-		_state.read = DONE; // TO DO is it ok ? same in File Download
+		_state.read = DONE;
 		_state.readStream = READY;
 	}
 	else
@@ -39,7 +39,6 @@ Error::Error(ResponseContext& ctx, BufferChain& writeChain, int statusCode) : Ht
 	writeChain.pushBack(getRawHeaders());
 	if (buff)
 		writeChain.pushBack(buff);
-	std::cout << "/* message */ " << _mapCodes.codes[_statusCode] << std::endl;
 }
 
 
@@ -50,15 +49,6 @@ void	Error::handleRead(BufferChain& readChain, BufferChain& writeChain)
 	HttpResponse::handleRead(readChain, writeChain);
 	_streamWriteChain.flush();
 }
-
-// void	Error::handleWrite(BufferChain& readChain, BufferChain& writeChain)
-// {
-// 	(void) readChain;
-
-// 	std::cout << "---------------------------------------------------------- " << writeChain <<std::endl;
-// 	if (writeChain.getFirst() == NULL)
-// 		throw HttpResponse::ConnectionClose(); 
-// }
 
 Error::~Error()
 {

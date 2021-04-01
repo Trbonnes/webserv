@@ -25,7 +25,6 @@ class FileDelete : public HeadersOnly
 {
 
 public:
-	//Coplien to do
 	FileDelete(ResponseContext& ctx, BufferChain& writeChain);
 	~FileDelete();
 };

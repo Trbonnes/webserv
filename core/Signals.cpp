@@ -21,6 +21,5 @@ void	sig_handler(int sig)
 
 void	sigpipe_handler(int sig)
 {
-	std::cout << "Broken Pipe" << std::endl;
 	(void) sig;
 }

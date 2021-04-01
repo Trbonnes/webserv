@@ -24,32 +24,22 @@ CgiResponse::CgiResponse(ResponseContext& ctx, BufferChain& writeChain) : HttpRe
 
     // first pipe
     if (pipe(cgi_in))
-    {
-		// TO DO throw error
-        Log::debug("PIPE 1 FAILLLLLLLLLLLED");
-        return;
-    }
-
+        throw HttpResponse::HttpError(INTERNAL_SERVER_ERROR);
     // second pipe
     if (pipe(cgi_out))
     {
-        Log::debug("PIPE 2 FAILLLLLLLLLLLED");
         close(cgi_in[0]);
         close(cgi_in[1]);
-		// TO DO throw error
-        return;
+        throw HttpResponse::HttpError(INTERNAL_SERVER_ERROR);
     }
     // Fork
     _cgipid = fork();
     if (_cgipid < 0)
     {
-        Log::debug("FORK FAILLLLLLLLLLLED");
-        _statusCode = INTERNAL_SERVER_ERROR;
-    }		// TO DO throw error
+        throw HttpResponse::HttpError(INTERNAL_SERVER_ERROR);
+    }
     else if (_cgipid == 0)
     {
-        // Log::debug("FORK GOOD");
-
         // Closing unused end in chlid process
         close(cgi_in[SIDE_IN]);
         close(cgi_out[SIDE_OUT]);
@@ -64,7 +54,6 @@ CgiResponse::CgiResponse(ResponseContext& ctx, BufferChain& writeChain) : HttpRe
             Log::debug("CGI launch error");
             exit(EXIT_FAILURE);
         }
-        // TO DO test for bad gateway just in case
     }
     else
     {
@@ -148,11 +137,11 @@ void        CgiResponse::setEnv()
     _cgi_env[SERVER_PORT] = ft_strdup(_cgi._server_port.insert(0, "SERVER_PORT=").c_str());
     _cgi_env[SERVER_PROTOCOL] = ft_strdup(_cgi._server_protocol.insert(0, "SERVER_PROTOCOL=").c_str());
     _cgi_env[SERVER_SOFTWARE] = ft_strdup(_cgi._server_software.insert(0, "SERVER_SOFTWARE=").c_str());
-    if (_request->getXSecret().compare("")) // TO DO assez crade ma foi
+    if (_request->getXSecret().compare("")) // OPTIMIZATION
         _cgi_env[X_SECRET] = ft_strdup("HTTP_X_SECRET_HEADER_FOR_TEST=1");
 	else
         _cgi_env[X_SECRET] = ft_strdup("HTTP_X_SECRET_HEADER_FOR_TEST=");
-    if (_request->getTransferEncoding() == "chunked" || _request->getTransferEncoding() == "chunked") // TO DO why the \r
+    if (_request->getTransferEncoding() == "chunked" || _request->getTransferEncoding() == "chunked")
         _cgi_env[CONTENT_LENGTH] = ft_strdup("CONTENT_LENGTH=");
     else
         _cgi_env[CONTENT_LENGTH] = ft_strdup(_cgi._content_length.insert(0, "CONTENT_LENGTH=").c_str());
@@ -165,7 +154,6 @@ void	CgiResponse::handleStreamRead(BufferChain& readChain, BufferChain& writeCha
 	
 	int ret;
 	size_t pos;
-                // std::cout << "dsddddddddddddddddddddddddddd Nothing more to see here" << std::endl;
 
 	if (_headersReceived == false)
 	{
@@ -186,7 +174,7 @@ void	CgiResponse::handleStreamRead(BufferChain& readChain, BufferChain& writeCha
 		{
 			throw;
 		}
-		if ((pos = _streamBuffer.find("\r\n\r\n")) != std::string::npos) // TO DO add join mechanic if buffer is incomplete
+		if ((pos = _streamBuffer.find("\r\n\r\n")) != std::string::npos)
 		{
 			std::string *httpHeaders;
 			std::string *cgiHeaders = new std::string();
@@ -195,7 +183,7 @@ void	CgiResponse::handleStreamRead(BufferChain& readChain, BufferChain& writeCha
 			cgiHeaders->append(_streamBuffer, 0, pos);
 			cgiHeaders->append("\r\n\r\n");
 			
-			httpHeaders = getRawHeaders(); // TO DO make a funciton to add unknonw header s too
+			httpHeaders = getRawHeaders(); // OPTIMIZATION unknown headers
 			httpHeaders->erase(httpHeaders->size() - 2);
 
 			writeChain.pushBack(httpHeaders);

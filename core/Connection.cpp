@@ -20,7 +20,6 @@ _module(*this)
 		throw Connectionfailed();
 	}
 	subRead();
-	std::cout << "Connection fd " << _socket << std::endl;
 }
 
 Connection::Connection(const Connection& c) :
@@ -69,14 +68,12 @@ void Connection::setStreamRead(int fd)
 
 void Connection::subStreamWrite()
 {
-	// std::cout << "SUB WRITE " << _stream_write << std::endl;
 	FD_SET(_stream_write, _active_write);
 }
 
 
 void Connection::subStreamRead()
 {
-	// std::cout << "SUB STREAM READ " << _stream_read << std::endl;
 	FD_SET(_stream_read, _active_read);
 }
 
@@ -92,15 +89,12 @@ void Connection::unsubRead()
 
 void Connection::unsubStreamWrite()
 {
-	// std::cout << "UNSUB WRITE " << _stream_write << std::endl;
 	if (_stream_write != -1)
 		FD_CLR(_stream_write, _active_write);
 }
 
 void Connection::unsubStreamRead()
 {
-	// std::cout << "UNSUB STREAM READ " << _stream_read << std::endl;
-	// std::cout << "UNSUB READ " << _stream_read << std::endl;
 	if (_stream_read != -1)
 		FD_CLR(_stream_read, _active_read);
 }
@@ -124,22 +118,6 @@ int counter = 0;
 
 int	Connection::isStreamReadReady(fd_set* set)
 {
-	// if (_stream_read == 63)
-	// {
-	// 	counter += 1;
-	// }
-
-	// if (counter > 100)
-	// {
-	// 	char buff[500];
-
-	// 	int ret = ::read(_stream_read, buff, 500);
-	// 	std::cout << "What the actual fuck" << std::endl;
-	// 	std::cout << ret << "   |" << buff << "|" << std::endl;
-	// 	std::cout << "plz be happy: " << FD_ISSET(_stream_read, _active_read) << std::endl;
-	// 	sleep(5000);
-	// }
-	// std::cout << "isstreameread ready fd: " << _stream_read << "   inset: " << FD_ISSET(_stream_read, set) << std::endl;
 	return _stream_read != -1 && FD_ISSET(_stream_read, set);
 }
 
@@ -152,8 +130,6 @@ void Connection::read()
 	{
 		read = BufferChain::readToBuffer(_read_chain, _socket);
 		// Log::debug(read);
-		// std::cout << "@@@@@@@@@ Connection read" << std::endl;
-		// std::cout << _read_chain << std::endl;
 	}
 	catch(const BufferChain::IOError& e)
 	{

@@ -1,9 +1,8 @@
 #if !defined(HTTP)
 #define HTTP
 
-
+#include <sstream>
 #include <string>
-#include <sstream> // TO DO is this legal ?
 
 #include "core/BufferChain.hpp"
 #include "core/Config.hpp"
