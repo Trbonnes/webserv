@@ -196,8 +196,8 @@ void	CgiResponse::handleStreamRead(BufferChain& readChain, BufferChain& writeCha
                 writeChain.pushBack(body);
             }
 			_streamBuffer.clear();
+		    _headersReceived = true;
 		}
-		_headersReceived = true;
 	}
 	else
 	{
