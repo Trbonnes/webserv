@@ -6,7 +6,7 @@
 /*   By: yorn <yorn@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/09 15:13:35 by trbonnes          #+#    #+#             */
-/*   Updated: 2021/04/01 01:59:25 by yorn             ###   ########.fr       */
+/*   Updated: 2021/04/01 19:23:32 by yorn             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -156,10 +156,10 @@ std::string             ConfigServer::getLocation(std::string uri)
     while (itBegin != itEnd)
     {
         length = itBegin->first.length();
-        if (itBegin->first[length - 1] == '*')
+        if (itBegin->first[length - 1] == '*' || itBegin->first[length - 1] == '/')
             location = itBegin->first.substr(0, length - 1);
         else
-            location = itBegin->first;        
+            location = itBegin->first;
         if (uri.find(location) != std::string::npos)
             return (itBegin->first);
         itBegin++;

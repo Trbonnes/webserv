@@ -251,6 +251,7 @@ static std::string    acceptLanguage(ResponseContext& ctx, std::string& root)
     std::string trydir;
     struct stat dir;
 
+
     if (!ctx.config->getLanguage(ctx.location).empty())
     {
         itClientBegin = ctx.request->getAcceptLanguage().begin();
@@ -314,7 +315,7 @@ static void       initRoute(ResponseContext& ctx)
         ctx.language = acceptLanguage(ctx, route);
         if (ctx.language != "")
             route.append(ctx.language).append("/");
-        route.append(uri.substr(ctx.location.size() - (ctx.location[ctx.location.size() - 1] == '*')));
+        route.append(uri.substr(ctx.location.size() - (ctx.location[ctx.location.size() - 1] == '*' || ctx.location[ctx.location.size() - 1] == '/')));
     }
     ret = stat(route.c_str(), &file);
     // if is file  exists or put request we're done
@@ -330,12 +331,18 @@ static void       initRoute(ResponseContext& ctx)
     if (isCgiExtension(ctx.config, ctx.location, extension))
     {
         ctx.route = route;
+        std::cout << "Here" << std::endl;
         return ;
     }
     // ** Else, add index if it is not a put or delete request **
     itIndexBegin = ctx.config->getIndex(ctx.location).begin();
     itIndexEnd = ctx.config->getIndex(ctx.location).end();
-    stat(route.c_str(), &file);
+    // if ile does not exist and cgi incompatible
+    if (stat(route.c_str(), &file))
+    {
+        ctx.route = route;
+        return ;
+    }
     str.assign(route);
     while (itIndexBegin != itIndexEnd && !S_ISREG(file.st_mode))
     {
