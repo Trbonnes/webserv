@@ -306,24 +306,36 @@ static void       initRoute(ResponseContext& ctx)
             if (((file.st_mode & S_IFMT) == S_IFDIR))
                 alias.append("/");
             route.assign(alias);
-            route.append(uri.substr(ctx.location.size()));
         }
     }
-    else 
+    else
     {
-        route.assign(root.substr(0, root.size() - (root[root.size() - 1] == '*')));
-        ctx.language = acceptLanguage(ctx, route);
-        if (ctx.language != "")
-            route.append(ctx.language).append("/");
-        route.append(uri.substr(ctx.location.size() - (ctx.location[ctx.location.size() - 1] == '*' || ctx.location[ctx.location.size() - 1] == '/')));
+        route.assign(root);
+        route.append(uri);
     }
+
     ret = stat(route.c_str(), &file);
     // if is file  exists or put request we're done
-    if ((ret == 0 && S_ISREG(file.st_mode)) || ctx.request->getMethod() == "PUT" || ctx.request->getMethod() == "DELETE")
+    if ((ret == 0 && S_ISREG(file.st_mode)) || ctx.request->getMethod() == "PUT" || (((file.st_mode & S_IFMT) == S_IFDIR) && ctx.request->getMethod() == "DELETE"))
     {
         ctx.route = route;
         return ;
     }
+
+    route.assign(root);
+    if (alias.length() > 0)
+    {
+        if (stat(alias.c_str(), &file) != -1)
+        {
+            if (((file.st_mode & S_IFMT) == S_IFDIR))
+                alias.append("/");
+            route.assign(alias);
+        }
+    }
+    ctx.language = acceptLanguage(ctx, route);
+    if (ctx.language != "")
+        route.append(ctx.language).append("/");
+    route.append(uri.substr(ctx.location.size() - (ctx.location[ctx.location.size() - 1] == '*' || ctx.location[ctx.location.size() - 1] == '/')));
     
     size_t pos = route.find_last_of('.');
     std::string extension(route);
@@ -331,9 +343,15 @@ static void       initRoute(ResponseContext& ctx)
     if (isCgiExtension(ctx.config, ctx.location, extension))
     {
         ctx.route = route;
-        std::cout << "Here" << std::endl;
         return ;
     }
+
+    if ((ret == 0 && S_ISREG(file.st_mode)) || (ctx.request->getMethod() == "DELETE" && route.compare(ctx.location)))
+    {
+        ctx.route = route;
+        return ;
+    }
+
     // ** Else, add index if it is not a put or delete request **
     itIndexBegin = ctx.config->getIndex(ctx.location).begin();
     itIndexEnd = ctx.config->getIndex(ctx.location).end();
