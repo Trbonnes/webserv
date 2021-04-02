@@ -6,7 +6,7 @@
 /*   By: yorn <yorn@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/30 15:45:46 by trbonnes          #+#    #+#             */
-/*   Updated: 2021/03/31 21:04:39 by yorn             ###   ########.fr       */
+/*   Updated: 2021/04/02 16:24:15 by yorn             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,10 +107,16 @@ HttpRequest* HttpRequest::parseRequest(std::string &request) {
 	HttpRequest *socket;
 
 	socket = new HttpRequest();
-	httpRequestParseRequestLine(request, socket);
-	httpRequestParseHeaders(request, socket);
-	// httpRequestParseBody(request, socket);
-	// request.clear();
+	try
+	{
+		httpRequestParseRequestLine(request, socket);
+		httpRequestParseHeaders(request, socket);
+	}
+	catch(const std::exception& e)
+	{
+		delete socket;
+		throw;
+	}
 	return socket;
 }
 

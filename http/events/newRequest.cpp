@@ -23,7 +23,14 @@ void Http::handleNewRequest()
 		}
 		_requestBuffer.clear();
 		// Instantiate new request
-		_req = HttpRequest::parseRequest(request);
+		try
+		{
+			_req = HttpRequest::parseRequest(request);
+		}
+		catch(const std::exception& e)
+		{
+			_req = new HttpRequest();
+		}
 		// Instantiate a new response from that request
 		_resp = HttpResponse::newResponse(_req, _config->getServerUnit(_req->getPort(), _req->getHost()), _write_chain);	
 		// Adding streams in select fd sets
