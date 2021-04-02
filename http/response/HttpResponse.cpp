@@ -310,13 +310,14 @@ static void       initRoute(ResponseContext& ctx)
     }
     else
     {
+        std::cout << "/* message */" << std::endl;
         route.assign(root);
         route.append(uri);
     }
 
     ret = stat(route.c_str(), &file);
     // if is file  exists or put request we're done
-    if ((ret == 0 && S_ISREG(file.st_mode)) || ctx.request->getMethod() == "PUT" || (((file.st_mode & S_IFMT) == S_IFDIR) && ctx.request->getMethod() == "DELETE"))
+    if ((ret == 0 && S_ISREG(file.st_mode)) || ctx.request->getMethod() == "PUT" || ((ret == 0 && (file.st_mode & S_IFMT) == S_IFDIR) && ctx.request->getMethod() == "DELETE"))
     {
         ctx.route = route;
         return ;
