@@ -310,7 +310,6 @@ static void       initRoute(ResponseContext& ctx)
     }
     else
     {
-        std::cout << "/* message */" << std::endl;
         route.assign(root);
         route.append(uri);
     }

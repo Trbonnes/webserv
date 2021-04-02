@@ -129,7 +129,6 @@ void Connection::read()
 	try
 	{
 		read = BufferChain::readToBuffer(_read_chain, _socket);
-		// Log::debug(read);
 	}
 	catch(const BufferChain::IOError& e)
 	{
@@ -144,13 +143,20 @@ void Connection::read()
 
 void Connection::write()
 {
+	size_t ret;
+	std::string* buff;
 	// Log::debug("Connection::write");
 	try
 	{
-		BufferChain::writeBufferToFd(_write_chain, _socket);
-		std::string* buff = _write_chain.getFirst();
-		delete buff;
-		_write_chain.popFirst();
+		ret = BufferChain::writeBufferToFd(_write_chain, _socket);
+		if (ret != 0)
+		{
+			buff = _write_chain.getFirst();
+			_write_chain.popFirst();
+			if (ret < buff->size())
+				_write_chain.pushFront(new std::string(*buff, ret));
+			delete buff;
+		}
 		if (_write_chain.getFirst() == NULL)
 			unsubWrite();
 	}

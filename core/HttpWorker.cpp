@@ -26,7 +26,7 @@ void	HttpWorker::acceptConnection(int s)
 	}
 	catch(const std::exception& e)
 	{
-		std::cerr << "Couldn't open connection : " << e.what() << std::endl;
+		(void) e;
 	}
 }
 
@@ -75,13 +75,11 @@ void	HttpWorker::run()
 			{
 				if (c->isStreamWriteReady(&write_fs))
 					c->streamWrite();
-				
-				if (c->isWriteReady(&write_fs))
+				else if (c->isWriteReady(&write_fs))
 					c->write();
-				
-				if (c->isStreamReadReady(&read_fs))
+				else if (c->isStreamReadReady(&read_fs))
 					c->streamRead();
-				if (c->isReadReady(&read_fs))
+				else if (c->isReadReady(&read_fs))
 					c->read();
 			}
 			catch(const std::exception& e)
